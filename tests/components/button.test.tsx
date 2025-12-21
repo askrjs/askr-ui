@@ -132,6 +132,27 @@ describe('Button', () => {
     document.body.removeChild(child);
   });
 
+  it('should call both existing onclick and provided onClick given asChild and child with existing handler when clicked', () => {
+    const child = document.createElement('button');
+    const existing = vi.fn();
+    child.onclick = existing;
+
+    const added = vi.fn();
+    Button({ asChild: true, children: child, onClick: added } as any);
+
+    child.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(existing).toHaveBeenCalled();
+    expect(added).toHaveBeenCalled();
+  });
+
+  it('should not add role or tabIndex given asChild when child is native button', () => {
+    const child = document.createElement('button');
+    Button({ asChild: true, children: child } as any);
+
+    expect(child.getAttribute('role')).toBe(null);
+    expect(child.getAttribute('tabindex')).toBe(null);
+  });
+
   it('should prevent default on Space keydown given asChild when keydown occurs', () => {
     const fn = vi.fn();
     const child = document.createElement('a');

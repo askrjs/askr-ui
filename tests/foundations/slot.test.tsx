@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { Slot } from '../../src/foundations/slot';
 
 describe('Slot', () => {
@@ -29,6 +29,27 @@ describe('Slot', () => {
     const objRef: any = { current: null };
     Slot({ asChild: true, children: child, ref: objRef } as any);
     expect(objRef.current).toBe(child);
+  });
+
+  it('should merge event handlers and preserve existing onclick when asChild', () => {
+    const child = document.createElement('button');
+    const existing = vi.fn();
+    child.onclick = existing;
+
+    const added = vi.fn();
+    Slot({ asChild: true, children: child, onClick: added } as any);
+
+    child.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(existing).toHaveBeenCalled();
+    expect(added).toHaveBeenCalled();
+  });
+
+  it('should prefer DOM properties over attributes when setting props', () => {
+    const child = document.createElement('button');
+    Slot({ asChild: true, children: child, disabled: true } as any);
+    expect((child as HTMLButtonElement).disabled).toBe(true);
+    // Attribute may be present (empty string) due to how browsers reflect boolean attributes
+    expect(child.hasAttribute('disabled')).toBe(true);
   });
 
   it('should return a wrapper span given not asChild when rendered', () => {

@@ -21,7 +21,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
-    "test:types": "npm run build && node scripts/generate-dist-test.cjs && tsd",
+    "test:types": "npm run build && node scripts/generate-dist-test.js && tsd",
     "bench": "cross-env NODE_ENV=production vitest bench --run --reporter=default --config vitest.bench.config.ts",
     "fmt": "prettier --write .",
     "lint": "eslint src tests benches --ext .ts,.tsx"
