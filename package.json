@@ -39,11 +39,11 @@
     "tsd": "^0.33.0",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.50.0",
+    "typescript-eslint": "^8.50.1",
     "vite": "^7.3.0",
     "vitest": "^4.0.16"
   },
   "dependencies": {
-    "@askrjs/askr": "^0.0.1"
+    "@askrjs/askr": "^0.0.2"
   }
 }
