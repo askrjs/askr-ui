@@ -9,6 +9,4 @@ export type AskRComponent = {
 export function createAskRComponent(name: string): AskRComponent {
   return { name };
 }
-
-export * from './foundations';
 export * from './components';
