@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Headless askr components",
   "type": "module",
-  "packageManager": "npm",
+  "packageManager": "npm@11.7.0",
   "license": "Apache-2.0",
   "sideEffects": false,
   "main": "./dist/index.js",
@@ -28,8 +28,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "@types/node": "^25.0.3",
-    "axe-core": "^4.11.0",
+    "@types/node": "^25.0.6",
+    "axe-core": "^4.11.1",
     "cross-env": "^10.1.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
@@ -39,19 +39,11 @@
     "tsd": "^0.33.0",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
-<<<<<<< HEAD
-    "typescript-eslint": "^8.50.1",
-=======
-    "typescript-eslint": "^8.51.0",
->>>>>>> e883998f4e3d748a01295131ee8a806523002168
-    "vite": "^7.3.0",
+    "typescript-eslint": "^8.52.0",
+    "vite": "^7.3.1",
     "vitest": "^4.0.16"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "@askrjs/askr": "^0.0.2"
-=======
-    "@askrjs/askr": "^0.0.6"
->>>>>>> e883998f4e3d748a01295131ee8a806523002168
+    "@askrjs/askr": "^0.0.8"
   }
 }
