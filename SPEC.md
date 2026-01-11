@@ -94,91 +94,135 @@ Components must:
 
 ## Component Inventory
 
+### Status Legend
+
+- ✅ **Complete**: Fully implemented with tests, benches, and exported
+- 🚧 **In Progress**: Implementation started but not exported
+- ⏳ **Planned**: Not yet started
+- ⚠️ **Blocked**: Needs architectural decision
+
 ### Inputs & Controls
 
-- Button
-- Toggle / ToggleGroup
-- Checkbox
-- Radio / RadioGroup
-- Switch
-- TextInput
-- TextArea
-- Select (Listbox)
-- Combobox
-- Slider
-- RangeSlider
-- NumberInput
-- FileInput
+- ✅ Button — Complete with behavior, a11y, and determinism tests
+- ✅ Toggle — Complete with behavior, a11y, and determinism tests
+- ⚠️ Checkbox — Blocked: needs non-button foundation (role="checkbox")
+- ⏳ Radio / RadioGroup
+- ⚠️ Switch — Blocked: needs non-button foundation (role="switch")
+- ⏳ TextInput
+- ⏳ TextArea
+- ⏳ Select (Listbox)
+- ⏳ Combobox
+- ⏳ Slider
+- ⏳ RangeSlider
+- ⏳ NumberInput
+- ⏳ FileInput
 
 ---
 
 ### Overlays
 
-- Dialog / Modal
-- AlertDialog
-- Popover
-- Tooltip
-- HoverCard
-- Drawer / Sheet
-- ContextMenu
+- ⏳ Dialog / Modal
+- ⏳ AlertDialog
+- ⏳ Popover
+- ⏳ Tooltip
+- ⏳ HoverCard
+- ⏳ Drawer / Sheet
+- ⏳ ContextMenu
 
 ---
 
 ### Navigation & Disclosure
 
-- Accordion
-- Collapsible
-- Tabs
-- Menu / MenuBar
-- DropdownMenu
-- NavigationMenu
-- Breadcrumbs (logic only)
+- ⚠️ **Collapsible** — Blocked: needs context API (createContext/readContext not in askr v0.0.9)
+- ⏳ Accordion — Blocked: depends on Collapsible
+- ⏳ Tabs
+- ⏳ Menu / MenuBar
+- ⏳ DropdownMenu
+- ⏳ NavigationMenu
+- ⏳ Breadcrumbs (logic only)
 
 ---
 
 ### Data Display
 
-- Table (headless)
-- DataGrid (advanced)
-- Listbox
-- TreeView
-- VirtualList
-- Pagination
-- InfiniteScroll controller
+- ⏳ Table (headless)
+- ⏳ DataGrid (advanced)
+- ⏳ Listbox
+- ⏳ TreeView
+- ⏳ VirtualList
+- ⏳ Pagination
+- ⏳ InfiniteScroll controller
 
 ---
 
 ### Feedback & Status
 
-- Toast (headless store + lifecycle)
-- Progress
-- Spinner (logic only)
-- Skeleton (presence + timing)
-- Badge (semantics only)
+- ⏳ Toast (headless store + lifecycle)
+- ⏳ Progress
+- ⏳ Spinner (logic only)
+- ⏳ Skeleton (presence + timing)
+- ⏳ Badge (semantics only)
 
 ---
 
 ### Forms
 
-- Form
-- Field
-- Fieldset
-- Label
-- ErrorMessage
-- HelpText
-- Validation orchestration (sync + async)
+- ⏳ Form
+- ⏳ Field
+- ⏳ Fieldset
+- ⏳ Label
+- ⏳ ErrorMessage
+- ⏳ HelpText
+- ⏳ Validation orchestration (sync + async)
 
 ---
 
 ### Advanced Primitives
 
-- Command / CommandPalette
-- Typeahead
-- Autocomplete
-- DragAndDrop (minimal, extensible)
-- ResizeObserver primitive
-- IntersectionObserver primitive
-- ScrollArea (logic only)
+- ⏳ Command / CommandPalette
+- ⏳ Typeahead
+- ⏳ Autocomplete
+- ⏳ DragAndDrop (minimal, extensible)
+- ⏳ ResizeObserver primitive
+- ⏳ IntersectionObserver primitive
+- ⏳ ScrollArea (logic only)
+
+---
+
+## Implementation Notes
+
+### Foundation Architecture
+
+The current `pressable` foundation from `@askrjs/askr/foundations` is optimized for button-like semantics:
+
+- Applies `role="button"`
+- Handles Enter/Space keyboard activation
+- Manages disabled state and aria-disabled
+- Perfect for: Button, Toggle, and button-like controls
+
+**Components blocked pending foundation work:**
+
+- **Checkbox**: Requires `role="checkbox"` and `aria-checked` (not `aria-pressed`)
+- **Switch**: Requires `role="switch"` and `aria-checked` (not `aria-pressed`)
+- **Radio**: Requires `role="radio"` and roving tab index patterns
+
+### Next Steps
+
+1. **Architectural Decision**: Define additional foundation primitives
+   - `checkable` foundation for checkbox/radio/switch semantics
+   - `tabbable` foundation for roving tabindex patterns
+2. **Component Priorities**: Focus on components that fit current foundations:
+   - ToggleGroup (extends Toggle)
+   - Collapsible (uses button trigger)
+   - Accordion (uses button triggers)
+   - Dialog system (uses button triggers)
+
+3. **Testing Infrastructure**: All components require:
+   - Behavior tests (`.behavior.test.tsx`)
+   - Accessibility tests with axe (`.a11y.test.tsx`)
+   - Determinism tests (`.determinism.test.tsx`)
+   - Benchmarks (`.bench.tsx`)
+   - Type tests (`.test-d.ts` - to be added)
 
 ---
 
@@ -248,3 +292,59 @@ askr-ui is successful if:
 - Accessibility bugs are rare and centralized
 - Design systems can wrap components without friction
 - Behavior remains predictable under load and stress
+
+---
+
+## Current Status (January 2026)
+
+### ✅ Completed & Exported (2 components)
+
+1. **Button** — Full implementation
+   - Behavior tests: 27 tests passing
+   - Accessibility tests: 20 tests passing (with axe)
+   - Determinism tests: 14 tests passing
+   - Benchmarks: 8 benches
+   - Supports native `<button>` and `asChild` polymorphism
+   - Uses `pressable` foundation for interaction
+
+2. **Toggle** — Full implementation
+   - Behavior tests: 21 tests passing
+   - Accessibility tests: 22 tests passing (with axe)
+   - Determinism tests: 15 tests passing
+   - Benchmarks: 5 benches
+   - Supports `aria-pressed` toggle semantics
+   - Uses `pressable` foundation for interaction
+
+### 🚧 Partially Implemented (not exported)
+
+- **Checkbox** — Implementation exists but blocked
+  - Component file created with all props and types
+  - Comprehensive test suite written (50 tests)
+  - Benchmarks defined
+  - **Blocked**: Needs `checkable` foundation instead of `pressable`
+  - Current `pressable` adds `role="button"` which conflicts with checkbox semantics
+
+### ⏳ Not Yet Started
+
+All other components in the inventory (see Component Inventory section above).
+
+---
+
+## Summary
+
+**What's working:**
+
+- Foundation architecture with `pressable` works excellently for button-like controls
+- Test infrastructure is solid (behavior + a11y + determinism + benches)
+- Component patterns are consistent and maintainable
+- Export policy ensures only production-ready components are public
+
+**What's next:**
+
+- Define `checkable` foundation for checkbox/radio/switch patterns
+- Implement ToggleGroup (extends Toggle pattern)
+- Begin work on Disclosure components (Collapsible, Accordion)
+- Set up Dialog system components
+
+**Key insight:**
+Not all interactive elements map to button semantics. The library needs multiple foundation primitives to support the full ARIA pattern library while maintaining the same quality standards established by Button and Toggle.
