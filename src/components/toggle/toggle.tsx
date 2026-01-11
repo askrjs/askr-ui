@@ -1,11 +1,12 @@
 import { Slot, pressable, mergeProps } from '@askrjs/askr/foundations';
-import type { ButtonButtonProps, ButtonAsChildProps } from './button.types';
+import type { ToggleButtonProps, ToggleAsChildProps } from './toggle.types';
 
 /**
- * Headless Button component
+ * Headless Toggle component
  *
  * ## Responsibilities
  * - Compose pressable foundation for interaction behavior
+ * - Apply aria-pressed for toggle state signaling
  * - Enforce type="button" default to prevent accidental form submission
  * - Forward props and refs to native button or child element
  *
@@ -13,39 +14,39 @@ import type { ButtonButtonProps, ButtonAsChildProps } from './button.types';
  * - Keyboard event handling (Enter/Space)
  * - Pointer event handling
  * - Disabled state enforcement
- * - ARIA attribute application
+ * - Role attribute application (for non-native elements)
  *
  * ## Invariants
  * - MUST NOT contain any event handler logic
- * - MUST NOT check disabled prop directly
+ * - MUST NOT check disabled or pressed props directly
  * - MUST use pressable() for ALL interaction behavior
  * - MUST use mergeProps() for ALL prop composition
+ * - pressed state is CONTROLLED (consumer manages state)
  *
- * @example Native button (prevents accidental submit)
+ * @example Native toggle button
  * ```tsx
- * <Button onPress={handleSave}>Save</Button>
- * ```
- *
- * @example Explicit form submission
- * ```tsx
- * <Button type="submit" onPress={handleSubmit}>Submit</Button>
+ * const [pressed, setPressed] = useState(false);
+ * <Toggle pressed={pressed} onPress={() => setPressed(!pressed)}>
+ *   Mute
+ * </Toggle>
  * ```
  *
  * @example Polymorphic rendering (asChild)
  * ```tsx
- * <Button asChild onPress={handleNav}>
- *   <a href="/home">Home</a>
- * </Button>
+ * <Toggle asChild pressed={muted} onPress={toggleMute}>
+ *   <span>🔇</span>
+ * </Toggle>
  * ```
  */
-export function Button(props: ButtonButtonProps): JSX.Element;
-export function Button(props: ButtonAsChildProps): JSX.Element;
-export function Button(props: ButtonButtonProps | ButtonAsChildProps) {
+export function Toggle(props: ToggleButtonProps): JSX.Element;
+export function Toggle(props: ToggleAsChildProps): JSX.Element;
+export function Toggle(props: ToggleButtonProps | ToggleAsChildProps) {
   const {
     asChild,
     children,
     onPress,
     type: typeProp,
+    pressed = false,
     disabled = false,
     ref,
     ...rest
@@ -58,8 +59,12 @@ export function Button(props: ButtonButtonProps | ButtonAsChildProps) {
     isNativeButton: !asChild,
   });
 
-  // Prop composition: merge user props, interaction props, and ref
-  const finalProps = mergeProps(rest, { ...interactionProps, ref });
+  // Prop composition: merge user props, interaction props, aria-pressed, and ref
+  const finalProps = mergeProps(rest, {
+    ...interactionProps,
+    'aria-pressed': String(pressed),
+    ref,
+  });
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;
