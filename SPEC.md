@@ -94,21 +94,6 @@ Components must:
 
 ## Component Inventory
 
-### Foundations
-
-- Slot / AsChild
-- Presence
-- FocusScope
-- FocusTrap
-- RovingFocus
-- DismissableLayer
-- Portal
-- VisuallyHidden
-- Id / Label / Description helpers
-- Keyboard intent helpers
-
----
-
 ### Inputs & Controls
 
 - Button

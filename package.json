@@ -34,16 +34,24 @@
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "jiti": "^2.6.1",
-    "jsdom": "^27.3.0",
+    "jsdom": "^27.4.0",
     "prettier": "^3.7.4",
     "tsd": "^0.33.0",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
+<<<<<<< HEAD
     "typescript-eslint": "^8.50.1",
+=======
+    "typescript-eslint": "^8.51.0",
+>>>>>>> e883998f4e3d748a01295131ee8a806523002168
     "vite": "^7.3.0",
     "vitest": "^4.0.16"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@askrjs/askr": "^0.0.2"
+=======
+    "@askrjs/askr": "^0.0.6"
+>>>>>>> e883998f4e3d748a01295131ee8a806523002168
   }
 }

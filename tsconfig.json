@@ -4,11 +4,7 @@
     "module": "ESNext",
     "lib": ["ES2020", "DOM"],
     "jsx": "preserve",
-    "jsxImportSource": "askr-jsx",
-    "paths": {
-      "askr-jsx": ["./src/jsx"],
-      "askr-jsx/*": ["./src/jsx/*"]
-    },
+    "jsxImportSource": "@askrjs/askr",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
