@@ -1,4 +1,4 @@
-import { Slot } from '../../foundations/slot';
+import { Slot } from '@askrjs/askr';
 
 // Polymorphic types for Button
 export type ButtonOwnProps = {
@@ -14,6 +14,7 @@ export type ButtonButtonProps = ButtonOwnProps & {
 
 // Overloads: native button vs asChild
 export function Button(props: ButtonButtonProps): HTMLButtonElement;
+
 export function Button<T extends Element = Element>(
   props: { asChild: true; children: T } & ButtonOwnProps & {
       ref?: ((el: T | null) => void) | { current: T | null } | null;
@@ -32,52 +33,135 @@ export function Button(props: any) {
   } = props;
 
   if (asChild) {
-    const child =
-      children && children instanceof Element ? (children as Element) : null;
+    // If a real DOM node was passed as the child (used by tests), apply props directly
+    const child = children && children instanceof Element ? children as Element : null;
+
+    if (child) {
+      // Merge attributes (skip forwarding `type` which shouldn't be applied to non-button anchors)
+      Object.keys(rest).forEach((key) => {
+        if (key === 'type') return;
+        const val = (rest as any)[key];
+        if (val == null) return;
+        if (key === 'className') (child as any).className = val;
+        else child.setAttribute(key, String(val));
+      });
+
+      const tag = child.tagName.toLowerCase();
+
+      // Disabled semantics
+      if (disabled) {
+        if (tag === 'button') {
+          (child as HTMLButtonElement).disabled = true;
+        } else {
+          child.setAttribute('aria-disabled', 'true');
+          (child as any).tabIndex = -1;
+        }
+      }
+
+      // Non-button children get role/tabindex and keyboard activation
+      if (tag !== 'button') {
+        if (!child.hasAttribute('role')) child.setAttribute('role', 'button');
+        // Ensure element is focusable in jsdom (anchors without href are not focusable)
+        (child as any).tabIndex = disabled ? -1 : 0;
+
+        const keydown = (e: KeyboardEvent) => {
+          if (disabled) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return;
+          }
+          const key = (e as KeyboardEvent).key;
+          if (key === 'Enter' || key === ' ' || key === 'Spacebar') {
+            e.preventDefault();
+            // Trigger a click on the element so consumers see a normal activation event
+            child.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+          }
+        };
+
+        child.addEventListener('keydown', keydown as any);
+      }
+
+      // Ensure clicks are suppressed when disabled (capture phase to stop other handlers)
+      child.addEventListener(
+        'click',
+        (e: Event) => {
+          if (disabled) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return;
+          }
+        },
+        true
+      );
+
+      // Add our onClick handler (bubble phase so existing onclick handlers still run)
+      if (onClick) {
+        child.addEventListener('click', (e: Event) => {
+          if (disabled) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return;
+          }
+          onClick(e);
+        });
+      }
+
+      // Forward ref (object or function)
+      if (ref) {
+        if (typeof ref === 'function') ref(child);
+        else if (typeof ref === 'object') (ref as any).current = child;
+      }
+
+      return child;
+    }
+
+    // Fallback: if child is not a DOM node (JSX usage), use Slot semantics
     const extra: any = {};
 
-    // If the child is not a native <button>, add role/tabIndex and keyboard activation
-    if (child && child.tagName.toLowerCase() !== 'button') {
-      extra.role = 'button';
-      extra.tabIndex = disabled ? -1 : 0;
+    if (props && props.children && !(props.children instanceof Element)) {
+      if (props.children && props.children.tagName && props.children.tagName.toLowerCase() !== 'button') {
+        extra.role = 'button';
+        extra.tabIndex = disabled ? -1 : 0;
 
-      extra.onKeyDown = (e: KeyboardEvent) => {
+        extra.onKeyDown = (e: KeyboardEvent) => {
+          if (disabled) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          const key = (e as KeyboardEvent).key;
+          if (key === 'Enter' || key === ' ' || key === 'Spacebar') {
+            e.preventDefault();
+            (props.children as any).dispatchEvent(new MouseEvent('click', { bubbles: true }));
+          }
+        };
+      }
+
+      extra.onClick = (e: Event) => {
         if (disabled) {
           e.preventDefault();
           e.stopPropagation();
           return;
         }
-        const key = (e as KeyboardEvent).key;
-        if (key === 'Enter' || key === ' ' || key === 'Spacebar') {
-          e.preventDefault();
-          // Trigger a click on the element so consumers see a normal activation event
-          (child as any).dispatchEvent(
-            new MouseEvent('click', { bubbles: true })
-          );
-        }
+        if (onClick) onClick(e);
       };
-    }
 
-    // Handle click activation and disabled suppression
-    extra.onClick = (e: Event) => {
       if (disabled) {
-        e.preventDefault();
-        e.stopPropagation();
-        return;
+        if (props.children && props.children.tagName && props.children.tagName.toLowerCase() === 'button') {
+          extra.disabled = true;
+        } else {
+          extra['aria-disabled'] = 'true';
+        }
       }
-      if (onClick) onClick(e);
-    };
 
-    // Disabled semantics
-    if (disabled) {
-      if (child && child.tagName.toLowerCase() === 'button') {
-        extra.disabled = true;
-      } else {
-        extra['aria-disabled'] = 'true';
-      }
+      if (ref) extra.ref = ref;
+
+      return (
+        <Slot asChild {...rest} {...extra}>
+          {children}
+        </Slot>
+      );
     }
-
-    if (ref) extra.ref = ref;
 
     return (
       <Slot asChild {...rest} {...extra}>
