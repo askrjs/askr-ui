@@ -28,29 +28,30 @@ describe('Toggle — Determinism', () => {
   });
 
   describe('Repeatable Outcomes', () => {
-    it('should render identically given same props (run 1)', () => {
-      container = mount(<Toggle pressed={false}>Toggle</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.getAttribute('aria-pressed')).toBe('false');
-      expect(button?.getAttribute('type')).toBe('button');
+    it('should produce identical DOM given identical props across mounts', () => {
+      container = mount(
+        <Toggle pressed={false} type="button">
+          Toggle
+        </Toggle>
+      );
+      const html1 = container.innerHTML;
+
+      unmount(container);
+
+      container = mount(
+        <Toggle pressed={false} type="button">
+          Toggle
+        </Toggle>
+      );
+      const html2 = container.innerHTML;
+
+      expect(html1).toBe(html2);
     });
 
-    it('should render identically given same props (run 2)', () => {
-      container = mount(<Toggle pressed={false}>Toggle</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.getAttribute('aria-pressed')).toBe('false');
-      expect(button?.getAttribute('type')).toBe('button');
-    });
+    it('should fire onPress in consistent order given multiple interactions', () => {
+      const calls: string[] = [];
+      const onPress = vi.fn(() => calls.push('press'));
 
-    it('should render identically given same props (run 3)', () => {
-      container = mount(<Toggle pressed={false}>Toggle</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.getAttribute('aria-pressed')).toBe('false');
-      expect(button?.getAttribute('type')).toBe('button');
-    });
-
-    it('should call onPress same number of times given repeated clicks', () => {
-      const onPress = vi.fn();
       container = mount(<Toggle onPress={onPress}>Toggle</Toggle>);
       const button = container.querySelector('button')!;
 
@@ -58,6 +59,7 @@ describe('Toggle — Determinism', () => {
       button.click();
       button.click();
 
+      expect(calls).toEqual(['press', 'press', 'press']);
       expect(onPress).toHaveBeenCalledTimes(3);
     });
   });
@@ -70,21 +72,54 @@ describe('Toggle — Determinism', () => {
       expect(button).toBeDefined();
     });
 
+    it('should not use timers given component is scheduler-safe', () => {
+      const setTimeoutSpy = vi.spyOn(global, 'setTimeout');
+      const setIntervalSpy = vi.spyOn(global, 'setInterval');
+
+      container = mount(<Toggle>Toggle</Toggle>);
+
+      expect(setTimeoutSpy).not.toHaveBeenCalled();
+      expect(setIntervalSpy).not.toHaveBeenCalled();
+
+      setTimeoutSpy.mockRestore();
+      setIntervalSpy.mockRestore();
+    });
+
     it('should call onPress synchronously given click', () => {
-      let callCount = 0;
-      const onPress = () => {
-        callCount++;
-      };
+      const onPress = vi.fn();
       container = mount(<Toggle onPress={onPress}>Toggle</Toggle>);
       const button = container.querySelector('button')!;
 
-      button.click();
-      // onPress called synchronously, no setTimeout or Promise
-      expect(callCount).toBe(1);
+      const result = button.click();
+
+      expect(result).toBeUndefined();
+      expect(onPress).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('No Side Effects', () => {
+    it('should not mutate global scope given component isolation', () => {
+      const beforeKeys = Object.keys(globalThis);
+
+      container = mount(<Toggle>Toggle</Toggle>);
+
+      const afterKeys = Object.keys(globalThis);
+      expect(afterKeys.length).toBe(beforeKeys.length);
+    });
+
+    it('should not modify DOM outside container given scoped mutations', () => {
+      const externalDiv = document.createElement('div');
+      externalDiv.id = 'external-toggle-test';
+      document.body.appendChild(externalDiv);
+
+      container = mount(<Toggle>Toggle</Toggle>);
+
+      const stillThere = document.getElementById('external-toggle-test');
+      expect(stillThere).toBe(externalDiv);
+
+      document.body.removeChild(externalDiv);
+    });
+
     it('should NOT mutate external state given render', () => {
       const externalState = { count: 0 };
       container = mount(
@@ -104,6 +139,19 @@ describe('Toggle — Determinism', () => {
       const onPress = vi.fn();
       container = mount(<Toggle onPress={onPress}>Toggle</Toggle>);
       expect(onPress).not.toHaveBeenCalled();
+    });
+
+    it('should clean up when unmounted given no leaked listeners', () => {
+      const onPress = vi.fn();
+      container = mount(<Toggle onPress={onPress}>Toggle</Toggle>);
+      const button = container.querySelector('button')!;
+
+      button.click();
+      expect(onPress).toHaveBeenCalledTimes(1);
+
+      unmount(container);
+
+      expect(button.isConnected).toBe(false);
     });
   });
 
@@ -125,6 +173,23 @@ describe('Toggle — Determinism', () => {
       container = mount(<Toggle>Toggle</Toggle>);
       const button = container.querySelector('button');
       expect(button?.getAttribute('type')).toBe('button');
+    });
+
+    it('should render consistently given same prop values multiple times', () => {
+      const snapshots: string[] = [];
+
+      for (let i = 0; i < 3; i++) {
+        container = mount(
+          <Toggle pressed={false} type="button">
+            Toggle
+          </Toggle>
+        );
+        snapshots.push(container.innerHTML);
+        unmount(container);
+      }
+
+      expect(snapshots[0]).toBe(snapshots[1]);
+      expect(snapshots[1]).toBe(snapshots[2]);
     });
   });
 

@@ -18,7 +18,10 @@ describe('Button benches', () => {
 
   bench('activation - dispatch click on native button (with handler)', () => {
     const fn = () => {};
-    const el = Button({ children: 'x', onPress: fn } as ButtonButtonProps) as Element;
+    const el = Button({
+      children: 'x',
+      onPress: fn,
+    } as ButtonButtonProps) as Element;
     el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   });
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
- import { Toggle } from './toggle';
+import { Toggle } from './toggle';
 import { createIsland } from '@askrjs/askr';
 import { axe } from 'vitest-axe';
 import { TOGGLE_A11Y_CONTRACT } from './toggle.a11y';
@@ -33,7 +33,7 @@ describe('Toggle — Accessibility', () => {
     it('should have no automated axe violations given default toggle', async () => {
       container = mount(<Toggle>Toggle</Toggle>);
       const results = await axe(container);
-      
+
       if (results.violations.length > 0) {
         throw new Error(
           `Axe violations found:\n${results.violations
@@ -49,7 +49,7 @@ describe('Toggle — Accessibility', () => {
     it('should have no automated axe violations given pressed toggle', async () => {
       container = mount(<Toggle pressed={true}>Pressed</Toggle>);
       const results = await axe(container);
-      
+
       if (results.violations.length > 0) {
         throw new Error(
           `Axe violations found:\n${results.violations
@@ -65,7 +65,7 @@ describe('Toggle — Accessibility', () => {
     it('should have no automated axe violations given disabled toggle', async () => {
       container = mount(<Toggle disabled>Disabled</Toggle>);
       const results = await axe(container);
-      
+
       if (results.violations.length > 0) {
         throw new Error(
           `Axe violations found:\n${results.violations
@@ -85,7 +85,7 @@ describe('Toggle — Accessibility', () => {
         </Toggle>
       );
       const results = await axe(container);
-      
+
       if (results.violations.length > 0) {
         throw new Error(
           `Axe violations found:\n${results.violations
@@ -100,10 +100,10 @@ describe('Toggle — Accessibility', () => {
   });
 
   describe('Role & Semantics', () => {
-    it('should have role=button given native button', () => {
+    it('should have implicit button role given native button', () => {
       container = mount(<Toggle>Toggle</Toggle>);
       const button = container.querySelector('button');
-      expect(button?.getAttribute('role')).toBe('button');
+      expect(button?.tagName).toBe('BUTTON');
     });
 
     it('should have role=button given asChild with non-button element', () => {
@@ -121,7 +121,9 @@ describe('Toggle — Accessibility', () => {
     it('should apply aria-pressed attribute per contract', () => {
       container = mount(<Toggle pressed={true}>Toggle</Toggle>);
       const button = container.querySelector('button');
-      expect(button?.getAttribute(TOGGLE_A11Y_CONTRACT.PRESSED_ATTRIBUTE)).toBe('true');
+      expect(button?.getAttribute(TOGGLE_A11Y_CONTRACT.PRESSED_ATTRIBUTE)).toBe(
+        'true'
+      );
     });
 
     it('should default to aria-pressed=false given no pressed prop', () => {
