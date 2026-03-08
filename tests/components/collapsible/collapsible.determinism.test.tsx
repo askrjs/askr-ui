@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from './collapsible';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '../../../src/components/collapsible/collapsible';
 import { createIsland } from '@askrjs/askr';
 
 function mount(element: JSX.Element): HTMLElement {

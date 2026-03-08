@@ -4,7 +4,21 @@
     "declaration": true,
     "declarationDir": "dist",
     "emitDeclarationOnly": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "rootDir": "src"
   },
-  "include": ["src"]
+  "include": [
+    "src/index.ts",
+    "src/components/index.ts",
+    "src/components/button/**/*.ts",
+    "src/components/button/**/*.tsx",
+    "src/components/toggle/**/*.ts",
+    "src/components/toggle/**/*.tsx"
+  ],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.bench.ts",
+    "src/**/*.bench.tsx"
+  ]
 }

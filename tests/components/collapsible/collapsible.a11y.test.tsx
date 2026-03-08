@@ -1,8 +1,8 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from './collapsible';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '../../../src/components/collapsible/collapsible';
 import { createIsland } from '@askrjs/askr';
 import { axe } from 'vitest-axe';
-import { COLLAPSIBLE_A11Y_CONTRACT } from './collapsible.a11y';
+import { COLLAPSIBLE_A11Y_CONTRACT } from '../../../src/components/collapsible/collapsible.a11y';
 
 function mount(element: JSX.Element): HTMLElement {
   const container = document.createElement('div');

@@ -1,8 +1,8 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { axe } from 'vitest-axe';
-import { Button } from './button';
+import { Button } from '../../../src/components/button/button';
 import { createIsland } from '@askrjs/askr';
-import { BUTTON_A11Y_CONTRACT } from './button.a11y';
+import { BUTTON_A11Y_CONTRACT } from '../../../src/components/button/button.a11y';
 
 function mount(element: JSX.Element): HTMLElement {
   const container = document.createElement('div');

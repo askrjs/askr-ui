@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { Checkbox } from './checkbox';
+import { Checkbox } from '../../../src/components/checkbox/checkbox';
 import { createIsland } from '@askrjs/askr';
 
 function mount(element: JSX.Element): HTMLElement {
