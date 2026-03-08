@@ -94,98 +94,42 @@ Components must:
 
 ## Component Inventory
 
-### Status Legend
+### Current Status
 
-- ✅ **Complete**: Fully implemented with tests, benches, and exported
-- 🚧 **In Progress**: Implementation started but not exported
-- ⏳ **Planned**: Not yet started
-- ⚠️ **Blocked**: Needs architectural decision
+- ✅ **Button** — Complete (v0.0.1)
+- ✅ **Toggle** — Complete (v0.0.1)
+- 🚧 **Checkbox** — Implemented but not exported (blocked: needs role="checkbox" foundation)
+- 🚧 **Collapsible** — Implemented but not exported (blocked: needs context API)
 
-### Inputs & Controls
+### Planned Components
 
-- ✅ Button — Complete with behavior, a11y, and determinism tests
-- ✅ Toggle — Complete with behavior, a11y, and determinism tests
-- ⚠️ Checkbox — Blocked: needs non-button foundation (role="checkbox")
-- ⏳ Radio / RadioGroup
-- ⚠️ Switch — Blocked: needs non-button foundation (role="switch")
-- ⏳ TextInput
-- ⏳ TextArea
-- ⏳ Select (Listbox)
-- ⏳ Combobox
-- ⏳ Slider
-- ⏳ RangeSlider
-- ⏳ NumberInput
-- ⏳ FileInput
+askr-ui will include **70+ UI components** organized across five milestones:
 
----
+| Milestone | Components | Target |
+|-----------|------------|--------|
+| **[v0.1.0](ROADMAP.md#v010--foundations)** | 15 | Basic interactive apps with forms and overlays |
+| **[v0.2.0](ROADMAP.md#v020--navigation-and-disclosure)** | 15 | App shells, dashboards, admin panels |
+| **[v0.3.0](ROADMAP.md#v030--data-entry-and-rich-forms)** | 14 | CRUD apps, internal tools, rich validation |
+| **[v0.4.0](ROADMAP.md#v040--collections-and-data-display)** | 15 | Complex admin UIs, explorer interfaces |
+| **[v0.5.0](ROADMAP.md#v050--advanced-patterns-and-polish)** | 15+ | Enterprise interfaces, performance-critical UIs |
 
-### Overlays
+**See [ROADMAP.md](ROADMAP.md) for the complete component list, implementation priorities, and milestone details.**
 
-- ⏳ Dialog / Modal
-- ⏳ AlertDialog
-- ⏳ Popover
-- ⏳ Tooltip
-- ⏳ HoverCard
-- ⏳ Drawer / Sheet
-- ⏳ ContextMenu
+**Note:** All components use existing primitives from `@askrjs/askr/foundations`: Slot, Portal, Presence, pressable(), focusable(), hoverable(), dismissable(), rovingFocus(), mergeProps, controllableState, Collection, Layer.
 
----
+### Component Categories
 
-### Navigation & Disclosure
+The complete library will include:
 
-- ⚠️ **Collapsible** — Blocked: needs context API (createContext/readContext not in askr v0.0.9)
-- ⏳ Accordion — Blocked: depends on Collapsible
-- ⏳ Tabs
-- ⏳ Menu / MenuBar
-- ⏳ DropdownMenu
-- ⏳ NavigationMenu
-- ⏳ Breadcrumbs (logic only)
-
----
-
-### Data Display
-
-- ⏳ Table (headless)
-- ⏳ DataGrid (advanced)
-- ⏳ Listbox
-- ⏳ TreeView
-- ⏳ VirtualList
-- ⏳ Pagination
-- ⏳ InfiniteScroll controller
-
----
-
-### Feedback & Status
-
-- ⏳ Toast (headless store + lifecycle)
-- ⏳ Progress
-- ⏳ Spinner (logic only)
-- ⏳ Skeleton (presence + timing)
-- ⏳ Badge (semantics only)
-
----
-
-### Forms
-
-- ⏳ Form
-- ⏳ Field
-- ⏳ Fieldset
-- ⏳ Label
-- ⏳ ErrorMessage
-- ⏳ HelpText
-- ⏳ Validation orchestration (sync + async)
-
----
-
-### Advanced Primitives
-
-- ⏳ Command / CommandPalette
-- ⏳ Typeahead
-- ⏳ Autocomplete
-- ⏳ DragAndDrop (minimal, extensible)
-- ⏳ ResizeObserver primitive
-- ⏳ IntersectionObserver primitive
-- ⏳ ScrollArea (logic only)
+- **Core Primitives** — Slot, Portal, Presence, VisuallyHidden, Separator
+- **Interaction Foundations** — Button, Pressable, FocusRing, FocusScope, DismissableLayer
+- **Form Controls** — Input, Textarea, Checkbox, RadioGroup, Switch, Select, NumberField, DatePicker, Combobox, etc.
+- **Overlays** — Dialog, AlertDialog, Popover, Tooltip, HoverCard, ContextMenu, Sheet
+- **Navigation** — Accordion, Tabs, Breadcrumb, Pagination, NavigationMenu, Menubar
+- **Data Display** — Table, DataGrid, TreeView, Listbox, DataList
+- **Feedback & Status** — Toast, Progress, Skeleton, Badge, Avatar, InlineAlert, Callout, Banner
+- **Layout Helpers** — AspectRatio, ScrollArea, ResizablePanel, Splitter
+- **Advanced Patterns** — CommandPalette, VirtualList, RovingFocusGroup, Toolbar, AppShell
 
 ---
 

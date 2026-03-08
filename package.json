@@ -45,6 +45,6 @@
     "vitest-axe": "^0.1.0"
   },
   "dependencies": {
-    "@askrjs/askr": "^0.0.9"
+    "@askrjs/askr": "^0.0.27"
   }
 }
