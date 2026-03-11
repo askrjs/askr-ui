@@ -98,20 +98,25 @@ Components must:
 
 - ✅ **Button** — Complete (v0.0.1)
 - ✅ **Toggle** — Complete (v0.0.1)
-- 🚧 **Checkbox** — Implemented but not exported (blocked: needs role="checkbox" foundation)
-- 🚧 **Collapsible** — Implemented but not exported (blocked: needs context API)
+- ✅ **Checkbox** — Exported
+- ✅ **VisuallyHidden** — Exported
+- ✅ **Separator** — Exported
+- ✅ **Label** — Exported
+- ✅ **Input** — Exported
+- ✅ **Textarea** — Exported
+- 🚧 **Collapsible** — Present in source but intentionally deferred and not exported
 
 ### Planned Components
 
 askr-ui will include **70+ UI components** organized across five milestones:
 
-| Milestone | Components | Target |
-|-----------|------------|--------|
-| **[v0.1.0](ROADMAP.md#v010--foundations)** | 15 | Basic interactive apps with forms and overlays |
-| **[v0.2.0](ROADMAP.md#v020--navigation-and-disclosure)** | 15 | App shells, dashboards, admin panels |
-| **[v0.3.0](ROADMAP.md#v030--data-entry-and-rich-forms)** | 14 | CRUD apps, internal tools, rich validation |
-| **[v0.4.0](ROADMAP.md#v040--collections-and-data-display)** | 15 | Complex admin UIs, explorer interfaces |
-| **[v0.5.0](ROADMAP.md#v050--advanced-patterns-and-polish)** | 15+ | Enterprise interfaces, performance-critical UIs |
+| Milestone                                                   | Components | Target                                          |
+| ----------------------------------------------------------- | ---------- | ----------------------------------------------- |
+| **[v0.1.0](ROADMAP.md#v010--foundations)**                  | 15         | Basic interactive apps with forms and overlays  |
+| **[v0.2.0](ROADMAP.md#v020--navigation-and-disclosure)**    | 15         | App shells, dashboards, admin panels            |
+| **[v0.3.0](ROADMAP.md#v030--data-entry-and-rich-forms)**    | 14         | CRUD apps, internal tools, rich validation      |
+| **[v0.4.0](ROADMAP.md#v040--collections-and-data-display)** | 15         | Complex admin UIs, explorer interfaces          |
+| **[v0.5.0](ROADMAP.md#v050--advanced-patterns-and-polish)** | 15+        | Enterprise interfaces, performance-critical UIs |
 
 **See [ROADMAP.md](ROADMAP.md) for the complete component list, implementation priorities, and milestone details.**
 
@@ -241,7 +246,7 @@ askr-ui is successful if:
 
 ## Current Status (January 2026)
 
-### ✅ Completed & Exported (2 components)
+### ✅ Completed & Exported (7 components)
 
 1. **Button** — Full implementation
    - Behavior tests: 27 tests passing
@@ -259,14 +264,29 @@ askr-ui is successful if:
    - Supports `aria-pressed` toggle semantics
    - Uses `pressable` foundation for interaction
 
+3. **Checkbox** — Exported
+  - Native-first checkbox API with `asChild` support
+  - Behavior, accessibility, and determinism tests passing
+  - Package exports added
+
+4. **VisuallyHidden** — Exported
+  - Structural accessibility utility
+
+5. **Separator** — Exported
+  - Semantic divider with decorative mode
+
+6. **Label** — Exported
+  - Thin labeling primitive with `asChild` support
+
+7. **Input** / **Textarea** — Exported
+  - Native-first text entry wrappers with focusable semantics
+
 ### 🚧 Partially Implemented (not exported)
 
-- **Checkbox** — Implementation exists but blocked
-  - Component file created with all props and types
-  - Comprehensive test suite written (50 tests)
-  - Benchmarks defined
-  - **Blocked**: Needs `checkable` foundation instead of `pressable`
-  - Current `pressable` adds `role="button"` which conflicts with checkbox semantics
+- **Collapsible** — implementation deferred
+  - Source and test suites exist
+  - Not exported
+  - Still blocked on compound-state/context architecture work
 
 ### ⏳ Not Yet Started
 

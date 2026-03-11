@@ -50,10 +50,18 @@ export function Collapsible(props: CollapsibleProps): JSX.Element {
   );
 }
 
-export function CollapsibleTrigger(props: CollapsibleTriggerProps): JSX.Element {
-  throw new Error('Collapsible components require context API (not yet available)');
+export function CollapsibleTrigger(
+  props: CollapsibleTriggerProps
+): JSX.Element {
+  throw new Error(
+    'Collapsible components require context API (not yet available)'
+  );
 }
 
-export function CollapsibleContent(props: CollapsibleContentProps): JSX.Element {
-  throw new Error('Collapsible components require context API (not yet available)');
+export function CollapsibleContent(
+  props: CollapsibleContentProps
+): JSX.Element {
+  throw new Error(
+    'Collapsible components require context API (not yet available)'
+  );
 }

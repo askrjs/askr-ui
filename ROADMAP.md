@@ -5,6 +5,7 @@
 askr-ui is being built progressively across five major milestones, each enabling increasingly complex application patterns while validating the library's core design.
 
 **Release Philosophy:**
+
 - **Early primitives first** — establish composition patterns before building on them
 - **Headless composability** — behavior and accessibility without visual opinions
 - **A11y-critical components before convenience** — accessible foundations enable everything else
@@ -17,10 +18,12 @@ Each milestone builds on the previous, expanding capabilities without breaking e
 ## Milestones
 
 ### [v0.1.0 — Foundations](docs/roadmap/v0.1.0-foundations.md)
+
 **Status:** In Progress  
 **Target:** Basic interactive apps with forms and overlays
 
 **What you can build:**
+
 - Sign-up and login forms
 - Settings screens
 - Modal confirmation flows
@@ -28,7 +31,7 @@ Each milestone builds on the previous, expanding capabilities without breaking e
 - Basic CRUD interfaces
 
 **Components:** 15 UI components  
-Button (✅ shipped), Input, Textarea, Checkbox, RadioGroup, Switch, Label, Field, Dialog, AlertDialog, Popover, Tooltip, Select, Menu, DropdownMenu, VisuallyHidden, Separator, FocusRing, FocusScope, DismissableLayer
+Button (✅ shipped), Checkbox (✅ shipped), Input (✅ shipped), Textarea (✅ shipped), Label (✅ shipped), VisuallyHidden (✅ shipped), Separator (✅ shipped), RadioGroup, Switch, Field, Dialog, AlertDialog, Popover, Tooltip, Select, Menu, DropdownMenu, FocusRing, FocusScope, DismissableLayer
 
 **Uses existing foundations:**  
 Slot, Portal, Presence, pressable(), focusable(), hoverable(), dismissable(), rovingFocus(), mergeProps, controllableState, Collection, Layer (all from `@askrjs/askr/foundations`)
@@ -39,10 +42,12 @@ Validates Slot-based composition, prop merging, controlled/uncontrolled state, a
 ---
 
 ### [v0.2.0 — Navigation and Disclosure](docs/roadmap/v0.2.0-navigation.md)
+
 **Status:** Planned  
 **Target:** App shells, dashboards, admin panels, documentation layouts
 
 **What you can build:**
+
 - Multi-page dashboards with navigation
 - Settings panels with tabbed sections
 - Documentation sites with expandable sections
@@ -58,10 +63,12 @@ Adds common app shell patterns and page-level navigation. Builds on v0.1.0's for
 ---
 
 ### [v0.3.0 — Data Entry and Rich Forms](docs/roadmap/v0.3.0-forms.md)
+
 **Status:** Planned  
 **Target:** Serious CRUD apps, internal tools, workflows with rich validation
 
 **What you can build:**
+
 - Advanced data entry forms with date/time pickers
 - Search interfaces with autocomplete
 - Command palettes for power users
@@ -77,10 +84,12 @@ Moves beyond basic inputs to enable complex data entry workflows. Combobox and C
 ---
 
 ### [v0.4.0 — Collections and Data Display](docs/roadmap/v0.4.0-data.md)
+
 **Status:** Planned  
 **Target:** Complex admin UIs, explorer-style interfaces, information-dense applications
 
 **What you can build:**
+
 - Data tables with sorting and selection
 - File explorers and tree navigation
 - Status dashboards with metrics
@@ -96,10 +105,12 @@ Complements v0.3.0's form-heavy focus with data display and hierarchical navigat
 ---
 
 ### [v0.5.0 — Advanced Patterns and Polish](docs/roadmap/v0.5.0-advanced.md)
+
 **Status:** Planned  
 **Target:** Enterprise interfaces, performance-critical UIs, advanced keyboard navigation
 
 **What you can build:**
+
 - Rich text editors with floating toolbars
 - Data grids with virtualization for thousands of rows
 - Onboarding flows with product tours
@@ -117,7 +128,9 @@ Maturity release focused on advanced interaction patterns, performance optimizat
 ## Recommended Adoption Path
 
 ### Start with v0.1.0
+
 If you're building a **new application**, v0.1.0 provides the essentials:
+
 - ✅ Forms and validation
 - ✅ Modal dialogs and popovers
 - ✅ Dropdowns and selections
@@ -126,7 +139,9 @@ If you're building a **new application**, v0.1.0 provides the essentials:
 **You can build:** signup flows, settings screens, basic CRUD interfaces, todo apps
 
 ### Add v0.2.0 for navigation
+
 When you need **application structure**:
+
 - ✅ Multi-page navigation
 - ✅ Tabbed interfaces
 - ✅ Collapsible sections
@@ -135,7 +150,9 @@ When you need **application structure**:
 **You can build:** dashboards, admin panels, documentation sites, settings panels
 
 ### Add v0.3.0 for complex forms
+
 When you need **advanced data entry**:
+
 - ✅ Date and time pickers
 - ✅ Autocomplete and search
 - ✅ Command palettes
@@ -144,7 +161,9 @@ When you need **advanced data entry**:
 **You can build:** booking systems, scheduling apps, CRM interfaces, internal tools
 
 ### Add v0.4.0 for data display
+
 When you need **information density**:
+
 - ✅ Data tables
 - ✅ Tree navigation
 - ✅ Metrics and stats
@@ -153,7 +172,9 @@ When you need **information density**:
 **You can build:** analytics dashboards, file explorers, reporting interfaces, monitoring UIs
 
 ### Add v0.5.0 for polish
+
 When you need **enterprise features**:
+
 - ✅ Virtualized collections
 - ✅ Advanced toolbars
 - ✅ Onboarding flows
@@ -180,12 +201,12 @@ These components are **intentionally** delayed until later milestones because th
 ## Component Count Summary
 
 | Milestone | UI Components | Cumulative |
-|-----------|---------------|------------|
-| v0.1.0 | 15 | 15 |
-| v0.2.0 | 15 | 30 |
-| v0.3.0 | 14 | 44 |
-| v0.4.0 | 15 | 59 |
-| v0.5.0 | 15+ | 74+ |
+| --------- | ------------- | ---------- |
+| v0.1.0    | 15            | 15         |
+| v0.2.0    | 15            | 30         |
+| v0.3.0    | 14            | 44         |
+| v0.4.0    | 15            | 59         |
+| v0.5.0    | 15+           | 74+        |
 
 **Note:** All milestones use existing primitives from `@askrjs/askr/foundations` (Slot, Portal, Presence, interaction primitives, prop utilities, state management).
 
@@ -208,6 +229,7 @@ Each milestone is **feature-complete** and **production-ready** for its target u
 ## Contributing
 
 See detailed milestone documentation in [docs/roadmap/](docs/roadmap/) for:
+
 - Component specifications
 - Accessibility requirements
 - Implementation priorities

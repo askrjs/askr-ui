@@ -1,4 +1,8 @@
 export * from './button';
+export * from './checkbox';
+export * from './input';
+export * from './label';
+export * from './separator';
 export * from './toggle';
-// TODO: Checkbox needs different foundation pattern - does not fit pressable
-// export * from './checkbox';
+export * from './textarea';
+export * from './visually-hidden';

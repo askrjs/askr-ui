@@ -2,6 +2,7 @@ import { Slot, mergeProps } from '@askrjs/askr/foundations';
 import type {
   CheckboxInputProps,
   CheckboxAsChildProps,
+  PressEvent,
 } from './checkbox.types';
 
 /**
@@ -60,49 +61,70 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
     ...rest
   } = props;
 
-  // Determine aria-checked based on indeterminate vs checked
-  const ariaChecked = indeterminate ? 'mixed' : String(checked);
-
-  // Interaction props: onClick handler that calls onPress
-  const interactionProps = disabled
-    ? {
-        'aria-disabled': 'true',
-        tabIndex: -1,
-      }
-    : {
-        onClick: onPress
-          ? (e: Event) => {
-              if (!disabled) {
-                onPress(e as PressEvent);
-              }
-            }
-          : undefined,
-        tabIndex: asChild ? 0 : undefined,
-      };
-
-  // Prop composition: merge user props, interaction props, aria-checked, and ref
-  const finalProps = mergeProps(rest, {
-    ...interactionProps,
-    'aria-checked': ariaChecked,
-    ref,
-  });
+  const ariaChecked = indeterminate ? 'mixed' : checked ? 'true' : 'false';
 
   if (asChild) {
+    const interactionProps = disabled
+      ? {
+          'aria-disabled': 'true' as const,
+          tabIndex: -1,
+        }
+      : {
+          onClick: onPress
+            ? (e: Event) => {
+                onPress(e as PressEvent);
+              }
+            : undefined,
+          onKeyDown: onPress
+            ? (e: KeyboardEvent) => {
+                if (e.key === ' ') {
+                  e.preventDefault();
+                }
+                if (e.key === 'Enter') {
+                  onPress(e as unknown as PressEvent);
+                }
+              }
+            : undefined,
+          onKeyUp: onPress
+            ? (e: KeyboardEvent) => {
+                if (e.key === ' ') {
+                  onPress(e as unknown as PressEvent);
+                }
+              }
+            : undefined,
+          tabIndex: 0,
+        };
+
+    const finalProps = mergeProps(rest, {
+      ...interactionProps,
+      'aria-checked': ariaChecked,
+      ref,
+    });
+
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  // Native checkbox input with proper attributes
+  const finalProps = mergeProps(rest, {
+    ref,
+    onClick: onPress
+      ? (e: Event) => {
+          onPress(e as PressEvent);
+        }
+      : undefined,
+    'aria-checked': indeterminate ? undefined : ariaChecked,
+    'aria-disabled': disabled ? 'true' : undefined,
+  });
+
   return (
     <input
       type="checkbox"
       checked={checked}
+      indeterminate={indeterminate}
       disabled={disabled}
       required={required}
       name={name}
       value={value}
       {...finalProps}
-    >
-      {children}
-    </input>
+    />
   );
 }

@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '../../../src/components/collapsible/collapsible';
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from '../../../src/components/collapsible/collapsible';
 import { createIsland } from '@askrjs/askr';
 
 function mount(element: JSX.Element): HTMLElement {
@@ -151,7 +155,9 @@ describe('Collapsible — Behavior', () => {
           <CollapsibleContent>Content</CollapsibleContent>
         </Collapsible>
       );
-      const contentElement = container.querySelector('[id^="collapsible-content"]');
+      const contentElement = container.querySelector(
+        '[id^="collapsible-content"]'
+      );
       expect(contentElement).toBeNull();
     });
 
@@ -162,7 +168,9 @@ describe('Collapsible — Behavior', () => {
           <CollapsibleContent>Content</CollapsibleContent>
         </Collapsible>
       );
-      const contentElement = container.querySelector('[id^="collapsible-content"]');
+      const contentElement = container.querySelector(
+        '[id^="collapsible-content"]'
+      );
       expect(contentElement).toBeDefined();
       expect(contentElement?.textContent).toBe('Content');
     });
@@ -174,7 +182,9 @@ describe('Collapsible — Behavior', () => {
           <CollapsibleContent forceMount>Content</CollapsibleContent>
         </Collapsible>
       );
-      const contentElement = container.querySelector('[id^="collapsible-content"]');
+      const contentElement = container.querySelector(
+        '[id^="collapsible-content"]'
+      );
       expect(contentElement).toBeDefined();
       expect(contentElement?.textContent).toBe('Content');
     });
@@ -240,10 +250,12 @@ describe('Collapsible — Behavior', () => {
         </div>
       );
 
-      const contents = container.querySelectorAll('[id^="collapsible-content"]');
+      const contents = container.querySelectorAll(
+        '[id^="collapsible-content"]'
+      );
       expect(contents.length).toBe(2);
-      
-      const ids = Array.from(contents).map(el => el.id);
+
+      const ids = Array.from(contents).map((el) => el.id);
       expect(new Set(ids).size).toBe(2); // All unique
     });
   });

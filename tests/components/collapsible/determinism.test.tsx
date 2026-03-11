@@ -1,5 +1,9 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '../../../src/components/collapsible/collapsible';
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from '../../../src/components/collapsible/collapsible';
 import { createIsland } from '@askrjs/askr';
 
 function mount(element: JSX.Element): HTMLElement {
@@ -239,7 +243,9 @@ describe('Collapsible — Determinism', () => {
       trigger.click(); // close
       trigger.click(); // reopen
 
-      const contentAfter = container.querySelector('[id^="collapsible-content"]')!;
+      const contentAfter = container.querySelector(
+        '[id^="collapsible-content"]'
+      )!;
       const controlsIdAfter = trigger.getAttribute('aria-controls');
 
       expect(contentAfter.id).toBe(contentId);

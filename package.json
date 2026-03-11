@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Headless askr components",
   "type": "module",
-  "packageManager": "npm@11.7.0",
+  "packageManager": "npm@11.11.0",
   "license": "Apache-2.0",
   "sideEffects": false,
   "main": "./dist/index.cjs",
@@ -27,6 +27,36 @@
       "types": "./dist/components/toggle/toggle.d.ts",
       "import": "./dist/components/toggle/toggle.js",
       "require": "./dist/components/toggle/toggle.cjs"
+    },
+    "./checkbox": {
+      "types": "./dist/components/checkbox/checkbox.d.ts",
+      "import": "./dist/components/checkbox/checkbox.js",
+      "require": "./dist/components/checkbox/checkbox.cjs"
+    },
+    "./input": {
+      "types": "./dist/components/input/input.d.ts",
+      "import": "./dist/components/input/input.js",
+      "require": "./dist/components/input/input.cjs"
+    },
+    "./label": {
+      "types": "./dist/components/label/label.d.ts",
+      "import": "./dist/components/label/label.js",
+      "require": "./dist/components/label/label.cjs"
+    },
+    "./separator": {
+      "types": "./dist/components/separator/separator.d.ts",
+      "import": "./dist/components/separator/separator.js",
+      "require": "./dist/components/separator/separator.cjs"
+    },
+    "./textarea": {
+      "types": "./dist/components/textarea/textarea.d.ts",
+      "import": "./dist/components/textarea/textarea.js",
+      "require": "./dist/components/textarea/textarea.cjs"
+    },
+    "./visually-hidden": {
+      "types": "./dist/components/visually-hidden/visually-hidden.d.ts",
+      "import": "./dist/components/visually-hidden/visually-hidden.js",
+      "require": "./dist/components/visually-hidden/visually-hidden.cjs"
     },
     "./package.json": "./package.json"
   },
@@ -57,20 +87,20 @@
     "lint": "eslint src tests benches --ext .ts,.tsx"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "@types/node": "^25.0.6",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.4.0",
     "axe-core": "^4.11.1",
     "cross-env": "^10.1.0",
-    "eslint": "^9.39.2",
+    "eslint": "^10.0.3",
     "eslint-config-prettier": "^10.1.8",
     "jiti": "^2.6.1",
-    "jsdom": "^27.4.0",
-    "prettier": "^3.7.4",
+    "jsdom": "^28.1.0",
+    "prettier": "^3.8.1",
     "tsd": "^0.33.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.52.0",
+    "typescript-eslint": "^8.57.0",
     "vite": "^7.3.1",
-    "vitest": "^4.0.16",
+    "vitest": "^4.0.18",
     "vitest-axe": "^0.1.0"
   },
   "dependencies": {}

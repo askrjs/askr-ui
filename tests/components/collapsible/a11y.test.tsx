@@ -1,5 +1,9 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '../../../src/components/collapsible/collapsible';
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from '../../../src/components/collapsible/collapsible';
 import { createIsland } from '@askrjs/askr';
 import { axe } from 'vitest-axe';
 import { COLLAPSIBLE_A11Y_CONTRACT } from '../../../src/components/collapsible/collapsible.a11y';
@@ -126,7 +130,7 @@ describe('Collapsible — Accessibility', () => {
       );
       const trigger = container.querySelector('button');
       const content = container.querySelector('[id^="collapsible-content"]');
-      
+
       const controlsId = trigger?.getAttribute('aria-controls');
       expect(controlsId).toBeDefined();
       expect(content?.id).toBe(controlsId);
@@ -169,7 +173,10 @@ describe('Collapsible — Accessibility', () => {
       document.body.appendChild(container);
       trigger.focus();
 
-      const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
+      const event = new KeyboardEvent('keydown', {
+        key: 'Enter',
+        bubbles: true,
+      });
       trigger.dispatchEvent(event);
 
       // Should be open after Enter
@@ -189,7 +196,11 @@ describe('Collapsible — Accessibility', () => {
       document.body.appendChild(container);
       trigger.focus();
 
-      const event = new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true });
+      const event = new KeyboardEvent('keydown', {
+        key: ' ',
+        code: 'Space',
+        bubbles: true,
+      });
       trigger.dispatchEvent(event);
 
       // Should be open after Space
@@ -237,7 +248,7 @@ describe('Collapsible — Accessibility', () => {
       const trigger = container.querySelector('button')!;
       document.body.appendChild(container);
       trigger.focus();
-      
+
       trigger.click();
 
       // Focus should remain on trigger
