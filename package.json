@@ -1,6 +1,6 @@
 {
   "name": "@askrjs/askr-ui",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Headless askr components",
   "type": "module",
   "packageManager": "npm@11.11.0",
@@ -82,6 +82,86 @@
       "types": "./dist/components/select/select.d.ts",
       "import": "./dist/components/select/select.js",
       "require": "./dist/components/select/select.cjs"
+    },
+    "./menubar": {
+      "types": "./dist/components/menubar/menubar.d.ts",
+      "import": "./dist/components/menubar/menubar.js",
+      "require": "./dist/components/menubar/menubar.cjs"
+    },
+    "./navigation-menu": {
+      "types": "./dist/components/navigation-menu/navigation-menu.d.ts",
+      "import": "./dist/components/navigation-menu/navigation-menu.js",
+      "require": "./dist/components/navigation-menu/navigation-menu.cjs"
+    },
+    "./collapsible": {
+      "types": "./dist/components/collapsible/collapsible.d.ts",
+      "import": "./dist/components/collapsible/collapsible.js",
+      "require": "./dist/components/collapsible/collapsible.cjs"
+    },
+    "./badge": {
+      "types": "./dist/components/badge/badge.d.ts",
+      "import": "./dist/components/badge/badge.js",
+      "require": "./dist/components/badge/badge.cjs"
+    },
+    "./avatar": {
+      "types": "./dist/components/avatar/avatar.d.ts",
+      "import": "./dist/components/avatar/avatar.js",
+      "require": "./dist/components/avatar/avatar.cjs"
+    },
+    "./skeleton": {
+      "types": "./dist/components/skeleton/skeleton.d.ts",
+      "import": "./dist/components/skeleton/skeleton.js",
+      "require": "./dist/components/skeleton/skeleton.cjs"
+    },
+    "./progress": {
+      "types": "./dist/components/progress/progress.d.ts",
+      "import": "./dist/components/progress/progress.js",
+      "require": "./dist/components/progress/progress.cjs"
+    },
+    "./progress-circle": {
+      "types": "./dist/components/progress-circle/progress-circle.d.ts",
+      "import": "./dist/components/progress-circle/progress-circle.js",
+      "require": "./dist/components/progress-circle/progress-circle.cjs"
+    },
+    "./spinner": {
+      "types": "./dist/components/spinner/spinner.d.ts",
+      "import": "./dist/components/spinner/spinner.js",
+      "require": "./dist/components/spinner/spinner.cjs"
+    },
+    "./breadcrumb": {
+      "types": "./dist/components/breadcrumb/breadcrumb.d.ts",
+      "import": "./dist/components/breadcrumb/breadcrumb.js",
+      "require": "./dist/components/breadcrumb/breadcrumb.cjs"
+    },
+    "./pagination": {
+      "types": "./dist/components/pagination/pagination.d.ts",
+      "import": "./dist/components/pagination/pagination.js",
+      "require": "./dist/components/pagination/pagination.cjs"
+    },
+    "./accordion": {
+      "types": "./dist/components/accordion/accordion.d.ts",
+      "import": "./dist/components/accordion/accordion.js",
+      "require": "./dist/components/accordion/accordion.cjs"
+    },
+    "./tabs": {
+      "types": "./dist/components/tabs/tabs.d.ts",
+      "import": "./dist/components/tabs/tabs.js",
+      "require": "./dist/components/tabs/tabs.cjs"
+    },
+    "./toggle-group": {
+      "types": "./dist/components/toggle-group/toggle-group.d.ts",
+      "import": "./dist/components/toggle-group/toggle-group.js",
+      "require": "./dist/components/toggle-group/toggle-group.cjs"
+    },
+    "./toast": {
+      "types": "./dist/components/toast/toast.d.ts",
+      "import": "./dist/components/toast/toast.js",
+      "require": "./dist/components/toast/toast.cjs"
+    },
+    "./slider": {
+      "types": "./dist/components/slider/slider.d.ts",
+      "import": "./dist/components/slider/slider.js",
+      "require": "./dist/components/slider/slider.cjs"
     },
     "./input": {
       "types": "./dist/components/input/input.d.ts",

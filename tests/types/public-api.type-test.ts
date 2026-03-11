@@ -11,6 +11,9 @@ import {
   AlertDialogTrigger,
   Button,
   Checkbox,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   Dialog,
   DialogClose,
   DialogContent,
@@ -78,6 +81,11 @@ import {
   type CheckboxAsChildProps,
   type CheckboxInputProps,
   type CheckboxProps,
+  type CollapsibleContentAsChildProps,
+  type CollapsibleContentProps,
+  type CollapsibleProps,
+  type CollapsibleTriggerAsChildProps,
+  type CollapsibleTriggerProps,
   type DialogCloseAsChildProps,
   type DialogCloseProps,
   type DialogContentAsChildProps,
@@ -135,6 +143,7 @@ import {
 import { AlertDialog as AlertDialogSubpath } from '@askrjs/askr-ui/alert-dialog';
 import { Button as ButtonSubpath } from '@askrjs/askr-ui/button';
 import { Checkbox as CheckboxSubpath } from '@askrjs/askr-ui/checkbox';
+import { Collapsible as CollapsibleSubpath } from '@askrjs/askr-ui/collapsible';
 import { Dialog as DialogSubpath } from '@askrjs/askr-ui/dialog';
 import { DropdownMenu as DropdownMenuSubpath } from '@askrjs/askr-ui/dropdown-menu';
 import { FocusRing as FocusRingSubpath } from '@askrjs/askr-ui/focus-ring';
@@ -152,6 +161,7 @@ const askrComponent: AskRComponent = createAskRComponent('button');
 
 const buttonFromSubpath: typeof Button = ButtonSubpath;
 const checkboxFromSubpath: typeof Checkbox = CheckboxSubpath;
+const collapsibleFromSubpath: typeof Collapsible = CollapsibleSubpath;
 const focusRingFromSubpath: typeof FocusRing = FocusRingSubpath;
 const focusScopeFromSubpath: typeof FocusScope = FocusScopeSubpath;
 const dialogFromSubpath: typeof Dialog = DialogSubpath;
@@ -205,6 +215,25 @@ const checkboxAsChildProps: CheckboxAsChildProps = {
   asChild: true,
   children: slotChild,
   checked: true,
+};
+
+const collapsibleProps: CollapsibleProps = {
+  defaultOpen: true,
+};
+const collapsibleTriggerProps: CollapsibleTriggerProps = {
+  children: 'Toggle details',
+};
+const collapsibleTriggerAsChildProps: CollapsibleTriggerAsChildProps = {
+  asChild: true,
+  children: slotChild,
+};
+const collapsibleContentProps: CollapsibleContentProps = {
+  forceMount: true,
+  children: 'Body',
+};
+const collapsibleContentAsChildProps: CollapsibleContentAsChildProps = {
+  asChild: true,
+  children: slotChild,
 };
 
 const toggleProps: ToggleProps = { pressed: true, children: 'Bold' };
@@ -375,27 +404,24 @@ const fieldControlAsChildProps: FieldControlAsChildProps = {
   children: slotChild,
 };
 
-// @ts-expect-error Collapsible must not be re-exported from the root entrypoint.
-import { Collapsible as _Collapsible } from '@askrjs/askr-ui';
-
-// @ts-expect-error asChild button props must not accept native button type.
 const _invalidButtonAsChild: ButtonAsChildProps = {
   asChild: true,
   children: slotChild,
+  // @ts-expect-error asChild button props must not accept native button type.
   type: 'button',
 };
 
-// @ts-expect-error asChild toggle props must not accept native button type.
 const _invalidToggleAsChild: ToggleAsChildProps = {
   asChild: true,
   children: slotChild,
+  // @ts-expect-error asChild toggle props must not accept native button type.
   type: 'button',
 };
 
-// @ts-expect-error asChild switch props must not accept native button type.
 const _invalidSwitchAsChild: SwitchAsChildProps = {
   asChild: true,
   children: slotChild,
+  // @ts-expect-error asChild switch props must not accept native button type.
   type: 'submit',
 };
 
@@ -411,17 +437,17 @@ const _invalidFieldControlAsChild: FieldControlAsChildProps = {
   fieldId: 'email',
 };
 
-// @ts-expect-error asChild select trigger props must not accept native button type.
 const _invalidSelectTriggerAsChild: SelectTriggerAsChildProps = {
   asChild: true,
   children: slotChild,
+  // @ts-expect-error asChild select trigger props must not accept native button type.
   type: 'button',
 };
 
-// @ts-expect-error asChild dialog trigger props must not accept native button type.
 const _invalidDialogTriggerAsChild: DialogTriggerAsChildProps = {
   asChild: true,
   children: slotChild,
+  // @ts-expect-error asChild dialog trigger props must not accept native button type.
   type: 'button',
 };
 
@@ -432,6 +458,7 @@ void [
   askrComponent,
   buttonFromSubpath,
   checkboxFromSubpath,
+  collapsibleFromSubpath,
   focusRingFromSubpath,
   focusScopeFromSubpath,
   dialogFromSubpath,
@@ -472,6 +499,9 @@ void [
   DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   FocusRing,
   FocusScope,
   MenuContent,
@@ -507,6 +537,11 @@ void [
   checkboxProps,
   checkboxInputProps,
   checkboxAsChildProps,
+  collapsibleProps,
+  collapsibleTriggerProps,
+  collapsibleTriggerAsChildProps,
+  collapsibleContentProps,
+  collapsibleContentAsChildProps,
   toggleProps,
   toggleButtonProps,
   toggleAsChildProps,

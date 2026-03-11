@@ -1,4 +1,5 @@
 import { createIsland } from '@askrjs/askr';
+import { _resetDefaultPortal } from '../node_modules/@askrjs/askr/dist/foundations/structures/portal.js';
 
 export function mount(element: JSX.Element): HTMLElement {
   const container = document.createElement('div');
@@ -19,4 +20,6 @@ export function unmount(container: HTMLElement | undefined) {
   if (container?.parentNode) {
     container.parentNode.removeChild(container);
   }
+
+  _resetDefaultPortal();
 }

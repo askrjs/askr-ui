@@ -182,8 +182,8 @@ export function Select(props: SelectProps) {
 
   return (
     <>
-      {injectedProps.__portal ? injectedProps.__portal() : null}
       {enhancedChildren}
+      {injectedProps.__portal ? injectedProps.__portal() : null}
       {name ? (
         <input
           type="hidden"

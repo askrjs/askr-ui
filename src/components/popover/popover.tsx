@@ -88,8 +88,8 @@ export function Popover(props: PopoverProps) {
 
   return (
     <>
-      {injectedProps.__portal ? injectedProps.__portal() : null}
       {enhancedChildren}
+      {injectedProps.__portal ? injectedProps.__portal() : null}
     </>
   );
 }

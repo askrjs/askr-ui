@@ -23,6 +23,28 @@
         "./src/components/dropdown-menu/index.ts"
       ],
       "@askrjs/askr-ui/select": ["./src/components/select/index.ts"],
+      "@askrjs/askr-ui/menubar": ["./src/components/menubar/index.ts"],
+      "@askrjs/askr-ui/navigation-menu": [
+        "./src/components/navigation-menu/index.ts"
+      ],
+      "@askrjs/askr-ui/collapsible": ["./src/components/collapsible/index.ts"],
+      "@askrjs/askr-ui/badge": ["./src/components/badge/index.ts"],
+      "@askrjs/askr-ui/avatar": ["./src/components/avatar/index.ts"],
+      "@askrjs/askr-ui/skeleton": ["./src/components/skeleton/index.ts"],
+      "@askrjs/askr-ui/progress": ["./src/components/progress/index.ts"],
+      "@askrjs/askr-ui/progress-circle": [
+        "./src/components/progress-circle/index.ts"
+      ],
+      "@askrjs/askr-ui/spinner": ["./src/components/spinner/index.ts"],
+      "@askrjs/askr-ui/breadcrumb": ["./src/components/breadcrumb/index.ts"],
+      "@askrjs/askr-ui/pagination": ["./src/components/pagination/index.ts"],
+      "@askrjs/askr-ui/accordion": ["./src/components/accordion/index.ts"],
+      "@askrjs/askr-ui/tabs": ["./src/components/tabs/index.ts"],
+      "@askrjs/askr-ui/toggle-group": [
+        "./src/components/toggle-group/index.ts"
+      ],
+      "@askrjs/askr-ui/toast": ["./src/components/toast/index.ts"],
+      "@askrjs/askr-ui/slider": ["./src/components/slider/index.ts"],
       "@askrjs/askr-ui/field": ["./src/components/field/index.ts"],
       "@askrjs/askr-ui/input": ["./src/components/input/index.ts"],
       "@askrjs/askr-ui/label": ["./src/components/label/index.ts"],
