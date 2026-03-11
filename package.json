@@ -33,6 +33,56 @@
       "import": "./dist/components/checkbox/checkbox.js",
       "require": "./dist/components/checkbox/checkbox.cjs"
     },
+    "./focus-ring": {
+      "types": "./dist/components/focus-ring/focus-ring.d.ts",
+      "import": "./dist/components/focus-ring/focus-ring.js",
+      "require": "./dist/components/focus-ring/focus-ring.cjs"
+    },
+    "./focus-scope": {
+      "types": "./dist/components/focus-scope/focus-scope.d.ts",
+      "import": "./dist/components/focus-scope/focus-scope.js",
+      "require": "./dist/components/focus-scope/focus-scope.cjs"
+    },
+    "./dismissable-layer": {
+      "types": "./dist/components/dismissable-layer/dismissable-layer.d.ts",
+      "import": "./dist/components/dismissable-layer/dismissable-layer.js",
+      "require": "./dist/components/dismissable-layer/dismissable-layer.cjs"
+    },
+    "./dialog": {
+      "types": "./dist/components/dialog/dialog.d.ts",
+      "import": "./dist/components/dialog/dialog.js",
+      "require": "./dist/components/dialog/dialog.cjs"
+    },
+    "./alert-dialog": {
+      "types": "./dist/components/alert-dialog/alert-dialog.d.ts",
+      "import": "./dist/components/alert-dialog/alert-dialog.js",
+      "require": "./dist/components/alert-dialog/alert-dialog.cjs"
+    },
+    "./popover": {
+      "types": "./dist/components/popover/popover.d.ts",
+      "import": "./dist/components/popover/popover.js",
+      "require": "./dist/components/popover/popover.cjs"
+    },
+    "./tooltip": {
+      "types": "./dist/components/tooltip/tooltip.d.ts",
+      "import": "./dist/components/tooltip/tooltip.js",
+      "require": "./dist/components/tooltip/tooltip.cjs"
+    },
+    "./menu": {
+      "types": "./dist/components/menu/menu.d.ts",
+      "import": "./dist/components/menu/menu.js",
+      "require": "./dist/components/menu/menu.cjs"
+    },
+    "./dropdown-menu": {
+      "types": "./dist/components/dropdown-menu/dropdown-menu.d.ts",
+      "import": "./dist/components/dropdown-menu/dropdown-menu.js",
+      "require": "./dist/components/dropdown-menu/dropdown-menu.cjs"
+    },
+    "./select": {
+      "types": "./dist/components/select/select.d.ts",
+      "import": "./dist/components/select/select.js",
+      "require": "./dist/components/select/select.cjs"
+    },
     "./input": {
       "types": "./dist/components/input/input.d.ts",
       "import": "./dist/components/input/input.js",
@@ -95,8 +145,9 @@
     "build:types": "tsc -p tsconfig.build.json",
     "build": "npm run clean && npm run build:js && npm run build:types",
     "dev": "vite build --watch",
-    "test": "vitest run",
-    "test:types": "npm run build && node scripts/generate-dist-test.js && tsd",
+    "verify:foundations": "node scripts/check-foundations-contract.mjs",
+    "test": "npm run verify:foundations && vitest run",
+    "test:types": "tsc -p tsconfig.type-tests.json --noEmit",
     "bench": "cross-env NODE_ENV=production vitest bench --run --reporter=default --config vitest.bench.config.ts",
     "fmt": "prettier --write .",
     "lint": "eslint src tests benches --ext .ts,.tsx"

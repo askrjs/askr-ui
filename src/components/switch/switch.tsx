@@ -1,5 +1,9 @@
-import { Slot, mergeProps, pressable } from '@askrjs/askr/foundations';
-import { state } from '@askrjs/askr';
+import {
+  Slot,
+  controllableState,
+  mergeProps,
+  pressable,
+} from '@askrjs/askr/foundations';
 import type { SwitchAsChildProps, SwitchButtonProps } from './switch.types';
 
 export function Switch(props: SwitchButtonProps): JSX.Element;
@@ -20,20 +24,16 @@ export function Switch(props: SwitchButtonProps | SwitchAsChildProps) {
     ...rest
   } = props;
 
-  const internalChecked = state(defaultChecked);
-  const isControlled = checked !== undefined;
-  const currentChecked = isControlled ? checked : internalChecked();
-
-  const setChecked = (next: boolean) => {
-    if (!isControlled) {
-      internalChecked.set(next);
-    }
-    onCheckedChange?.(next);
-  };
+  const checkedState = controllableState({
+    value: checked,
+    defaultValue: defaultChecked,
+    onChange: onCheckedChange,
+  });
+  const currentChecked = checkedState();
 
   const interactionProps = pressable({
     disabled,
-    onPress: () => setChecked(!currentChecked),
+    onPress: () => checkedState.set(!checkedState()),
     isNativeButton: !asChild,
   });
 

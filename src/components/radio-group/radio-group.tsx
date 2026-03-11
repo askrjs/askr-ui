@@ -1,10 +1,10 @@
 import {
   Slot,
+  controllableState,
   mergeProps,
   pressable,
   rovingFocus,
 } from '@askrjs/askr/foundations';
-import { state } from '@askrjs/askr';
 import type { JSXElement } from '@askrjs/askr/foundations';
 import type {
   RadioGroupItemAsChildProps,
@@ -70,15 +70,13 @@ export function RadioGroup(props: RadioGroupProps) {
     ...rest
   } = props;
 
-  const internalValue = state(defaultValue);
-  const isControlled = value !== undefined;
-  const currentValue = () => (isControlled ? value : internalValue());
-  const setValue = (next: string) => {
-    if (!isControlled) {
-      internalValue.set(next);
-    }
-    onValueChange?.(next);
-  };
+  const valueState = controllableState({
+    value,
+    defaultValue,
+    onChange: onValueChange,
+  });
+  const currentValue = valueState;
+  const setValue = valueState.set;
 
   const childArray = toChildArray(children);
   const itemChildren = childArray.filter(

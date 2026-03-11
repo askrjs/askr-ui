@@ -1,11 +1,12 @@
 import {
   Slot,
   Presence,
+  controllableState,
   composeRefs,
+  formatId,
   mergeProps,
   pressable,
 } from '@askrjs/askr/foundations';
-import { state } from '@askrjs/askr';
 import type { JSXElement } from '@askrjs/askr/foundations';
 import type {
   CollapsibleContentAsChildProps,
@@ -22,13 +23,7 @@ type InjectedCollapsibleProps = {
   __contentId?: string;
 };
 
-let collapsibleIdCounter = 0;
 let pendingFocusRestoreId: string | null = null;
-
-function nextCollapsibleId() {
-  collapsibleIdCounter += 1;
-  return `collapsible-content-${collapsibleIdCounter}`;
-}
 
 function isJsxElement(value: unknown): value is JSXElement {
   return (
@@ -45,6 +40,74 @@ function toChildArray(children: unknown): unknown[] {
   }
 
   return children === undefined || children === null ? [] : [children];
+}
+
+function serializeForId(value: unknown): string {
+  if (Array.isArray(value)) {
+    return value.map((item) => serializeForId(item)).join('|');
+  }
+
+  if (value === undefined || value === null || typeof value === 'boolean') {
+    return '';
+  }
+
+  if (typeof value === 'string' || typeof value === 'number') {
+    return String(value);
+  }
+
+  if (isJsxElement(value)) {
+    const typeName =
+      typeof value.type === 'string'
+        ? value.type
+        : typeof value.type === 'function'
+          ? value.type.name || 'component'
+          : 'component';
+    const propEntries = Object.entries(value.props ?? {})
+      .filter(
+        ([key, entryValue]) =>
+          key !== 'children' &&
+          key !== 'ref' &&
+          !key.startsWith('on') &&
+          (typeof entryValue === 'string' ||
+            typeof entryValue === 'number' ||
+            typeof entryValue === 'boolean')
+      )
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, entryValue]) => `${key}:${String(entryValue)}`)
+      .join(',');
+
+    return `${typeName}[${propEntries}](${serializeForId(value.props?.children)})`;
+  }
+
+  return typeof value;
+}
+
+function hashString(value: string): string {
+  let hash = 2166136261;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return (hash >>> 0).toString(36);
+}
+
+function resolveCollapsibleContentId(props: CollapsibleProps): string {
+  const identity =
+    props.id ??
+    `auto-${hashString(
+      [
+        props.defaultOpen ? 'open' : 'closed',
+        props.disabled ? 'disabled' : 'enabled',
+        serializeForId(props.children),
+      ].join('|')
+    )}`;
+
+  return formatId({
+    prefix: 'collapsible-content',
+    id: identity,
+  });
 }
 
 function cloneCollapsibleChild(
@@ -84,6 +147,7 @@ function readInjectedState(
 
 export function Collapsible(props: CollapsibleProps) {
   const {
+    id,
     children,
     open,
     defaultOpen = false,
@@ -91,21 +155,23 @@ export function Collapsible(props: CollapsibleProps) {
     disabled = false,
   } = props;
 
-  const internalOpen = state(defaultOpen);
-  const stableContentId = state(nextCollapsibleId());
-  const isControlled = open !== undefined;
-  const currentOpen = () => (isControlled ? open : internalOpen());
-  const setOpen = (next: boolean) => {
-    if (!isControlled) {
-      internalOpen.set(next);
-    }
-    onOpenChange?.(next);
-  };
-  const contentId = stableContentId();
+  const openState = controllableState({
+    value: open,
+    defaultValue: defaultOpen,
+    onChange: onOpenChange,
+  });
+  const contentId = resolveCollapsibleContentId({
+    id,
+    children,
+    open,
+    defaultOpen,
+    onOpenChange,
+    disabled,
+  });
   const enhancedChildren = toChildArray(children).map((child) =>
     cloneCollapsibleChild(child, {
-      __open: currentOpen(),
-      __setOpen: setOpen,
+      __open: openState(),
+      __setOpen: openState.set,
       __disabled: disabled,
       __contentId: contentId,
     })

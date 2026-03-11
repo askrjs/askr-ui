@@ -54,8 +54,8 @@ Validates Slot-based composition, prop merging, controlled/uncontrolled state, a
 - Admin panels with filtered lists and pagination
 - Feature announcements with toast notifications
 
-**Components:** 15  
-Accordion, Collapsible, Tabs, Breadcrumb, Pagination, NavigationMenu, Menubar, Badge, Avatar, Skeleton, Spinner, Progress, Toast, Toggle, ToggleGroup, Slider
+**Components:** 15 net-new, plus already-shipped `Toggle` as a dependency reference  
+Accordion, Collapsible, Tabs, Breadcrumb, Pagination, NavigationMenu, Menubar, Badge, Avatar, Skeleton, Spinner, Progress, Toast, ToggleGroup, Slider
 
 **Why this milestone:**  
 Adds common app shell patterns and page-level navigation. Builds on v0.1.0's form and overlay foundation to enable complete application layouts. Introduces disclosure patterns (accordions, tabs, collapsibles) that many apps need.

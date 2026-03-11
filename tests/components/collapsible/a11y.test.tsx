@@ -143,7 +143,7 @@ describe('Collapsible — Accessibility', () => {
         </Collapsible>
       );
       const content = container.querySelector('[id^="collapsible-content"]');
-      expect(content?.id).toMatch(/^collapsible-content-\d+$/);
+      expect(content?.id).toMatch(/^collapsible-content-[a-z0-9-]+$/);
     });
 
     it('should have button role on trigger', () => {

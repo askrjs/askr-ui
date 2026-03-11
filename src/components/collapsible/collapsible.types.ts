@@ -13,6 +13,8 @@ import type { JSXElement, Ref } from '@askrjs/askr/foundations';
  * Root component props
  */
 export interface CollapsibleProps {
+  /** Stable caller-provided identity used for ARIA linking when available */
+  id?: string;
   /** Controlled open state */
   open?: boolean;
   /** Uncontrolled default open state */

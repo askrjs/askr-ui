@@ -174,7 +174,7 @@ The current `pressable` foundation from `@askrjs/askr/foundations` is optimized 
    - Accessibility tests with axe (`.a11y.test.tsx`)
    - Determinism tests (`.determinism.test.tsx`)
    - Benchmarks (`.bench.tsx`)
-   - Type tests (`.test-d.ts` - to be added)
+   - Compile-time type tests (`tests/types/*.test.ts`)
 
 ---
 

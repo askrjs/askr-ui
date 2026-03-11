@@ -11,8 +11,6 @@ import type {
   FieldProps,
 } from './field.types';
 
-let fieldIdCounter = 0;
-
 function resolveFieldId(explicitId?: string): string {
   if (explicitId) {
     return explicitId;
@@ -27,17 +25,16 @@ export function Field(props: FieldProps) {
   const {
     children,
     ref,
+    id,
     invalid = false,
     required = false,
     disabled = false,
     ...rest
   } = props;
 
-  fieldIdCounter += 1;
-  const baseId = props.id ?? `field-${fieldIdCounter}`;
   const finalProps = mergeProps(rest, {
     ref,
-    id: baseId,
+    id,
     'data-invalid': invalid ? 'true' : undefined,
     'data-required': required ? 'true' : undefined,
     'data-disabled': disabled ? 'true' : undefined,
