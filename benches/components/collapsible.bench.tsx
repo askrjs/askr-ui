@@ -46,7 +46,7 @@ describe('Collapsible benches', () => {
   });
 
   bench('state toggle - open to closed to open', () => {
-    const onOpenChange = (open: boolean) => {
+    const onOpenChange = (_open: boolean) => {
       // Simulates state change
     };
     Collapsible({

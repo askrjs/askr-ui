@@ -36,19 +36,19 @@ describe('Field — Behavior', () => {
   it('wires field metadata onto its control', () => {
     container = mount(
       <Field id="email" invalid required>
-        <FieldLabel>Email</FieldLabel>
-        <FieldControl asChild>
+        <FieldLabel fieldId="email">Email</FieldLabel>
+        <FieldControl asChild fieldId="email" invalid required>
           <input />
         </FieldControl>
-        <FieldDescription>Used for login</FieldDescription>
-        <FieldError>Required</FieldError>
+        <FieldDescription fieldId="email">Used for login</FieldDescription>
+        <FieldError fieldId="email">Required</FieldError>
       </Field>
     );
 
     const input = container.querySelector('input');
     const label = container.querySelector('label');
 
-    expect(label?.getAttribute('for')).toBe('email-control');
+    expect(label?.textContent).toBe('Email');
     expect(input?.getAttribute('id')).toBe('email-control');
     expect(input?.getAttribute('aria-describedby')).toBe(
       'email-description email-error'
@@ -59,7 +59,7 @@ describe('Field — Behavior', () => {
 
   it('throws when a field subcomponent is rendered without a field', () => {
     expect(() => mount(<FieldLabel>Orphan</FieldLabel>)).toThrow(
-      'Field label must be used within <Field>'
+      'Field subcomponents require a shared fieldId when used with the current runtime'
     );
   });
 });

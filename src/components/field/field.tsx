@@ -11,32 +11,16 @@ import type {
   FieldProps,
 } from './field.types';
 
-type FieldContext = {
-  baseId: string;
-  invalid: boolean;
-  required: boolean;
-  disabled: boolean;
-};
-
-const fieldStack: FieldContext[] = [];
 let fieldIdCounter = 0;
 
-function createFieldContext(props: FieldProps): FieldContext {
-  fieldIdCounter += 1;
-  return {
-    baseId: props.id ?? `field-${fieldIdCounter}`,
-    invalid: props.invalid ?? false,
-    required: props.required ?? false,
-    disabled: props.disabled ?? false,
-  };
-}
-
-function readFieldContext(part: string): FieldContext {
-  const ctx = fieldStack[fieldStack.length - 1];
-  if (!ctx) {
-    throw new Error(`Field ${part} must be used within <Field>`);
+function resolveFieldId(explicitId?: string): string {
+  if (explicitId) {
+    return explicitId;
   }
-  return ctx;
+
+  throw new Error(
+    'Field subcomponents require a shared fieldId when used with the current runtime'
+  );
 }
 
 export function Field(props: FieldProps) {
@@ -49,31 +33,27 @@ export function Field(props: FieldProps) {
     ...rest
   } = props;
 
-  const ctx = createFieldContext(props);
-  fieldStack.push(ctx);
+  fieldIdCounter += 1;
+  const baseId = props.id ?? `field-${fieldIdCounter}`;
+  const finalProps = mergeProps(rest, {
+    ref,
+    id: baseId,
+    'data-invalid': invalid ? 'true' : undefined,
+    'data-required': required ? 'true' : undefined,
+    'data-disabled': disabled ? 'true' : undefined,
+  });
 
-  try {
-    const finalProps = mergeProps(rest, {
-      ref,
-      'data-invalid': invalid ? 'true' : undefined,
-      'data-required': required ? 'true' : undefined,
-      'data-disabled': disabled ? 'true' : undefined,
-    });
-
-    return <div {...finalProps}>{children}</div>;
-  } finally {
-    fieldStack.pop();
-  }
+  return <div {...finalProps}>{children}</div>;
 }
 
 export function FieldLabel(props: FieldLabelProps): JSX.Element;
 export function FieldLabel(props: FieldLabelAsChildProps): JSX.Element;
 export function FieldLabel(props: FieldLabelProps | FieldLabelAsChildProps) {
-  const ctx = readFieldContext('label');
-  const { asChild, children, ref, ...rest } = props;
+  const { asChild, children, ref, fieldId, ...rest } = props;
+  const baseId = resolveFieldId(fieldId);
   const finalProps = mergeProps(rest, {
     ref,
-    htmlFor: `${ctx.baseId}-control`,
+    htmlFor: `${baseId}-control`,
   });
 
   if (asChild) {
@@ -84,15 +64,17 @@ export function FieldLabel(props: FieldLabelProps | FieldLabelAsChildProps) {
 }
 
 export function FieldDescription(props: FieldDescriptionProps): JSX.Element;
-export function FieldDescription(props: FieldDescriptionAsChildProps): JSX.Element;
+export function FieldDescription(
+  props: FieldDescriptionAsChildProps
+): JSX.Element;
 export function FieldDescription(
   props: FieldDescriptionProps | FieldDescriptionAsChildProps
 ) {
-  const ctx = readFieldContext('description');
-  const { asChild, children, ref, ...rest } = props;
+  const { asChild, children, ref, fieldId, ...rest } = props;
+  const baseId = resolveFieldId(fieldId);
   const finalProps = mergeProps(rest, {
     ref,
-    id: `${ctx.baseId}-description`,
+    id: `${baseId}-description`,
   });
 
   if (asChild) {
@@ -105,11 +87,11 @@ export function FieldDescription(
 export function FieldError(props: FieldErrorProps): JSX.Element;
 export function FieldError(props: FieldErrorAsChildProps): JSX.Element;
 export function FieldError(props: FieldErrorProps | FieldErrorAsChildProps) {
-  const ctx = readFieldContext('error');
-  const { asChild, children, ref, ...rest } = props;
+  const { asChild, children, ref, fieldId, ...rest } = props;
+  const baseId = resolveFieldId(fieldId);
   const finalProps = mergeProps(rest, {
     ref,
-    id: `${ctx.baseId}-error`,
+    id: `${baseId}-error`,
     role: 'alert',
   });
 
@@ -125,23 +107,32 @@ export function FieldControl(props: FieldControlAsChildProps): JSX.Element;
 export function FieldControl(
   props: FieldControlProps | FieldControlAsChildProps
 ) {
-  const ctx = readFieldContext('control');
-  const { asChild, children, ref, ...rest } = props;
+  const {
+    asChild,
+    children,
+    ref,
+    fieldId,
+    invalid = false,
+    required = false,
+    disabled = false,
+    ...rest
+  } = props;
+  const baseId = resolveFieldId(fieldId);
   const describedBy = [
-    `${ctx.baseId}-description`,
-    ctx.invalid ? `${ctx.baseId}-error` : null,
+    `${baseId}-description`,
+    invalid ? `${baseId}-error` : null,
   ]
     .filter(Boolean)
     .join(' ');
 
   const finalProps = mergeProps(rest, {
     ref,
-    id: `${ctx.baseId}-control`,
+    id: `${baseId}-control`,
     'aria-describedby': describedBy || undefined,
-    'aria-invalid': ctx.invalid ? 'true' : undefined,
-    'aria-required': ctx.required ? 'true' : undefined,
-    'aria-disabled': ctx.disabled ? 'true' : undefined,
-    disabled: ctx.disabled ? true : undefined,
+    'aria-invalid': invalid ? 'true' : undefined,
+    'aria-required': required ? 'true' : undefined,
+    'aria-disabled': disabled ? 'true' : undefined,
+    disabled: disabled ? true : undefined,
   });
 
   if (asChild) {

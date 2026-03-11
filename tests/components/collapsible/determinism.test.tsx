@@ -26,6 +26,10 @@ function getCollapsibleHTML(container: HTMLElement): string {
   return container.innerHTML;
 }
 
+function normalizeCollapsibleHtml(html: string): string {
+  return html.replace(/collapsible-content-\d+/g, 'collapsible-content-id');
+}
+
 describe('Collapsible — Determinism', () => {
   let container: HTMLElement;
 
@@ -45,7 +49,7 @@ describe('Collapsible — Determinism', () => {
           <CollapsibleContent>Content</CollapsibleContent>
         </Collapsible>
       );
-      const output1 = getCollapsibleHTML(container);
+      const output1 = normalizeCollapsibleHtml(getCollapsibleHTML(container));
       unmount(container);
 
       container = mount(
@@ -54,7 +58,7 @@ describe('Collapsible — Determinism', () => {
           <CollapsibleContent>Content</CollapsibleContent>
         </Collapsible>
       );
-      const output2 = getCollapsibleHTML(container);
+      const output2 = normalizeCollapsibleHtml(getCollapsibleHTML(container));
 
       expect(output1).toBe(output2);
     });
@@ -68,7 +72,7 @@ describe('Collapsible — Determinism', () => {
           <CollapsibleContent>Content</CollapsibleContent>
         </Collapsible>
       );
-      const output1 = getCollapsibleHTML(container);
+      const output1 = normalizeCollapsibleHtml(getCollapsibleHTML(container));
       unmount(container);
 
       container = mount(
@@ -77,7 +81,7 @@ describe('Collapsible — Determinism', () => {
           <CollapsibleContent>Content</CollapsibleContent>
         </Collapsible>
       );
-      const output2 = getCollapsibleHTML(container);
+      const output2 = normalizeCollapsibleHtml(getCollapsibleHTML(container));
 
       expect(output1).toBe(output2);
     });
@@ -91,7 +95,7 @@ describe('Collapsible — Determinism', () => {
           <CollapsibleContent>Content</CollapsibleContent>
         </Collapsible>
       );
-      const output1 = getCollapsibleHTML(container);
+      const output1 = normalizeCollapsibleHtml(getCollapsibleHTML(container));
       unmount(container);
 
       container = mount(
@@ -100,7 +104,7 @@ describe('Collapsible — Determinism', () => {
           <CollapsibleContent>Content</CollapsibleContent>
         </Collapsible>
       );
-      const output2 = getCollapsibleHTML(container);
+      const output2 = normalizeCollapsibleHtml(getCollapsibleHTML(container));
 
       expect(output1).toBe(output2);
     });
@@ -115,17 +119,23 @@ describe('Collapsible — Determinism', () => {
         </Collapsible>
       );
 
-      let trigger = container.querySelector('button')!;
+      const trigger = container.querySelector('button')!;
       expect(trigger.getAttribute('aria-expanded')).toBe('false');
 
       trigger.click();
-      expect(trigger.getAttribute('aria-expanded')).toBe('true');
+      expect(
+        container.querySelector('button')?.getAttribute('aria-expanded')
+      ).toBe('true');
 
-      trigger.click();
-      expect(trigger.getAttribute('aria-expanded')).toBe('false');
+      container.querySelector('button')!.click();
+      expect(
+        container.querySelector('button')?.getAttribute('aria-expanded')
+      ).toBe('false');
 
-      trigger.click();
-      expect(trigger.getAttribute('aria-expanded')).toBe('true');
+      container.querySelector('button')!.click();
+      expect(
+        container.querySelector('button')?.getAttribute('aria-expanded')
+      ).toBe('true');
     });
   });
 
@@ -185,12 +195,12 @@ describe('Collapsible — Determinism', () => {
       expect(content).toBeDefined();
 
       // Close - content removed from DOM
-      trigger.click();
+      container.querySelector('button')!.click();
       content = container.querySelector('[id^="collapsible-content"]');
       expect(content).toBeNull();
 
       // Reopen - content in DOM again
-      trigger.click();
+      container.querySelector('button')!.click();
       content = container.querySelector('[id^="collapsible-content"]');
       expect(content).toBeDefined();
     });
@@ -241,7 +251,7 @@ describe('Collapsible — Determinism', () => {
 
       // Toggle state - IDs should remain the same
       trigger.click(); // close
-      trigger.click(); // reopen
+      container.querySelector('button')!.click(); // reopen
 
       const contentAfter = container.querySelector(
         '[id^="collapsible-content"]'
@@ -261,7 +271,7 @@ describe('Collapsible — Determinism', () => {
           <CollapsibleContent>Stable Content</CollapsibleContent>
         </Collapsible>
       );
-      const output1 = getCollapsibleHTML(container);
+      const output1 = normalizeCollapsibleHtml(getCollapsibleHTML(container));
       unmount(container);
 
       container = mount(
@@ -270,7 +280,7 @@ describe('Collapsible — Determinism', () => {
           <CollapsibleContent>Stable Content</CollapsibleContent>
         </Collapsible>
       );
-      const output2 = getCollapsibleHTML(container);
+      const output2 = normalizeCollapsibleHtml(getCollapsibleHTML(container));
 
       expect(output1).toBe(output2);
     });

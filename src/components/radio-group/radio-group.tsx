@@ -1,33 +1,59 @@
 import {
   Slot,
-  controllableState,
   mergeProps,
   pressable,
   rovingFocus,
 } from '@askrjs/askr/foundations';
+import { state } from '@askrjs/askr';
+import type { JSXElement } from '@askrjs/askr/foundations';
 import type {
   RadioGroupItemAsChildProps,
   RadioGroupItemProps,
   RadioGroupProps,
 } from './radio-group.types';
 
-type RadioGroupContext = {
-  valueState: ReturnType<typeof controllableState<string>>;
-  disabled: boolean;
-  orientation: 'horizontal' | 'vertical' | 'both';
-  loop: boolean;
-  itemValues: string[];
-  itemCursor: number;
+type InjectedRadioGroupItemProps = {
+  __groupValue?: string;
+  __setGroupValue?: (value: string) => void;
+  __groupDisabled?: boolean;
+  __groupOrientation?: 'horizontal' | 'vertical' | 'both';
+  __groupLoop?: boolean;
+  __itemIndex?: number;
+  __itemCount?: number;
+  __itemValues?: string[];
 };
 
-const radioGroupStack: RadioGroupContext[] = [];
+function isJsxElement(value: unknown): value is JSXElement {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    '$$typeof' in value &&
+    'props' in value
+  );
+}
 
-function readRadioGroupContext(): RadioGroupContext {
-  const ctx = radioGroupStack[radioGroupStack.length - 1];
-  if (!ctx) {
-    throw new Error('RadioGroupItem must be used within <RadioGroup>');
+function toChildArray(children: unknown): unknown[] {
+  if (Array.isArray(children)) {
+    return children;
   }
-  return ctx;
+  return children === undefined || children === null ? [] : [children];
+}
+
+function cloneRadioItemChild(
+  child: unknown,
+  injected: InjectedRadioGroupItemProps
+): unknown {
+  if (!isJsxElement(child) || child.type !== RadioGroupItem) {
+    return child;
+  }
+
+  return {
+    ...child,
+    props: {
+      ...child.props,
+      ...injected,
+    },
+  };
 }
 
 export function RadioGroup(props: RadioGroupProps) {
@@ -44,91 +70,125 @@ export function RadioGroup(props: RadioGroupProps) {
     ...rest
   } = props;
 
-  const valueState = controllableState({
-    value,
-    defaultValue,
-    onChange: onValueChange,
-  });
-
-  const ctx: RadioGroupContext = {
-    valueState,
-    disabled,
-    orientation,
-    loop,
-    itemValues: [],
-    itemCursor: 0,
+  const internalValue = state(defaultValue);
+  const isControlled = value !== undefined;
+  const currentValue = () => (isControlled ? value : internalValue());
+  const setValue = (next: string) => {
+    if (!isControlled) {
+      internalValue.set(next);
+    }
+    onValueChange?.(next);
   };
 
-  radioGroupStack.push(ctx);
+  const childArray = toChildArray(children);
+  const itemChildren = childArray.filter(
+    (child): child is JSXElement =>
+      isJsxElement(child) && child.type === RadioGroupItem
+  );
+  const itemValues = itemChildren.map((child) =>
+    String(child.props.value ?? '')
+  );
+  const currentIndex = Math.max(0, itemValues.indexOf(currentValue()));
+  const nav = rovingFocus({
+    currentIndex,
+    itemCount: Math.max(itemValues.length, 1),
+    orientation,
+    loop,
+    onNavigate: (index) => {
+      const next = itemValues[index];
+      if (next) {
+        setValue(next);
+      }
+    },
+  });
 
-  try {
-    const currentIndex = Math.max(0, ctx.itemValues.indexOf(valueState()));
-    const nav = rovingFocus({
-      currentIndex,
-      itemCount: Math.max(ctx.itemValues.length, 1),
-      orientation,
-      loop,
-      onNavigate: (index) => {
-        const next = ctx.itemValues[index];
-        if (next) {
-          valueState.set(next);
-        }
-      },
-    });
+  const enhancedChildren = childArray.map((child, index) =>
+    cloneRadioItemChild(child, {
+      __groupValue: currentValue(),
+      __setGroupValue: setValue,
+      __groupDisabled: disabled,
+      __groupOrientation: orientation,
+      __groupLoop: loop,
+      __itemIndex: index,
+      __itemCount: itemValues.length,
+      __itemValues: itemValues,
+    })
+  );
 
-    const finalProps = mergeProps(rest, {
-      ...nav.container,
-      ref,
-      role: 'radiogroup',
-      'aria-orientation': orientation === 'both' ? undefined : orientation,
-    });
+  const finalProps = mergeProps(rest, {
+    ...nav.container,
+    ref,
+    role: 'radiogroup',
+    'aria-orientation': orientation === 'both' ? undefined : orientation,
+  });
 
-    return (
-      <div {...finalProps}>
-        {children}
-        {name ? (
-          <input type="hidden" name={name} value={valueState()} disabled={disabled} />
-        ) : null}
-      </div>
-    );
-  } finally {
-    radioGroupStack.pop();
-  }
+  return (
+    <div {...finalProps}>
+      {enhancedChildren}
+      {name ? (
+        <input
+          type="hidden"
+          name={name}
+          value={currentValue()}
+          disabled={disabled}
+        />
+      ) : null}
+    </div>
+  );
 }
 
 export function RadioGroupItem(props: RadioGroupItemProps): JSX.Element;
 export function RadioGroupItem(props: RadioGroupItemAsChildProps): JSX.Element;
 export function RadioGroupItem(
-  props: RadioGroupItemProps | RadioGroupItemAsChildProps
+  props:
+    | (RadioGroupItemProps & InjectedRadioGroupItemProps)
+    | (RadioGroupItemAsChildProps & InjectedRadioGroupItemProps)
 ) {
-  const ctx = readRadioGroupContext();
-  const { asChild, children, value, disabled = false, ref, ...rest } = props;
-  const index = ctx.itemCursor++;
-  ctx.itemValues[index] = value;
-  const checked = ctx.valueState() === value;
+  const {
+    asChild,
+    children,
+    value,
+    disabled = false,
+    ref,
+    __groupValue,
+    __setGroupValue,
+    __groupDisabled = false,
+    __groupOrientation = 'vertical',
+    __groupLoop = true,
+    __itemIndex = 0,
+    __itemCount = 1,
+    __itemValues = [value],
+    ...rest
+  } = props;
+
+  if (!__setGroupValue) {
+    throw new Error('RadioGroupItem must be used within <RadioGroup>');
+  }
+
+  const checked = __groupValue === value;
 
   const nav = rovingFocus({
-    currentIndex: Math.max(0, ctx.itemValues.indexOf(ctx.valueState())),
-    itemCount: Math.max(ctx.itemValues.length, index + 1),
-    orientation: ctx.orientation,
-    loop: ctx.loop,
+    currentIndex: Math.max(0, __itemValues.indexOf(__groupValue ?? '')),
+    itemCount: Math.max(__itemCount, 1),
+    orientation: __groupOrientation,
+    loop: __groupLoop,
     onNavigate: (nextIndex) => {
-      const next = ctx.itemValues[nextIndex];
+      const next = __itemValues[nextIndex];
       if (next) {
-        ctx.valueState.set(next);
+        __setGroupValue(next);
       }
     },
   });
 
   const interactionProps = pressable({
-    disabled: ctx.disabled || disabled,
-    onPress: () => ctx.valueState.set(value),
+    disabled: __groupDisabled || disabled,
+    onPress: () => __setGroupValue(value),
     isNativeButton: !asChild,
   });
 
   const finalProps = mergeProps(rest, {
     ...interactionProps,
-    ...nav.item(index),
+    ...nav.item(__itemIndex),
     ref,
     role: asChild ? 'radio' : undefined,
     'aria-checked': checked ? 'true' : 'false',

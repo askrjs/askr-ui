@@ -31,7 +31,7 @@ Each milestone builds on the previous, expanding capabilities without breaking e
 - Basic CRUD interfaces
 
 **Components:** 15 UI components  
-Button (✅ shipped), Checkbox (✅ shipped), Input (✅ shipped), Textarea (✅ shipped), Label (✅ shipped), VisuallyHidden (✅ shipped), Separator (✅ shipped), RadioGroup, Switch, Field, Dialog, AlertDialog, Popover, Tooltip, Select, Menu, DropdownMenu, FocusRing, FocusScope, DismissableLayer
+Button (✅ shipped), Checkbox (✅ shipped), Input (✅ shipped), Textarea (✅ shipped), Label (✅ shipped), VisuallyHidden (✅ shipped), Separator (✅ shipped), RadioGroup (✅ shipped), Switch (✅ shipped), Field (✅ shipped), Dialog, AlertDialog, Popover, Tooltip, Select, Menu, DropdownMenu, FocusRing, FocusScope, DismissableLayer
 
 **Uses existing foundations:**  
 Slot, Portal, Presence, pressable(), focusable(), hoverable(), dismissable(), rovingFocus(), mergeProps, controllableState, Collection, Layer (all from `@askrjs/askr/foundations`)

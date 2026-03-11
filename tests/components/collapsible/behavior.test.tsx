@@ -74,7 +74,7 @@ describe('Collapsible — Behavior', () => {
       expect(content).toContain('Content');
 
       // Click to close
-      trigger.click();
+      container.querySelector('button')!.click();
       content = container.textContent;
       expect(content).not.toContain('Content');
     });

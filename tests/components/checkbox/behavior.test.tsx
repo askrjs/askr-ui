@@ -192,20 +192,20 @@ describe('Checkbox — Behavior', () => {
   });
 
   describe('Ref Forwarding', () => {
-    it('should accept ref prop on native input without affecting render', () => {
+    it('should forward ref prop to native input', () => {
       let refNode: HTMLInputElement | null = null;
-      const refCallback = (node: HTMLInputElement) => {
+      const refCallback = (node: HTMLInputElement | null) => {
         refNode = node;
       };
       container = mount(<Checkbox ref={refCallback} />);
-      const input = container.querySelector('input');
+      const input = container.querySelector('input') as HTMLInputElement;
       expect(input).toBeTruthy();
-      expect(refNode).toBeNull();
+      expect(refNode).toBe(input);
     });
 
-    it('should accept ref prop on asChild without affecting render', () => {
+    it('should forward ref prop on asChild', () => {
       let refNode: HTMLElement | null = null;
-      const refCallback = (node: HTMLElement) => {
+      const refCallback = (node: HTMLElement | null) => {
         refNode = node;
       };
       container = mount(
@@ -213,9 +213,9 @@ describe('Checkbox — Behavior', () => {
           <div>Checkbox</div>
         </Checkbox>
       );
-      const div = container.querySelector('div');
+      const div = container.querySelector('div') as HTMLElement;
       expect(div).toBeTruthy();
-      expect(refNode).toBeNull();
+      expect(refNode).toBe(div);
     });
   });
 });

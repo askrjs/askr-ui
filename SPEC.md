@@ -104,6 +104,9 @@ Components must:
 - ✅ **Label** — Exported
 - ✅ **Input** — Exported
 - ✅ **Textarea** — Exported
+- ✅ **Field** — Exported
+- ✅ **RadioGroup** — Exported
+- ✅ **Switch** — Exported
 - 🚧 **Collapsible** — Present in source but intentionally deferred and not exported
 
 ### Planned Components
@@ -246,7 +249,7 @@ askr-ui is successful if:
 
 ## Current Status (January 2026)
 
-### ✅ Completed & Exported (7 components)
+### ✅ Completed & Exported (10 components)
 
 1. **Button** — Full implementation
    - Behavior tests: 27 tests passing
@@ -265,21 +268,38 @@ askr-ui is successful if:
    - Uses `pressable` foundation for interaction
 
 3. **Checkbox** — Exported
-  - Native-first checkbox API with `asChild` support
-  - Behavior, accessibility, and determinism tests passing
-  - Package exports added
+
+- Native-first checkbox API with `asChild` support
+- Behavior, accessibility, and determinism tests passing
+- Package exports added
 
 4. **VisuallyHidden** — Exported
-  - Structural accessibility utility
+
+- Structural accessibility utility
 
 5. **Separator** — Exported
-  - Semantic divider with decorative mode
+
+- Semantic divider with decorative mode
 
 6. **Label** — Exported
-  - Thin labeling primitive with `asChild` support
+
+- Thin labeling primitive with `asChild` support
 
 7. **Input** / **Textarea** — Exported
-  - Native-first text entry wrappers with focusable semantics
+
+- Native-first text entry wrappers with focusable semantics
+
+8. **Field** — Exported
+
+- Headless field metadata and ARIA association wrapper
+
+9. **RadioGroup** — Exported
+
+- Controlled/uncontrolled single-selection group
+
+10. **Switch** — Exported
+
+- Checked-state control with switch semantics
 
 ### 🚧 Partially Implemented (not exported)
 

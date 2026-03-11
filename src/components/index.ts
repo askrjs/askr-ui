@@ -1,5 +1,6 @@
 export * from './button';
 export * from './checkbox';
+export * from './collapsible';
 export * from './field';
 export * from './input';
 export * from './label';

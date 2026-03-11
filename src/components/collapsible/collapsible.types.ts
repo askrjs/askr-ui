@@ -1,4 +1,4 @@
-import type { JSXElement } from '@askrjs/askr/foundations';
+import type { JSXElement, Ref } from '@askrjs/askr/foundations';
 
 /**
  * Collapsible component prop types
@@ -28,21 +28,51 @@ export interface CollapsibleProps {
 /**
  * Trigger component props (button semantics)
  */
-export interface CollapsibleTriggerProps {
+export interface CollapsibleTriggerProps extends Omit<
+  JSX.IntrinsicElements['button'],
+  'children' | 'ref'
+> {
   /** Render as child element instead of button */
-  asChild?: boolean;
+  asChild?: false;
   /** Child content */
   children?: unknown;
+  /** Ref forwarding */
+  ref?: Ref<HTMLButtonElement>;
+}
+
+export interface CollapsibleTriggerAsChildProps {
+  /** Render as child element instead of button */
+  asChild: true;
+  /** Child content */
+  children: JSXElement;
+  /** Ref forwarding */
+  ref?: Ref<unknown>;
 }
 
 /**
  * Content component props
  */
-export interface CollapsibleContentProps {
+export interface CollapsibleContentProps extends Omit<
+  JSX.IntrinsicElements['div'],
+  'children' | 'ref'
+> {
   /** Render as child element instead of div */
-  asChild?: boolean;
+  asChild?: false;
   /** Child content */
   children?: unknown;
   /** Force mount even when closed (for animation) */
   forceMount?: boolean;
+  /** Ref forwarding */
+  ref?: Ref<HTMLDivElement>;
+}
+
+export interface CollapsibleContentAsChildProps {
+  /** Render as child element instead of div */
+  asChild: true;
+  /** Child content */
+  children: JSXElement;
+  /** Force mount even when closed (for animation) */
+  forceMount?: boolean;
+  /** Ref forwarding */
+  ref?: Ref<unknown>;
 }

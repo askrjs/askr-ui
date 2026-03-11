@@ -38,15 +38,30 @@
       "import": "./dist/components/input/input.js",
       "require": "./dist/components/input/input.cjs"
     },
+    "./field": {
+      "types": "./dist/components/field/field.d.ts",
+      "import": "./dist/components/field/field.js",
+      "require": "./dist/components/field/field.cjs"
+    },
     "./label": {
       "types": "./dist/components/label/label.d.ts",
       "import": "./dist/components/label/label.js",
       "require": "./dist/components/label/label.cjs"
     },
+    "./radio-group": {
+      "types": "./dist/components/radio-group/radio-group.d.ts",
+      "import": "./dist/components/radio-group/radio-group.js",
+      "require": "./dist/components/radio-group/radio-group.cjs"
+    },
     "./separator": {
       "types": "./dist/components/separator/separator.d.ts",
       "import": "./dist/components/separator/separator.js",
       "require": "./dist/components/separator/separator.cjs"
+    },
+    "./switch": {
+      "types": "./dist/components/switch/switch.d.ts",
+      "import": "./dist/components/switch/switch.js",
+      "require": "./dist/components/switch/switch.cjs"
     },
     "./textarea": {
       "types": "./dist/components/textarea/textarea.d.ts",
@@ -67,7 +82,7 @@
     "node": ">=18"
   },
   "peerDependencies": {
-    "@askrjs/askr": "^0.0.27"
+    "@askrjs/askr": "^0.0.28"
   },
   "peerDependenciesMeta": {
     "@askrjs/askr": {
@@ -87,6 +102,7 @@
     "lint": "eslint src tests benches --ext .ts,.tsx"
   },
   "devDependencies": {
+    "@askrjs/askr": "^0.0.28",
     "@eslint/js": "^10.0.1",
     "@types/node": "^25.4.0",
     "axe-core": "^4.11.1",
@@ -102,6 +118,5 @@
     "vite": "^7.3.1",
     "vitest": "^4.0.18",
     "vitest-axe": "^0.1.0"
-  },
-  "dependencies": {}
+  }
 }

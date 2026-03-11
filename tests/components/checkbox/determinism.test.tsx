@@ -133,17 +133,15 @@ describe('Checkbox — Determinism', () => {
     it('should provide same element reference given multiple calls', () => {
       const refs: Array<HTMLInputElement | null> = [];
       const refCallback = (node: HTMLInputElement | null) => {
-        if (node) {
-          refs.push(node);
-        }
+        refs.push(node);
       };
 
       container = mount(<Checkbox ref={refCallback} />);
-      const input = container.querySelector('input');
+      const input = container.querySelector('input') as HTMLInputElement;
 
-      // Ref callback should be called with the same element
       expect(input).toBeTruthy();
-      expect(refs.length).toBe(0);
+      expect(refs.filter(Boolean)).toHaveLength(1);
+      expect(refs[0]).toBe(input);
     });
   });
 

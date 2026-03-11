@@ -8,6 +8,7 @@
     "rootDir": "src"
   },
   "include": [
+    "src/**/*.d.ts",
     "src/index.ts",
     "src/components/index.ts",
     "src/components/button/**/*.ts",
