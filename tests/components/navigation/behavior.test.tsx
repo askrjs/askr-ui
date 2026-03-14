@@ -192,7 +192,9 @@ describe('Navigation components - Behavior', () => {
 
     (
       document.body.querySelector('[role="menu"]') as HTMLDivElement
-    ).dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    ).dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+    );
     await flushPortalUpdates();
     expect(document.body.textContent).not.toContain('New');
 
@@ -202,10 +204,12 @@ describe('Navigation components - Behavior', () => {
     expect(document.body.textContent).toContain('Core');
 
     (
-      document.body.querySelector('[data-state="open"][data-side="bottom"]') as
-        | HTMLDivElement
-        | null
-    )?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      document.body.querySelector(
+        '[data-state="open"][data-side="bottom"]'
+      ) as HTMLDivElement | null
+    )?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+    );
     await flushPortalUpdates();
     expect(document.body.textContent).not.toContain('Core');
   });

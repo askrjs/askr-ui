@@ -61,17 +61,19 @@ describe('Consistency Reset - Internal Props', () => {
       </Menubar>
     );
 
-    (Array.from(document.body.querySelectorAll('button')).find(
-      (element) => element.textContent?.trim() === 'File'
-    ) as HTMLButtonElement).click();
+    (
+      Array.from(document.body.querySelectorAll('button')).find(
+        (element) => element.textContent?.trim() === 'File'
+      ) as HTMLButtonElement
+    ).click();
     await flushUpdates();
     await flushUpdates();
 
-    (Array.from(document.body.querySelectorAll('button')).find(
-      (element) => element.textContent?.trim() === 'Share'
-    ) as HTMLButtonElement).dispatchEvent(
-      new PointerEvent('pointerenter', { bubbles: true })
-    );
+    (
+      Array.from(document.body.querySelectorAll('button')).find(
+        (element) => element.textContent?.trim() === 'Share'
+      ) as HTMLButtonElement
+    ).dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
     await flushUpdates();
     await flushUpdates();
 
@@ -88,7 +90,9 @@ describe('Consistency Reset - Internal Props', () => {
               <NavigationMenuSub value="more">
                 <NavigationMenuSubTrigger>More</NavigationMenuSubTrigger>
                 <NavigationMenuSubContent>
-                  <NavigationMenuLink href="/products/pro">Pro</NavigationMenuLink>
+                  <NavigationMenuLink href="/products/pro">
+                    Pro
+                  </NavigationMenuLink>
                 </NavigationMenuSubContent>
               </NavigationMenuSub>
             </NavigationMenuContent>
@@ -97,17 +101,19 @@ describe('Consistency Reset - Internal Props', () => {
       </NavigationMenu>
     );
 
-    (Array.from(document.body.querySelectorAll('button')).find(
-      (element) => element.textContent?.trim() === 'Products'
-    ) as HTMLButtonElement).click();
+    (
+      Array.from(document.body.querySelectorAll('button')).find(
+        (element) => element.textContent?.trim() === 'Products'
+      ) as HTMLButtonElement
+    ).click();
     await flushUpdates();
     await flushUpdates();
 
-    (Array.from(document.body.querySelectorAll('button')).find(
-      (element) => element.textContent?.trim() === 'More'
-    ) as HTMLButtonElement).dispatchEvent(
-      new PointerEvent('pointerenter', { bubbles: true })
-    );
+    (
+      Array.from(document.body.querySelectorAll('button')).find(
+        (element) => element.textContent?.trim() === 'More'
+      ) as HTMLButtonElement
+    ).dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
     await flushUpdates();
     await flushUpdates();
 

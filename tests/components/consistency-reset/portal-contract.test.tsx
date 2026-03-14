@@ -87,8 +87,12 @@ describe('Consistency Reset - Portal Contract', () => {
 
     const text = container.textContent ?? '';
 
-    expect(text.indexOf('Open dialog')).toBeLessThan(text.indexOf('Dialog body'));
-    expect(text.indexOf('Open popover')).toBeLessThan(text.indexOf('Popover body'));
+    expect(text.indexOf('Open dialog')).toBeLessThan(
+      text.indexOf('Dialog body')
+    );
+    expect(text.indexOf('Open popover')).toBeLessThan(
+      text.indexOf('Popover body')
+    );
     expect(text.indexOf('Open menu')).toBeLessThan(text.indexOf('Archive'));
     expect(text.indexOf('Tooltip trigger')).toBeLessThan(
       text.indexOf('Tooltip body')
