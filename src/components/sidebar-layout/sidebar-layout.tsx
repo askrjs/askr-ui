@@ -42,10 +42,10 @@ export function SidebarLayout(props: SidebarLayoutProps): JSX.Element {
       data-collapse-below={collapseBelow}
       style={mergeLayoutStyles(wrapperStyle, userStyle)}
     >
-      <aside data-slot="sidebar" style={sidebarStyle}>
+      <aside data-slot="sidebar" style={mergeLayoutStyles(sidebarStyle, undefined)}>
         {sidebar}
       </aside>
-      <main data-slot="main" style={mainStyle}>
+      <main data-slot="main" style={mergeLayoutStyles(mainStyle, undefined)}>
         {children}
       </main>
     </div>

@@ -27,19 +27,29 @@ export function isCssLength(value: unknown): value is string {
 export function mergeLayoutStyles(
   layout: Record<string, string | number>,
   user: unknown,
-): Record<string, unknown> | string {
-  if (typeof user === 'string' && user.trim()) {
-    const layoutStr = Object.entries(layout)
-      .map(([k, v]) => `${camelToKebab(k)}:${v}`)
-      .join(';');
-    return `${layoutStr};${user.trim()}`;
-  }
+): string {
+  const merged: Record<string, unknown> = { ...layout };
+
   if (user !== null && user !== undefined && typeof user === 'object') {
-    return { ...layout, ...(user as Record<string, unknown>) };
+    Object.assign(merged, user as Record<string, unknown>);
   }
-  return { ...layout };
+
+  const mergedString = objectToCssString(merged);
+
+  if (typeof user === 'string' && user.trim()) {
+    return mergedString ? `${mergedString};${user.trim()}` : user.trim();
+  }
+
+  return mergedString;
 }
 
 function camelToKebab(s: string): string {
   return s.replace(/([A-Z])/g, (c) => `-${c.toLowerCase()}`);
+}
+
+function objectToCssString(styles: Record<string, unknown>): string {
+  return Object.entries(styles)
+    .filter(([, value]) => value !== undefined && value !== null)
+    .map(([key, value]) => `${camelToKebab(key)}:${String(value)}`)
+    .join(';');
 }
