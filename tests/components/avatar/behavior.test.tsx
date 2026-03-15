@@ -4,6 +4,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from '../../../src/components/avatar';
+import { AVATAR_A11Y_CONTRACT } from '../../../src/components/avatar/avatar.a11y';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Avatar - Behavior', () => {
@@ -17,14 +18,20 @@ describe('Avatar - Behavior', () => {
 
     try {
       expect(
-        container.querySelector('[data-avatar-fallback="true"]')?.textContent
+        container.querySelector(
+          `[${AVATAR_A11Y_CONTRACT.FALLBACK.marker}="true"]`
+        )?.textContent
       ).toBe('JD');
 
       const image = container.querySelector('img');
       image?.dispatchEvent(new Event('load'));
       await flushUpdates();
 
-      expect(container.querySelector('[data-avatar-fallback="true"]')).toBeNull();
+      expect(
+        container.querySelector(
+          `[${AVATAR_A11Y_CONTRACT.FALLBACK.marker}="true"]`
+        )
+      ).toBeNull();
     } finally {
       unmount(container);
     }

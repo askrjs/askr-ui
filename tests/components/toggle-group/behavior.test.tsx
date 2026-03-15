@@ -3,6 +3,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from '../../../src/components/toggle-group';
+import { TOGGLE_GROUP_A11Y_CONTRACT } from '../../../src/components/toggle-group/toggle-group.a11y';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 function getButtonByText(
@@ -45,20 +46,28 @@ describe('ToggleGroup - Behavior', () => {
     await flushUpdates();
 
     expect(
-      getButtonByText(container, 'Left').getAttribute('aria-pressed')
+      getButtonByText(container, 'Left').getAttribute(
+        TOGGLE_GROUP_A11Y_CONTRACT.PRESSED_ATTRIBUTE
+      )
     ).toBe('false');
     expect(
-      getButtonByText(container, 'Right').getAttribute('aria-pressed')
+      getButtonByText(container, 'Right').getAttribute(
+        TOGGLE_GROUP_A11Y_CONTRACT.PRESSED_ATTRIBUTE
+      )
     ).toBe('true');
 
     getButtonByText(container, 'Right multiple').click();
     await flushUpdates();
 
     expect(
-      getButtonByText(container, 'Left multiple').getAttribute('aria-pressed')
+      getButtonByText(container, 'Left multiple').getAttribute(
+        TOGGLE_GROUP_A11Y_CONTRACT.PRESSED_ATTRIBUTE
+      )
     ).toBe('true');
     expect(
-      getButtonByText(container, 'Right multiple').getAttribute('aria-pressed')
+      getButtonByText(container, 'Right multiple').getAttribute(
+        TOGGLE_GROUP_A11Y_CONTRACT.PRESSED_ATTRIBUTE
+      )
     ).toBe('true');
   });
 });

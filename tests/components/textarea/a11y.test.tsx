@@ -15,7 +15,9 @@ describe('Textarea - Accessibility', () => {
     try {
       const textarea = container.querySelector('textarea');
       expect(
-        textarea?.getAttribute(TEXTAREA_A11Y_CONTRACT.DISABLED_ATTRIBUTES.asChild)
+        textarea?.getAttribute(
+          TEXTAREA_A11Y_CONTRACT.DISABLED_ATTRIBUTES.asChild
+        )
       ).toBe('true');
     } finally {
       unmount(container);

@@ -12,6 +12,7 @@ import {
   NavigationMenuTrigger,
   NavigationMenuViewport,
 } from '../../../src/components/navigation-menu';
+import { NAVIGATION_MENU_A11Y_CONTRACT } from '../../../src/components/navigation-menu/navigation-menu.a11y';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 function getButtonByText(text: string): HTMLButtonElement {
@@ -46,11 +47,15 @@ describe('NavigationMenu - Behavior', () => {
           <NavigationMenuItem value="products">
             <NavigationMenuTrigger>Products</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <NavigationMenuLink href="/products/core">Core</NavigationMenuLink>
+              <NavigationMenuLink href="/products/core">
+                Core
+              </NavigationMenuLink>
               <NavigationMenuSub value="more">
                 <NavigationMenuSubTrigger>More</NavigationMenuSubTrigger>
                 <NavigationMenuSubContent>
-                  <NavigationMenuLink href="/products/pro">Pro</NavigationMenuLink>
+                  <NavigationMenuLink href="/products/pro">
+                    Pro
+                  </NavigationMenuLink>
                 </NavigationMenuSubContent>
               </NavigationMenuSub>
             </NavigationMenuContent>
@@ -66,12 +71,16 @@ describe('NavigationMenu - Behavior', () => {
 
     expect(
       container
-        .querySelector('[data-navigation-menu-viewport="true"]')
+        .querySelector(
+          `[${NAVIGATION_MENU_A11Y_CONTRACT.VIEWPORT_MARKER}="true"]`
+        )
         ?.getAttribute('data-state')
     ).toBe('open');
     expect(
       container
-        .querySelector('[data-navigation-menu-indicator="true"]')
+        .querySelector(
+          `[${NAVIGATION_MENU_A11Y_CONTRACT.INDICATOR_MARKER}="true"]`
+        )
         ?.getAttribute('data-active-item')
     ).toBe('products');
 
@@ -90,7 +99,9 @@ describe('NavigationMenu - Behavior', () => {
           <NavigationMenuItem value="products">
             <NavigationMenuTrigger>Products</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <NavigationMenuLink href="/products/core">Core</NavigationMenuLink>
+              <NavigationMenuLink href="/products/core">
+                Core
+              </NavigationMenuLink>
             </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>

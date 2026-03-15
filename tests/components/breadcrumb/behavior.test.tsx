@@ -7,6 +7,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from '../../../src/components/breadcrumb';
+import { BREADCRUMB_A11Y_CONTRACT } from '../../../src/components/breadcrumb/breadcrumb.a11y';
 import { mount, unmount } from '../../test-utils';
 
 describe('Breadcrumb - Behavior', () => {
@@ -26,10 +27,16 @@ describe('Breadcrumb - Behavior', () => {
     );
 
     try {
-      expect(container.querySelector('[aria-current="page"]')?.textContent).toBe(
-        'Overview'
-      );
-      expect(container.querySelector('[data-breadcrumb-separator="true"]')).not.toBeNull();
+      expect(
+        container.querySelector(
+          `[${BREADCRUMB_A11Y_CONTRACT.CURRENT_PAGE_ATTRIBUTE}="${BREADCRUMB_A11Y_CONTRACT.CURRENT_PAGE_VALUE}"]`
+        )?.textContent
+      ).toBe('Overview');
+      expect(
+        container.querySelector(
+          `[${BREADCRUMB_A11Y_CONTRACT.SEPARATOR_MARKER}="true"]`
+        )
+      ).not.toBeNull();
     } finally {
       unmount(container);
     }

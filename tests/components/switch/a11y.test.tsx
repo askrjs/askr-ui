@@ -21,9 +21,9 @@ describe('Switch - Accessibility', () => {
         `[role="${SWITCH_A11Y_CONTRACT.ROLE}"]`
       );
       expect(element?.getAttribute('role')).toBe(SWITCH_A11Y_CONTRACT.ROLE);
-      expect(element?.getAttribute(SWITCH_A11Y_CONTRACT.CHECKED_ATTRIBUTE)).toBe(
-        'true'
-      );
+      expect(
+        element?.getAttribute(SWITCH_A11Y_CONTRACT.CHECKED_ATTRIBUTE)
+      ).toBe('true');
     } finally {
       unmount(container);
     }

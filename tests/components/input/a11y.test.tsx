@@ -14,9 +14,9 @@ describe('Input - Accessibility', () => {
 
     try {
       const input = container.querySelector('input');
-      expect(input?.getAttribute(INPUT_A11Y_CONTRACT.DISABLED_ATTRIBUTES.asChild)).toBe(
-        'true'
-      );
+      expect(
+        input?.getAttribute(INPUT_A11Y_CONTRACT.DISABLED_ATTRIBUTES.asChild)
+      ).toBe('true');
     } finally {
       unmount(container);
     }

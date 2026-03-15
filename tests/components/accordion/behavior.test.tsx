@@ -6,6 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '../../../src/components/accordion';
+import { ACCORDION_A11Y_CONTRACT } from '../../../src/components/accordion/accordion.a11y';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 function getButtonByText(
@@ -68,17 +69,23 @@ describe('Accordion - Behavior', () => {
     await flushUpdates();
 
     expect(
-      getButtonByText(container, 'Two').getAttribute('aria-expanded')
+      getButtonByText(container, 'Two').getAttribute(
+        ACCORDION_A11Y_CONTRACT.EXPANDED_ATTRIBUTE
+      )
     ).toBe('true');
     expect(
-      getButtonByText(container, 'One').getAttribute('aria-expanded')
+      getButtonByText(container, 'One').getAttribute(
+        ACCORDION_A11Y_CONTRACT.EXPANDED_ATTRIBUTE
+      )
     ).toBe('false');
 
     getButtonByText(container, 'Two multiple').click();
     await flushUpdates();
 
     const multiOpen = Array.from(
-      container.querySelectorAll('[data-accordion] button[aria-expanded="true"]')
+      container.querySelectorAll(
+        `[data-accordion] button[${ACCORDION_A11Y_CONTRACT.EXPANDED_ATTRIBUTE}="true"]`
+      )
     ).filter((element) => element.textContent?.includes('multiple'));
     expect(multiOpen).toHaveLength(2);
   });

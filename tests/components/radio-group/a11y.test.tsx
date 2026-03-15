@@ -31,14 +31,18 @@ describe('RadioGroup - Accessibility', () => {
       );
       const items = container.querySelectorAll('button');
       expect(group).toBeTruthy();
-      expect(group?.getAttribute('role')).toBe(RADIO_GROUP_A11Y_CONTRACT.GROUP_ROLE);
-      expect(items[0]?.getAttribute('role')).toBe(RADIO_GROUP_A11Y_CONTRACT.ITEM_ROLE);
-      expect(items[0]?.getAttribute(RADIO_GROUP_A11Y_CONTRACT.CHECKED_ATTRIBUTE)).toBe(
-        'false'
+      expect(group?.getAttribute('role')).toBe(
+        RADIO_GROUP_A11Y_CONTRACT.GROUP_ROLE
       );
-      expect(items[1]?.getAttribute(RADIO_GROUP_A11Y_CONTRACT.CHECKED_ATTRIBUTE)).toBe(
-        'true'
+      expect(items[0]?.getAttribute('role')).toBe(
+        RADIO_GROUP_A11Y_CONTRACT.ITEM_ROLE
       );
+      expect(
+        items[0]?.getAttribute(RADIO_GROUP_A11Y_CONTRACT.CHECKED_ATTRIBUTE)
+      ).toBe('false');
+      expect(
+        items[1]?.getAttribute(RADIO_GROUP_A11Y_CONTRACT.CHECKED_ATTRIBUTE)
+      ).toBe('true');
     } finally {
       unmount(container);
     }

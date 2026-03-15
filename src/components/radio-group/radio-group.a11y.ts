@@ -9,7 +9,12 @@ export const RADIO_GROUP_A11Y_CONTRACT = {
   ITEM_ROLE: 'radio' as const,
   CHECKED_ATTRIBUTE: 'aria-checked' as const,
   ORIENTATION_ATTRIBUTE: 'aria-orientation' as const,
-  KEYBOARD_NAVIGATION: ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'] as const,
+  KEYBOARD_NAVIGATION: [
+    'ArrowLeft',
+    'ArrowRight',
+    'ArrowUp',
+    'ArrowDown',
+  ] as const,
   ROVING_FOCUS: {
     activeItemTabIndex: 0,
     inactiveItemTabIndex: -1,

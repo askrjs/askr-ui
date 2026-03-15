@@ -107,7 +107,9 @@ describe('Collapsible — Accessibility', () => {
         </Collapsible>
       );
       const trigger = container.querySelector('button');
-      expect(trigger?.getAttribute(COLLAPSIBLE_A11Y_CONTRACT.EXPANDED_ATTRIBUTE)).toBe('false');
+      expect(
+        trigger?.getAttribute(COLLAPSIBLE_A11Y_CONTRACT.EXPANDED_ATTRIBUTE)
+      ).toBe('false');
     });
 
     it('should apply aria-expanded=true when open', () => {
@@ -118,7 +120,9 @@ describe('Collapsible — Accessibility', () => {
         </Collapsible>
       );
       const trigger = container.querySelector('button');
-      expect(trigger?.getAttribute(COLLAPSIBLE_A11Y_CONTRACT.EXPANDED_ATTRIBUTE)).toBe('true');
+      expect(
+        trigger?.getAttribute(COLLAPSIBLE_A11Y_CONTRACT.EXPANDED_ATTRIBUTE)
+      ).toBe('true');
     });
 
     it('should apply aria-controls to trigger', () => {

@@ -10,6 +10,7 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from '../../../src/components/menubar';
+import { MENUBAR_A11Y_CONTRACT } from '../../../src/components/menubar/menubar.a11y';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 function getButtonByText(text: string): HTMLButtonElement {
@@ -109,7 +110,11 @@ describe('Menubar - Behavior', () => {
     await flushPortalUpdates();
     expect(document.body.textContent).toContain('New');
 
-    (document.body.querySelector('[role="menu"]') as HTMLDivElement).dispatchEvent(
+    (
+      document.body.querySelector(
+        `[role="${MENUBAR_A11Y_CONTRACT.CONTENT_ROLE}"]`
+      ) as HTMLDivElement
+    ).dispatchEvent(
       new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
     );
     await flushPortalUpdates();

@@ -38,7 +38,9 @@ describe('Popover - Accessibility', () => {
       expect(content).toBeTruthy();
       expect(trigger?.id).toBeTruthy();
       expect(
-        content?.getAttribute(POPOVER_A11Y_CONTRACT.CONTENT_ATTRIBUTES.labelledBy)
+        content?.getAttribute(
+          POPOVER_A11Y_CONTRACT.CONTENT_ATTRIBUTES.labelledBy
+        )
       ).toBe(trigger?.id);
     } finally {
       unmount(container);

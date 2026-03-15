@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Pagination } from '../../../src/components/pagination';
+import { PAGINATION_A11Y_CONTRACT } from '../../../src/components/pagination/pagination.a11y';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Pagination - Behavior', () => {
@@ -8,17 +9,25 @@ describe('Pagination - Behavior', () => {
 
     try {
       expect(
-        container.querySelectorAll('[data-pagination-ellipsis="true"]').length
+        container.querySelectorAll(
+          `[${PAGINATION_A11Y_CONTRACT.ELLIPSIS_MARKER}="true"]`
+        ).length
       ).toBe(2);
 
-      let current = container.querySelector('[aria-current="page"]') as HTMLButtonElement;
+      let current = container.querySelector(
+        `[${PAGINATION_A11Y_CONTRACT.CURRENT_PAGE_ATTRIBUTE}="${PAGINATION_A11Y_CONTRACT.CURRENT_PAGE_VALUE}"]`
+      ) as HTMLButtonElement;
       expect(current.textContent).toBe('5');
 
-      const next = container.querySelector('[aria-label="Next page"]') as HTMLButtonElement;
+      const next = container.querySelector(
+        `[aria-label="${PAGINATION_A11Y_CONTRACT.NEXT_LABEL}"]`
+      ) as HTMLButtonElement;
       next.click();
       await flushUpdates();
 
-      current = container.querySelector('[aria-current="page"]') as HTMLButtonElement;
+      current = container.querySelector(
+        `[${PAGINATION_A11Y_CONTRACT.CURRENT_PAGE_ATTRIBUTE}="${PAGINATION_A11Y_CONTRACT.CURRENT_PAGE_VALUE}"]`
+      ) as HTMLButtonElement;
       expect(current.textContent).toBe('6');
     } finally {
       unmount(container);

@@ -3,6 +3,7 @@ import {
   ProgressCircle,
   ProgressCircleIndicator,
 } from '../../../src/components/progress-circle';
+import { PROGRESS_CIRCLE_A11Y_CONTRACT } from '../../../src/components/progress-circle/progress-circle.a11y';
 import { mount, unmount } from '../../test-utils';
 
 describe('ProgressCircle - Behavior', () => {
@@ -14,8 +15,14 @@ describe('ProgressCircle - Behavior', () => {
     );
 
     try {
-      const circular = container.querySelector('[role="progressbar"]');
-      expect(circular?.getAttribute('aria-valuenow')).toBe('30');
+      const circular = container.querySelector(
+        `[role="${PROGRESS_CIRCLE_A11Y_CONTRACT.ROLE}"]`
+      );
+      expect(
+        circular?.getAttribute(
+          PROGRESS_CIRCLE_A11Y_CONTRACT.VALUE_NOW_ATTRIBUTE
+        )
+      ).toBe('30');
     } finally {
       unmount(container);
     }

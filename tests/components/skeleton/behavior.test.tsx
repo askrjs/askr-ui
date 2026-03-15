@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Skeleton } from '../../../src/components/skeleton';
+import { SKELETON_A11Y_CONTRACT } from '../../../src/components/skeleton/skeleton.a11y';
 import { mount, unmount } from '../../test-utils';
 
 describe('Skeleton - Behavior', () => {
@@ -9,9 +10,9 @@ describe('Skeleton - Behavior', () => {
     try {
       expect(
         container
-          .querySelector('[data-skeleton="true"]')
-          ?.getAttribute('aria-hidden')
-      ).toBe('true');
+          .querySelector(`[${SKELETON_A11Y_CONTRACT.MARKER}="true"]`)
+          ?.getAttribute(SKELETON_A11Y_CONTRACT.DECORATIVE_ATTRIBUTE)
+      ).toBe(SKELETON_A11Y_CONTRACT.DECORATIVE_VALUE);
     } finally {
       unmount(container);
     }

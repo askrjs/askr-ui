@@ -45,9 +45,9 @@ describe('Field - Accessibility', () => {
       expect(control?.getAttribute(FIELD_A11Y_CONTRACT.INVALID_ATTRIBUTE)).toBe(
         'true'
       );
-      expect(control?.getAttribute(FIELD_A11Y_CONTRACT.REQUIRED_ATTRIBUTE)).toBe(
-        'true'
-      );
+      expect(
+        control?.getAttribute(FIELD_A11Y_CONTRACT.REQUIRED_ATTRIBUTE)
+      ).toBe('true');
     } finally {
       unmount(container);
     }

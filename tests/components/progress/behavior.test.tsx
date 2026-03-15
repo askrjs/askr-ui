@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Progress, ProgressIndicator } from '../../../src/components/progress';
+import { PROGRESS_A11Y_CONTRACT } from '../../../src/components/progress/progress.a11y';
 import { mount, unmount } from '../../test-utils';
 
 describe('Progress - Behavior', () => {
@@ -11,12 +12,16 @@ describe('Progress - Behavior', () => {
     );
 
     try {
-      const linear = container.querySelector('[role="progressbar"]');
-      expect(linear?.getAttribute('aria-valuenow')).toBe('40');
+      const linear = container.querySelector(
+        `[role="${PROGRESS_A11Y_CONTRACT.ROLE}"]`
+      );
+      expect(
+        linear?.getAttribute(PROGRESS_A11Y_CONTRACT.VALUE_NOW_ATTRIBUTE)
+      ).toBe('40');
       expect(
         container
-          .querySelector('[data-progress-indicator="true"]')
-          ?.getAttribute('data-percentage')
+          .querySelector(`[${PROGRESS_A11Y_CONTRACT.INDICATOR_MARKER}="true"]`)
+          ?.getAttribute(PROGRESS_A11Y_CONTRACT.INDICATOR_PERCENTAGE_ATTRIBUTE)
       ).toBe('50');
     } finally {
       unmount(container);

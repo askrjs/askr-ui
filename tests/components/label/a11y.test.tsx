@@ -19,9 +19,9 @@ describe('Label - Accessibility', () => {
 
     try {
       const label = container.querySelector(LABEL_A11Y_CONTRACT.ELEMENT);
-      expect(label?.getAttribute(LABEL_A11Y_CONTRACT.ASSOCIATION_ATTRIBUTE)).toBe(
-        'email'
-      );
+      expect(
+        label?.getAttribute(LABEL_A11Y_CONTRACT.ASSOCIATION_ATTRIBUTE)
+      ).toBe('email');
     } finally {
       unmount(container);
     }

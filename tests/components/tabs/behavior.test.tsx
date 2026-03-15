@@ -5,6 +5,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '../../../src/components/tabs';
+import { TABS_A11Y_CONTRACT } from '../../../src/components/tabs/tabs.a11y';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 function getButtonByText(
@@ -53,24 +54,25 @@ describe('Tabs - Behavior', () => {
 
     getButtonByText(container, 'Settings').focus();
     await flushUpdates();
-    expect(container.querySelector('[role="tabpanel"]')?.textContent).toContain(
-      'Settings panel'
-    );
+    expect(
+      container.querySelector(`[role="${TABS_A11Y_CONTRACT.PANEL_ROLE}"]`)
+        ?.textContent
+    ).toContain('Settings panel');
 
     getButtonByText(container, 'Settings manual').focus();
     await flushUpdates();
     expect(
-      Array.from(container.querySelectorAll('[role="tabpanel"]')).some((panel) =>
-        panel.textContent?.includes('Settings manual panel')
-      )
+      Array.from(
+        container.querySelectorAll(`[role="${TABS_A11Y_CONTRACT.PANEL_ROLE}"]`)
+      ).some((panel) => panel.textContent?.includes('Settings manual panel'))
     ).toBe(false);
 
     getButtonByText(container, 'Settings manual').click();
     await flushUpdates();
     expect(
-      Array.from(container.querySelectorAll('[role="tabpanel"]')).some((panel) =>
-        panel.textContent?.includes('Settings manual panel')
-      )
+      Array.from(
+        container.querySelectorAll(`[role="${TABS_A11Y_CONTRACT.PANEL_ROLE}"]`)
+      ).some((panel) => panel.textContent?.includes('Settings manual panel'))
     ).toBe(true);
   });
 });

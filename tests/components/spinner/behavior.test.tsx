@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Spinner } from '../../../src/components/spinner';
+import { SPINNER_A11Y_CONTRACT } from '../../../src/components/spinner/spinner.a11y';
 import { mount, unmount } from '../../test-utils';
 
 describe('Spinner - Behavior', () => {
@@ -7,7 +8,11 @@ describe('Spinner - Behavior', () => {
     const container = mount(<Spinner label="Syncing" />);
 
     try {
-      expect(container.querySelector('[role="progressbar"]')?.getAttribute('aria-valuetext')).toBe('Syncing');
+      expect(
+        container
+          .querySelector(`[role="${SPINNER_A11Y_CONTRACT.ROLE}"]`)
+          ?.getAttribute(SPINNER_A11Y_CONTRACT.VALUE_TEXT_ATTRIBUTE)
+      ).toBe('Syncing');
     } finally {
       unmount(container);
     }

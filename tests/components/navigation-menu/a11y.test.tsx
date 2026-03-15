@@ -18,7 +18,9 @@ describe('NavigationMenu - Accessibility', () => {
           <NavigationMenuItem value="products">
             <NavigationMenuTrigger>Products</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <NavigationMenuLink href="/products/core">Core</NavigationMenuLink>
+              <NavigationMenuLink href="/products/core">
+                Core
+              </NavigationMenuLink>
             </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>
