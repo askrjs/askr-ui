@@ -188,7 +188,7 @@ export function RadioGroupItem(
     ...interactionProps,
     ...nav.item(__itemIndex),
     ref,
-    role: asChild ? 'radio' : undefined,
+    role: 'radio',
     'aria-checked': checked ? 'true' : 'false',
     'data-state': checked ? 'checked' : 'unchecked',
     value,

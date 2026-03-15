@@ -1,7 +1,8 @@
 import { defineConfig } from 'vitest/config';
-import * as path from 'path';
+import { askr } from '@askrjs/askr/vite';
 
 export default defineConfig({
+  plugins: [askr()],
   test: {
     environment: 'jsdom',
     globals: true,
@@ -10,9 +11,13 @@ export default defineConfig({
       include: ['benches/**/*.bench.ts', 'benches/**/*.bench.tsx'],
     },
   },
-  esbuild: {
-    jsx: 'automatic',
-    jsxImportSource: '@askrjs/askr',
+  oxc: {
+    jsx: {
+      runtime: 'automatic',
+      importSource: '@askrjs/askr',
+    },
+    jsxInject:
+      "import { jsx, jsxs, Fragment } from '@askrjs/askr/jsx-runtime';",
   },
   resolve: {
     alias: {},

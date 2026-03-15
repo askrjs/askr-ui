@@ -5,6 +5,7 @@ export {
   FieldError,
   FieldLabel,
 } from './field';
+export { FIELD_A11Y_CONTRACT, type FieldA11yContract } from './field.a11y';
 export type {
   FieldProps,
   FieldOwnProps,

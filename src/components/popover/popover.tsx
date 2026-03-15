@@ -26,6 +26,7 @@ type InjectedPopoverProps = {
   __popoverId?: string;
   __open?: boolean;
   __setOpen?: (open: boolean) => void;
+  __triggerId?: string;
   __contentId?: string;
   __portal?: ReturnType<typeof getPersistentPortal>;
 };
@@ -37,6 +38,7 @@ function readInjectedPopoverProps(
     !props.__popoverId ||
     props.__open === undefined ||
     !props.__setOpen ||
+    !props.__triggerId ||
     !props.__contentId ||
     !props.__portal
   ) {
@@ -47,6 +49,7 @@ function readInjectedPopoverProps(
     __popoverId: props.__popoverId,
     __open: props.__open,
     __setOpen: props.__setOpen,
+    __triggerId: props.__triggerId,
     __contentId: props.__contentId,
     __portal: props.__portal,
   };
@@ -64,6 +67,7 @@ export function Popover(props: PopoverProps) {
     __popoverId: popoverId,
     __open: openState(),
     __setOpen: openState.set,
+    __triggerId: resolvePartId(popoverId, 'trigger'),
     __contentId: resolvePartId(popoverId, 'content'),
     __portal: getPersistentPortal(popoverId),
   };
@@ -110,6 +114,7 @@ export function PopoverTrigger(
     __popoverId,
     __open,
     __setOpen,
+    __triggerId,
     __contentId,
     __portal,
     ...rest
@@ -118,6 +123,7 @@ export function PopoverTrigger(
     __popoverId,
     __open,
     __setOpen,
+    __triggerId,
     __contentId,
     __portal,
   });
@@ -144,6 +150,7 @@ export function PopoverTrigger(
         overlayNodes.trigger = node;
       }
     ),
+    id: injected.__triggerId,
     'aria-haspopup': 'dialog',
     'aria-expanded': injected.__open ? 'true' : 'false',
     'aria-controls': injected.__contentId,
@@ -164,12 +171,20 @@ export function PopoverTrigger(
 export function PopoverPortal(
   props: PopoverPortalProps & InjectedPopoverProps
 ) {
-  const { children, __popoverId, __open, __setOpen, __contentId, __portal } =
-    props;
+  const {
+    children,
+    __popoverId,
+    __open,
+    __setOpen,
+    __triggerId,
+    __contentId,
+    __portal,
+  } = props;
   const injected = readInjectedPopoverProps({
     __popoverId,
     __open,
     __setOpen,
+    __triggerId,
     __contentId,
     __portal,
   });
@@ -199,6 +214,7 @@ export function PopoverContent(
     __popoverId,
     __open,
     __setOpen,
+    __triggerId,
     __contentId,
     __portal,
     ...rest
@@ -207,10 +223,23 @@ export function PopoverContent(
     __popoverId,
     __open,
     __setOpen,
+    __triggerId,
     __contentId,
     __portal,
   });
   const overlayNodes = getOverlayNodes(injected.__popoverId);
+  const restDomProps = rest as Record<string, unknown>;
+  const explicitAriaLabel =
+    typeof restDomProps['aria-label'] === 'string'
+      ? (restDomProps['aria-label'] as string)
+      : undefined;
+  const explicitAriaLabelledBy =
+    typeof restDomProps['aria-labelledby'] === 'string'
+      ? (restDomProps['aria-labelledby'] as string)
+      : undefined;
+  const autoAriaLabelledBy = explicitAriaLabel
+    ? undefined
+    : (explicitAriaLabelledBy ?? injected.__triggerId);
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
       ref as
@@ -224,6 +253,7 @@ export function PopoverContent(
     ),
     id: injected.__contentId,
     role: 'dialog',
+    'aria-labelledby': autoAriaLabelledBy,
     tabIndex: -1,
     'data-state': injected.__open ? 'open' : 'closed',
     'data-side': side,
@@ -266,6 +296,7 @@ export function PopoverClose(
     __popoverId,
     __open,
     __setOpen,
+    __triggerId,
     __contentId,
     __portal,
     ...rest
@@ -274,6 +305,7 @@ export function PopoverClose(
     __popoverId,
     __open,
     __setOpen,
+    __triggerId,
     __contentId,
     __portal,
   });

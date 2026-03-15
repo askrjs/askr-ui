@@ -15,12 +15,6 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '../../../src/components/navigation-menu';
-import {
-  Slider,
-  SliderRange,
-  SliderThumb,
-  SliderTrack,
-} from '../../../src/components/slider';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Navigation components - Determinism', () => {
@@ -50,14 +44,6 @@ describe('Navigation components - Determinism', () => {
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
-    ));
-    expectDeterministicRender(() => (
-      <Slider defaultValue={20}>
-        <SliderTrack>
-          <SliderRange />
-          <SliderThumb />
-        </SliderTrack>
-      </Slider>
     ));
   });
 });

@@ -50,7 +50,7 @@ export function FieldLabel(props: FieldLabelProps | FieldLabelAsChildProps) {
   const baseId = resolveFieldId(fieldId);
   const finalProps = mergeProps(rest, {
     ref,
-    htmlFor: `${baseId}-control`,
+    for: `${baseId}-control`,
   });
 
   if (asChild) {

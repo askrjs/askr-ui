@@ -40,7 +40,7 @@ export function Switch(props: SwitchButtonProps | SwitchAsChildProps) {
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     ref,
-    role: asChild ? 'switch' : undefined,
+    role: 'switch',
     'aria-checked': currentChecked ? 'true' : 'false',
     'data-state': currentChecked ? 'checked' : 'unchecked',
   });
