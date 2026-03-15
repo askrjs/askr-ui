@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Separator } from '../../../src/components/separator/separator';
+import { SEPARATOR_A11Y_CONTRACT } from '../../../src/components/separator/separator.a11y';
 import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';
 
@@ -19,8 +20,12 @@ describe('Separator - Accessibility', () => {
 
     try {
       const separator = container.querySelector('div');
-      expect(separator?.getAttribute('role')).toBe('presentation');
-      expect(separator?.hasAttribute('aria-orientation')).toBe(false);
+      expect(separator?.getAttribute('role')).toBe(
+        SEPARATOR_A11Y_CONTRACT.DECORATIVE_ROLE
+      );
+      expect(
+        separator?.hasAttribute(SEPARATOR_A11Y_CONTRACT.ORIENTATION_ATTRIBUTE)
+      ).toBe(false);
     } finally {
       unmount(container);
     }

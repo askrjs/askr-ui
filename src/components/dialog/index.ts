@@ -8,6 +8,7 @@ export {
   DialogDescription,
   DialogClose,
 } from './dialog';
+export { DIALOG_A11Y_CONTRACT, type DialogA11yContract } from './dialog.a11y';
 export type {
   DialogOwnProps,
   DialogProps,

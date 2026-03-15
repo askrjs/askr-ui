@@ -8,6 +8,10 @@ export {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from './dropdown-menu';
+export {
+  DROPDOWN_MENU_A11Y_CONTRACT,
+  type DropdownMenuA11yContract,
+} from './dropdown-menu.a11y';
 export type {
   DropdownMenuOwnProps,
   DropdownMenuProps,

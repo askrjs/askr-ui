@@ -11,6 +11,10 @@ export {
   NavigationMenuSubTrigger,
   NavigationMenuSubContent,
 } from './navigation-menu';
+export {
+  NAVIGATION_MENU_A11Y_CONTRACT,
+  type NavigationMenuA11yContract,
+} from './navigation-menu.a11y';
 export type {
   NavigationMenuOwnProps,
   NavigationMenuProps,

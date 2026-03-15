@@ -4,6 +4,7 @@ import {
   CollapsibleTrigger,
   CollapsibleContent,
 } from '../../../src/components/collapsible/collapsible';
+import { COLLAPSIBLE_A11Y_CONTRACT } from '../../../src/components/collapsible/collapsible.a11y';
 import { createIsland } from '@askrjs/askr';
 import { axe } from 'vitest-axe';
 
@@ -106,7 +107,7 @@ describe('Collapsible — Accessibility', () => {
         </Collapsible>
       );
       const trigger = container.querySelector('button');
-      expect(trigger?.getAttribute('aria-expanded')).toBe('false');
+      expect(trigger?.getAttribute(COLLAPSIBLE_A11Y_CONTRACT.EXPANDED_ATTRIBUTE)).toBe('false');
     });
 
     it('should apply aria-expanded=true when open', () => {
@@ -117,7 +118,7 @@ describe('Collapsible — Accessibility', () => {
         </Collapsible>
       );
       const trigger = container.querySelector('button');
-      expect(trigger?.getAttribute('aria-expanded')).toBe('true');
+      expect(trigger?.getAttribute(COLLAPSIBLE_A11Y_CONTRACT.EXPANDED_ATTRIBUTE)).toBe('true');
     });
 
     it('should apply aria-controls to trigger', () => {
@@ -130,7 +131,9 @@ describe('Collapsible — Accessibility', () => {
       const trigger = container.querySelector('button');
       const content = container.querySelector('[id^="collapsible-content"]');
 
-      const controlsId = trigger?.getAttribute('aria-controls');
+      const controlsId = trigger?.getAttribute(
+        COLLAPSIBLE_A11Y_CONTRACT.CONTROLS_ATTRIBUTE
+      );
       expect(controlsId).toBeDefined();
       expect(content?.id).toBe(controlsId);
     });

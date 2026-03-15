@@ -12,6 +12,10 @@ export {
   MenubarSubTrigger,
   MenubarSubContent,
 } from './menubar';
+export {
+  MENUBAR_A11Y_CONTRACT,
+  type MenubarA11yContract,
+} from './menubar.a11y';
 export type {
   MenubarOwnProps,
   MenubarProps,

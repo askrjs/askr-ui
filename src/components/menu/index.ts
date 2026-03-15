@@ -6,6 +6,7 @@ export {
   MenuLabel,
   MenuSeparator,
 } from './menu';
+export { MENU_A11Y_CONTRACT, type MenuA11yContract } from './menu.a11y';
 export type {
   MenuOwnProps,
   MenuProps,

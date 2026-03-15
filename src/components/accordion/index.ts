@@ -5,6 +5,10 @@ export {
   AccordionTrigger,
   AccordionContent,
 } from './accordion';
+export {
+  ACCORDION_A11Y_CONTRACT,
+  type AccordionA11yContract,
+} from './accordion.a11y';
 export type {
   AccordionOrientation,
   AccordionSingleProps,

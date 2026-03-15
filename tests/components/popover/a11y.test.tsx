@@ -4,6 +4,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '../../../src/components/popover';
+import { POPOVER_A11Y_CONTRACT } from '../../../src/components/popover/popover.a11y';
 import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';
 
@@ -26,13 +27,19 @@ describe('Popover - Accessibility', () => {
     );
 
     try {
-      const trigger = container.querySelector('[aria-haspopup="dialog"]');
-      const content = document.body.querySelector('[role="dialog"]');
+      const trigger = container.querySelector(
+        `[${POPOVER_A11Y_CONTRACT.TRIGGER_ATTRIBUTES.popup}="dialog"]`
+      );
+      const content = document.body.querySelector(
+        `[role="${POPOVER_A11Y_CONTRACT.CONTENT_ATTRIBUTES.role}"]`
+      );
 
       expect(trigger).toBeTruthy();
       expect(content).toBeTruthy();
       expect(trigger?.id).toBeTruthy();
-      expect(content?.getAttribute('aria-labelledby')).toBe(trigger?.id);
+      expect(
+        content?.getAttribute(POPOVER_A11Y_CONTRACT.CONTENT_ATTRIBUTES.labelledBy)
+      ).toBe(trigger?.id);
     } finally {
       unmount(container);
     }
@@ -49,7 +56,9 @@ describe('Popover - Accessibility', () => {
     );
 
     try {
-      const content = document.body.querySelector('[role="dialog"]');
+      const content = document.body.querySelector(
+        `[role="${POPOVER_A11Y_CONTRACT.CONTENT_ATTRIBUTES.role}"]`
+      );
 
       expect(content).toBeTruthy();
       expect(content?.getAttribute('aria-label')).toBe('Popover content');

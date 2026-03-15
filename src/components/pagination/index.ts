@@ -5,6 +5,10 @@ export {
   PaginationPage,
   PaginationEllipsis,
 } from './pagination';
+export {
+  PAGINATION_A11Y_CONTRACT,
+  type PaginationA11yContract,
+} from './pagination.a11y';
 export type {
   PaginationOwnProps,
   PaginationProps,

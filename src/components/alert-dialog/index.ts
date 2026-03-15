@@ -9,6 +9,10 @@ export {
   AlertDialogAction,
   AlertDialogCancel,
 } from './alert-dialog';
+export {
+  ALERT_DIALOG_A11Y_CONTRACT,
+  type AlertDialogA11yContract,
+} from './alert-dialog.a11y';
 export type {
   AlertDialogOwnProps,
   AlertDialogProps,

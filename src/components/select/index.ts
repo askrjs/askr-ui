@@ -10,6 +10,7 @@ export {
   SelectLabel,
   SelectSeparator,
 } from './select';
+export { SELECT_A11Y_CONTRACT, type SelectA11yContract } from './select.a11y';
 export type {
   SelectOwnProps,
   SelectProps,

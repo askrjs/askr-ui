@@ -4,6 +4,10 @@ export {
   TooltipPortal,
   TooltipContent,
 } from './tooltip';
+export {
+  TOOLTIP_A11Y_CONTRACT,
+  type TooltipA11yContract,
+} from './tooltip.a11y';
 export type {
   TooltipOwnProps,
   TooltipProps,

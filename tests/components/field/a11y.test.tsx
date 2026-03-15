@@ -6,6 +6,7 @@ import {
   FieldError,
   FieldLabel,
 } from '../../../src/components/field/field';
+import { FIELD_A11Y_CONTRACT } from '../../../src/components/field/field.a11y';
 import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';
 
@@ -39,10 +40,14 @@ describe('Field - Accessibility', () => {
     try {
       const control = container.querySelector('input');
       expect(control?.getAttribute('aria-describedby')).toBe(
-        'email-description email-error'
+        `email${FIELD_A11Y_CONTRACT.DESCRIPTION_ID_SUFFIX} email${FIELD_A11Y_CONTRACT.ERROR_ID_SUFFIX}`
       );
-      expect(control?.getAttribute('aria-invalid')).toBe('true');
-      expect(control?.getAttribute('aria-required')).toBe('true');
+      expect(control?.getAttribute(FIELD_A11Y_CONTRACT.INVALID_ATTRIBUTE)).toBe(
+        'true'
+      );
+      expect(control?.getAttribute(FIELD_A11Y_CONTRACT.REQUIRED_ATTRIBUTE)).toBe(
+        'true'
+      );
     } finally {
       unmount(container);
     }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Label } from '../../../src/components/label/label';
+import { LABEL_A11Y_CONTRACT } from '../../../src/components/label/label.a11y';
 import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';
 
@@ -17,8 +18,10 @@ describe('Label - Accessibility', () => {
     const container = mount(<Label htmlFor="email">Email</Label>);
 
     try {
-      const label = container.querySelector('label');
-      expect(label?.getAttribute('for')).toBe('email');
+      const label = container.querySelector(LABEL_A11Y_CONTRACT.ELEMENT);
+      expect(label?.getAttribute(LABEL_A11Y_CONTRACT.ASSOCIATION_ATTRIBUTE)).toBe(
+        'email'
+      );
     } finally {
       unmount(container);
     }

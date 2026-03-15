@@ -1,4 +1,5 @@
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
+export { TABS_A11Y_CONTRACT, type TabsA11yContract } from './tabs.a11y';
 export type {
   TabsOrientation,
   TabsActivationMode,
