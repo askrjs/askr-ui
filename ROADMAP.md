@@ -17,7 +17,7 @@ askr-ui is curated as a headless component library, not a milestone tracker. A c
 ## Internal
 
 - Shared collection, disclosure, range, overlay, focus, JSX, and prop utilities under `src/components/_internal`
-- Dependency contract verification in `scripts/check-foundations-contract.mjs`
+- Dependency contract verification in `scripts/check-foundations-contract.js`
 
 ## Planned
 
