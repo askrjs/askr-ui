@@ -54,6 +54,13 @@ export const BUTTON_A11Y_CONTRACT = {
   },
 
   /**
+   * Public styling hooks preserved on the host element.
+   */
+  DATA_ATTRIBUTES: {
+    disabled: 'data-disabled' as const,
+  },
+
+  /**
    * Focus management rules
    */
   FOCUS_RULES: {

@@ -18,6 +18,8 @@ export function Separator(props: SeparatorDivProps | SeparatorAsChildProps) {
 
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'separator',
+    'data-orientation': orientation,
     role: decorative ? 'presentation' : 'separator',
     'aria-orientation': decorative ? undefined : orientation,
   });

@@ -183,6 +183,8 @@ export function DialogTrigger(
     'aria-haspopup': 'dialog',
     'aria-expanded': injected.__open ? 'true' : 'false',
     'aria-controls': injected.__contentId,
+    'data-slot': 'dialog-trigger',
+    'data-disabled': disabled ? 'true' : undefined,
     'data-state': injected.__open ? 'open' : 'closed',
   });
 
@@ -261,6 +263,7 @@ export function DialogOverlay(
   });
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'dialog-overlay',
     'data-state': injected.__open ? 'open' : 'closed',
     'data-dialog-overlay': 'true',
     'aria-hidden': 'true',
@@ -332,6 +335,7 @@ export function DialogContent(
     'aria-modal': injected.__modal ? 'true' : undefined,
     'aria-labelledby': injected.__titleId,
     'aria-describedby': injected.__descriptionId,
+    'data-slot': 'dialog-content',
     'data-state': injected.__open ? 'open' : 'closed',
   });
 
@@ -399,6 +403,7 @@ export function DialogTitle(
   const finalProps = mergeProps(rest, {
     ref,
     id: injected.__titleId,
+    'data-slot': 'dialog-title',
   });
 
   if (asChild) {
@@ -444,6 +449,7 @@ export function DialogDescription(
   const finalProps = mergeProps(rest, {
     ref,
     id: injected.__descriptionId,
+    'data-slot': 'dialog-description',
   });
 
   if (asChild) {
@@ -498,6 +504,8 @@ export function DialogClose(
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     ref,
+    'data-slot': 'dialog-close',
+    'data-disabled': disabled ? 'true' : undefined,
     'data-state': injected.__open ? 'open' : 'closed',
   });
 

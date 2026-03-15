@@ -154,6 +154,8 @@ export function PopoverTrigger(
     'aria-haspopup': 'dialog',
     'aria-expanded': injected.__open ? 'true' : 'false',
     'aria-controls': injected.__contentId,
+    'data-slot': 'popover-trigger',
+    'data-disabled': disabled ? 'true' : undefined,
     'data-state': injected.__open ? 'open' : 'closed',
   });
 
@@ -255,6 +257,7 @@ export function PopoverContent(
     role: 'dialog',
     'aria-labelledby': autoAriaLabelledBy,
     tabIndex: -1,
+    'data-slot': 'popover-content',
     'data-state': injected.__open ? 'open' : 'closed',
     'data-side': side,
     'data-align': align,
@@ -322,6 +325,9 @@ export function PopoverClose(
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     ref,
+    'data-slot': 'popover-close',
+    'data-disabled': disabled ? 'true' : undefined,
+    'data-state': injected.__open ? 'open' : 'closed',
   });
 
   if (asChild) {

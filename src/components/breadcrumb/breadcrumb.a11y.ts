@@ -3,6 +3,9 @@
  */
 
 export const BREADCRUMB_A11Y_CONTRACT = {
+  DATA_ATTRIBUTES: {
+    slot: 'data-slot' as const,
+  },
   NAV_ROLE: 'navigation' as const,
   CURRENT_PAGE_ATTRIBUTE: 'aria-current' as const,
   CURRENT_PAGE_VALUE: 'page' as const,

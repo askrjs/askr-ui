@@ -274,6 +274,7 @@ export function NavigationMenu(props: NavigationMenuProps) {
   });
   const finalProps = mergeProps(stripInternalProps(rest), {
     ref,
+    'data-slot': 'navigation-menu',
     'data-navigation-menu': 'true',
   });
 
@@ -334,6 +335,7 @@ export function NavigationMenuList(
   const finalProps = mergeProps(stripInternalProps(rest), {
     ...nav.container,
     ref,
+    'data-slot': 'navigation-menu-list',
     'data-navigation-menu-list': 'true',
   });
 
@@ -461,6 +463,8 @@ export function NavigationMenuTrigger(
     id: injected.__triggerId,
     'aria-expanded': open ? 'true' : 'false',
     'aria-controls': injected.__contentId,
+    'data-slot': 'navigation-menu-trigger',
+    'data-disabled': disabled ? 'true' : undefined,
     'data-state': open ? 'open' : 'closed',
     onFocus: () => {
       injected.__setCurrentTriggerIndex(injected.__itemIndex);
@@ -645,6 +649,7 @@ export function NavigationMenuContent(
     ),
     id: injected.__contentId,
     'aria-labelledby': injected.__triggerId,
+    'data-slot': 'navigation-menu-content',
     'data-state': open ? 'open' : 'closed',
     'data-side': side,
     'data-align': align,
@@ -760,6 +765,7 @@ export function NavigationMenuLink(
       }
     ),
     id: injected.__surfaceId,
+    'data-slot': 'navigation-menu-link',
     'data-navigation-menu-link': 'true',
     onClick: () => {
       injected.__setOpenPath([]);
@@ -812,6 +818,7 @@ export function NavigationMenuViewport(
   });
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'navigation-menu-viewport',
     'data-navigation-menu-viewport': 'true',
     'data-state': injected.__openPath.length > 0 ? 'open' : 'closed',
     'data-active-item': injected.__openPath[0] ?? '',
@@ -863,6 +870,7 @@ export function NavigationMenuIndicator(
   });
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'navigation-menu-indicator',
     'data-navigation-menu-indicator': 'true',
     'data-state': injected.__openPath.length > 0 ? 'open' : 'closed',
     'data-active-item': injected.__openPath[0] ?? '',
@@ -1010,6 +1018,7 @@ export function NavigationMenuSubTrigger(
     id: injected.__surfaceId,
     'aria-haspopup': 'menu',
     'aria-expanded': open ? 'true' : 'false',
+    'data-slot': 'navigation-menu-sub-trigger',
     'data-state': open ? 'open' : 'closed',
     'data-disabled': isDisabled ? 'true' : undefined,
     onPointerEnter: () => {

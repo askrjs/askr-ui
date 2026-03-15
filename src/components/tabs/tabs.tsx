@@ -207,6 +207,7 @@ export function Tabs(props: TabsProps) {
   });
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'tabs',
     'data-tabs': 'true',
     'data-orientation': orientation,
   });
@@ -264,6 +265,8 @@ export function TabsList(
     ref,
     role: 'tablist',
     'aria-orientation': injected.__orientation,
+    'data-slot': 'tabs-list',
+    'data-orientation': injected.__orientation,
     'data-tabs-list': 'true',
   });
 
@@ -369,6 +372,7 @@ export function TabsTrigger(
     role: 'tab',
     'aria-selected': selected ? 'true' : 'false',
     'aria-controls': injected.__contentId,
+    'data-slot': 'tabs-trigger',
     'data-state': selected ? 'active' : 'inactive',
     'data-disabled': isDisabled ? 'true' : undefined,
     onFocus: () => {
@@ -443,6 +447,7 @@ export function TabsContent(
     id: injected.__contentId,
     role: 'tabpanel',
     'aria-labelledby': injected.__triggerId,
+    'data-slot': 'tabs-content',
     'data-state': selected ? 'active' : 'inactive',
   });
 

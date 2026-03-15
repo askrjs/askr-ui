@@ -3,6 +3,13 @@
  */
 
 export const POPOVER_A11Y_CONTRACT = {
+  DATA_ATTRIBUTES: {
+    slot: 'data-slot' as const,
+    state: 'data-state' as const,
+    disabled: 'data-disabled' as const,
+    side: 'data-side' as const,
+    align: 'data-align' as const,
+  },
   TRIGGER_ATTRIBUTES: {
     popup: 'aria-haspopup' as const,
     expanded: 'aria-expanded' as const,

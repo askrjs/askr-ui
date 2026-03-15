@@ -262,6 +262,8 @@ export function SelectTrigger(
     'aria-haspopup': 'listbox',
     'aria-expanded': injected.__open ? 'true' : 'false',
     'aria-controls': injected.__contentId,
+    'data-slot': 'select-trigger',
+    'data-disabled': disabled ? 'true' : undefined,
     'data-state': injected.__open ? 'open' : 'closed',
   });
 
@@ -318,6 +320,7 @@ export function SelectValue(
     children ?? (injected.__selectedText || placeholder || null);
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'select-value',
     'data-placeholder':
       !injected.__selectedText && placeholder ? 'true' : undefined,
   });
@@ -412,6 +415,7 @@ export function SelectContent(
     ),
     id: injected.__contentId,
     role: 'listbox',
+    'data-slot': 'select-content',
     'data-state': injected.__open ? 'open' : 'closed',
     'data-side': side,
     'data-align': align,
@@ -551,6 +555,7 @@ export function SelectItem(
     id: injected.__itemId,
     role: 'option',
     'aria-selected': selected ? 'true' : 'false',
+    'data-slot': 'select-item',
     'data-state': selected ? 'checked' : 'unchecked',
     'data-disabled': disabled ? 'true' : undefined,
     'aria-disabled': disabled ? 'true' : undefined,
@@ -575,6 +580,7 @@ export function SelectItemText(
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'select-item-text',
     'data-select-item-text': 'true',
   });
 
@@ -592,6 +598,7 @@ export function SelectGroup(props: SelectGroupProps | SelectGroupAsChildProps) {
   const finalProps = mergeProps(rest, {
     ref,
     role: 'group',
+    'data-slot': 'select-group',
   });
 
   if (asChild) {
@@ -607,6 +614,7 @@ export function SelectLabel(props: SelectLabelProps | SelectLabelAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'select-label',
     'data-select-label': 'true',
   });
 
@@ -628,6 +636,7 @@ export function SelectSeparator(
   const finalProps = mergeProps(rest, {
     ref,
     role: 'separator',
+    'data-slot': 'select-separator',
   });
 
   if (asChild) {

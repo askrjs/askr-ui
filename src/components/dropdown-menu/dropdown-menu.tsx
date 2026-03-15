@@ -215,6 +215,8 @@ export function DropdownMenuTrigger(
     'aria-haspopup': 'menu',
     'aria-expanded': injected.__open ? 'true' : 'false',
     'aria-controls': injected.__contentId,
+    'data-slot': 'dropdown-menu-trigger',
+    'data-disabled': disabled ? 'true' : undefined,
     'data-state': injected.__open ? 'open' : 'closed',
   });
 
@@ -312,6 +314,7 @@ export function DropdownMenuContent(
     ),
     id: injected.__contentId,
     role: 'menu',
+    'data-slot': 'dropdown-menu-content',
     'data-state': injected.__open ? 'open' : 'closed',
     'data-side': side,
     'data-align': align,
@@ -443,6 +446,7 @@ export function DropdownMenuItem(
     id: injected.__itemId,
     role: 'menuitem',
     'aria-disabled': disabled ? 'true' : undefined,
+    'data-slot': 'dropdown-menu-item',
     'data-disabled': disabled ? 'true' : undefined,
   });
 
@@ -464,6 +468,7 @@ export function DropdownMenuGroup(
   const finalProps = mergeProps(rest, {
     ref,
     role: 'group',
+    'data-slot': 'dropdown-menu-group',
   });
 
   if (asChild) {
@@ -479,6 +484,7 @@ export function DropdownMenuLabel(
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'dropdown-menu-label',
     'data-dropdown-menu-label': 'true',
   });
 
@@ -496,6 +502,7 @@ export function DropdownMenuSeparator(
   const finalProps = mergeProps(rest, {
     ref,
     role: 'separator',
+    'data-slot': 'dropdown-menu-separator',
   });
 
   if (asChild) {

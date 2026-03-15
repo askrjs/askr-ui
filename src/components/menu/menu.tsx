@@ -159,10 +159,11 @@ export function MenuContent(
   const finalProps = mergeProps(rest, {
     ...nav.container,
     ref,
+    'data-slot': 'menu-content',
+    'data-orientation': injected.__orientation,
     role: 'menu',
     'aria-orientation':
       injected.__orientation === 'both' ? undefined : injected.__orientation,
-    'data-menu-content': 'true',
   });
 
   if (asChild) {
@@ -268,6 +269,7 @@ export function MenuItem(
     id: injected.__itemId,
     role: 'menuitem',
     'aria-disabled': disabled ? 'true' : undefined,
+    'data-slot': 'menu-item',
     'data-disabled': disabled ? 'true' : undefined,
   });
 
@@ -288,6 +290,7 @@ export function MenuGroup(props: MenuGroupProps | MenuGroupAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'menu-group',
     role: 'group',
   });
 
@@ -304,7 +307,7 @@ export function MenuLabel(props: MenuLabelProps | MenuLabelAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
-    'data-menu-label': 'true',
+    'data-slot': 'menu-label',
   });
 
   if (asChild) {
@@ -322,6 +325,7 @@ export function MenuSeparator(
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'menu-separator',
     role: 'separator',
   });
 

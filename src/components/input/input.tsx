@@ -7,7 +7,12 @@ export function Input(props: InputInputProps | InputAsChildProps) {
   const { asChild, children, disabled = false, ref, tabIndex, ...rest } = props;
 
   const focusProps = focusable({ disabled, tabIndex });
-  const finalProps = mergeProps(rest, { ...focusProps, ref });
+  const finalProps = mergeProps(rest, {
+    ...focusProps,
+    'data-slot': 'input',
+    'data-disabled': disabled ? 'true' : undefined,
+    ref,
+  });
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;

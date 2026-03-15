@@ -1,4 +1,5 @@
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
+import { mergeCssVar } from '../_internal/style';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import { mapJsxTree } from '../_internal/jsx';
 import {
@@ -50,6 +51,7 @@ export function ProgressCircle(props: ProgressCircleProps) {
   const valueLabel =
     getValueLabel?.(normalizedValue, normalizedMax) ??
     defaultProgressValueLabel(normalizedValue, normalizedMax);
+  const percentage = progressPercentage(normalizedValue, normalizedMax);
   const enhancedChildren = mapJsxTree(children, (element) => {
     if (element.type !== ProgressCircleIndicator) {
       return element;
@@ -69,12 +71,18 @@ export function ProgressCircle(props: ProgressCircleProps) {
   const finalProps = mergeProps(rest, {
     ref,
     id: progressCircleId,
+    style: mergeCssVar(
+      (rest as { style?: unknown }).style,
+      '--ak-progress-percentage',
+      percentage === null ? '25%' : `${percentage}%`
+    ),
     role: 'progressbar',
     'aria-valuemin': '0',
     'aria-valuemax': String(normalizedMax),
     'aria-valuenow':
       normalizedValue === null ? undefined : String(normalizedValue),
     'aria-valuetext': valueLabel,
+    'data-slot': 'progress-circle',
     'data-progress-circle': 'true',
     'data-state': normalizedValue === null ? 'indeterminate' : 'determinate',
   });
@@ -113,6 +121,7 @@ export function ProgressCircleIndicator(
   const finalProps = mergeProps(rest, {
     ref,
     id: resolvePartId(injected.__progressCircleId, 'indicator'),
+    'data-slot': 'progress-circle-indicator',
     'data-progress-circle-indicator': 'true',
     'data-state': injected.__value === null ? 'indeterminate' : 'determinate',
     'data-value':

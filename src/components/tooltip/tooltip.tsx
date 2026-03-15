@@ -145,6 +145,8 @@ export function TooltipTrigger(
       injected.__setOpen(false);
     },
     'aria-describedby': injected.__open ? injected.__contentId : undefined,
+    'data-slot': 'tooltip-trigger',
+    'data-disabled': disabled ? 'true' : undefined,
     'data-state': injected.__open ? 'open' : 'closed',
   });
 
@@ -222,6 +224,7 @@ export function TooltipContent(
     ),
     id: injected.__contentId,
     role: 'tooltip',
+    'data-slot': 'tooltip-content',
     'data-state': injected.__open ? 'open' : 'closed',
     'data-side': side,
     'data-align': align,

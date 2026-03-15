@@ -62,6 +62,11 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
   } = props;
 
   const ariaChecked = indeterminate ? 'mixed' : checked ? 'true' : 'false';
+  const dataState = indeterminate
+    ? 'indeterminate'
+    : checked
+      ? 'checked'
+      : 'unchecked';
 
   if (asChild) {
     const interactionProps = disabled
@@ -98,6 +103,9 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
     const finalProps = mergeProps(rest, {
       ...interactionProps,
       'aria-checked': ariaChecked,
+      'data-slot': 'checkbox',
+      'data-disabled': disabled ? 'true' : undefined,
+      'data-state': dataState,
       ref,
     });
 
@@ -113,6 +121,9 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
       : undefined,
     'aria-checked': indeterminate ? undefined : ariaChecked,
     'aria-disabled': disabled ? 'true' : undefined,
+    'data-slot': 'checkbox',
+    'data-disabled': disabled ? 'true' : undefined,
+    'data-state': dataState,
   });
 
   return (

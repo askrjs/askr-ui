@@ -68,6 +68,14 @@ export const TOGGLE_A11Y_CONTRACT = {
   },
 
   /**
+   * Public styling hooks preserved on the host element.
+   */
+  DATA_ATTRIBUTES: {
+    state: 'data-state' as const,
+    disabled: 'data-disabled' as const,
+  },
+
+  /**
    * Focus rules
    *
    * - Enabled: in tab order (tabIndex >= 0)

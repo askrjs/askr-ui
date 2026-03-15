@@ -8,6 +8,9 @@ export const TEXTAREA_A11Y_CONTRACT = {
     native: 'disabled' as const,
     asChild: 'aria-disabled' as const,
   },
+  DATA_ATTRIBUTES: {
+    disabled: 'data-disabled' as const,
+  },
   FOCUS_RULES: {
     defaultTabIndex: 0,
     disabledTabIndex: -1,

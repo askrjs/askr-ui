@@ -63,6 +63,9 @@ export function Toggle(props: ToggleButtonProps | ToggleAsChildProps) {
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     'aria-pressed': String(pressed),
+    'data-slot': 'toggle',
+    'data-disabled': disabled ? 'true' : undefined,
+    'data-state': pressed ? 'on' : 'off',
     ref,
   });
 

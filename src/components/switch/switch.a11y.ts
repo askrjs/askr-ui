@@ -8,6 +8,11 @@ export const SWITCH_A11Y_CONTRACT = {
   ROLE: 'switch' as const,
   CHECKED_ATTRIBUTE: 'aria-checked' as const,
   KEYBOARD_ACTIVATION: ['Enter', 'Space'] as const,
+  DATA_ATTRIBUTES: {
+    slot: 'data-slot' as const,
+    state: 'data-state' as const,
+    disabled: 'data-disabled' as const,
+  },
   DISABLED_ATTRIBUTES: {
     nativeButton: {
       disabled: true,

@@ -203,6 +203,46 @@
       "import": "./dist/components/visually-hidden/visually-hidden.js",
       "require": "./dist/components/visually-hidden/visually-hidden.cjs"
     },
+    "./container": {
+      "types": "./dist/components/container/container.d.ts",
+      "import": "./dist/components/container/container.js",
+      "require": "./dist/components/container/container.cjs"
+    },
+    "./stack": {
+      "types": "./dist/components/stack/stack.d.ts",
+      "import": "./dist/components/stack/stack.js",
+      "require": "./dist/components/stack/stack.cjs"
+    },
+    "./inline": {
+      "types": "./dist/components/inline/inline.d.ts",
+      "import": "./dist/components/inline/inline.js",
+      "require": "./dist/components/inline/inline.cjs"
+    },
+    "./grid": {
+      "types": "./dist/components/grid/grid.d.ts",
+      "import": "./dist/components/grid/grid.js",
+      "require": "./dist/components/grid/grid.cjs"
+    },
+    "./center": {
+      "types": "./dist/components/center/center.d.ts",
+      "import": "./dist/components/center/center.js",
+      "require": "./dist/components/center/center.cjs"
+    },
+    "./spacer": {
+      "types": "./dist/components/spacer/spacer.d.ts",
+      "import": "./dist/components/spacer/spacer.js",
+      "require": "./dist/components/spacer/spacer.cjs"
+    },
+    "./sidebar-layout": {
+      "types": "./dist/components/sidebar-layout/sidebar-layout.d.ts",
+      "import": "./dist/components/sidebar-layout/sidebar-layout.js",
+      "require": "./dist/components/sidebar-layout/sidebar-layout.cjs"
+    },
+    "./topbar-layout": {
+      "types": "./dist/components/topbar-layout/topbar-layout.d.ts",
+      "import": "./dist/components/topbar-layout/topbar-layout.js",
+      "require": "./dist/components/topbar-layout/topbar-layout.cjs"
+    },
     "./package.json": "./package.json"
   },
   "publishConfig": {

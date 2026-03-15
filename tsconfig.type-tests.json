@@ -55,7 +55,15 @@
       "@askrjs/askr-ui/toggle": ["./src/components/toggle/index.ts"],
       "@askrjs/askr-ui/visually-hidden": [
         "./src/components/visually-hidden/index.ts"
-      ]
+      ],
+      "@askrjs/askr-ui/container": ["./src/components/container/index.ts"],
+      "@askrjs/askr-ui/stack": ["./src/components/stack/index.ts"],
+      "@askrjs/askr-ui/inline": ["./src/components/inline/index.ts"],
+      "@askrjs/askr-ui/grid": ["./src/components/grid/index.ts"],
+      "@askrjs/askr-ui/center": ["./src/components/center/index.ts"],
+      "@askrjs/askr-ui/spacer": ["./src/components/spacer/index.ts"],
+      "@askrjs/askr-ui/sidebar-layout": ["./src/components/sidebar-layout/index.ts"],
+      "@askrjs/askr-ui/topbar-layout": ["./src/components/topbar-layout/index.ts"]
     }
   },
   "include": ["tests/types/**/*.ts", "src/**/*.ts", "src/**/*.tsx"]

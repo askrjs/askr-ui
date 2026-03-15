@@ -144,6 +144,7 @@ export function Pagination(props: PaginationProps) {
   const finalProps = mergeProps(rest, {
     ref,
     'aria-label': 'Pagination',
+    'data-slot': 'pagination',
     'data-pagination': 'true',
   });
 
@@ -197,6 +198,7 @@ export function PaginationPrevious(
     ref,
     id: resolvePartId(injected.__paginationId, 'previous'),
     'aria-label': 'Previous page',
+    'data-slot': 'pagination-previous',
     'data-disabled': isDisabled ? 'true' : undefined,
   });
 
@@ -257,6 +259,7 @@ export function PaginationNext(
     ref,
     id: resolvePartId(injected.__paginationId, 'next'),
     'aria-label': 'Next page',
+    'data-slot': 'pagination-next',
     'data-disabled': isDisabled ? 'true' : undefined,
   });
 
@@ -339,6 +342,7 @@ export function PaginationPage(
     id: resolvePartId(injected.__paginationId, `page-${injected.page}`),
     'aria-label': `Page ${injected.page}`,
     'aria-current': selected ? 'page' : undefined,
+    'data-slot': 'pagination-page',
     'data-state': selected ? 'active' : 'inactive',
     'data-page': String(injected.page),
     'data-disabled': isDisabled ? 'true' : undefined,
@@ -377,6 +381,7 @@ export function PaginationEllipsis(
   const finalProps = mergeProps(rest, {
     ref,
     'aria-hidden': 'true',
+    'data-slot': 'pagination-ellipsis',
     'data-pagination-ellipsis': 'true',
   });
 

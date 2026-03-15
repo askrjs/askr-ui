@@ -7,6 +7,7 @@ export function Skeleton(props: SkeletonProps | SkeletonAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'skeleton',
     'data-skeleton': 'true',
     'aria-hidden': 'true',
   });

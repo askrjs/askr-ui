@@ -117,6 +117,9 @@ export function RadioGroup(props: RadioGroupProps) {
     ...nav.container,
     ref,
     role: 'radiogroup',
+    'data-slot': 'radio-group',
+    'data-disabled': disabled ? 'true' : undefined,
+    'data-orientation': orientation,
     'aria-orientation': orientation === 'both' ? undefined : orientation,
   });
 
@@ -190,6 +193,8 @@ export function RadioGroupItem(
     ref,
     role: 'radio',
     'aria-checked': checked ? 'true' : 'false',
+    'data-slot': 'radio-group-item',
+    'data-disabled': __groupDisabled || disabled ? 'true' : undefined,
     'data-state': checked ? 'checked' : 'unchecked',
     value,
   });

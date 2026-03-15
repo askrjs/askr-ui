@@ -21,6 +21,7 @@ export function Breadcrumb(props: BreadcrumbProps | BreadcrumbAsChildProps) {
   const finalProps = mergeProps(rest, {
     ref,
     'aria-label': ariaLabel ?? 'Breadcrumb',
+    'data-slot': 'breadcrumb',
     'data-breadcrumb': 'true',
   });
 
@@ -39,6 +40,7 @@ export function BreadcrumbList(
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'breadcrumb-list',
     'data-breadcrumb-list': 'true',
   });
 
@@ -57,6 +59,7 @@ export function BreadcrumbItem(
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'breadcrumb-item',
     'data-breadcrumb-item': 'true',
   });
 
@@ -75,6 +78,7 @@ export function BreadcrumbLink(
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'breadcrumb-link',
     'data-breadcrumb-link': 'true',
   });
 
@@ -96,6 +100,7 @@ export function BreadcrumbCurrent(
   const finalProps = mergeProps(rest, {
     ref,
     'aria-current': 'page',
+    'data-slot': 'breadcrumb-current',
     'data-breadcrumb-current': 'true',
   });
 
@@ -119,6 +124,7 @@ export function BreadcrumbSeparator(
   const finalProps = mergeProps(rest, {
     ref,
     'aria-hidden': 'true',
+    'data-slot': 'breadcrumb-separator',
     'data-breadcrumb-separator': 'true',
   });
 

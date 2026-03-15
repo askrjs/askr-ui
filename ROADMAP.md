@@ -12,6 +12,7 @@ askr-ui is curated as a headless component library, not a milestone tracker. A c
 - Disclosure and content: `Collapsible`, `Accordion`, `Tabs`
 - Status and identity: `Badge`, `Avatar`, `Skeleton`, `Progress`, `ProgressCircle`, `Spinner`, `Toast`
 - Basic navigation and utility: `Breadcrumb`, `Pagination`, `ToggleGroup`, `Slider`, `Menubar`, `NavigationMenu`
+- Layout primitives (structural/headless only): `Container`, `Stack`, `Inline`, `Grid`, `Center`, `Spacer`, `SidebarLayout`, `TopbarLayout`
 
 ## Internal
 

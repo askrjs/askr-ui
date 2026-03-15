@@ -7,6 +7,7 @@ export function Badge(props: BadgeProps | BadgeAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'badge',
     'data-badge': 'true',
   });
 

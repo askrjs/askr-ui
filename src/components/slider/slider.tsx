@@ -4,6 +4,7 @@ import {
   controllableState,
   mergeProps,
 } from '@askrjs/askr/foundations';
+import { mergeCssVar } from '../_internal/style';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import { mapJsxTree } from '../_internal/jsx';
 import {
@@ -179,6 +180,7 @@ export function Slider(props: SliderProps) {
     onChange: onValueChange,
   });
   const normalizedValue = snapRangeValue(valueState(), min, max, step);
+  const percentage = rangePercentage(normalizedValue, min, max);
   const injectedProps: InjectedSliderProps = {
     __sliderId: sliderId,
     __value: normalizedValue,
@@ -210,6 +212,12 @@ export function Slider(props: SliderProps) {
   });
   const finalProps = mergeProps(rest, {
     ref,
+    style: mergeCssVar(
+      (rest as { style?: unknown }).style,
+      '--ak-slider-percentage',
+      `${percentage}%`
+    ),
+    'data-slot': 'slider',
     'data-slider': 'true',
     'data-orientation': orientation,
     'data-disabled': disabled ? 'true' : undefined,
@@ -283,6 +291,7 @@ export function SliderTrack(
       }
     ),
     id: injected.__trackId,
+    'data-slot': 'slider-track',
     'data-slider-track': 'true',
     'data-orientation': injected.__orientation,
     'data-percentage': String(percentage),
@@ -345,6 +354,7 @@ export function SliderRange(
   );
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'slider-range',
     'data-slider-range': 'true',
     'data-orientation': injected.__orientation,
     'data-percentage': String(percentage),
@@ -417,6 +427,7 @@ export function SliderThumb(
     'aria-valuenow': String(injected.__value),
     'aria-orientation': injected.__orientation,
     'aria-disabled': injected.__disabled ? 'true' : undefined,
+    'data-slot': 'slider-thumb',
     'data-slider-thumb': 'true',
     'data-orientation': injected.__orientation,
     'data-percentage': String(percentage),

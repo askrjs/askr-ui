@@ -60,6 +60,12 @@ export const COLLAPSIBLE_A11Y_CONTRACT = {
    */
   CONTROLS_ATTRIBUTE: 'aria-controls' as const,
 
+  DATA_ATTRIBUTES: {
+    slot: 'data-slot' as const,
+    state: 'data-state' as const,
+    disabled: 'data-disabled' as const,
+  },
+
   /**
    * Content region requirements
    *

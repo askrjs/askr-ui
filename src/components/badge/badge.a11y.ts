@@ -3,6 +3,9 @@
  */
 
 export const BADGE_A11Y_CONTRACT = {
+  DATA_ATTRIBUTES: {
+    slot: 'data-slot' as const,
+  },
   MARKER: 'data-badge' as const,
   CONTENT: {
     textAllowed: true,

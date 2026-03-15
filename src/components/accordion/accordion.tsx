@@ -202,6 +202,7 @@ export function Accordion(props: AccordionProps) {
   });
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'accordion',
     'data-accordion': 'true',
     'data-orientation': orientation,
   });
@@ -278,6 +279,7 @@ export function AccordionItem(
   const finalProps = mergeProps(rest, {
     ref,
     id: injected.__itemId,
+    'data-slot': 'accordion-item',
     'data-state': open ? 'open' : 'closed',
     'data-disabled': injected.__itemDisabled ? 'true' : undefined,
     'data-orientation': injected.__orientation,
@@ -339,6 +341,7 @@ export function AccordionHeader(
   });
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'accordion-header',
     'data-accordion-header': 'true',
   });
 
@@ -458,6 +461,7 @@ export function AccordionTrigger(
       }
     ),
     id: injected.__triggerId,
+    'data-slot': 'accordion-trigger',
     'aria-controls': injected.__contentId,
     'aria-expanded': open ? 'true' : 'false',
     'data-state': open ? 'open' : 'closed',
@@ -539,6 +543,7 @@ export function AccordionContent(
     id: injected.__contentId,
     role: 'region',
     'aria-labelledby': injected.__triggerId,
+    'data-slot': 'accordion-content',
     'data-state': open ? 'open' : 'closed',
   });
 

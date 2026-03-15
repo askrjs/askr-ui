@@ -139,6 +139,28 @@ import {
   type TooltipProps,
   type TooltipTriggerAsChildProps,
   type TooltipTriggerProps,
+  Container,
+  Stack,
+  Inline,
+  Grid,
+  Center,
+  Spacer,
+  SidebarLayout,
+  TopbarLayout,
+  type ContainerProps,
+  type ContainerAsChildProps,
+  type StackProps,
+  type StackAsChildProps,
+  type InlineProps,
+  type InlineAsChildProps,
+  type GridProps,
+  type GridAsChildProps,
+  type CenterProps,
+  type CenterAsChildProps,
+  type SpacerProps,
+  type SpacerAsChildProps,
+  type SidebarLayoutProps,
+  type TopbarLayoutProps,
 } from '@askrjs/askr-ui';
 import { AlertDialog as AlertDialogSubpath } from '@askrjs/askr-ui/alert-dialog';
 import { Button as ButtonSubpath } from '@askrjs/askr-ui/button';
@@ -177,6 +199,29 @@ const radioGroupFromRoot: typeof RadioGroup = RadioGroup;
 const radioGroupItemFromRoot: typeof RadioGroupItem = RadioGroupItem;
 const switchFromSubpath: typeof Switch = SwitchSubpath;
 const toggleFromSubpath: typeof Toggle = ToggleSubpath;
+const containerFromSubpath: typeof Container = ContainerSubpath;
+const stackFromSubpath: typeof Stack = StackSubpath;
+const inlineFromSubpath: typeof Inline = InlineSubpath;
+const gridFromSubpath: typeof Grid = GridSubpath;
+const centerFromSubpath: typeof Center = CenterSubpath;
+const spacerFromSubpath: typeof Spacer = SpacerSubpath;
+const sidebarLayoutFromSubpath: typeof SidebarLayout = SidebarLayoutSubpath;
+const topbarLayoutFromSubpath: typeof TopbarLayout = TopbarLayoutSubpath;
+
+const containerProps: ContainerProps = { children: 'Content' };
+const containerAsChildProps: ContainerAsChildProps = { asChild: true, children: slotChild };
+const stackProps: StackProps = { gap: '1rem' };
+const stackAsChildProps: StackAsChildProps = { asChild: true, children: slotChild };
+const inlineProps: InlineProps = { gap: '0.5rem' };
+const inlineAsChildProps: InlineAsChildProps = { asChild: true, children: slotChild };
+const gridProps: GridProps = { columns: 3 };
+const gridAsChildProps: GridAsChildProps = { asChild: true, children: slotChild };
+const centerProps: CenterProps = { axis: 'both' };
+const centerAsChildProps: CenterAsChildProps = { asChild: true, children: slotChild };
+const spacerProps: SpacerProps = { grow: 1 };
+const spacerAsChildProps: SpacerAsChildProps = { asChild: true, children: slotChild };
+const sidebarLayoutProps: SidebarLayoutProps = { sidebar: 'Nav', children: 'Main' };
+const topbarLayoutProps: TopbarLayoutProps = { topbar: 'Header', children: 'Main' };
 
 const focusRingProps: FocusRingProps = { children: 'ring' };
 const focusRingAsChildProps: FocusRingAsChildProps = {
@@ -600,4 +645,34 @@ void [
   selectItemAsChildProps,
   fieldProps,
   fieldControlAsChildProps,
+  containerFromSubpath,
+  stackFromSubpath,
+  inlineFromSubpath,
+  gridFromSubpath,
+  centerFromSubpath,
+  spacerFromSubpath,
+  sidebarLayoutFromSubpath,
+  topbarLayoutFromSubpath,
+  Container,
+  Stack,
+  Inline,
+  Grid,
+  Center,
+  Spacer,
+  SidebarLayout,
+  TopbarLayout,
+  containerProps,
+  containerAsChildProps,
+  stackProps,
+  stackAsChildProps,
+  inlineProps,
+  inlineAsChildProps,
+  gridProps,
+  gridAsChildProps,
+  centerProps,
+  centerAsChildProps,
+  spacerProps,
+  spacerAsChildProps,
+  sidebarLayoutProps,
+  topbarLayoutProps,
 ];

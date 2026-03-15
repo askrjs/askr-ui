@@ -101,6 +101,7 @@ export function Avatar(props: AvatarProps | AvatarAsChildProps) {
   });
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'avatar',
     'data-avatar': 'true',
     'data-state': entry.status,
   });
@@ -158,6 +159,7 @@ export function AvatarImage(
     alt,
     src,
     hidden: injected.__status !== 'loaded' ? true : undefined,
+    'data-slot': 'avatar-image',
     'data-avatar-image': 'true',
     'data-state': injected.__status,
     onLoad: () => {
@@ -189,6 +191,7 @@ export function AvatarFallback(
   });
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'avatar-fallback',
     'data-avatar-fallback': 'true',
     'data-state': injected.__status,
   });

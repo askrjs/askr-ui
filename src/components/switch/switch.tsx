@@ -42,6 +42,8 @@ export function Switch(props: SwitchButtonProps | SwitchAsChildProps) {
     ref,
     role: 'switch',
     'aria-checked': currentChecked ? 'true' : 'false',
+    'data-slot': 'switch',
+    'data-disabled': disabled ? 'true' : undefined,
     'data-state': currentChecked ? 'checked' : 'unchecked',
   });
 

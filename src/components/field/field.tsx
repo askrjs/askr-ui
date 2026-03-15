@@ -35,6 +35,7 @@ export function Field(props: FieldProps) {
   const finalProps = mergeProps(rest, {
     ref,
     id,
+    'data-slot': 'field',
     'data-invalid': invalid ? 'true' : undefined,
     'data-required': required ? 'true' : undefined,
     'data-disabled': disabled ? 'true' : undefined,
@@ -50,6 +51,7 @@ export function FieldLabel(props: FieldLabelProps | FieldLabelAsChildProps) {
   const baseId = resolveFieldId(fieldId);
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'field-label',
     for: `${baseId}-control`,
   });
 
@@ -72,6 +74,7 @@ export function FieldDescription(
   const finalProps = mergeProps(rest, {
     ref,
     id: `${baseId}-description`,
+    'data-slot': 'field-description',
   });
 
   if (asChild) {
@@ -89,6 +92,7 @@ export function FieldError(props: FieldErrorProps | FieldErrorAsChildProps) {
   const finalProps = mergeProps(rest, {
     ref,
     id: `${baseId}-error`,
+    'data-slot': 'field-error',
     role: 'alert',
   });
 
@@ -126,6 +130,10 @@ export function FieldControl(
     ref,
     id: `${baseId}-control`,
     'aria-describedby': describedBy || undefined,
+    'data-slot': 'field-control',
+    'data-disabled': disabled ? 'true' : undefined,
+    'data-invalid': invalid ? 'true' : undefined,
+    'data-required': required ? 'true' : undefined,
     'aria-invalid': invalid ? 'true' : undefined,
     'aria-required': required ? 'true' : undefined,
     'aria-disabled': disabled ? 'true' : undefined,

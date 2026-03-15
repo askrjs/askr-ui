@@ -263,6 +263,7 @@ export function Menubar(props: MenubarProps) {
     ...nav.container,
     ref,
     role: 'menubar',
+    'data-slot': 'menubar',
     'data-menubar': 'true',
   });
 
@@ -391,6 +392,8 @@ export function MenubarTrigger(
     'aria-haspopup': 'menu',
     'aria-expanded': open ? 'true' : 'false',
     'aria-controls': injected.__contentId,
+    'data-slot': 'menubar-trigger',
+    'data-disabled': disabled ? 'true' : undefined,
     'data-state': open ? 'open' : 'closed',
     onFocus: () => {
       injected.__setCurrentTriggerIndex(injected.__menuIndex);
@@ -590,6 +593,7 @@ export function MenubarContent(
     id: injected.__contentId,
     role: 'menu',
     'aria-labelledby': injected.__triggerId,
+    'data-slot': 'menubar-content',
     'data-state': open ? 'open' : 'closed',
     'data-side': side,
     'data-align': align,
@@ -719,6 +723,7 @@ export function MenubarItem(
     id: injected.__surfaceId,
     role: 'menuitem',
     'aria-disabled': isDisabled ? 'true' : undefined,
+    'data-slot': 'menubar-item',
     'data-disabled': isDisabled ? 'true' : undefined,
   });
 
@@ -867,6 +872,7 @@ export function MenubarSubTrigger(
     role: 'menuitem',
     'aria-haspopup': 'menu',
     'aria-expanded': open ? 'true' : 'false',
+    'data-slot': 'menubar-sub-trigger',
     'data-state': open ? 'open' : 'closed',
     'data-disabled': isDisabled ? 'true' : undefined,
     onPointerEnter: () => {
@@ -917,7 +923,11 @@ export function MenubarGroup(
   props: MenubarGroupProps | MenubarGroupAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
-  const finalProps = mergeProps(rest, { ref, role: 'group' });
+  const finalProps = mergeProps(rest, {
+    ref,
+    role: 'group',
+    'data-slot': 'menubar-group',
+  });
   return asChild ? (
     <Slot asChild {...finalProps} children={children} />
   ) : (
@@ -929,7 +939,11 @@ export function MenubarLabel(
   props: MenubarLabelProps | MenubarLabelAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
-  const finalProps = mergeProps(rest, { ref, 'data-menubar-label': 'true' });
+  const finalProps = mergeProps(rest, {
+    ref,
+    'data-slot': 'menubar-label',
+    'data-menubar-label': 'true',
+  });
   return asChild ? (
     <Slot asChild {...finalProps} children={children} />
   ) : (
@@ -941,7 +955,11 @@ export function MenubarSeparator(
   props: MenubarSeparatorProps | MenubarSeparatorAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
-  const finalProps = mergeProps(rest, { ref, role: 'separator' });
+  const finalProps = mergeProps(rest, {
+    ref,
+    role: 'separator',
+    'data-slot': 'menubar-separator',
+  });
   return asChild ? (
     <Slot asChild {...finalProps} children={children} />
   ) : (

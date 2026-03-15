@@ -59,7 +59,12 @@ export function Button(props: ButtonButtonProps | ButtonAsChildProps) {
   });
 
   // Prop composition: merge user props, interaction props, and ref
-  const finalProps = mergeProps(rest, { ...interactionProps, ref });
+  const finalProps = mergeProps(rest, {
+    ...interactionProps,
+    'data-slot': 'button',
+    'data-disabled': disabled ? 'true' : undefined,
+    ref,
+  });
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;

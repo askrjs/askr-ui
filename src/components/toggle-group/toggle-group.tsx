@@ -201,6 +201,7 @@ export function ToggleGroup(props: ToggleGroupProps) {
     ...nav.container,
     ref,
     role: 'group',
+    'data-slot': 'toggle-group',
     'data-orientation': orientation,
     'data-toggle-group': 'true',
     'data-disabled': disabled ? 'true' : undefined,
@@ -315,6 +316,7 @@ export function ToggleGroupItem(
     ),
     id: injected.__itemId,
     'aria-pressed': pressed ? 'true' : 'false',
+    'data-slot': 'toggle-group-item',
     'data-state': pressed ? 'on' : 'off',
     'data-disabled': isDisabled ? 'true' : undefined,
   });

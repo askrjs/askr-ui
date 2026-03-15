@@ -239,8 +239,11 @@ export function CollapsibleTrigger(
         | undefined,
       restoreFocusRef
     ),
+    'data-slot': 'collapsible-trigger',
     'aria-expanded': injected.__open ? 'true' : 'false',
     'aria-controls': injected.__contentId,
+    'data-state': injected.__open ? 'open' : 'closed',
+    'data-disabled': injected.__disabled ? 'true' : undefined,
     onKeyDown: !asChild
       ? (event: KeyboardEvent) => {
           if (event.key === ' ') {
@@ -302,6 +305,7 @@ export function CollapsibleContent(
   const finalProps = mergeProps(rest, {
     ref,
     id: injected.__contentId,
+    'data-slot': 'collapsible-content',
     'data-state': injected.__open ? 'open' : 'closed',
   });
 

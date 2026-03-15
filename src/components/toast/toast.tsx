@@ -226,6 +226,7 @@ export function ToastProvider(props: ToastProviderProps) {
   });
   const finalProps = mergeProps(rest, {
     ref,
+    'data-slot': 'toast-provider',
     'data-toast-provider': 'true',
   });
 
@@ -267,6 +268,7 @@ export function ToastViewport(
     role: 'region',
     'aria-live': 'polite',
     'aria-label': 'Notifications',
+    'data-slot': 'toast-viewport',
     'data-toast-viewport': 'true',
   });
 
@@ -343,6 +345,7 @@ export function Toast(
     'aria-live': 'polite',
     'aria-labelledby': injected.__titleId,
     'aria-describedby': injected.__descriptionId,
+    'data-slot': 'toast',
     'data-state': injected.__open ? 'open' : 'closed',
     'data-toast': 'true',
   });
@@ -395,6 +398,7 @@ export function ToastTitle(
   const finalProps = mergeProps(rest, {
     ref,
     id: injected.__titleId,
+    'data-slot': 'toast-title',
     'data-toast-title': 'true',
   });
 
@@ -439,6 +443,7 @@ export function ToastDescription(
   const finalProps = mergeProps(rest, {
     ref,
     id: injected.__descriptionId,
+    'data-slot': 'toast-description',
     'data-toast-description': 'true',
   });
 
@@ -495,6 +500,8 @@ export function ToastAction(
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     ref,
+    'data-slot': 'toast-action',
+    'data-disabled': disabled ? 'true' : undefined,
     'data-toast-action': 'true',
   });
 
@@ -555,6 +562,8 @@ export function ToastClose(
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     ref,
+    'data-slot': 'toast-close',
+    'data-disabled': disabled ? 'true' : undefined,
     'data-toast-close': 'true',
   });
 
