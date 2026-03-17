@@ -16,7 +16,10 @@ export type SidebarLayoutProps = Omit<
   sidebarWidth?: string;
   /** CSS gap between sidebar and main. Applied as inline style only when it is a real CSS length. */
   gap?: string;
-  /** Named breakpoint below which the layout collapses to a single column. */
+  /**
+   * Named breakpoint below which the layout collapses to a single column.
+   * Official themes recognize `sm`, `md`, `lg`, and `xl`.
+   */
   collapseBelow?: string;
   ref?: Ref<HTMLDivElement>;
 };

@@ -9,7 +9,10 @@ export type InlineOwnProps = {
   justify?: string;
   /** CSS flex-wrap value. */
   wrap?: 'wrap' | 'nowrap' | 'wrap-reverse';
-  /** Named breakpoint below which the row layout collapses to a column. */
+  /**
+   * Named breakpoint below which the row layout collapses to a column.
+   * Official themes recognize `sm`, `md`, `lg`, and `xl`.
+   */
   collapseBelow?: string;
   children?: unknown;
 };
