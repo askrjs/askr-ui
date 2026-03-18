@@ -3,8 +3,26 @@
   "version": "1.0.0",
   "description": "Headless askr components",
   "type": "module",
-  "packageManager": "npm@11.11.1",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/askrjs/askr-ui"
+  },
+  "homepage": "https://github.com/askrjs/askr-ui#readme",
+  "bugs": {
+    "url": "https://github.com/askrjs/askr-ui/issues"
+  },
+  "author": {
+    "name": "askrjs",
+    "url": "https://github.com/askrjs"
+  },
+  "keywords": [
+    "askr",
+    "ui",
+    "components",
+    "headless",
+    "accessible"
+  ],
   "sideEffects": false,
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -252,7 +270,7 @@
     "node": ">=18"
   },
   "peerDependencies": {
-    "@askrjs/askr": "^0.0.28"
+    "@askrjs/askr": ">=0.0.28 <1.0.0"
   },
   "peerDependenciesMeta": {
     "@askrjs/askr": {
@@ -275,7 +293,7 @@
     "lint": "eslint src tests benches --ext .ts,.tsx"
   },
   "devDependencies": {
-    "@askrjs/askr": "^0.0.28",
+    "@askrjs/askr": ">=0.0.28 <1.0.0",
     "@eslint/js": "^10.0.1",
     "@types/node": "^25.5.0",
     "axe-core": "^4.11.1",
