@@ -49,5 +49,8 @@ describe('Public API', () => {
     expect(askrUi.SIDEBAR_LAYOUT_A11Y_CONTRACT).toBeDefined();
     expect(askrUi.TopbarLayout).toBeDefined();
     expect(askrUi.TOPBAR_LAYOUT_A11Y_CONTRACT).toBeDefined();
+    expect(askrUi.IconBase).toBeDefined();
+    expect(askrUi.getIconContractProps).toBeDefined();
+    expect(askrUi.resolveIconSizeVariable).toBeDefined();
   });
 });

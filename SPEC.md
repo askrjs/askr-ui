@@ -27,11 +27,20 @@ If a component fails that bar, it does not ship as public API.
 - Basic navigation and utility: `Breadcrumb`, `Pagination`, `ToggleGroup`, `Slider`, `Menubar`, `NavigationMenu`
 - Layout primitives (structural/headless only — no colors, borders, or theme tokens): `Container`, `Stack`, `Inline`, `Grid`, `Center`, `Spacer`, `SidebarLayout`, `TopbarLayout`
 
+- Icon foundation: `IconBase`, `IconProps`, `IconSizeToken`
+
 Responsive theme contract:
 
 - Layout primitives emit semantic `data-*` attributes for theming, including `data-collapse-below`, `data-columns`, `data-min-item-width`, `data-gap`, `data-sidebar-position`, and `data-sidebar-width`.
 - Official themes interpret `data-collapse-below` using the canonical breakpoint names `sm`, `md`, `lg`, and `xl`.
 - Responsive styling remains theme-owned and mobile first: narrow screens are the base, larger layouts layer on with additive media queries.
+
+Icon contract:
+
+- `IconBase` owns the canonical public icon hooks: `data-slot="icon"`, `data-icon`, semantic `data-size`, `data-decorative`, and `data-color="current"`.
+- Icon sizing and stroke defaults resolve through `--ak-icon-size` and `--ak-icon-stroke-width`, with semantic theme tokens layered underneath.
+- Decorative icons are `aria-hidden="true"` when unlabeled. Labeled icons render `role="img"` with a `<title>`.
+- Explicit `size`, `strokeWidth`, `color`, and `style` props override theme defaults. Raw CSS sizes are consumer overrides; only `sm|md|lg|xl` participate in the shared theme contract.
 
 ## Design Rules
 

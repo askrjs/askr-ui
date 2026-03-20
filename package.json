@@ -1,6 +1,6 @@
 {
   "name": "@askrjs/askr-ui",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Headless askr components",
   "type": "module",
   "license": "Apache-2.0",
@@ -260,6 +260,11 @@
       "types": "./dist/components/topbar-layout/topbar-layout.d.ts",
       "import": "./dist/components/topbar-layout/topbar-layout.js",
       "require": "./dist/components/topbar-layout/topbar-layout.cjs"
+    },
+    "./icon": {
+      "types": "./dist/components/icon/icon.d.ts",
+      "import": "./dist/components/icon/icon.js",
+      "require": "./dist/components/icon/icon.cjs"
     },
     "./package.json": "./package.json"
   },
