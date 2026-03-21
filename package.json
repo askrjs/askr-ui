@@ -266,6 +266,11 @@
       "import": "./dist/components/icon/icon.js",
       "require": "./dist/components/icon/icon.cjs"
     },
+    "./data-table": {
+      "types": "./dist/components/data-table/data-table.d.ts",
+      "import": "./dist/components/data-table/data-table.js",
+      "require": "./dist/components/data-table/data-table.cjs"
+    },
     "./package.json": "./package.json"
   },
   "publishConfig": {
