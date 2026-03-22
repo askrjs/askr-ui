@@ -65,4 +65,18 @@ describe('Slider - Behavior', () => {
     await flushUpdates();
     expect(input.value).toBe('81');
   });
+
+  it('should emit --ak-slider-percentage as a CSS custom property on the root', () => {
+    container = mount(
+      <Slider defaultValue={25} min={0} max={100}>
+        <SliderTrack>
+          <SliderRange />
+          <SliderThumb />
+        </SliderTrack>
+      </Slider>
+    );
+
+    const root = container.querySelector('[data-slot="slider"]') as HTMLElement;
+    expect(root?.getAttribute('style')).toContain('--ak-slider-percentage:25%');
+  });
 });

@@ -27,4 +27,21 @@ describe('Progress - Behavior', () => {
       unmount(container);
     }
   });
+
+  it('should emit --ak-progress-percentage as a CSS custom property on the root', () => {
+    const container = mount(
+      <Progress value={40} max={80}>
+        <ProgressIndicator />
+      </Progress>
+    );
+
+    try {
+      const root = container.querySelector(
+        `[role="${PROGRESS_A11Y_CONTRACT.ROLE}"]`
+      ) as HTMLElement;
+      expect(root?.getAttribute('style')).toContain('--ak-progress-percentage:50%');
+    } finally {
+      unmount(container);
+    }
+  });
 });
