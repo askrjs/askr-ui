@@ -1,5 +1,5 @@
-import { describe, it } from 'vitest';
-import { Container } from '../../../src/components/container/container';
+import { describe, it } from 'vite-plus/test';
+import { Container } from '../../../src/components/primitives/container/container';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Container - Accessibility', () => {
@@ -11,7 +11,7 @@ describe('Container - Accessibility', () => {
     await expectNoAxeViolations(
       <Container centered fluid maxWidth="64rem" padding="1rem">
         Content
-      </Container>,
+      </Container>
     );
   });
 });

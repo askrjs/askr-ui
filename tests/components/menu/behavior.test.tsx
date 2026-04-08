@@ -1,11 +1,11 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vite-plus/test';
 import {
   Menu,
   MenuContent,
   MenuItem,
   MenuLabel,
   MenuSeparator,
-} from '../../../src/components/menu';
+} from '../../../src/components/composites/menu';
 import { mount, unmount } from '../../test-utils';
 
 describe('Menu - Behavior', () => {

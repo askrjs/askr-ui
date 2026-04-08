@@ -1,10 +1,10 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vite-plus/test';
 import {
   Tooltip,
   TooltipContent,
   TooltipPortal,
   TooltipTrigger,
-} from '../../../src/components/tooltip';
+} from '../../../src/components/composites/tooltip';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Tooltip - Behavior', () => {
@@ -25,7 +25,7 @@ describe('Tooltip - Behavior', () => {
     );
 
     let trigger = container.querySelector('button') as HTMLButtonElement;
-    trigger.focus();
+    trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
     await flushUpdates();
     trigger = container.querySelector('button') as HTMLButtonElement;
 

@@ -1,12 +1,12 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vite-plus/test';
 import {
   Accordion,
   AccordionContent,
   AccordionHeader,
   AccordionItem,
   AccordionTrigger,
-} from '../../../src/components/accordion';
-import { ACCORDION_A11Y_CONTRACT } from '../../../src/components/accordion/accordion.a11y';
+} from '../../../src/components/composites/accordion';
+import { ACCORDION_A11Y_CONTRACT } from '../../../src/components/composites/accordion/accordion.a11y';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 function getButtonByText(

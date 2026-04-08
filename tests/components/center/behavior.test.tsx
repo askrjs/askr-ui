@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { Center } from '../../../src/components/center/center';
-import { CENTER_A11Y_CONTRACT } from '../../../src/components/center/center.a11y';
+import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { Center } from '../../../src/components/primitives/center/center';
+import { CENTER_A11Y_CONTRACT } from '../../../src/components/primitives/center/center.a11y';
 import { mount, unmount } from '../../test-utils';
 
 describe('Center - Behavior', () => {
@@ -18,7 +18,9 @@ describe('Center - Behavior', () => {
   it('should default axis to both', () => {
     container = mount(<Center />);
     const el = container.querySelector('[data-slot="center"]');
-    expect(el?.getAttribute(CENTER_A11Y_CONTRACT.DATA_ATTRIBUTES.axis)).toBe('both');
+    expect(el?.getAttribute(CENTER_A11Y_CONTRACT.DATA_ATTRIBUTES.axis)).toBe(
+      'both'
+    );
   });
 
   it('should pass through className', () => {
@@ -30,13 +32,17 @@ describe('Center - Behavior', () => {
   it('should emit data-axis attribute', () => {
     container = mount(<Center axis="horizontal" />);
     const el = container.querySelector('[data-slot="center"]');
-    expect(el?.getAttribute(CENTER_A11Y_CONTRACT.DATA_ATTRIBUTES.axis)).toBe('horizontal');
+    expect(el?.getAttribute(CENTER_A11Y_CONTRACT.DATA_ATTRIBUTES.axis)).toBe(
+      'horizontal'
+    );
   });
 
   it('should emit data-min-height attribute', () => {
     container = mount(<Center minHeight="100vh" />);
     const el = container.querySelector('[data-slot="center"]');
-    expect(el?.getAttribute(CENTER_A11Y_CONTRACT.DATA_ATTRIBUTES.minHeight)).toBe('100vh');
+    expect(
+      el?.getAttribute(CENTER_A11Y_CONTRACT.DATA_ATTRIBUTES.minHeight)
+    ).toBe('100vh');
   });
 
   it('should set minHeight inline style for valid CSS lengths', () => {
@@ -48,14 +54,16 @@ describe('Center - Behavior', () => {
   it('should emit data-inline attribute when inline is true', () => {
     container = mount(<Center inline />);
     const el = container.querySelector('[data-slot="center"]');
-    expect(el?.getAttribute(CENTER_A11Y_CONTRACT.DATA_ATTRIBUTES.inline)).toBe('true');
+    expect(el?.getAttribute(CENTER_A11Y_CONTRACT.DATA_ATTRIBUTES.inline)).toBe(
+      'true'
+    );
   });
 
   it('should render the child element when asChild is true', () => {
     container = mount(
       <Center asChild>
         <section>content</section>
-      </Center>,
+      </Center>
     );
     const el = container.querySelector('section');
     expect(el?.getAttribute('data-slot')).toBe('center');

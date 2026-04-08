@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { FocusScope } from '../../../src/components/focus-scope';
+import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { FocusScope } from '../../../src/components/composites/focus-scope';
 import { mount, unmount } from '../../test-utils';
 
 describe('FocusScope - Behavior', () => {

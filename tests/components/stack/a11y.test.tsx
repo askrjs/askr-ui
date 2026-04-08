@@ -1,5 +1,5 @@
-import { describe, it } from 'vitest';
-import { Stack } from '../../../src/components/stack/stack';
+import { describe, it } from 'vite-plus/test';
+import { Stack } from '../../../src/components/primitives/stack/stack';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Stack - Accessibility', () => {
@@ -8,11 +8,15 @@ describe('Stack - Accessibility', () => {
       <Stack>
         <span>Item one</span>
         <span>Item two</span>
-      </Stack>,
+      </Stack>
     );
   });
 
   it('should have no automated axe violations given stack with gap and align', async () => {
-    await expectNoAxeViolations(<Stack gap="1rem" align="center">Content</Stack>);
+    await expectNoAxeViolations(
+      <Stack gap="1rem" align="center">
+        Content
+      </Stack>
+    );
   });
 });

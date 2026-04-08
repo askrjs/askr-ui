@@ -127,7 +127,6 @@ import {
   Stack,
   Inline,
   Grid,
-  IconBase,
   Center,
   Spacer,
   SidebarLayout,
@@ -136,38 +135,35 @@ import {
   type StackProps,
   type InlineProps,
   type GridProps,
-  type IconProps,
-  type IconSizeToken,
   type CenterProps,
   type SpacerProps,
   type SidebarLayoutProps,
   type TopbarLayoutProps,
 } from '@askrjs/askr-ui';
-import { Accordion as AccordionSubpath } from '@askrjs/askr-ui/accordion';
-import { Avatar as AvatarSubpath } from '@askrjs/askr-ui/avatar';
-import { Badge as BadgeSubpath } from '@askrjs/askr-ui/badge';
-import { Breadcrumb as BreadcrumbSubpath } from '@askrjs/askr-ui/breadcrumb';
-import { Collapsible as CollapsibleSubpath } from '@askrjs/askr-ui/collapsible';
-import { Menubar as MenubarSubpath } from '@askrjs/askr-ui/menubar';
-import { NavigationMenu as NavigationMenuSubpath } from '@askrjs/askr-ui/navigation-menu';
-import { Pagination as PaginationSubpath } from '@askrjs/askr-ui/pagination';
-import { Progress as ProgressSubpath } from '@askrjs/askr-ui/progress';
-import { ProgressCircle as ProgressCircleSubpath } from '@askrjs/askr-ui/progress-circle';
-import { Skeleton as SkeletonSubpath } from '@askrjs/askr-ui/skeleton';
-import { Slider as SliderSubpath } from '@askrjs/askr-ui/slider';
-import { Spinner as SpinnerSubpath } from '@askrjs/askr-ui/spinner';
-import { Tabs as TabsSubpath } from '@askrjs/askr-ui/tabs';
-import { ToastProvider as ToastSubpath } from '@askrjs/askr-ui/toast';
-import { ToggleGroup as ToggleGroupSubpath } from '@askrjs/askr-ui/toggle-group';
-import { Container as ContainerSubpath } from '@askrjs/askr-ui/container';
-import { Stack as StackSubpath } from '@askrjs/askr-ui/stack';
-import { Inline as InlineSubpath } from '@askrjs/askr-ui/inline';
-import { Grid as GridSubpath } from '@askrjs/askr-ui/grid';
-import { IconBase as IconBaseSubpath } from '@askrjs/askr-ui/icon';
-import { Center as CenterSubpath } from '@askrjs/askr-ui/center';
-import { Spacer as SpacerSubpath } from '@askrjs/askr-ui/spacer';
-import { SidebarLayout as SidebarLayoutSubpath } from '@askrjs/askr-ui/sidebar-layout';
-import { TopbarLayout as TopbarLayoutSubpath } from '@askrjs/askr-ui/topbar-layout';
+import { Accordion as AccordionSubpath } from '@askrjs/askr-ui/composites/accordion';
+import { Avatar as AvatarSubpath } from '@askrjs/askr-ui/primitives/avatar';
+import { Badge as BadgeSubpath } from '@askrjs/askr-ui/primitives/badge';
+import { Breadcrumb as BreadcrumbSubpath } from '@askrjs/askr-ui/composites/breadcrumb';
+import { Collapsible as CollapsibleSubpath } from '@askrjs/askr-ui/composites/collapsible';
+import { Menubar as MenubarSubpath } from '@askrjs/askr-ui/composites/menubar';
+import { NavigationMenu as NavigationMenuSubpath } from '@askrjs/askr-ui/composites/navigation-menu';
+import { Pagination as PaginationSubpath } from '@askrjs/askr-ui/composites/pagination';
+import { Progress as ProgressSubpath } from '@askrjs/askr-ui/primitives/progress';
+import { ProgressCircle as ProgressCircleSubpath } from '@askrjs/askr-ui/primitives/progress-circle';
+import { Skeleton as SkeletonSubpath } from '@askrjs/askr-ui/primitives/skeleton';
+import { Slider as SliderSubpath } from '@askrjs/askr-ui/primitives/slider';
+import { Spinner as SpinnerSubpath } from '@askrjs/askr-ui/primitives/spinner';
+import { Tabs as TabsSubpath } from '@askrjs/askr-ui/composites/tabs';
+import { ToastProvider as ToastSubpath } from '@askrjs/askr-ui/composites/toast';
+import { ToggleGroup as ToggleGroupSubpath } from '@askrjs/askr-ui/primitives/toggle-group';
+import { Container as ContainerSubpath } from '@askrjs/askr-ui/primitives/container';
+import { Stack as StackSubpath } from '@askrjs/askr-ui/primitives/stack';
+import { Inline as InlineSubpath } from '@askrjs/askr-ui/primitives/inline';
+import { Grid as GridSubpath } from '@askrjs/askr-ui/primitives/grid';
+import { Center as CenterSubpath } from '@askrjs/askr-ui/primitives/center';
+import { Spacer as SpacerSubpath } from '@askrjs/askr-ui/primitives/spacer';
+import { SidebarLayout as SidebarLayoutSubpath } from '@askrjs/askr-ui/patterns/sidebar-layout';
+import { TopbarLayout as TopbarLayoutSubpath } from '@askrjs/askr-ui/patterns/topbar-layout';
 
 const slotChild = {} as JSXElement;
 
@@ -193,7 +189,6 @@ const containerFromSubpath: typeof Container = ContainerSubpath;
 const stackFromSubpath: typeof Stack = StackSubpath;
 const inlineFromSubpath: typeof Inline = InlineSubpath;
 const gridFromSubpath: typeof Grid = GridSubpath;
-const iconBaseFromSubpath: typeof IconBase = IconBaseSubpath;
 const centerFromSubpath: typeof Center = CenterSubpath;
 const spacerFromSubpath: typeof Spacer = SpacerSubpath;
 const sidebarLayoutFromSubpath: typeof SidebarLayout = SidebarLayoutSubpath;
@@ -203,11 +198,15 @@ const containerLayoutProps: ContainerProps = { maxWidth: '64rem' };
 const stackLayoutProps: StackProps = { gap: '1rem', align: 'center' };
 const inlineLayoutProps: InlineProps = { gap: '0.5rem', wrap: 'wrap' };
 const gridLayoutProps: GridProps = { columns: 3, gap: '1rem' };
-const iconProps: IconProps = { iconName: 'Search', size: 'sm', children: 'x' };
-const iconSizeToken: IconSizeToken = 'md';
-const centerLayoutProps: CenterProps = { axis: 'horizontal', minHeight: '100vh' };
+const centerLayoutProps: CenterProps = {
+  axis: 'horizontal',
+  minHeight: '100vh',
+};
 const spacerLayoutProps: SpacerProps = { grow: 1 };
-const sidebarLayoutLayoutProps: SidebarLayoutProps = { sidebarWidth: '20rem', gap: '1rem' };
+const sidebarLayoutLayoutProps: SidebarLayoutProps = {
+  sidebarWidth: '20rem',
+  gap: '1rem',
+};
 const topbarLayoutLayoutProps: TopbarLayoutProps = { topbarHeight: '3rem' };
 
 const badgeProps: BadgeProps = { children: 'Beta' };
@@ -544,7 +543,6 @@ void [
   stackFromSubpath,
   inlineFromSubpath,
   gridFromSubpath,
-  iconBaseFromSubpath,
   centerFromSubpath,
   spacerFromSubpath,
   sidebarLayoutFromSubpath,
@@ -553,7 +551,6 @@ void [
   Stack,
   Inline,
   Grid,
-  IconBase,
   Center,
   Spacer,
   SidebarLayout,
@@ -562,8 +559,6 @@ void [
   stackLayoutProps,
   inlineLayoutProps,
   gridLayoutProps,
-  iconProps,
-  iconSizeToken,
   centerLayoutProps,
   spacerLayoutProps,
   sidebarLayoutLayoutProps,

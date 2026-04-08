@@ -1,5 +1,5 @@
-import { describe, it } from 'vitest';
-import { Skeleton } from '../../../src/components/skeleton';
+import { describe, it } from 'vite-plus/test';
+import { Skeleton } from '../../../src/components/primitives/skeleton';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Skeleton - Accessibility', () => {

@@ -1,23 +1,23 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vite-plus/test';
 import {
   Dialog,
   DialogContent,
   DialogPortal,
   DialogTrigger,
-} from '../../../src/components/dialog';
+} from '../../../src/components/composites/dialog';
 import {
   Popover,
   PopoverContent,
   PopoverPortal,
   PopoverTrigger,
-} from '../../../src/components/popover';
+} from '../../../src/components/composites/popover';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuPortal,
   DropdownMenuTrigger,
-} from '../../../src/components/dropdown-menu';
+} from '../../../src/components/composites/dropdown-menu';
 import {
   Select,
   SelectContent,
@@ -25,13 +25,13 @@ import {
   SelectPortal,
   SelectTrigger,
   SelectValue,
-} from '../../../src/components/select';
+} from '../../../src/components/primitives/select';
 import {
   Tooltip,
   TooltipContent,
   TooltipPortal,
   TooltipTrigger,
-} from '../../../src/components/tooltip';
+} from '../../../src/components/composites/tooltip';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Consistency Reset - Portal Contract', () => {

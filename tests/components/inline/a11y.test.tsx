@@ -1,5 +1,5 @@
-import { describe, it } from 'vitest';
-import { Inline } from '../../../src/components/inline/inline';
+import { describe, it } from 'vite-plus/test';
+import { Inline } from '../../../src/components/primitives/inline/inline';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Inline - Accessibility', () => {
@@ -8,11 +8,15 @@ describe('Inline - Accessibility', () => {
       <Inline>
         <span>Item one</span>
         <span>Item two</span>
-      </Inline>,
+      </Inline>
     );
   });
 
   it('should have no automated axe violations given inline with gap and wrap', async () => {
-    await expectNoAxeViolations(<Inline gap="0.5rem" wrap="wrap">Content</Inline>);
+    await expectNoAxeViolations(
+      <Inline gap="0.5rem" wrap="wrap">
+        Content
+      </Inline>
+    );
   });
 });

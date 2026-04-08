@@ -1,4 +1,4 @@
-import { describe, it } from 'vitest';
+import { describe, it } from 'vite-plus/test';
 import {
   Dialog,
   DialogContent,
@@ -6,7 +6,7 @@ import {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-} from '../../../src/components/dialog';
+} from '../../../src/components/composites/dialog';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Dialog - Accessibility', () => {

@@ -1,9 +1,9 @@
-import { describe, it } from 'vitest';
+import { describe, it } from 'vite-plus/test';
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from '../../../src/components/avatar';
+} from '../../../src/components/primitives/avatar';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Avatar - Accessibility', () => {
