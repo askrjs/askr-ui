@@ -1,6 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "references": [{ "path": "../askr-core" }],
   "compilerOptions": {
     "declaration": true,
     "declarationDir": "dist",

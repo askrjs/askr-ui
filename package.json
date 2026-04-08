@@ -87,8 +87,8 @@
     "generate": "node scripts/generate.js"
   },
   "devDependencies": {
-    "@askrjs/askr": "0.0.1",
-    "@askrjs/askr-vite": "github:askrjs/askr-vite",
+    "@askrjs/askr": "file:../askr",
+    "@askrjs/askr-vite": "file:../askr-vite",
     "@types/node": "^25.5.0",
     "axe-core": "^4.11.2",
     "cross-env": "^10.1.0",
