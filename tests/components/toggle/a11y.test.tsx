@@ -1,244 +1,121 @@
-import { describe, it, expect, afterEach } from 'vite-plus/test';
+import { describe, expect, it } from 'vite-plus/test';
 import { Toggle } from '../../../src/components/primitives/toggle/toggle';
-import { createIsland } from '@askrjs/askr';
-import { axe } from 'vitest-axe';
 import { TOGGLE_A11Y_CONTRACT } from '../../../src/components/primitives/toggle/toggle.a11y';
+import { expectNoAxeViolations } from '../../accessibility';
+import { mount, unmount } from '../../test-utils';
 
-function mount(element: JSX.Element): HTMLElement {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-  createIsland({
-    root: container,
-    component: () => element,
+describe('Toggle - Accessibility', () => {
+  it('has no automated axe violations for the native toggle path', async () => {
+    await expectNoAxeViolations(<Toggle>Mute</Toggle>);
   });
-  return container;
-}
 
-function unmount(container: HTMLElement) {
-  if (container.parentNode) {
-    container.parentNode.removeChild(container);
-  }
-}
+  it('has no automated axe violations for labelled asChild composition', async () => {
+    await expectNoAxeViolations(
+      <Toggle asChild>
+        <span>Mute</span>
+      </Toggle>
+    );
+  });
 
-describe('Toggle — Accessibility', () => {
-  let container: HTMLElement;
+  it('uses implicit native button semantics for the default host', () => {
+    const container = mount(<Toggle pressed={false}>Mute</Toggle>);
 
-  afterEach(() => {
-    if (container) {
+    try {
+      const button = container.querySelector('button');
+
+      expect(button?.tagName).toBe('BUTTON');
+      expect(button?.getAttribute('aria-pressed')).toBe('false');
+    } finally {
       unmount(container);
     }
   });
 
-  describe('Automated Axe Checks', () => {
-    it('should have no automated axe violations given default toggle', async () => {
-      container = mount(<Toggle>Toggle</Toggle>);
-      const results = await axe(container);
+  it('uses button semantics when composed with asChild', () => {
+    const container = mount(
+      <Toggle asChild pressed>
+        <span>Mute</span>
+      </Toggle>
+    );
 
-      if (results.violations.length > 0) {
-        throw new Error(
-          `Axe violations found:\n${results.violations
-            .map(
-              (v) =>
-                `  - ${v.id}: ${v.description}\n    ${v.nodes.map((n) => n.html).join('\n    ')}`
-            )
-            .join('\n')}`
-        );
-      }
-    });
+    try {
+      const host = container.querySelector('[role="button"]');
 
-    it('should have no automated axe violations given pressed toggle', async () => {
-      container = mount(<Toggle pressed={true}>Pressed</Toggle>);
-      const results = await axe(container);
-
-      if (results.violations.length > 0) {
-        throw new Error(
-          `Axe violations found:\n${results.violations
-            .map(
-              (v) =>
-                `  - ${v.id}: ${v.description}\n    ${v.nodes.map((n) => n.html).join('\n    ')}`
-            )
-            .join('\n')}`
-        );
-      }
-    });
-
-    it('should have no automated axe violations given disabled toggle', async () => {
-      container = mount(<Toggle disabled>Disabled</Toggle>);
-      const results = await axe(container);
-
-      if (results.violations.length > 0) {
-        throw new Error(
-          `Axe violations found:\n${results.violations
-            .map(
-              (v) =>
-                `  - ${v.id}: ${v.description}\n    ${v.nodes.map((n) => n.html).join('\n    ')}`
-            )
-            .join('\n')}`
-        );
-      }
-    });
-
-    it('should have no automated axe violations given asChild toggle', async () => {
-      container = mount(
-        <Toggle asChild pressed={false}>
-          <button type="button">Custom</button>
-        </Toggle>
-      );
-      const results = await axe(container);
-
-      if (results.violations.length > 0) {
-        throw new Error(
-          `Axe violations found:\n${results.violations
-            .map(
-              (v) =>
-                `  - ${v.id}: ${v.description}\n    ${v.nodes.map((n) => n.html).join('\n    ')}`
-            )
-            .join('\n')}`
-        );
-      }
-    });
-  });
-
-  describe('Role & Semantics', () => {
-    it('should have implicit button role given native button', () => {
-      container = mount(<Toggle>Toggle</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.tagName).toBe('BUTTON');
-    });
-
-    it('should have role=button given asChild with non-button element', () => {
-      container = mount(
-        <Toggle asChild>
-          <span>Toggle</span>
-        </Toggle>
-      );
-      const span = container.querySelector('span');
-      expect(span?.getAttribute('role')).toBe(TOGGLE_A11Y_CONTRACT.ROLE);
-    });
-  });
-
-  describe('Pressed State', () => {
-    it('should apply aria-pressed attribute per contract', () => {
-      container = mount(<Toggle pressed={true}>Toggle</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.getAttribute(TOGGLE_A11Y_CONTRACT.PRESSED_ATTRIBUTE)).toBe(
+      expect(host?.getAttribute('role')).toBe(TOGGLE_A11Y_CONTRACT.ROLE);
+      expect(host?.getAttribute(TOGGLE_A11Y_CONTRACT.PRESSED_ATTRIBUTE)).toBe(
         'true'
       );
-    });
-
-    it('should default to aria-pressed=false given no pressed prop', () => {
-      container = mount(<Toggle>Toggle</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.getAttribute('aria-pressed')).toBe('false');
-    });
+    } finally {
+      unmount(container);
+    }
   });
 
-  describe('Disabled State', () => {
-    it('should apply disabled attribute given native button', () => {
-      container = mount(<Toggle disabled>Toggle</Toggle>);
+  it('uses native disabled semantics for the default host', () => {
+    const container = mount(<Toggle disabled>Mute</Toggle>);
+
+    try {
       const button = container.querySelector('button');
+
       expect(button?.hasAttribute('disabled')).toBe(true);
-    });
-
-    it('should apply aria-disabled per contract given disabled', () => {
-      container = mount(<Toggle disabled>Toggle</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.getAttribute('aria-disabled')).toBe(
-        TOGGLE_A11Y_CONTRACT.DISABLED_ATTRIBUTES.nativeButton['aria-disabled']
-      );
-    });
-
-    it('should apply aria-disabled on non-native element given asChild', () => {
-      container = mount(
-        <Toggle asChild disabled>
-          <span>Toggle</span>
-        </Toggle>
-      );
-      const span = container.querySelector('span');
-      expect(span?.getAttribute('aria-disabled')).toBe(
-        TOGGLE_A11Y_CONTRACT.DISABLED_ATTRIBUTES.nonNative['aria-disabled']
-      );
-    });
-
-    it('should apply tabIndex=-1 on non-native element given disabled', () => {
-      container = mount(
-        <Toggle asChild disabled>
-          <span>Toggle</span>
-        </Toggle>
-      );
-      const span = container.querySelector('span');
-      expect(span?.getAttribute('tabIndex')).toBe(
-        String(TOGGLE_A11Y_CONTRACT.DISABLED_ATTRIBUTES.nonNative.tabIndex)
-      );
-    });
+      expect(button?.getAttribute('aria-disabled')).toBe('true');
+    } finally {
+      unmount(container);
+    }
   });
 
-  describe('Focus Management', () => {
-    it('should be focusable given enabled toggle', () => {
-      container = mount(<Toggle>Toggle</Toggle>);
-      const button = container.querySelector('button')!;
-      button.focus();
-      expect(document.activeElement).toBe(button);
-    });
+  it('uses aria-disabled and removes disabled asChild hosts from tab order', () => {
+    const container = mount(
+      <Toggle asChild disabled>
+        <span>Mute</span>
+      </Toggle>
+    );
 
-    it('should NOT be in tab order given disabled native button', () => {
-      container = mount(<Toggle disabled>Toggle</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.hasAttribute('disabled')).toBe(true);
-      // Disabled native buttons are implicitly removed from tab order
-    });
+    try {
+      const host = container.querySelector('[role="button"]');
 
-    it('should have tabIndex=-1 given disabled asChild element', () => {
-      container = mount(
-        <Toggle asChild disabled>
-          <span>Toggle</span>
-        </Toggle>
-      );
-      const span = container.querySelector('span');
-      expect(span?.getAttribute('tabIndex')).toBe('-1');
-    });
+      expect(host?.getAttribute('aria-disabled')).toBe('true');
+      expect(host?.getAttribute('tabindex')).toBe('-1');
+    } finally {
+      unmount(container);
+    }
   });
 
-  describe('Accessible Name', () => {
-    it('should use text content as accessible name given children', () => {
-      container = mount(<Toggle>Mute Audio</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.textContent).toBe('Mute Audio');
-    });
+  it('preserves accessible naming props from the host', () => {
+    const container = mount(
+      <div>
+        <span id="toggle-label">Mute audio</span>
+        <Toggle aria-labelledby="toggle-label">Mute</Toggle>
+      </div>
+    );
 
-    it('should support aria-label given explicit label', () => {
-      container = mount(<Toggle aria-label="Toggle mute">🔇</Toggle>);
+    try {
       const button = container.querySelector('button');
-      expect(button?.getAttribute('aria-label')).toBe('Toggle mute');
-    });
 
-    it('should support aria-labelledby given external label', () => {
-      container = mount(
-        <>
-          <span id="toggle-label">Mute</span>
-          <Toggle aria-labelledby="toggle-label">🔇</Toggle>
-        </>
-      );
-      const button = container.querySelector('button');
       expect(button?.getAttribute('aria-labelledby')).toBe('toggle-label');
-    });
+    } finally {
+      unmount(container);
+    }
   });
 
-  describe('Contract Validation', () => {
-    it('should support Enter key activation per contract', () => {
-      expect(TOGGLE_A11Y_CONTRACT.KEYBOARD_ACTIVATION).toContain('Enter');
+  it('matches the documented toggle accessibility contract', () => {
+    expect(TOGGLE_A11Y_CONTRACT.ROLE).toBe('button');
+    expect(TOGGLE_A11Y_CONTRACT.KEYBOARD_ACTIVATION).toEqual([
+      'Enter',
+      'Space',
+    ]);
+    expect(TOGGLE_A11Y_CONTRACT.PRESSED_ATTRIBUTE).toBe('aria-pressed');
+    expect(TOGGLE_A11Y_CONTRACT.DISABLED_ATTRIBUTES).toEqual({
+      nativeButton: {
+        disabled: true,
+        'aria-disabled': 'true',
+      },
+      nonNative: {
+        'aria-disabled': 'true',
+        tabIndex: -1,
+      },
     });
-
-    it('should support Space key activation per contract', () => {
-      expect(TOGGLE_A11Y_CONTRACT.KEYBOARD_ACTIVATION).toContain('Space');
-    });
-
-    it('should define pressed attribute in contract', () => {
-      expect(TOGGLE_A11Y_CONTRACT.PRESSED_ATTRIBUTE).toBe('aria-pressed');
-    });
-
-    it('should define role in contract', () => {
-      expect(TOGGLE_A11Y_CONTRACT.ROLE).toBe('button');
+    expect(TOGGLE_A11Y_CONTRACT.DATA_ATTRIBUTES).toEqual({
+      state: 'data-state',
+      disabled: 'data-disabled',
     });
   });
 });

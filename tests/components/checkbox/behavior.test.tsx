@@ -1,221 +1,180 @@
-import { describe, it, expect, vi, afterEach } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { Checkbox } from '../../../src/components/primitives/checkbox/checkbox';
-import { createIsland } from '@askrjs/askr';
+import { mount, unmount } from '../../test-utils';
 
-function mount(element: JSX.Element): HTMLElement {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-  createIsland({
-    root: container,
-    component: () => element,
-  });
-  return container;
-}
-
-function unmount(container: HTMLElement) {
-  if (container.parentNode) {
-    container.parentNode.removeChild(container);
-  }
-}
-
-describe('Checkbox — Behavior', () => {
-  let container: HTMLElement;
+describe('Checkbox - Behavior', () => {
+  let container: HTMLElement | undefined;
 
   afterEach(() => {
-    if (container) {
-      unmount(container);
-    }
+    unmount(container);
+    container = undefined;
   });
 
-  describe('Foundation Delegation', () => {
-    it('should render native input given no asChild', () => {
-      container = mount(<Checkbox />);
-      const input = container.querySelector('input[type="checkbox"]');
-      expect(input).toBeDefined();
-    });
+  it('renders a native checkbox input by default', () => {
+    container = mount(<Checkbox />);
+    const input = container.querySelector(
+      'input[type="checkbox"]'
+    ) as HTMLInputElement | null;
 
-    it('should call onPress given click when not disabled', () => {
-      const onPress = vi.fn();
-      container = mount(<Checkbox onPress={onPress} />);
-      const input = container.querySelector('input')!;
-      input.click();
-      expect(onPress).toHaveBeenCalledOnce();
-    });
-
-    it('should NOT call onPress given click when disabled', () => {
-      const onPress = vi.fn();
-      container = mount(<Checkbox disabled onPress={onPress} />);
-      const input = container.querySelector('input')!;
-      input.click();
-      expect(onPress).not.toHaveBeenCalled();
-    });
+    expect(input).toBeTruthy();
+    expect(input?.getAttribute('data-slot')).toBe('checkbox');
+    expect(input?.getAttribute('data-state')).toBe('unchecked');
+    expect(input?.getAttribute('aria-checked')).toBe('false');
   });
 
-  describe('ARIA Checked State', () => {
-    it('should set aria-checked=false given checked=false', () => {
-      container = mount(<Checkbox checked={false} />);
-      const input = container.querySelector('input');
-      expect(input?.getAttribute('aria-checked')).toBe('false');
-    });
+  it('invokes onPress exactly once per native click', () => {
+    const onPress = vi.fn();
 
-    it('should set aria-checked=true given checked=true', () => {
-      container = mount(<Checkbox checked={true} />);
-      const input = container.querySelector('input');
-      expect(input?.getAttribute('aria-checked')).toBe('true');
-    });
+    container = mount(<Checkbox onPress={onPress} />);
+    const input = container.querySelector('input') as HTMLInputElement | null;
 
-    it('should default aria-checked=false given no checked prop', () => {
-      container = mount(<Checkbox />);
-      const input = container.querySelector('input');
-      expect(input?.getAttribute('aria-checked')).toBe('false');
-    });
+    input?.click();
 
-    it('should omit aria-checked given indeterminate=true on native input', () => {
-      container = mount(<Checkbox indeterminate={true} />);
-      const input = container.querySelector('input') as HTMLInputElement;
-      expect(input.getAttribute('aria-checked')).toBeNull();
-    });
-
-    it('should omit aria-checked given checked and indeterminate on native input', () => {
-      container = mount(<Checkbox checked={true} indeterminate={true} />);
-      const input = container.querySelector('input') as HTMLInputElement;
-      expect(input.getAttribute('aria-checked')).toBeNull();
-    });
+    expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  describe('Native Input Attributes', () => {
-    it('should set checked attribute given checked=true', () => {
-      container = mount(<Checkbox checked={true} />);
-      const input = container.querySelector('input') as HTMLInputElement;
-      expect(input?.checked).toBe(true);
-    });
+  it('blocks native interaction when disabled', () => {
+    const onPress = vi.fn();
 
-    it('should set disabled attribute given disabled=true', () => {
-      container = mount(<Checkbox disabled={true} />);
-      const input = container.querySelector('input') as HTMLInputElement;
-      expect(input?.disabled).toBe(true);
-    });
+    container = mount(<Checkbox disabled onPress={onPress} />);
+    const input = container.querySelector('input') as HTMLInputElement | null;
 
-    it('should set required attribute given required=true', () => {
-      container = mount(<Checkbox required={true} />);
-      const input = container.querySelector('input') as HTMLInputElement;
-      expect(input?.required).toBe(true);
-    });
+    expect(input?.disabled).toBe(true);
+    expect(input?.getAttribute('aria-disabled')).toBe('true');
 
-    it('should set name attribute given name prop', () => {
-      container = mount(<Checkbox name="terms" />);
-      const input = container.querySelector('input');
-      expect(input?.getAttribute('name')).toBe('terms');
-    });
+    input?.click();
 
-    it('should set value attribute given value prop', () => {
-      container = mount(<Checkbox value="accepted" />);
-      const input = container.querySelector('input');
-      expect(input?.getAttribute('value')).toBe('accepted');
-    });
+    expect(onPress).not.toHaveBeenCalled();
   });
 
-  describe('asChild Invariant', () => {
-    it('should render child element given asChild=true', () => {
-      container = mount(
-        <Checkbox asChild>
-          <span>Custom Checkbox</span>
-        </Checkbox>
-      );
-      const span = container.querySelector('span');
-      expect(span).toBeDefined();
-      expect(span?.textContent).toBe('Custom Checkbox');
-    });
+  it('applies checked and indeterminate state hooks to the native host', () => {
+    container = mount(<Checkbox checked indeterminate />);
+    const input = container.querySelector('input') as HTMLInputElement | null;
 
-    it('should merge aria-checked onto child given asChild', () => {
-      container = mount(
-        <Checkbox asChild checked={true}>
-          <div>Agree</div>
-        </Checkbox>
-      );
-      const div = container.querySelector('div');
-      expect(div?.getAttribute('aria-checked')).toBe('true');
-    });
-
-    it('should merge indeterminate aria-checked onto child given asChild', () => {
-      container = mount(
-        <Checkbox asChild indeterminate={true}>
-          <div>Select All</div>
-        </Checkbox>
-      );
-      const div = container.querySelector('div');
-      expect(div?.getAttribute('aria-checked')).toBe('mixed');
-    });
-
-    it('should call onPress given click on asChild element', () => {
-      const onPress = vi.fn();
-      container = mount(
-        <Checkbox asChild onPress={onPress}>
-          <span>Checkbox</span>
-        </Checkbox>
-      );
-      const span = container.querySelector('span')!;
-      span.click();
-      expect(onPress).toHaveBeenCalledOnce();
-    });
-
-    it('should forward custom props given asChild', () => {
-      container = mount(
-        <Checkbox asChild data-testid="custom">
-          <div>Checkbox</div>
-        </Checkbox>
-      );
-      const div = container.querySelector('div');
-      expect(div?.getAttribute('data-testid')).toBe('custom');
-    });
+    expect(input?.checked).toBe(true);
+    expect(input?.getAttribute('data-state')).toBe('indeterminate');
+    expect(input?.getAttribute('aria-checked')).toBeNull();
   });
 
-  describe('Composition Safety', () => {
-    it('should NOT leak onClick prop given onPress', () => {
-      container = mount(<Checkbox onPress={() => {}} />);
-      const input = container.querySelector('input')!;
-      // onClick is added by pressable foundation, not leaked from user
-      expect(input.onclick).toBeDefined();
-    });
+  it('forwards required, name, and value to the native host', () => {
+    container = mount(
+      <Checkbox required name="terms" value="accepted" checked />
+    );
+    const input = container.querySelector('input') as HTMLInputElement | null;
 
-    it('should merge user className with component props', () => {
-      container = mount(<Checkbox className="custom" />);
-      const input = container.querySelector('input');
-      expect(input?.classList.contains('custom')).toBe(true);
-    });
-
-    it('should preserve user data attributes', () => {
-      container = mount(<Checkbox data-custom="value" />);
-      const input = container.querySelector('input');
-      expect(input?.getAttribute('data-custom')).toBe('value');
-    });
+    expect(input?.required).toBe(true);
+    expect(input?.name).toBe('terms');
+    expect(input?.value).toBe('accepted');
   });
 
-  describe('Ref Forwarding', () => {
-    it('should forward ref prop to native input', () => {
-      let refNode: HTMLInputElement | null = null;
-      const refCallback = (node: HTMLInputElement | null) => {
-        refNode = node;
-      };
-      container = mount(<Checkbox ref={refCallback} />);
-      const input = container.querySelector('input') as HTMLInputElement;
-      expect(input).toBeTruthy();
-      expect(refNode).toBe(input);
-    });
+  it('supports asChild composition and merges host props', () => {
+    container = mount(
+      <Checkbox
+        asChild
+        checked
+        data-testid="custom-checkbox"
+        data-from-checkbox="yes"
+      >
+        <div role="checkbox" data-from-child="yes">
+          Agree
+        </div>
+      </Checkbox>
+    );
+    const host = container.querySelector('[role="checkbox"]');
 
-    it('should forward ref prop on asChild', () => {
-      let refNode: HTMLElement | null = null;
-      const refCallback = (node: HTMLElement | null) => {
-        refNode = node;
-      };
-      container = mount(
-        <Checkbox asChild ref={refCallback as never}>
-          <div>Checkbox</div>
-        </Checkbox>
-      );
-      const div = container.querySelector('div') as HTMLElement;
-      expect(div).toBeTruthy();
-      expect(refNode).toBe(div);
-    });
+    expect(host?.textContent).toBe('Agree');
+    expect(host?.getAttribute('data-testid')).toBe('custom-checkbox');
+    expect(host?.getAttribute('data-from-checkbox')).toBe('yes');
+    expect(host?.getAttribute('data-from-child')).toBe('yes');
+    expect(host?.getAttribute('aria-checked')).toBe('true');
+    expect(host?.getAttribute('data-state')).toBe('checked');
+    expect(host?.getAttribute('data-slot')).toBe('checkbox');
+  });
+
+  it('emits mixed state for indeterminate asChild hosts', () => {
+    container = mount(
+      <Checkbox asChild indeterminate>
+        <div role="checkbox">Select all</div>
+      </Checkbox>
+    );
+    const host = container.querySelector('[role="checkbox"]');
+
+    expect(host?.getAttribute('aria-checked')).toBe('mixed');
+    expect(host?.getAttribute('data-state')).toBe('indeterminate');
+  });
+
+  it('supports click, Enter, and Space activation for asChild hosts', () => {
+    const onPress = vi.fn();
+
+    container = mount(
+      <Checkbox asChild onPress={onPress}>
+        <div role="checkbox">Agree</div>
+      </Checkbox>
+    );
+    const host = container.querySelector(
+      '[role="checkbox"]'
+    ) as HTMLElement | null;
+
+    host?.click();
+    host?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+    );
+    host?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: ' ', bubbles: true })
+    );
+    host?.dispatchEvent(
+      new KeyboardEvent('keyup', { key: ' ', bubbles: true })
+    );
+
+    expect(onPress).toHaveBeenCalledTimes(3);
+  });
+
+  it('applies disabled semantics to asChild hosts', () => {
+    const onPress = vi.fn();
+
+    container = mount(
+      <Checkbox asChild disabled onPress={onPress}>
+        <div role="checkbox">Agree</div>
+      </Checkbox>
+    );
+    const host = container.querySelector(
+      '[role="checkbox"]'
+    ) as HTMLElement | null;
+
+    expect(host?.getAttribute('aria-disabled')).toBe('true');
+    expect(host?.getAttribute('tabindex')).toBe('-1');
+    expect(host?.getAttribute('data-disabled')).toBe('true');
+
+    host?.click();
+    host?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+    );
+    host?.dispatchEvent(
+      new KeyboardEvent('keyup', { key: ' ', bubbles: true })
+    );
+
+    expect(onPress).not.toHaveBeenCalled();
+  });
+
+  it('forwards refs to native and asChild hosts', () => {
+    let nativeRef: HTMLInputElement | null = null;
+    let childRef: HTMLElement | null = null;
+
+    container = mount(<Checkbox ref={(node) => (nativeRef = node)} />);
+    const input = container.querySelector('input') as HTMLInputElement | null;
+
+    expect(nativeRef).toBe(input);
+
+    unmount(container);
+    container = mount(
+      <Checkbox asChild ref={(node) => (childRef = node as HTMLElement | null)}>
+        <div role="checkbox">Agree</div>
+      </Checkbox>
+    );
+    const host = container.querySelector(
+      '[role="checkbox"]'
+    ) as HTMLElement | null;
+
+    expect(childRef).toBe(host);
   });
 });

@@ -5,4 +5,7 @@ export type {
   CheckboxAsChildProps,
   CheckboxOwnProps,
 } from './checkbox.types';
-export { CHECKBOX_A11Y_CONTRACT } from './checkbox.a11y';
+export {
+  CHECKBOX_A11Y_CONTRACT,
+  type CheckboxA11yContract,
+} from './checkbox.a11y';
