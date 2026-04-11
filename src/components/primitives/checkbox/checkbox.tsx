@@ -10,18 +10,18 @@ import type {
  *
  * ## Responsibilities
  * - Apply aria-checked for checkbox state signaling
- * - Handle indeterminate state via aria-checked='mixed'
+ * - Handle indeterminate state for native and asChild hosts
  * - Forward props and refs to native input or child element
- * - Delegate keyboard/mouse interaction to native input semantics
+ * - Preserve native checkbox semantics and apply checkbox behavior to asChild hosts
  *
  * ## Non-Responsibilities
- * - Custom keyboard event handling (native inputs handle this)
- * - Custom pointer event handling (delegated to onPress via wrapper)
+ * - Checked state ownership (consumer manages state)
+ * - Form submission orchestration beyond native input props
  *
  * ## Invariants
  * - MUST NOT add role="button" (native inputs are role="checkbox")
  * - checked state is CONTROLLED (consumer manages state)
- * - indeterminate overrides checked for aria-checked value
+ * - indeterminate overrides checked for state signaling
  * - For asChild, consumer MUST provide role="checkbox"
  *
  * @example Native checkbox input

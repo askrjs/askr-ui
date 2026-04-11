@@ -62,16 +62,16 @@ A component is ready to close when all of the following are true:
 
 ## Phase 4 — Form And Selection Primitives
 
-| Component   | Status      | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf    | Docs/Exports | Notes                                            |
-| ----------- | ----------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | ------------------------------------------------ |
-| Textarea    | in progress | review     | done          | review  | review       | done    | covered | done         | Shares Input's field-control `asChild` question  |
-| Checkbox    | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Confirm checked-state consistency                |
-| Switch      | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Confirm checked-state consistency                |
-| Toggle      | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Confirm pressed-state consistency                |
-| RadioGroup  | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Likely reference for grouped selection semantics |
-| Slider      | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Validate input semantics and perf                |
-| ToggleGroup | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Validate grouped selection naming and slots      |
-| Select      | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | High-risk architecture pass                      |
+| Component   | Status      | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf    | Docs/Exports | Notes                                                                          |
+| ----------- | ----------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | ------------------------------------------------------------------------------ |
+| Textarea    | in progress | review     | done          | review  | review       | done    | covered | done         | Shares Input's field-control `asChild` question                                |
+| Checkbox    | in progress | review     | done          | done    | review       | done    | covered | done         | Controlled-only API and manual `asChild` interaction still diverge from Switch |
+| Switch      | in progress | done       | done          | done    | review       | done    | covered | done         | Uncontrolled rendering after press still needs deeper follow-up                |
+| Toggle      | done        | done       | done          | done    | done         | done    | covered | done         | Pressed-state contract and `asChild` semantics locked                          |
+| RadioGroup  | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Likely reference for grouped selection semantics                               |
+| Slider      | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Validate input semantics and perf                                              |
+| ToggleGroup | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Validate grouped selection naming and slots                                    |
+| Select      | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | High-risk architecture pass                                                    |
 
 ## Phase 5 — Infrastructure Composites
 

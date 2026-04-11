@@ -88,3 +88,5 @@ export const TOGGLE_A11Y_CONTRACT = {
     visualIndicator: 'required',
   },
 } as const;
+
+export type ToggleA11yContract = typeof TOGGLE_A11Y_CONTRACT;
