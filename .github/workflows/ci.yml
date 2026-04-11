@@ -1,29 +1,38 @@
 name: CI
 
 on:
+  workflow_dispatch:
+  workflow_call:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  test:
+  ci:
+    name: Release Gate
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-
     steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 'lts/*'
           cache: 'npm'
-      - name: Install
+
+      - name: Install dependencies
         run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
       - name: Build
         run: npm run build
-      - name: Run tests
+
+      - name: Test
         run: npm test

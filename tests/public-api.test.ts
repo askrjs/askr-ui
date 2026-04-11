@@ -1,5 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import * as askrUi from '../src';
+import * as primitiveButton from '../src/components/primitives/button';
+import * as compositeField from '../src/components/composites/field';
+import * as patternDataTable from '../src/components/patterns/data-table';
 
 describe('Public API', () => {
   it('exposes the 1.0 public component surface from the root entrypoint', () => {
@@ -49,9 +52,6 @@ describe('Public API', () => {
     expect(askrUi.SIDEBAR_LAYOUT_A11Y_CONTRACT).toBeDefined();
     expect(askrUi.TopbarLayout).toBeDefined();
     expect(askrUi.TOPBAR_LAYOUT_A11Y_CONTRACT).toBeDefined();
-    expect(askrUi.IconBase).toBeDefined();
-    expect(askrUi.getIconContractProps).toBeDefined();
-    expect(askrUi.resolveIconSizeVariable).toBeDefined();
     // DataTable
     expect(askrUi.createDataTable).toBeDefined();
     expect(askrUi.column).toBeDefined();
@@ -78,5 +78,13 @@ describe('Public API', () => {
     expect(askrUi.DataTableLoading).toBeDefined();
     expect(askrUi.DataTableError).toBeDefined();
     expect(askrUi.DATA_TABLE_A11Y_CONTRACT).toBeDefined();
+  });
+
+  it('exposes bucketed component entrypoints from the source layout', () => {
+    expect(primitiveButton.Button).toBeDefined();
+    expect(compositeField.Field).toBeDefined();
+    expect(compositeField.FieldInput).toBeDefined();
+    expect(patternDataTable.DataTableRoot).toBeDefined();
+    expect(patternDataTable.createDataTable).toBeDefined();
   });
 });

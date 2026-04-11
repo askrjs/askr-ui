@@ -1,5 +1,5 @@
-import { describe, it } from 'vitest';
-import { Center } from '../../../src/components/center/center';
+import { describe, it } from 'vite-plus/test';
+import { Center } from '../../../src/components/primitives/center/center';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Center - Accessibility', () => {
@@ -11,7 +11,7 @@ describe('Center - Accessibility', () => {
     await expectNoAxeViolations(
       <Center axis="vertical" minHeight="100vh">
         Content
-      </Center>,
+      </Center>
     );
   });
 });

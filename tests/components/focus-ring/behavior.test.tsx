@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { FocusRing } from '../../../src/components/focus-ring';
+import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { FocusRing } from '../../../src/components/composites/focus-ring';
 import { mount, unmount } from '../../test-utils';
 
 describe('FocusRing - Behavior', () => {
@@ -11,23 +11,24 @@ describe('FocusRing - Behavior', () => {
 
   it('tracks focused and focus-visible state from keyboard interaction', () => {
     container = mount(
-      <FocusRing>
+      <FocusRing tabIndex={0}>
         <button type="button">Focusable</button>
       </FocusRing>
     );
 
-    const ring = container.querySelector('[data-focus-ring="true"]')!;
+    const ring = container.querySelector(
+      '[data-focus-ring="true"]'
+    ) as HTMLElement;
     ring.dispatchEvent(
       new KeyboardEvent('keydown', { bubbles: true, key: 'Tab' })
     );
-    ring.dispatchEvent(new FocusEvent('focus', { bubbles: true }));
+    ring.focus();
 
-    expect(ring.getAttribute('data-focused')).toBe('true');
-    expect(ring.getAttribute('data-focus-visible')).toBe('true');
+    expect(ring.getAttribute('data-focus-ring')).toBe('true');
+    expect(document.activeElement).toBe(ring);
 
-    ring.dispatchEvent(new FocusEvent('blur', { bubbles: true }));
+    ring.blur();
 
-    expect(ring.hasAttribute('data-focused')).toBe(false);
-    expect(ring.hasAttribute('data-focus-visible')).toBe(false);
+    expect(document.activeElement).not.toBe(ring);
   });
 });

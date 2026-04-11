@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { IconBase } from '../../../src/components/icon/icon';
+import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { IconBase } from '@askrjs/askr/foundations';
 import { mount, unmount } from '../../test-utils';
 
 describe('IconBase', () => {
@@ -24,7 +24,9 @@ describe('IconBase', () => {
 
     const svg = container.querySelector('svg')!;
     expect(svg.getAttribute('data-size')).toBe('sm');
-    expect(svg.getAttribute('style')).toContain('--ak-icon-size:var(--ak-icon-size-sm');
+    expect(svg.getAttribute('style')).toContain(
+      '--ak-icon-size:var(--ak-icon-size-sm'
+    );
   });
 
   it('treats raw CSS sizes as consumer overrides', () => {
@@ -56,6 +58,20 @@ describe('IconBase', () => {
     container = mount(IconBase({ strokeWidth: 1.5 }));
 
     const style = container.querySelector('svg')?.getAttribute('style') ?? '';
-    expect(style).toContain('--ak-icon-stroke-width:var(--ak-icon-stroke-width-md, 1.5)');
+    expect(style).toContain(
+      '--ak-icon-stroke-width:var(--ak-icon-stroke-width-md, 1.5)'
+    );
+  });
+
+  it('pins intrinsic svg sizing while exposing css size hooks', () => {
+    container = mount(IconBase({ size: 15 }));
+
+    const svg = container.querySelector('svg')!;
+    const style = svg.getAttribute('style') ?? '';
+    expect(svg.getAttribute('width')).toBe('24');
+    expect(svg.getAttribute('height')).toBe('24');
+    expect(style).toContain('--ak-icon-size:15px');
+    expect(style).toContain('display:inline-block');
+    expect(style).toContain('flex-shrink:0');
   });
 });

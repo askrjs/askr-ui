@@ -1,10 +1,10 @@
-import { describe, it } from 'vitest';
+import { describe, it } from 'vite-plus/test';
 import {
   Tooltip,
   TooltipContent,
   TooltipPortal,
   TooltipTrigger,
-} from '../../../src/components/tooltip';
+} from '../../../src/components/composites/tooltip';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Tooltip - Determinism', () => {

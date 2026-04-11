@@ -1,10 +1,10 @@
-import { describe, it } from 'vitest';
+import { describe, it } from 'vite-plus/test';
 import {
   Breadcrumb,
   BreadcrumbCurrent,
   BreadcrumbItem,
   BreadcrumbList,
-} from '../../../src/components/breadcrumb';
+} from '../../../src/components/composites/breadcrumb';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Breadcrumb - Determinism', () => {

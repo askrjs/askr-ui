@@ -1,5 +1,5 @@
-import { describe, it } from 'vitest';
-import { Stack } from '../../../src/components/stack/stack';
+import { describe, it } from 'vite-plus/test';
+import { Stack } from '../../../src/components/primitives/stack/stack';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Stack - Determinism', () => {
@@ -9,6 +9,8 @@ describe('Stack - Determinism', () => {
         <span>Item</span>
       </Stack>
     ));
-    expectDeterministicRender(() => <Stack justify="space-between" wrap="wrap" />);
+    expectDeterministicRender(() => (
+      <Stack justify="space-between" wrap="wrap" />
+    ));
   });
 });

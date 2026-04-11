@@ -1,9 +1,9 @@
-import { describe, it } from 'vitest';
+import { describe, it } from 'vite-plus/test';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '../../../src/components/popover';
+} from '../../../src/components/composites/popover';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Popover - Determinism', () => {

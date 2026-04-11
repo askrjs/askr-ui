@@ -1,5 +1,5 @@
-import { describe, it } from 'vitest';
-import { Spacer } from '../../../src/components/spacer/spacer';
+import { describe, it } from 'vite-plus/test';
+import { Spacer } from '../../../src/components/primitives/spacer/spacer';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Spacer - Accessibility', () => {
@@ -9,7 +9,7 @@ describe('Spacer - Accessibility', () => {
         <span>Left</span>
         <Spacer />
         <span>Right</span>
-      </div>,
+      </div>
     );
   });
 

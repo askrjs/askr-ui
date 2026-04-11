@@ -1,10 +1,10 @@
-import { describe, it } from 'vitest';
+import { describe, it } from 'vite-plus/test';
 import {
   Slider,
   SliderRange,
   SliderThumb,
   SliderTrack,
-} from '../../../src/components/slider';
+} from '../../../src/components/primitives/slider';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Slider - Determinism', () => {

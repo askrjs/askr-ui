@@ -1,10 +1,10 @@
-import { describe, it } from 'vitest';
+import { describe, it } from 'vite-plus/test';
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '../../../src/components/tabs';
+} from '../../../src/components/composites/tabs';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Tabs - Accessibility', () => {

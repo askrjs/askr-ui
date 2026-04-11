@@ -1,10 +1,10 @@
-import { describe, it } from 'vitest';
+import { describe, it } from 'vite-plus/test';
 import {
   Toast,
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from '../../../src/components/toast';
+} from '../../../src/components/composites/toast';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Toast - Determinism', () => {

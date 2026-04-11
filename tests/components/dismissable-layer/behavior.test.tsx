@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { DismissableLayer } from '../../../src/components/dismissable-layer';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { DismissableLayer } from '../../../src/components/composites/dismissable-layer';
 import { mount, unmount } from '../../test-utils';
 
 describe('DismissableLayer - Behavior', () => {

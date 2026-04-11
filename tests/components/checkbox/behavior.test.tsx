@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { Checkbox } from '../../../src/components/checkbox/checkbox';
+import { describe, it, expect, vi, afterEach } from 'vite-plus/test';
+import { Checkbox } from '../../../src/components/primitives/checkbox/checkbox';
 import { createIsland } from '@askrjs/askr';
 
 function mount(element: JSX.Element): HTMLElement {
@@ -209,7 +209,7 @@ describe('Checkbox — Behavior', () => {
         refNode = node;
       };
       container = mount(
-        <Checkbox asChild ref={refCallback}>
+        <Checkbox asChild ref={refCallback as never}>
           <div>Checkbox</div>
         </Checkbox>
       );

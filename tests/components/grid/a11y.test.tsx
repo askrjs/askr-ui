@@ -1,5 +1,5 @@
-import { describe, it } from 'vitest';
-import { Grid } from '../../../src/components/grid/grid';
+import { describe, it } from 'vite-plus/test';
+import { Grid } from '../../../src/components/primitives/grid/grid';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Grid - Accessibility', () => {
@@ -9,7 +9,7 @@ describe('Grid - Accessibility', () => {
         <span>Cell one</span>
         <span>Cell two</span>
         <span>Cell three</span>
-      </Grid>,
+      </Grid>
     );
   });
 

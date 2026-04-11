@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import {
   createDataTable,
   column,
-} from '../../../src/components/data-table/create-data-table';
-import type { DataTableInstance } from '../../../src/components/data-table/data-table.types';
+} from '../../../src/components/patterns/data-table/create-data-table';
+import type { DataTableInstance } from '../../../src/components/patterns/data-table/data-table.types';
 import { mount, unmount } from '../../test-utils';
 
 type User = {
@@ -15,10 +15,28 @@ type User = {
 };
 
 const users: User[] = [
-  { id: '1', name: 'Alice', email: 'alice@example.com', role: 'admin', age: 30 },
+  {
+    id: '1',
+    name: 'Alice',
+    email: 'alice@example.com',
+    role: 'admin',
+    age: 30,
+  },
   { id: '2', name: 'Bob', email: 'bob@example.com', role: 'user', age: 25 },
-  { id: '3', name: 'Charlie', email: 'charlie@example.com', role: 'user', age: 35 },
-  { id: '4', name: 'Diana', email: 'diana@example.com', role: 'admin', age: 28 },
+  {
+    id: '3',
+    name: 'Charlie',
+    email: 'charlie@example.com',
+    role: 'user',
+    age: 35,
+  },
+  {
+    id: '4',
+    name: 'Diana',
+    email: 'diana@example.com',
+    role: 'admin',
+    age: 28,
+  },
   { id: '5', name: 'Eve', email: 'eve@example.com', role: 'user', age: 22 },
 ];
 
@@ -909,10 +927,7 @@ describe('createDataTable - Mobile Summary', () => {
       const row = table.getPageRows()[0];
 
       expect(row.getListPrimary()).toBe('Alice');
-      expect(row.getListSecondary()).toEqual([
-        'alice@example.com',
-        'admin',
-      ]);
+      expect(row.getListSecondary()).toEqual(['alice@example.com', 'admin']);
     } finally {
       cleanup();
     }

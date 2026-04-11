@@ -1,4 +1,4 @@
-import { describe, it } from 'vitest';
+import { describe, it } from 'vite-plus/test';
 import {
   Breadcrumb,
   BreadcrumbCurrent,
@@ -6,7 +6,7 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from '../../../src/components/breadcrumb';
+} from '../../../src/components/composites/breadcrumb';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Breadcrumb - Accessibility', () => {

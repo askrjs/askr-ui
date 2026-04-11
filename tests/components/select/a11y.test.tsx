@@ -1,4 +1,4 @@
-import { describe, it } from 'vitest';
+import { describe, it } from 'vite-plus/test';
 import {
   Select,
   SelectContent,
@@ -6,7 +6,7 @@ import {
   SelectPortal,
   SelectTrigger,
   SelectValue,
-} from '../../../src/components/select';
+} from '../../../src/components/primitives/select';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Select - Accessibility', () => {

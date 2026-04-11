@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import {
   ProgressCircle,
   ProgressCircleIndicator,
-} from '../../../src/components/progress-circle';
-import { PROGRESS_CIRCLE_A11Y_CONTRACT } from '../../../src/components/progress-circle/progress-circle.a11y';
+} from '../../../src/components/primitives/progress-circle';
+import { PROGRESS_CIRCLE_A11Y_CONTRACT } from '../../../src/components/primitives/progress-circle/progress-circle.a11y';
 import { mount, unmount } from '../../test-utils';
 
 describe('ProgressCircle - Behavior', () => {
@@ -39,7 +39,9 @@ describe('ProgressCircle - Behavior', () => {
       const root = container.querySelector(
         `[role="${PROGRESS_CIRCLE_A11Y_CONTRACT.ROLE}"]`
       ) as HTMLElement;
-      expect(root?.getAttribute('style')).toContain('--ak-progress-percentage:50%');
+      expect(root?.getAttribute('style')).toContain(
+        '--ak-progress-percentage:50%'
+      );
     } finally {
       unmount(container);
     }

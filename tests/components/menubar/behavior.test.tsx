@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vite-plus/test';
 import {
   Menubar,
   MenubarContent,
@@ -9,8 +9,8 @@ import {
   MenubarSubContent,
   MenubarSubTrigger,
   MenubarTrigger,
-} from '../../../src/components/menubar';
-import { MENUBAR_A11Y_CONTRACT } from '../../../src/components/menubar/menubar.a11y';
+} from '../../../src/components/composites/menubar';
+import { MENUBAR_A11Y_CONTRACT } from '../../../src/components/composites/menubar/menubar.a11y';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 function getButtonByText(text: string): HTMLButtonElement {

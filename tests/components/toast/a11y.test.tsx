@@ -1,4 +1,4 @@
-import { describe, it } from 'vitest';
+import { describe, it } from 'vite-plus/test';
 import {
   Toast,
   ToastAction,
@@ -6,7 +6,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from '../../../src/components/toast';
+} from '../../../src/components/composites/toast';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Toast - Accessibility', () => {

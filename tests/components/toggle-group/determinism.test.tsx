@@ -1,8 +1,8 @@
-import { describe, it } from 'vitest';
+import { describe, it } from 'vite-plus/test';
 import {
   ToggleGroup,
   ToggleGroupItem,
-} from '../../../src/components/toggle-group';
+} from '../../../src/components/primitives/toggle-group';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('ToggleGroup - Determinism', () => {

@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { Spacer } from '../../../src/components/spacer/spacer';
-import { SPACER_A11Y_CONTRACT } from '../../../src/components/spacer/spacer.a11y';
+import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { Spacer } from '../../../src/components/primitives/spacer/spacer';
+import { SPACER_A11Y_CONTRACT } from '../../../src/components/primitives/spacer/spacer.a11y';
 import { mount, unmount } from '../../test-utils';
 
 describe('Spacer - Behavior', () => {
@@ -29,19 +29,25 @@ describe('Spacer - Behavior', () => {
   it('should emit data-grow attribute', () => {
     container = mount(<Spacer grow={2} />);
     const el = container.querySelector('[data-slot="spacer"]');
-    expect(el?.getAttribute(SPACER_A11Y_CONTRACT.DATA_ATTRIBUTES.grow)).toBe('2');
+    expect(el?.getAttribute(SPACER_A11Y_CONTRACT.DATA_ATTRIBUTES.grow)).toBe(
+      '2'
+    );
   });
 
   it('should emit data-axis attribute', () => {
     container = mount(<Spacer axis="block" />);
     const el = container.querySelector('[data-slot="spacer"]');
-    expect(el?.getAttribute(SPACER_A11Y_CONTRACT.DATA_ATTRIBUTES.axis)).toBe('block');
+    expect(el?.getAttribute(SPACER_A11Y_CONTRACT.DATA_ATTRIBUTES.axis)).toBe(
+      'block'
+    );
   });
 
   it('should emit data-basis attribute', () => {
     container = mount(<Spacer axis="inline" basis="1rem" />);
     const el = container.querySelector('[data-slot="spacer"]');
-    expect(el?.getAttribute(SPACER_A11Y_CONTRACT.DATA_ATTRIBUTES.basis)).toBe('1rem');
+    expect(el?.getAttribute(SPACER_A11Y_CONTRACT.DATA_ATTRIBUTES.basis)).toBe(
+      '1rem'
+    );
   });
 
   it('should set width inline style for inline axis with valid CSS basis', () => {
@@ -55,7 +61,7 @@ describe('Spacer - Behavior', () => {
     container = mount(
       <Spacer asChild>
         <span />
-      </Spacer>,
+      </Spacer>
     );
     const el = container.querySelector('span');
     expect(el?.getAttribute('data-slot')).toBe('spacer');

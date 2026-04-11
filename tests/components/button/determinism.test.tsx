@@ -1,5 +1,5 @@
-import { describe, it, expect, afterEach, vi } from 'vitest';
-import { Button } from '../../../src/components/button/button';
+import { describe, it, expect, afterEach, vi } from 'vite-plus/test';
+import { Button } from '../../../src/components/primitives/button/button';
 import { createIsland } from '@askrjs/askr';
 
 function mount(element: JSX.Element): HTMLElement {

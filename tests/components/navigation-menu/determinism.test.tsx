@@ -1,4 +1,4 @@
-import { describe, it } from 'vitest';
+import { describe, it } from 'vite-plus/test';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -6,7 +6,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from '../../../src/components/navigation-menu';
+} from '../../../src/components/composites/navigation-menu';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('NavigationMenu - Determinism', () => {

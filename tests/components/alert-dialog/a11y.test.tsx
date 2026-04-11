@@ -1,4 +1,4 @@
-import { describe, it } from 'vitest';
+import { describe, it } from 'vite-plus/test';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -6,7 +6,7 @@ import {
   AlertDialogPortal,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '../../../src/components/alert-dialog';
+} from '../../../src/components/composites/alert-dialog';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('AlertDialog - Accessibility', () => {
