@@ -26,7 +26,7 @@ export function isCssLength(value: unknown): value is string {
  */
 export function mergeLayoutStyles(
   layout: Record<string, string | number>,
-  user: unknown,
+  user: unknown
 ): string {
   const merged: Record<string, unknown> = { ...layout };
 

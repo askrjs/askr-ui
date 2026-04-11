@@ -1,11 +1,11 @@
-import { describe, it } from 'vitest';
+import { describe, it } from 'vite-plus/test';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuPortal,
   DropdownMenuTrigger,
-} from '../../../src/components/dropdown-menu';
+} from '../../../src/components/composites/dropdown-menu';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('DropdownMenu - Determinism', () => {

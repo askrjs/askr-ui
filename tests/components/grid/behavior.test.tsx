@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { Grid } from '../../../src/components/grid/grid';
-import { GRID_A11Y_CONTRACT } from '../../../src/components/grid/grid.a11y';
+import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { Grid } from '../../../src/components/primitives/grid/grid';
+import { GRID_A11Y_CONTRACT } from '../../../src/components/primitives/grid/grid.a11y';
 import { mount, unmount } from '../../test-utils';
 
 describe('Grid - Behavior', () => {
@@ -44,32 +44,40 @@ describe('Grid - Behavior', () => {
     // CSS grid string is not a plain CSS length, should not set inline style
     const el = container.querySelector('[data-slot="grid"]') as HTMLElement;
     // data-columns attribute should still be set
-    expect(el.getAttribute(GRID_A11Y_CONTRACT.DATA_ATTRIBUTES.columns)).toBe('1fr 2fr 1fr');
+    expect(el.getAttribute(GRID_A11Y_CONTRACT.DATA_ATTRIBUTES.columns)).toBe(
+      '1fr 2fr 1fr'
+    );
   });
 
   it('should emit data-columns attribute', () => {
     container = mount(<Grid columns={2} />);
     const el = container.querySelector('[data-slot="grid"]');
-    expect(el?.getAttribute(GRID_A11Y_CONTRACT.DATA_ATTRIBUTES.columns)).toBe('2');
+    expect(el?.getAttribute(GRID_A11Y_CONTRACT.DATA_ATTRIBUTES.columns)).toBe(
+      '2'
+    );
   });
 
   it('should emit data-min-item-width attribute', () => {
     container = mount(<Grid minItemWidth="200px" />);
     const el = container.querySelector('[data-slot="grid"]');
-    expect(el?.getAttribute(GRID_A11Y_CONTRACT.DATA_ATTRIBUTES.minItemWidth)).toBe('200px');
+    expect(
+      el?.getAttribute(GRID_A11Y_CONTRACT.DATA_ATTRIBUTES.minItemWidth)
+    ).toBe('200px');
   });
 
   it('should emit data-gap attribute', () => {
     container = mount(<Grid gap="1rem" />);
     const el = container.querySelector('[data-slot="grid"]');
-    expect(el?.getAttribute(GRID_A11Y_CONTRACT.DATA_ATTRIBUTES.gap)).toBe('1rem');
+    expect(el?.getAttribute(GRID_A11Y_CONTRACT.DATA_ATTRIBUTES.gap)).toBe(
+      '1rem'
+    );
   });
 
   it('should render the child element when asChild is true', () => {
     container = mount(
       <Grid asChild>
         <ul>content</ul>
-      </Grid>,
+      </Grid>
     );
     const el = container.querySelector('ul');
     expect(el?.getAttribute('data-slot')).toBe('grid');

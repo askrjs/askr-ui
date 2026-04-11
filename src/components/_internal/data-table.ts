@@ -14,7 +14,7 @@ import type {
   SortDescriptor,
   SortingConfig,
   SortingState,
-} from '../data-table/data-table.types';
+} from '../patterns/data-table/data-table.types';
 
 // ─── Feature config resolution ───
 
@@ -257,7 +257,11 @@ export function applyFilters<T>(
   const columnMap = new Map(columns.map((col) => [col.id, col]));
 
   for (const [columnId, filterValue] of Object.entries(filters.columns)) {
-    if (filterValue === undefined || filterValue === null || filterValue === '') {
+    if (
+      filterValue === undefined ||
+      filterValue === null ||
+      filterValue === ''
+    ) {
       continue;
     }
 
@@ -298,10 +302,7 @@ export function applyPagination<T>(
   return rows.slice(start, start + pagination.pageSize);
 }
 
-export function computePageCount(
-  totalRows: number,
-  pageSize: number
-): number {
+export function computePageCount(totalRows: number, pageSize: number): number {
   if (totalRows <= 0 || pageSize <= 0) {
     return 1;
   }

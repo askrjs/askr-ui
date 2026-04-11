@@ -1,11 +1,11 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vite-plus/test';
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '../../../src/components/tabs';
-import { TABS_A11Y_CONTRACT } from '../../../src/components/tabs/tabs.a11y';
+} from '../../../src/components/composites/tabs';
+import { TABS_A11Y_CONTRACT } from '../../../src/components/composites/tabs/tabs.a11y';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 function getButtonByText(
@@ -52,14 +52,16 @@ describe('Tabs - Behavior', () => {
       </div>
     );
 
-    getButtonByText(container, 'Settings').focus();
+    const settingsButton = getButtonByText(container, 'Settings');
+    settingsButton.click();
     await flushUpdates();
     expect(
       container.querySelector(`[role="${TABS_A11Y_CONTRACT.PANEL_ROLE}"]`)
         ?.textContent
     ).toContain('Settings panel');
 
-    getButtonByText(container, 'Settings manual').focus();
+    const settingsManualButton = getButtonByText(container, 'Settings manual');
+    settingsManualButton.focus();
     await flushUpdates();
     expect(
       Array.from(
@@ -67,7 +69,7 @@ describe('Tabs - Behavior', () => {
       ).some((panel) => panel.textContent?.includes('Settings manual panel'))
     ).toBe(false);
 
-    getButtonByText(container, 'Settings manual').click();
+    settingsManualButton.click();
     await flushUpdates();
     expect(
       Array.from(

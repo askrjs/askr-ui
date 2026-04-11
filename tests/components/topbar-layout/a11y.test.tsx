@@ -1,5 +1,5 @@
-import { describe, it } from 'vitest';
-import { TopbarLayout } from '../../../src/components/topbar-layout/topbar-layout';
+import { describe, it } from 'vite-plus/test';
+import { TopbarLayout } from '../../../src/components/patterns/topbar-layout/topbar-layout';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('TopbarLayout - Accessibility', () => {
@@ -7,7 +7,7 @@ describe('TopbarLayout - Accessibility', () => {
     await expectNoAxeViolations(
       <TopbarLayout topbar={<span>Header</span>}>
         <p>Main content</p>
-      </TopbarLayout>,
+      </TopbarLayout>
     );
   });
 
@@ -15,7 +15,7 @@ describe('TopbarLayout - Accessibility', () => {
     await expectNoAxeViolations(
       <TopbarLayout topbarHeight="3rem" topbar={<span>Header</span>}>
         <p>Content</p>
-      </TopbarLayout>,
+      </TopbarLayout>
     );
   });
 });

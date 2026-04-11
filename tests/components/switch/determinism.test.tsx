@@ -1,5 +1,5 @@
-import { describe, it } from 'vitest';
-import { Switch } from '../../../src/components/switch/switch';
+import { describe, it } from 'vite-plus/test';
+import { Switch } from '../../../src/components/primitives/switch/switch';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Switch - Determinism', () => {
