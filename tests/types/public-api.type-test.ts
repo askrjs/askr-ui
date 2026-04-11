@@ -64,8 +64,6 @@ import {
   TooltipContent,
   TooltipPortal,
   TooltipTrigger,
-  createAskRComponent,
-  type AskRComponent,
   type AlertDialogActionAsChildProps,
   type AlertDialogActionProps,
   type AlertDialogCancelAsChildProps,
@@ -186,8 +184,6 @@ import { SidebarLayout as SidebarLayoutSubpath } from '@askrjs/askr-ui/patterns/
 import { TopbarLayout as TopbarLayoutSubpath } from '@askrjs/askr-ui/patterns/topbar-layout';
 
 const slotChild = {} as JSXElement;
-
-const askrComponent: AskRComponent = createAskRComponent('button');
 
 const buttonFromSubpath: typeof Button = ButtonSubpath;
 const checkboxFromSubpath: typeof Checkbox = CheckboxSubpath;
@@ -523,7 +519,6 @@ const _invalidDialogTriggerAsChild: DialogTriggerAsChildProps = {
 const _invalidSelectItem: SelectItemProps = { children: 'Missing value' };
 
 void [
-  askrComponent,
   buttonFromSubpath,
   checkboxFromSubpath,
   collapsibleFromSubpath,

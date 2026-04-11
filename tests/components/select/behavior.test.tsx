@@ -2,7 +2,9 @@ import { afterEach, describe, expect, it } from 'vite-plus/test';
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectPortal,
   SelectTrigger,
   SelectValue,
@@ -47,5 +49,31 @@ describe('Select - Behavior', () => {
       '[aria-haspopup="listbox"]'
     ) as HTMLButtonElement;
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('labels select groups through nested SelectLabel parts', async () => {
+    container = mount(
+      <Select defaultOpen defaultValue="askr">
+        <SelectTrigger aria-label="Framework">
+          <SelectValue placeholder="Choose one" />
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Frameworks</SelectLabel>
+              <SelectItem value="askr">Askr</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </SelectPortal>
+      </Select>
+    );
+
+    await flushUpdates();
+
+    const group = Array.from(document.body.querySelectorAll('[role="group"]'))[0] as HTMLElement;
+    const label = group.querySelector('[data-select-label="true"]') as HTMLElement;
+
+    expect(label.id).not.toBe('');
+    expect(group.getAttribute('aria-labelledby')).toBe(label.id);
   });
 });

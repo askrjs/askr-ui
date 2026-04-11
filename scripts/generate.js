@@ -2,7 +2,7 @@ import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const COMPONENT_REGISTRY = [
+export const COMPONENT_REGISTRY = [
   { name: 'avatar', bucket: 'primitives' },
   { name: 'badge', bucket: 'primitives' },
   { name: 'button', bucket: 'primitives' },
@@ -51,7 +51,7 @@ const COMPONENT_REGISTRY = [
   { name: 'topbar-layout', bucket: 'patterns' },
 ];
 
-const EXPORT_PATTERNS = [
+export const EXPORT_PATTERNS = [
   {
     key: './primitives/*',
     basePath: './dist/components/primitives/*/*',

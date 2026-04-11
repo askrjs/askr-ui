@@ -16,6 +16,5 @@ npm install @askrjs/askr-ui @askrjs/askr
 ```
 
 ```tsx
-import { Button } from '@askrjs/askr-ui/button';
-import { Dialog, DialogTrigger, DialogContent } from '@askrjs/askr-ui/dialog';
+import { Button, Dialog, DialogTrigger, DialogContent } from '@askrjs/askr-ui';
 ```
