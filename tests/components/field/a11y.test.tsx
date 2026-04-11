@@ -10,6 +10,7 @@ import {
   FieldRadioGroup,
   FieldRow,
   FieldSwitch,
+  FieldTextarea,
   Fieldset,
 } from '../../../src/components/composites/field/field';
 import { RadioGroupItem } from '../../../src/components/primitives/radio-group/radio-group';
@@ -24,6 +25,16 @@ describe('Field - Accessibility', () => {
         <FieldLabel>Email</FieldLabel>
         <FieldInput />
         <FieldDescription>Used for login</FieldDescription>
+      </Field>
+    );
+  });
+
+  it('should have no automated axe violations given a composed field textarea', async () => {
+    await expectNoAxeViolations(
+      <Field id="bio" required>
+        <FieldLabel>Bio</FieldLabel>
+        <FieldTextarea />
+        <FieldDescription>Tell people about your role</FieldDescription>
       </Field>
     );
   });

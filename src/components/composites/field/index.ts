@@ -10,6 +10,7 @@ export {
   FieldRow,
   FieldSelectTrigger,
   FieldSwitch,
+  FieldTextarea,
   Fieldset,
 } from './field';
 export { FIELD_A11Y_CONTRACT, type FieldA11yContract } from './field-a11y';
@@ -31,4 +32,5 @@ export type {
   FieldRadioGroupProps,
   FieldSelectTriggerProps,
   FieldSwitchProps,
+  FieldTextareaProps,
 } from './field-types';

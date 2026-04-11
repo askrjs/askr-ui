@@ -109,6 +109,29 @@ describe('ToggleGroup - Behavior', () => {
     expect(right.getAttribute('aria-pressed')).toBe('true');
   });
 
+  it('supports nested toggle items without relying on direct child injection', async () => {
+    container = mount(
+      <ToggleGroup defaultValue="left">
+        <div>
+          <ToggleGroupItem value="left">Left</ToggleGroupItem>
+        </div>
+        <div>
+          <ToggleGroupItem value="right">Right</ToggleGroupItem>
+        </div>
+      </ToggleGroup>
+    );
+
+    getToggleByText(container, 'Right').click();
+    await flushUpdates();
+
+    expect(getToggleByText(container, 'Left').getAttribute('aria-pressed')).toBe(
+      'false'
+    );
+    expect(getToggleByText(container, 'Right').getAttribute('aria-pressed')).toBe(
+      'true'
+    );
+  });
+
   it('emits normalized values for single and multiple groups', async () => {
     const onSingleValueChange = vi.fn();
     const onMultipleValueChange = vi.fn();

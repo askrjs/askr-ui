@@ -33,6 +33,7 @@ import {
   DropdownMenuTrigger,
   Field,
   FieldInput,
+  FieldTextarea,
   FocusRing,
   FocusScope,
   Menu,
@@ -99,6 +100,7 @@ import {
   type DropdownMenuItemProps,
   type FieldInputProps,
   type FieldProps,
+  type FieldTextareaProps,
   type FocusRingAsChildProps,
   type FocusRingProps,
   type FocusScopeAsChildProps,
@@ -199,6 +201,7 @@ const selectFromSubpath: typeof Select = SelectSubpath;
 const tooltipFromSubpath: typeof Tooltip = TooltipSubpath;
 const fieldFromRoot: typeof Field = Field;
 const fieldInputFromRoot: typeof FieldInput = FieldInput;
+const fieldTextareaFromRoot: typeof FieldTextarea = FieldTextarea;
 const radioGroupFromRoot: typeof RadioGroup = RadioGroup;
 const radioGroupItemFromRoot: typeof RadioGroupItem = RadioGroupItem;
 const switchFromSubpath: typeof Switch = SwitchSubpath;
@@ -213,6 +216,7 @@ const sidebarLayoutFromSubpath: typeof SidebarLayout = SidebarLayoutSubpath;
 const topbarLayoutFromSubpath: typeof TopbarLayout = TopbarLayoutSubpath;
 
 const fieldInputProps: FieldInputProps = {};
+const fieldTextareaProps: FieldTextareaProps = {};
 
 const containerProps: ContainerProps = { children: 'Content' };
 const containerAsChildProps: ContainerAsChildProps = {
@@ -284,7 +288,12 @@ const buttonAsChildProps: ButtonAsChildProps = {
   children: slotChild,
 };
 
-const checkboxProps: CheckboxProps = { checked: true, indeterminate: false };
+const checkboxControlledProps: CheckboxProps = {
+  checked: true,
+  indeterminate: false,
+  onCheckedChange: (checked: boolean) => checked,
+};
+const checkboxUncontrolledProps: CheckboxProps = { defaultChecked: true };
 const checkboxInputProps: CheckboxInputProps = { name: 'terms', value: 'yes' };
 const checkboxAsChildProps: CheckboxAsChildProps = {
   asChild: true,
@@ -534,6 +543,8 @@ void [
   fieldFromRoot,
   fieldInputFromRoot,
   fieldInputProps,
+  fieldTextareaFromRoot,
+  fieldTextareaProps,
   radioGroupFromRoot,
   radioGroupItemFromRoot,
   switchFromSubpath,
@@ -598,7 +609,8 @@ void [
   buttonProps,
   buttonButtonProps,
   buttonAsChildProps,
-  checkboxProps,
+  checkboxControlledProps,
+  checkboxUncontrolledProps,
   checkboxInputProps,
   checkboxAsChildProps,
   collapsibleProps,

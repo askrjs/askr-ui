@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { Checkbox } from '../../../src/components/primitives/checkbox/checkbox';
-import { mount, unmount } from '../../test-utils';
+import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Checkbox - Behavior', () => {
   let container: HTMLElement | undefined;
@@ -31,6 +31,37 @@ describe('Checkbox - Behavior', () => {
     input?.click();
 
     expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  it('emits uncontrolled state changes through onCheckedChange', async () => {
+    const onCheckedChange = vi.fn();
+
+    container = mount(
+      <Checkbox defaultChecked={false} onCheckedChange={onCheckedChange} />
+    );
+    const input = container.querySelector('input') as HTMLInputElement | null;
+
+    expect(input?.checked).toBe(false);
+
+    input?.click();
+    await flushUpdates();
+
+    expect(onCheckedChange).toHaveBeenCalledWith(true);
+    expect(input?.checked).toBe(true);
+    expect(input?.getAttribute('data-state')).toBe('checked');
+  });
+
+  it('calls onCheckedChange in controlled mode', () => {
+    const onCheckedChange = vi.fn();
+
+    container = mount(
+      <Checkbox checked={false} onCheckedChange={onCheckedChange} />
+    );
+    const input = container.querySelector('input') as HTMLInputElement | null;
+
+    input?.click();
+
+    expect(onCheckedChange).toHaveBeenCalledWith(true);
   });
 
   it('blocks native interaction when disabled', () => {
@@ -91,6 +122,24 @@ describe('Checkbox - Behavior', () => {
     expect(host?.getAttribute('data-slot')).toBe('checkbox');
   });
 
+  it('updates uncontrolled asChild hosts through checked state', async () => {
+    container = mount(
+      <Checkbox asChild defaultChecked>
+        <div role="checkbox">Agree</div>
+      </Checkbox>
+    );
+    let host = container.querySelector('[role="checkbox"]') as HTMLElement | null;
+
+    expect(host?.getAttribute('aria-checked')).toBe('true');
+
+    host?.click();
+    await flushUpdates();
+    host = container.querySelector('[role="checkbox"]') as HTMLElement | null;
+
+    expect(host?.getAttribute('aria-checked')).toBe('false');
+    expect(host?.getAttribute('data-state')).toBe('unchecked');
+  });
+
   it('emits mixed state for indeterminate asChild hosts', () => {
     container = mount(
       <Checkbox asChild indeterminate>
@@ -103,7 +152,7 @@ describe('Checkbox - Behavior', () => {
     expect(host?.getAttribute('data-state')).toBe('indeterminate');
   });
 
-  it('supports click, Enter, and Space activation for asChild hosts', () => {
+  it('supports click, Enter, and Space activation for asChild hosts', async () => {
     const onPress = vi.fn();
 
     container = mount(
@@ -111,20 +160,23 @@ describe('Checkbox - Behavior', () => {
         <div role="checkbox">Agree</div>
       </Checkbox>
     );
-    const host = container.querySelector(
-      '[role="checkbox"]'
-    ) as HTMLElement | null;
+    let host = container.querySelector('[role="checkbox"]') as HTMLElement | null;
 
     host?.click();
+    await flushUpdates();
+    host = container.querySelector('[role="checkbox"]') as HTMLElement | null;
     host?.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
     );
+    await flushUpdates();
+    host = container.querySelector('[role="checkbox"]') as HTMLElement | null;
     host?.dispatchEvent(
       new KeyboardEvent('keydown', { key: ' ', bubbles: true })
     );
     host?.dispatchEvent(
       new KeyboardEvent('keyup', { key: ' ', bubbles: true })
     );
+    await flushUpdates();
 
     expect(onPress).toHaveBeenCalledTimes(3);
   });
