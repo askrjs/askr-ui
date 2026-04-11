@@ -41,7 +41,7 @@ A component is ready to close when all of the following are true:
 
 | Component      | Status  | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf    | Docs/Exports | Notes                                        |
 | -------------- | ------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | -------------------------------------------- |
-| Badge          | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Keep primitive surface narrow                |
+| Badge          | done    | done       | done          | done    | done         | done    | covered | done         | Passive variant hooks and asChild contract locked |
 | Spinner        | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Verify loading semantics stay minimal        |
 | Skeleton       | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Check slot contract and deterministic markup |
 | Avatar         | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Validate fallback and image composition      |
@@ -68,9 +68,9 @@ A component is ready to close when all of the following are true:
 | Checkbox    | in progress | review     | done          | done    | review       | done    | covered | done         | Controlled-only API and manual `asChild` interaction still diverge from Switch |
 | Switch      | in progress | done       | done          | done    | review       | done    | covered | done         | Uncontrolled rendering after press still needs deeper follow-up                |
 | Toggle      | done        | done       | done          | done    | done         | done    | covered | done         | Pressed-state contract and `asChild` semantics locked                          |
-| RadioGroup  | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Likely reference for grouped selection semantics                               |
+| RadioGroup  | in progress | done       | done          | done    | review       | done    | covered | done         | Direct-child cloning and compound injection still need a deeper review         |
 | Slider      | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Validate input semantics and perf                                              |
-| ToggleGroup | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Validate grouped selection naming and slots                                    |
+| ToggleGroup | in progress | done       | done          | done    | review       | done    | covered | done         | Compound injection path and keyboard-focus contract still need a deeper review |
 | Select      | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | High-risk architecture pass                                                    |
 
 ## Phase 5 — Infrastructure Composites
