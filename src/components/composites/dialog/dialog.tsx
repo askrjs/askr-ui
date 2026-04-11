@@ -9,7 +9,7 @@ import {
 import { DismissableLayer } from '../../composites/dismissable-layer';
 import { FocusScope } from '../../composites/focus-scope';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
-import { mapJsxTree } from '../../_internal/jsx';
+import { collectJsxElements, mapJsxTree } from '../../_internal/jsx';
 import {
   clearOverlayPosition,
   getOverlayNodes,
@@ -41,6 +41,8 @@ type InjectedDialogProps = {
   __contentId?: string;
   __titleId?: string;
   __descriptionId?: string;
+  __hasTitle?: boolean;
+  __hasDescription?: boolean;
   __portal?: ReturnType<typeof getPersistentPortal>;
 };
 
@@ -55,6 +57,8 @@ function readInjectedDialogProps(
     !props.__contentId ||
     !props.__titleId ||
     !props.__descriptionId ||
+    props.__hasTitle === undefined ||
+    props.__hasDescription === undefined ||
     !props.__portal
   ) {
     throw new Error('Dialog components must be used within <Dialog>');
@@ -68,6 +72,8 @@ function readInjectedDialogProps(
     __contentId: props.__contentId,
     __titleId: props.__titleId,
     __descriptionId: props.__descriptionId,
+    __hasTitle: props.__hasTitle,
+    __hasDescription: props.__hasDescription,
     __portal: props.__portal,
   };
 }
@@ -89,6 +95,14 @@ export function Dialog(props: DialogProps) {
   });
 
   const dialogId = resolveCompoundId('dialog', id, children);
+  const hasTitle = collectJsxElements(
+    children,
+    (element) => element.type === DialogTitle
+  ).length > 0;
+  const hasDescription = collectJsxElements(
+    children,
+    (element) => element.type === DialogDescription
+  ).length > 0;
   const injectedProps: InjectedDialogProps = {
     __dialogId: dialogId,
     __open: openState(),
@@ -97,6 +111,8 @@ export function Dialog(props: DialogProps) {
     __contentId: resolvePartId(dialogId, 'content'),
     __titleId: resolvePartId(dialogId, 'title'),
     __descriptionId: resolvePartId(dialogId, 'description'),
+    __hasTitle: hasTitle,
+    __hasDescription: hasDescription,
     __portal: getPersistentPortal(dialogId),
   };
 
@@ -150,6 +166,8 @@ export function DialogTrigger(
     __contentId,
     __titleId,
     __descriptionId,
+    __hasTitle,
+    __hasDescription,
     __portal,
     ...rest
   } = props;
@@ -161,6 +179,8 @@ export function DialogTrigger(
     __contentId,
     __titleId,
     __descriptionId,
+    __hasTitle,
+    __hasDescription,
     __portal,
   });
   const overlayNodes = getOverlayNodes(injected.__dialogId);
@@ -217,6 +237,8 @@ export function DialogPortal(
     __contentId,
     __titleId,
     __descriptionId,
+    __hasTitle,
+    __hasDescription,
     __portal,
   } = props;
   const injected = readInjectedDialogProps({
@@ -227,6 +249,8 @@ export function DialogPortal(
     __contentId,
     __titleId,
     __descriptionId,
+    __hasTitle,
+    __hasDescription,
     __portal,
   });
 
@@ -256,6 +280,8 @@ export function DialogOverlay(
     __contentId,
     __titleId,
     __descriptionId,
+    __hasTitle,
+    __hasDescription,
     __portal,
     ...rest
   } = props;
@@ -267,6 +293,8 @@ export function DialogOverlay(
     __contentId,
     __titleId,
     __descriptionId,
+    __hasTitle,
+    __hasDescription,
     __portal,
   });
   const finalProps = mergeProps(rest, {
@@ -313,6 +341,8 @@ export function DialogContent(
     __contentId,
     __titleId,
     __descriptionId,
+    __hasTitle,
+    __hasDescription,
     __portal,
     ...rest
   } = props;
@@ -324,6 +354,8 @@ export function DialogContent(
     __contentId,
     __titleId,
     __descriptionId,
+    __hasTitle,
+    __hasDescription,
     __portal,
   });
   const overlayNodes = getOverlayNodes(injected.__dialogId);
@@ -350,8 +382,9 @@ export function DialogContent(
     id: injected.__contentId,
     role: 'dialog',
     'aria-modal': injected.__modal ? 'true' : undefined,
-    'aria-labelledby': injected.__titleId,
-    'aria-describedby': injected.__descriptionId,
+    'aria-labelledby': injected.__hasTitle ? injected.__titleId : undefined,
+    'aria-describedby':
+      injected.__hasDescription ? injected.__descriptionId : undefined,
     'data-slot': 'dialog-content',
     'data-state': injected.__open ? 'open' : 'closed',
   });
@@ -404,6 +437,8 @@ export function DialogTitle(
     __contentId,
     __titleId,
     __descriptionId,
+    __hasTitle,
+    __hasDescription,
     __portal,
     ...rest
   } = props;
@@ -415,6 +450,8 @@ export function DialogTitle(
     __contentId,
     __titleId,
     __descriptionId,
+    __hasTitle,
+    __hasDescription,
     __portal,
   });
   const finalProps = mergeProps(rest, {
@@ -450,6 +487,8 @@ export function DialogDescription(
     __contentId,
     __titleId,
     __descriptionId,
+    __hasTitle,
+    __hasDescription,
     __portal,
     ...rest
   } = props;
@@ -461,6 +500,8 @@ export function DialogDescription(
     __contentId,
     __titleId,
     __descriptionId,
+    __hasTitle,
+    __hasDescription,
     __portal,
   });
   const finalProps = mergeProps(rest, {
@@ -495,6 +536,8 @@ export function DialogClose(
     __contentId,
     __titleId,
     __descriptionId,
+    __hasTitle,
+    __hasDescription,
     __portal,
     ...rest
   } = props;
@@ -506,6 +549,8 @@ export function DialogClose(
     __contentId,
     __titleId,
     __descriptionId,
+    __hasTitle,
+    __hasDescription,
     __portal,
   });
   const interactionProps = pressable({

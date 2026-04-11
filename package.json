@@ -75,12 +75,12 @@
   "scripts": {
     "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
     "build:js": "vp build",
-    "build:types": "tsc -p tsconfig.build.json",
+    "build:types": "node ./node_modules/typescript/bin/tsc -p tsconfig.build.json",
     "build": "npm run clean && npm run build:js && npm run build:types",
     "dev": "vp build --watch",
     "verify:foundations": "node scripts/check-foundations-contract.js",
     "test": "npm run verify:foundations && vp test run",
-    "test:types": "tsc -p tsconfig.type-tests.json --noEmit",
+    "test:types": "node ./node_modules/typescript/bin/tsc -p tsconfig.type-tests.json --noEmit",
     "bench": "cross-env NODE_ENV=production vp test bench --run --reporter=default --config vitest.bench.config.ts",
     "fmt": "vp fmt .",
     "lint": "vp fmt --check .",
@@ -89,13 +89,13 @@
   "devDependencies": {
     "@askrjs/askr": "file:../askr",
     "@askrjs/askr-vite": "file:../askr-vite",
-    "@types/node": "^25.5.0",
+    "@types/node": "^25.6.0",
     "axe-core": "^4.11.2",
     "cross-env": "^10.1.0",
     "jiti": "^2.6.1",
-    "jsdom": "^29.0.1",
+    "jsdom": "^29.0.2",
     "tsd": "^0.33.0",
-    "typescript": "^5.0.0",
+    "typescript": "^6.0.2",
     "vitest-axe": "^0.1.0",
     "vite-plus": "latest"
   }

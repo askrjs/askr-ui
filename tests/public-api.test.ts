@@ -6,6 +6,8 @@ import * as patternDataTable from '../src/components/patterns/data-table';
 
 describe('Public API', () => {
   it('exposes the 1.0 public component surface from the root entrypoint', () => {
+    expect('createAskRComponent' in askrUi).toBe(false);
+    expect('AskRComponent' in askrUi).toBe(false);
     expect(askrUi.FocusRing).toBeDefined();
     expect(askrUi.FocusScope).toBeDefined();
     expect(askrUi.DismissableLayer).toBeDefined();

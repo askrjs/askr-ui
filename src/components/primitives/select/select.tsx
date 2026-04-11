@@ -18,7 +18,7 @@ import {
   getMenuCollection,
   registerCollectionNode,
 } from '../../_internal/menu';
-import { mapJsxTree } from '../../_internal/jsx';
+import { collectJsxElements, mapJsxTree } from '../../_internal/jsx';
 import {
   clearOverlayPosition,
   getOverlayNodes,
@@ -60,6 +60,24 @@ type InjectedSelectProps = {
   __disabledIndexes?: number[];
   __selectedText?: string;
 };
+
+type SelectGroupInjectedProps = {
+  __selectId?: string;
+  __groupIndex?: number;
+};
+
+function readInjectedSelectGroupProps(
+  props: SelectGroupInjectedProps
+): Required<SelectGroupInjectedProps> {
+  if (!props.__selectId || props.__groupIndex === undefined) {
+    throw new Error('SelectGroup must be used within <Select>');
+  }
+
+  return {
+    __selectId: props.__selectId,
+    __groupIndex: props.__groupIndex,
+  };
+}
 
 function readInjectedSelectProps(
   props: InjectedSelectProps
@@ -151,13 +169,15 @@ export function Select(props: SelectProps) {
     __selectedText: selectedText,
   };
   let itemIndex = 0;
+  let groupIndex = 0;
   const enhancedChildren = mapJsxTree(children, (element) => {
     if (
       element.type !== SelectTrigger &&
       element.type !== SelectValue &&
       element.type !== SelectPortal &&
       element.type !== SelectContent &&
-      element.type !== SelectItem
+      element.type !== SelectItem &&
+      element.type !== SelectGroup
     ) {
       return element;
     }
@@ -172,6 +192,19 @@ export function Select(props: SelectProps) {
           ...injectedProps,
           __itemIndex: nextItemIndex,
           __itemId: resolvePartId(selectId, `item-${nextItemIndex}`),
+        },
+      };
+    }
+
+    if (element.type === SelectGroup) {
+      const nextGroupIndex = groupIndex;
+      groupIndex += 1;
+      return {
+        ...element,
+        props: {
+          ...element.props,
+          __selectId: selectId,
+          __groupIndex: nextGroupIndex,
         },
       };
     }
@@ -612,27 +645,73 @@ export function SelectItemText(
 
 export function SelectGroup(props: SelectGroupProps): JSX.Element;
 export function SelectGroup(props: SelectGroupAsChildProps): JSX.Element;
-export function SelectGroup(props: SelectGroupProps | SelectGroupAsChildProps) {
-  const { asChild, children, ref, ...rest } = props;
+export function SelectGroup(
+  props:
+    | (SelectGroupProps & SelectGroupInjectedProps)
+    | (SelectGroupAsChildProps & SelectGroupInjectedProps)
+) {
+  const {
+    asChild,
+    children,
+    ref,
+    __selectId,
+    __groupIndex,
+    ...rest
+  } = props;
+  const injected = readInjectedSelectGroupProps({
+    __selectId,
+    __groupIndex,
+  });
+  const groupId = resolvePartId(
+    injected.__selectId,
+    `group-${injected.__groupIndex}`
+  );
+  const labelId = `${groupId}-label`;
+  const containsLabel =
+    collectJsxElements(children, (element) => element.type === SelectLabel)
+      .length > 0;
+  const labeledChildren =
+    mapJsxTree(children, (element) => {
+      if (element.type !== SelectLabel) {
+        return element;
+      }
+
+      return {
+        ...element,
+        props: {
+          ...element.props,
+          __labelId: labelId,
+        },
+      };
+    });
   const finalProps = mergeProps(rest, {
     ref,
+    id: groupId,
     role: 'group',
+    'aria-labelledby': containsLabel ? labelId : undefined,
     'data-slot': 'select-group',
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot asChild {...finalProps} children={labeledChildren as JSX.Element} />
+    );
   }
 
-  return <div {...finalProps}>{children}</div>;
+  return <div {...finalProps}>{labeledChildren}</div>;
 }
 
 export function SelectLabel(props: SelectLabelProps): JSX.Element;
 export function SelectLabel(props: SelectLabelAsChildProps): JSX.Element;
-export function SelectLabel(props: SelectLabelProps | SelectLabelAsChildProps) {
-  const { asChild, children, ref, ...rest } = props;
+export function SelectLabel(
+  props:
+    | (SelectLabelProps & { __labelId?: string })
+    | (SelectLabelAsChildProps & { __labelId?: string })
+) {
+  const { asChild, children, ref, __labelId, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
+    id: __labelId,
     'data-slot': 'select-label',
     'data-select-label': 'true',
   });
