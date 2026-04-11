@@ -39,7 +39,10 @@ export function collectItemMetadata(
       typeof element.props?.value === 'string'
         ? element.props.value
         : undefined,
-    text: extractTextContent(element.props?.children).trim(),
+    text:
+      typeof element.props?.textValue === 'string'
+        ? element.props.textValue
+        : extractTextContent(element.props?.children).trim(),
   }));
 }
 

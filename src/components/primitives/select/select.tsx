@@ -12,13 +12,13 @@ import { DismissableLayer } from '../../composites/dismissable-layer';
 import { FocusScope } from '../../composites/focus-scope';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
+import { collectJsxElements } from '../../_internal/jsx';
 import {
   collectItemMetadata,
   firstEnabledIndex,
   getMenuCollection,
   registerCollectionNode,
 } from '../../_internal/menu';
-import { collectJsxElements, mapJsxTree } from '../../_internal/jsx';
 import {
   clearOverlayPosition,
   getOverlayNodes,
@@ -45,74 +45,75 @@ import type {
   SelectValueAsChildProps,
   SelectValueProps,
 } from './select.types';
+import {
+  createSelectRenderContext,
+  getSelectDisabledIndexes,
+  readSelectGroupContext,
+  readSelectRenderContext,
+  readSelectRootContext,
+  SelectGroupContext,
+  SelectRenderContext,
+  SelectRootContext,
+  type SelectRootContextValue,
+} from './select.shared';
 
-type InjectedSelectProps = {
-  __selectId?: string;
-  __open?: boolean;
-  __setOpen?: (open: boolean) => void;
-  __contentId?: string;
-  __portal?: ReturnType<typeof getPersistentPortal>;
-  __value?: string;
-  __setValue?: (value: string) => void;
-  __currentIndex?: number;
-  __setCurrentIndex?: (index: number) => void;
-  __itemCount?: number;
-  __disabledIndexes?: number[];
-  __selectedText?: string;
-};
-
-type SelectGroupInjectedProps = {
-  __selectId?: string;
-  __groupIndex?: number;
-};
-
-function readInjectedSelectGroupProps(
-  props: SelectGroupInjectedProps
-): Required<SelectGroupInjectedProps> {
-  if (!props.__selectId || props.__groupIndex === undefined) {
-    throw new Error('SelectGroup must be used within <Select>');
-  }
-
-  return {
-    __selectId: props.__selectId,
-    __groupIndex: props.__groupIndex,
-  };
+function SelectRootScopeView(props: {
+  children?: unknown;
+  name?: string;
+  disabled: boolean;
+  renderContext: ReturnType<typeof createSelectRenderContext>;
+}) {
+  return (
+    <SelectRenderContext.Scope value={props.renderContext}>
+      <SelectRootView
+        name={props.name}
+        disabled={props.disabled}
+        children={props.children}
+      />
+    </SelectRenderContext.Scope>
+  );
 }
 
-function readInjectedSelectProps(
-  props: InjectedSelectProps
-): Required<InjectedSelectProps> {
-  if (
-    !props.__selectId ||
-    props.__open === undefined ||
-    !props.__setOpen ||
-    !props.__contentId ||
-    !props.__portal ||
-    props.__value === undefined ||
-    !props.__setValue ||
-    props.__currentIndex === undefined ||
-    !props.__setCurrentIndex ||
-    props.__itemCount === undefined ||
-    !props.__disabledIndexes ||
-    props.__selectedText === undefined
-  ) {
-    throw new Error('Select components must be used within <Select>');
+function SelectRootView(props: {
+  children?: unknown;
+  name?: string;
+  disabled: boolean;
+}) {
+  const root = readSelectRootContext();
+  const PortalHost = root.portal;
+
+  return (
+    <>
+      {props.children}
+      {PortalHost ? <PortalHost /> : null}
+      {props.name ? (
+        <input
+          type="hidden"
+          name={props.name}
+          value={root.value}
+          disabled={props.disabled}
+        />
+      ) : null}
+    </>
+  );
+}
+
+function SelectGroupScopeView(props: {
+  asChild?: boolean;
+  children?: unknown;
+  finalProps: Record<string, unknown>;
+}) {
+  if (props.asChild) {
+    return (
+      <Slot
+        asChild
+        {...props.finalProps}
+        children={props.children as JSX.Element}
+      />
+    );
   }
 
-  return {
-    __selectId: props.__selectId,
-    __open: props.__open,
-    __setOpen: props.__setOpen,
-    __contentId: props.__contentId,
-    __portal: props.__portal,
-    __value: props.__value,
-    __setValue: props.__setValue,
-    __currentIndex: props.__currentIndex,
-    __setCurrentIndex: props.__setCurrentIndex,
-    __itemCount: props.__itemCount,
-    __disabledIndexes: props.__disabledIndexes,
-    __selectedText: props.__selectedText,
-  };
+  return <div {...props.finalProps}>{props.children}</div>;
 }
 
 export function Select(props: SelectProps) {
@@ -140,148 +141,69 @@ export function Select(props: SelectProps) {
     onChange: onOpenChange,
   });
   const items = collectItemMetadata(children, SelectItem);
+  const effectiveItems = items.map((item) => ({
+    disabled: disabled || item.disabled,
+  }));
   const selectedIndex = items.findIndex((item) => item.value === valueState());
+  const fallbackIndex = firstEnabledIndex(effectiveItems);
   const currentIndexState = state(
-    selectedIndex >= 0 ? selectedIndex : firstEnabledIndex(items)
-  );
-  const currentIndex =
-    selectedIndex >= 0
+    selectedIndex >= 0 && !effectiveItems[selectedIndex]?.disabled
       ? selectedIndex
-      : items[currentIndexState()]
-        ? currentIndexState()
-        : firstEnabledIndex(items);
-  const selectedText =
-    items.find((item) => item.value === valueState())?.text ?? '';
-  const injectedProps: InjectedSelectProps = {
-    __selectId: selectId,
-    __open: openState(),
-    __setOpen: openState.set,
-    __contentId: resolvePartId(selectId, 'content'),
-    __portal: getPersistentPortal(selectId),
-    __value: valueState(),
-    __setValue: valueState.set,
-    __currentIndex: currentIndex,
-    __setCurrentIndex: currentIndexState.set,
-    __itemCount: items.length,
-    __disabledIndexes: items
-      .map((item, index) => (item.disabled ? index : -1))
-      .filter((index) => index !== -1),
-    __selectedText: selectedText,
+      : fallbackIndex
+  );
+  const currentIndexCandidate = currentIndexState();
+  const currentIndex =
+    selectedIndex >= 0 && !effectiveItems[selectedIndex]?.disabled
+      ? selectedIndex
+      : effectiveItems[currentIndexCandidate] &&
+          !effectiveItems[currentIndexCandidate]?.disabled
+        ? currentIndexCandidate
+        : fallbackIndex;
+  const rootContext: SelectRootContextValue = {
+    selectId,
+    open: openState(),
+    setOpen: openState.set,
+    contentId: resolvePartId(selectId, 'content'),
+    portal: getPersistentPortal(selectId),
+    value: valueState(),
+    setValue: valueState.set,
+    currentIndex,
+    setCurrentIndex: currentIndexState.set,
+    items,
+    disabled,
+    selectedText:
+      items.find((item) => item.value === valueState())?.text ?? '',
   };
-  let itemIndex = 0;
-  let groupIndex = 0;
-  const enhancedChildren = mapJsxTree(children, (element) => {
-    if (
-      element.type !== SelectTrigger &&
-      element.type !== SelectValue &&
-      element.type !== SelectPortal &&
-      element.type !== SelectContent &&
-      element.type !== SelectItem &&
-      element.type !== SelectGroup
-    ) {
-      return element;
-    }
-
-    if (element.type === SelectItem) {
-      const nextItemIndex = itemIndex;
-      itemIndex += 1;
-      return {
-        ...element,
-        props: {
-          ...element.props,
-          ...injectedProps,
-          __itemIndex: nextItemIndex,
-          __itemId: resolvePartId(selectId, `item-${nextItemIndex}`),
-        },
-      };
-    }
-
-    if (element.type === SelectGroup) {
-      const nextGroupIndex = groupIndex;
-      groupIndex += 1;
-      return {
-        ...element,
-        props: {
-          ...element.props,
-          __selectId: selectId,
-          __groupIndex: nextGroupIndex,
-        },
-      };
-    }
-
-    return {
-      ...element,
-      props: {
-        ...element.props,
-        ...injectedProps,
-      },
-    };
-  });
-  const PortalHost = injectedProps.__portal;
+  const renderContext = createSelectRenderContext();
 
   return (
-    <>
-      {enhancedChildren}
-      {PortalHost ? <PortalHost /> : null}
-      {name ? (
-        <input
-          type="hidden"
-          name={name}
-          value={valueState()}
-          disabled={disabled}
-        />
-      ) : null}
-    </>
+    <SelectRootContext.Scope value={rootContext}>
+      <SelectRootScopeView
+        renderContext={renderContext}
+        name={name}
+        disabled={disabled}
+        children={children}
+      />
+    </SelectRootContext.Scope>
   );
 }
 
 export function SelectTrigger(props: SelectTriggerProps): JSX.Element;
 export function SelectTrigger(props: SelectTriggerAsChildProps): JSX.Element;
 export function SelectTrigger(
-  props: (SelectTriggerProps | SelectTriggerAsChildProps) & InjectedSelectProps
+  props: SelectTriggerProps | SelectTriggerAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    disabled = false,
-    onPress,
-    ref,
-    type: typeProp,
-    __selectId,
-    __open,
-    __setOpen,
-    __contentId,
-    __portal,
-    __value,
-    __setValue,
-    __currentIndex,
-    __setCurrentIndex,
-    __itemCount,
-    __disabledIndexes,
-    __selectedText,
-    ...rest
-  } = props;
-  const injected = readInjectedSelectProps({
-    __selectId,
-    __open,
-    __setOpen,
-    __contentId,
-    __portal,
-    __value,
-    __setValue,
-    __currentIndex,
-    __setCurrentIndex,
-    __itemCount,
-    __disabledIndexes,
-    __selectedText,
-  });
-  const overlayNodes = getOverlayNodes(injected.__selectId);
+  const { asChild, children, disabled = false, onPress, ref, type, ...rest } =
+    props;
+  const root = readSelectRootContext();
+  const overlayNodes = getOverlayNodes(root.selectId);
+  const isDisabled = root.disabled || disabled;
   const interactionProps = pressable({
-    disabled,
+    disabled: isDisabled,
     onPress: (event) => {
       onPress?.(event);
       if (!event.defaultPrevented) {
-        injected.__setOpen(!injected.__open);
+        root.setOpen(!root.open);
       }
     },
     isNativeButton: !asChild,
@@ -299,11 +221,11 @@ export function SelectTrigger(
       }
     ),
     'aria-haspopup': 'listbox',
-    'aria-expanded': injected.__open ? 'true' : 'false',
-    'aria-controls': injected.__contentId,
+    'aria-expanded': root.open ? 'true' : 'false',
+    'aria-controls': root.contentId,
     'data-slot': 'select-trigger',
-    'data-disabled': disabled ? 'true' : undefined,
-    'data-state': injected.__open ? 'open' : 'closed',
+    'data-disabled': isDisabled ? 'true' : undefined,
+    'data-state': root.open ? 'open' : 'closed',
   });
 
   if (asChild) {
@@ -311,7 +233,7 @@ export function SelectTrigger(
   }
 
   return (
-    <button type={typeProp ?? 'button'} {...finalProps}>
+    <button type={type ?? 'button'} {...finalProps}>
       {children}
     </button>
   );
@@ -319,49 +241,16 @@ export function SelectTrigger(
 
 export function SelectValue(props: SelectValueProps): JSX.Element;
 export function SelectValue(props: SelectValueAsChildProps): JSX.Element;
-export function SelectValue(
-  props: (SelectValueProps | SelectValueAsChildProps) & InjectedSelectProps
-) {
-  const {
-    asChild,
-    children,
-    placeholder,
-    ref,
-    __selectId,
-    __open,
-    __setOpen,
-    __contentId,
-    __portal,
-    __value,
-    __setValue,
-    __currentIndex,
-    __setCurrentIndex,
-    __itemCount,
-    __disabledIndexes,
-    __selectedText,
-    ...rest
-  } = props;
-  const injected = readInjectedSelectProps({
-    __selectId,
-    __open,
-    __setOpen,
-    __contentId,
-    __portal,
-    __value,
-    __setValue,
-    __currentIndex,
-    __setCurrentIndex,
-    __itemCount,
-    __disabledIndexes,
-    __selectedText,
-  });
+export function SelectValue(props: SelectValueProps | SelectValueAsChildProps) {
+  const { asChild, children, placeholder, ref, ...rest } = props;
+  const root = readSelectRootContext();
   const renderedChildren =
-    children ?? (injected.__selectedText || placeholder || null);
+    children ?? (root.selectedText || placeholder || null);
   const finalProps = mergeProps(rest, {
     ref,
     'data-slot': 'select-value',
     'data-placeholder':
-      !injected.__selectedText && placeholder ? 'true' : undefined,
+      !root.selectedText && placeholder ? 'true' : undefined,
   });
 
   if (asChild) {
@@ -371,12 +260,10 @@ export function SelectValue(
   return <span {...finalProps}>{renderedChildren}</span>;
 }
 
-export function SelectPortal(
-  props: SelectPortalProps & InjectedSelectProps
-): JSX.Element | null {
-  const injected = readInjectedSelectProps(props);
+export function SelectPortal(props: SelectPortalProps): JSX.Element | null {
+  const root = readSelectRootContext();
 
-  return injected.__portal.render({
+  return root.portal.render({
     children: props.children,
   }) as JSX.Element | null;
 }
@@ -386,9 +273,7 @@ export function SelectContent(
   props: SelectContentAsChildProps
 ): JSX.Element | null;
 export function SelectContent(
-  props:
-    | (SelectContentProps & InjectedSelectProps)
-    | (SelectContentAsChildProps & InjectedSelectProps)
+  props: SelectContentProps | SelectContentAsChildProps
 ) {
   const {
     asChild,
@@ -398,44 +283,20 @@ export function SelectContent(
     side = 'bottom',
     align = 'start',
     sideOffset = 0,
-    __selectId,
-    __open,
-    __setOpen,
-    __contentId,
-    __portal,
-    __value,
-    __setValue,
-    __currentIndex,
-    __setCurrentIndex,
-    __itemCount,
-    __disabledIndexes,
-    __selectedText,
     ...rest
   } = props;
-  const injected = readInjectedSelectProps({
-    __selectId,
-    __open,
-    __setOpen,
-    __contentId,
-    __portal,
-    __value,
-    __setValue,
-    __currentIndex,
-    __setCurrentIndex,
-    __itemCount,
-    __disabledIndexes,
-    __selectedText,
-  });
-  const overlayNodes = getOverlayNodes(injected.__selectId);
-  const collection = getMenuCollection(injected.__selectId);
+  const root = readSelectRootContext();
+  const overlayNodes = getOverlayNodes(root.selectId);
+  const collection = getMenuCollection(root.selectId);
+  const disabledIndexes = getSelectDisabledIndexes(root.items, root.disabled);
   const nav = rovingFocus({
-    currentIndex: injected.__currentIndex,
-    itemCount: Math.max(injected.__itemCount, 1),
+    currentIndex: root.currentIndex,
+    itemCount: Math.max(root.items.length, 1),
     orientation: 'vertical',
     loop: true,
-    isDisabled: (index) => injected.__disabledIndexes.includes(index),
+    isDisabled: (index) => disabledIndexes.includes(index),
     onNavigate: (index) => {
-      injected.__setCurrentIndex(index);
+      root.setCurrentIndex(index);
       focusSelectedCollectionItem(collection, index);
     },
   });
@@ -449,26 +310,26 @@ export function SelectContent(
         | undefined,
       (node: HTMLElement | null) => {
         overlayNodes.content = node;
-        if (node && injected.__open) {
-          syncOverlayPosition(injected.__selectId, {
+        if (node && root.open) {
+          syncOverlayPosition(root.selectId, {
             side,
             align,
             sideOffset,
             matchTriggerWidth: true,
           });
         } else {
-          clearOverlayPosition(injected.__selectId);
+          clearOverlayPosition(root.selectId);
         }
 
-        if (node && injected.__open) {
-          focusSelectedCollectionItem(collection, injected.__currentIndex);
+        if (node && root.open) {
+          focusSelectedCollectionItem(collection, root.currentIndex);
         }
       }
     ),
-    id: injected.__contentId,
+    id: root.contentId,
     role: 'listbox',
     'data-slot': 'select-content',
-    'data-state': injected.__open ? 'open' : 'closed',
+    'data-state': root.open ? 'open' : 'closed',
     'data-side': side,
     'data-align': align,
     'data-side-offset': String(sideOffset),
@@ -480,11 +341,11 @@ export function SelectContent(
   );
 
   return (
-    <Presence present={forceMount || injected.__open}>
+    <Presence present={forceMount || root.open}>
       <FocusScope restoreFocus>
         <DismissableLayer
           onDismiss={() => {
-            injected.__setOpen(false);
+            root.setOpen(false);
           }}
         >
           {contentNode}
@@ -494,102 +355,54 @@ export function SelectContent(
   );
 }
 
-type SelectItemInjectedProps = InjectedSelectProps & {
-  __itemIndex?: number;
-  __itemId?: string;
-};
-
-function readInjectedSelectItemProps(
-  props: SelectItemInjectedProps
-): Required<SelectItemInjectedProps> {
-  const injected = readInjectedSelectProps(props);
-
-  if (props.__itemIndex === undefined || !props.__itemId) {
-    throw new Error('SelectItem must be used within <Select>');
-  }
-
-  return {
-    ...injected,
-    __itemIndex: props.__itemIndex,
-    __itemId: props.__itemId,
-  };
-}
-
 export function SelectItem(props: SelectItemProps): JSX.Element;
 export function SelectItem(props: SelectItemAsChildProps): JSX.Element;
-export function SelectItem(
-  props:
-    | (SelectItemProps & SelectItemInjectedProps)
-    | (SelectItemAsChildProps & SelectItemInjectedProps)
-) {
+export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
   const {
     asChild,
     children,
     disabled = false,
     value,
+    textValue,
     ref,
-    type: typeProp,
-    __selectId,
-    __open,
-    __setOpen,
-    __contentId,
-    __portal,
-    __currentIndex,
-    __setCurrentIndex,
-    __itemCount,
-    __disabledIndexes,
-    __value,
-    __setValue,
-    __selectedText,
-    __itemIndex,
-    __itemId,
+    type,
     ...rest
   } = props;
-  const injected = readInjectedSelectItemProps({
-    __selectId,
-    __open,
-    __setOpen,
-    __contentId,
-    __portal,
-    __currentIndex,
-    __setCurrentIndex,
-    __itemCount,
-    __disabledIndexes,
-    __value,
-    __setValue,
-    __selectedText,
-    __itemIndex,
-    __itemId,
-  });
-  const collection = getMenuCollection(injected.__selectId);
+  const root = readSelectRootContext();
+  const renderContext = readSelectRenderContext();
+  const itemIndex = renderContext.claimItemIndex();
+  const itemId = resolvePartId(root.selectId, `item-${itemIndex}`);
+  const collection = getMenuCollection(root.selectId);
+  const disabledIndexes = getSelectDisabledIndexes(root.items, root.disabled);
   const nav = rovingFocus({
-    currentIndex: injected.__currentIndex,
-    itemCount: Math.max(injected.__itemCount, 1),
+    currentIndex: root.currentIndex,
+    itemCount: Math.max(root.items.length, 1),
     orientation: 'vertical',
     loop: true,
-    isDisabled: (index) => injected.__disabledIndexes.includes(index),
+    isDisabled: (index) => disabledIndexes.includes(index),
     onNavigate: (index) => {
-      injected.__setCurrentIndex(index);
+      root.setCurrentIndex(index);
       focusSelectedCollectionItem(collection, index);
     },
   });
-  const selected = injected.__value === value;
+  const selected = root.value === value;
+  const isDisabled = root.disabled || disabled;
   const interactionProps = pressable({
-    disabled,
+    disabled: isDisabled,
     onPress: (event) => {
       if (event.defaultPrevented) {
         return;
       }
 
-      injected.__setValue(value);
-      injected.__setCurrentIndex(injected.__itemIndex);
-      injected.__setOpen(false);
+      root.setValue(value);
+      root.setCurrentIndex(itemIndex);
+      root.setOpen(false);
     },
     isNativeButton: !asChild,
   });
   const finalProps = mergeProps(rest, {
     ...interactionProps,
-    ...nav.item(injected.__itemIndex),
+    ...nav.item(itemIndex),
     ref: composeRefs(
       ref as
         | ((value: HTMLElement | null) => void)
@@ -597,20 +410,22 @@ export function SelectItem(
         | null
         | undefined,
       (node: HTMLElement | null) => {
-        registerCollectionNode(injected.__itemId, collection, node, {
-          index: injected.__itemIndex,
-          disabled,
+        registerCollectionNode(itemId, collection, node, {
+          index: itemIndex,
+          disabled: isDisabled,
           value,
+          text: textValue ?? root.items[itemIndex]?.text,
         });
       }
     ),
-    id: injected.__itemId,
+    id: itemId,
     role: 'option',
+    tabIndex: isDisabled ? -1 : undefined,
     'aria-selected': selected ? 'true' : 'false',
     'data-slot': 'select-item',
     'data-state': selected ? 'checked' : 'unchecked',
-    'data-disabled': disabled ? 'true' : undefined,
-    'aria-disabled': disabled ? 'true' : undefined,
+    'data-disabled': isDisabled ? 'true' : undefined,
+    'aria-disabled': isDisabled ? 'true' : undefined,
   });
 
   if (asChild) {
@@ -618,7 +433,7 @@ export function SelectItem(
   }
 
   return (
-    <button type={typeProp ?? 'button'} {...finalProps}>
+    <button type={type ?? 'button'} {...finalProps}>
       {children}
     </button>
   );
@@ -646,44 +461,17 @@ export function SelectItemText(
 export function SelectGroup(props: SelectGroupProps): JSX.Element;
 export function SelectGroup(props: SelectGroupAsChildProps): JSX.Element;
 export function SelectGroup(
-  props:
-    | (SelectGroupProps & SelectGroupInjectedProps)
-    | (SelectGroupAsChildProps & SelectGroupInjectedProps)
+  props: SelectGroupProps | SelectGroupAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    ref,
-    __selectId,
-    __groupIndex,
-    ...rest
-  } = props;
-  const injected = readInjectedSelectGroupProps({
-    __selectId,
-    __groupIndex,
-  });
-  const groupId = resolvePartId(
-    injected.__selectId,
-    `group-${injected.__groupIndex}`
-  );
+  const { asChild, children, ref, ...rest } = props;
+  const root = readSelectRootContext();
+  const renderContext = readSelectRenderContext();
+  const groupIndex = renderContext.claimGroupIndex();
+  const groupId = resolvePartId(root.selectId, `group-${groupIndex}`);
   const labelId = `${groupId}-label`;
   const containsLabel =
     collectJsxElements(children, (element) => element.type === SelectLabel)
       .length > 0;
-  const labeledChildren =
-    mapJsxTree(children, (element) => {
-      if (element.type !== SelectLabel) {
-        return element;
-      }
-
-      return {
-        ...element,
-        props: {
-          ...element.props,
-          __labelId: labelId,
-        },
-      };
-    });
   const finalProps = mergeProps(rest, {
     ref,
     id: groupId,
@@ -692,26 +480,25 @@ export function SelectGroup(
     'data-slot': 'select-group',
   });
 
-  if (asChild) {
-    return (
-      <Slot asChild {...finalProps} children={labeledChildren as JSX.Element} />
-    );
-  }
-
-  return <div {...finalProps}>{labeledChildren}</div>;
+  return (
+    <SelectGroupContext.Scope value={{ groupId, labelId }}>
+      <SelectGroupScopeView
+        asChild={asChild}
+        finalProps={finalProps as Record<string, unknown>}
+        children={children}
+      />
+    </SelectGroupContext.Scope>
+  );
 }
 
 export function SelectLabel(props: SelectLabelProps): JSX.Element;
 export function SelectLabel(props: SelectLabelAsChildProps): JSX.Element;
-export function SelectLabel(
-  props:
-    | (SelectLabelProps & { __labelId?: string })
-    | (SelectLabelAsChildProps & { __labelId?: string })
-) {
-  const { asChild, children, ref, __labelId, ...rest } = props;
+export function SelectLabel(props: SelectLabelProps | SelectLabelAsChildProps) {
+  const { asChild, children, ref, ...rest } = props;
+  const groupContext = readSelectGroupContext();
   const finalProps = mergeProps(rest, {
     ref,
-    id: __labelId,
+    id: groupContext?.labelId,
     'data-slot': 'select-label',
     'data-select-label': 'true',
   });

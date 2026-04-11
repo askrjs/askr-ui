@@ -2,8 +2,10 @@ import { describe, it } from 'vite-plus/test';
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectPortal,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '../../../src/components/primitives/select';
@@ -18,8 +20,13 @@ describe('Select - Accessibility', () => {
         </SelectTrigger>
         <SelectPortal>
           <SelectContent aria-label="Framework options">
-            <SelectItem value="askr">Askr</SelectItem>
-            <SelectItem value="solid">Solid</SelectItem>
+            <SelectGroup>
+              <div>
+                <SelectLabel>Frameworks</SelectLabel>
+              </div>
+              <SelectItem value="askr">Askr</SelectItem>
+              <SelectItem value="solid">Solid</SelectItem>
+            </SelectGroup>
           </SelectContent>
         </SelectPortal>
       </Select>

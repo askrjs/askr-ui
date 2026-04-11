@@ -53,6 +53,7 @@ export type SelectContentAsChildProps = BoxAsChildProps & SelectContentOwnProps;
 export type SelectItemOwnProps = {
   children?: unknown;
   disabled?: boolean;
+  textValue?: string;
   value: string;
 };
 

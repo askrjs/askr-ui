@@ -71,7 +71,7 @@ A component is ready to close when all of the following are true:
 | RadioGroup  | in progress | done       | done          | done    | review       | done    | covered | done         | Direct-child cloning and compound injection still need a deeper review         |
 | Slider      | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Validate input semantics and perf                                              |
 | ToggleGroup | in progress | done       | done          | done    | review       | done    | covered | done         | Compound injection path and keyboard-focus contract still need a deeper review |
-| Select      | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | High-risk architecture pass                                                    |
+| Select      | in progress | review     | done          | done    | review       | done    | covered | review       | Context replaces injected props and group rewriting; item metadata still uses collection scanning |
 
 ## Phase 5 — Infrastructure Composites
 
@@ -80,7 +80,7 @@ A component is ready to close when all of the following are true:
 | FocusRing        | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Lock focus-visible contract            |
 | FocusScope       | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Lock trap and restore semantics        |
 | DismissableLayer | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Lock outside-interaction rules         |
-| Field            | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Normalize label/help/error composition |
+| Field            | in progress | review  | done          | done    | done         | done    | covered | review       | Context replaces injected props; wrapper-based Field control API still needs consolidation |
 
 ## Phase 6 — Disclosure Composites
 

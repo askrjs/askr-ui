@@ -4,6 +4,7 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectItemText,
   SelectLabel,
   SelectPortal,
   SelectTrigger,
@@ -51,6 +52,65 @@ describe('Select - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
   });
 
+  it('applies root disabled semantics to the trigger and hidden input', async () => {
+    container = mount(
+      <Select disabled name="framework" defaultValue="askr">
+        <SelectTrigger>
+          <SelectValue placeholder="Choose one" />
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectContent>
+            <SelectItem value="askr">Askr</SelectItem>
+            <SelectItem value="solid">Solid</SelectItem>
+          </SelectContent>
+        </SelectPortal>
+      </Select>
+    );
+
+    const trigger = container.querySelector(
+      '[aria-haspopup="listbox"]'
+    ) as HTMLButtonElement;
+    const input = container.querySelector(
+      'input[type="hidden"]'
+    ) as HTMLInputElement;
+
+    expect(trigger.disabled).toBe(true);
+    expect(trigger.getAttribute('data-disabled')).toBe('true');
+    expect(input.disabled).toBe(true);
+
+    trigger.click();
+    await flushUpdates();
+
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('uses explicit item text values for trigger rendering', () => {
+    container = mount(
+      <Select defaultValue="askr">
+        <SelectTrigger>
+          <SelectValue placeholder="Choose one" />
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectContent>
+            <SelectItem value="askr" textValue="Askr">
+              <SelectItemText>
+                <span>Askr</span>
+              </SelectItemText>
+              <span aria-hidden="true"> Framework</span>
+            </SelectItem>
+            <SelectItem value="solid">Solid</SelectItem>
+          </SelectContent>
+        </SelectPortal>
+      </Select>
+    );
+
+    const trigger = container.querySelector(
+      '[aria-haspopup="listbox"]'
+    ) as HTMLButtonElement;
+
+    expect(trigger.textContent).toBe('Askr');
+  });
+
   it('labels select groups through nested SelectLabel parts', async () => {
     container = mount(
       <Select defaultOpen defaultValue="askr">
@@ -60,7 +120,9 @@ describe('Select - Behavior', () => {
         <SelectPortal>
           <SelectContent>
             <SelectGroup>
-              <SelectLabel>Frameworks</SelectLabel>
+              <div>
+                <SelectLabel>Frameworks</SelectLabel>
+              </div>
               <SelectItem value="askr">Askr</SelectItem>
             </SelectGroup>
           </SelectContent>
