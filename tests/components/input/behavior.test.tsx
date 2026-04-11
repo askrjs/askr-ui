@@ -1,60 +1,74 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
-import { createIsland } from '@askrjs/askr';
 import {
   DebouncedInput,
   Input,
 } from '../../../src/components/primitives/input/input';
-import { flushUpdates } from '../../test-utils';
+import { flushUpdates, mount, unmount } from '../../test-utils';
 
-function mount(element: JSX.Element): HTMLElement {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-  createIsland({
-    root: container,
-    component: () => element,
-  });
-  return container;
-}
-
-function unmount(container: HTMLElement) {
-  if (container.parentNode) {
-    container.parentNode.removeChild(container);
-  }
-}
-
-describe('Input — Behavior', () => {
-  let container: HTMLElement;
+describe('Input - Behavior', () => {
+  let container: HTMLElement | undefined;
 
   afterEach(() => {
     vi.useRealTimers();
-
-    if (container) {
-      unmount(container);
-    }
+    unmount(container);
+    container = undefined;
   });
 
   it('renders a native input by default', () => {
     container = mount(<Input type="email" placeholder="Email" />);
-    const input = container.querySelector('input');
+
+    const input = container.querySelector('input') as HTMLInputElement | null;
+
     expect(input?.getAttribute('type')).toBe('email');
     expect(input?.getAttribute('placeholder')).toBe('Email');
+    expect(input?.getAttribute('data-slot')).toBe('input');
   });
 
   it('applies disabled semantics to native input', () => {
     container = mount(<Input disabled />);
-    const input = container.querySelector('input') as HTMLInputElement;
-    expect(input.disabled).toBe(true);
-    expect(input.getAttribute('aria-disabled')).toBe('true');
+
+    const input = container.querySelector('input') as HTMLInputElement | null;
+
+    expect(input?.disabled).toBe(true);
+    expect(input?.getAttribute('aria-disabled')).toBe('true');
+    expect(input?.getAttribute('data-disabled')).toBe('true');
   });
 
-  it('supports asChild composition', () => {
+  it('supports asChild composition and merges host props', () => {
+    container = mount(
+      <Input asChild data-testid="custom-input" data-from-input="yes">
+        <input aria-label="Email" data-from-child="yes" />
+      </Input>
+    );
+
+    const input = container.querySelector('input') as HTMLInputElement | null;
+
+    expect(input?.getAttribute('data-testid')).toBe('custom-input');
+    expect(input?.getAttribute('data-from-input')).toBe('yes');
+    expect(input?.getAttribute('data-from-child')).toBe('yes');
+    expect(input?.getAttribute('data-slot')).toBe('input');
+  });
+
+  it('applies disabled semantics to asChild hosts', () => {
     container = mount(
       <Input asChild disabled>
         <div role="textbox">Custom input</div>
       </Input>
     );
-    const div = container.querySelector('div');
-    expect(div?.getAttribute('aria-disabled')).toBe('true');
+
+    const host = container.querySelector('[role="textbox"]');
+
+    expect(host?.getAttribute('aria-disabled')).toBe('true');
+    expect(host?.getAttribute('tabindex')).toBe('-1');
+    expect(host?.getAttribute('data-disabled')).toBe('true');
+  });
+
+  it('uses search as the default debounced input type', () => {
+    container = mount(<DebouncedInput aria-label="Search" />);
+
+    const input = container.querySelector('input') as HTMLInputElement | null;
+
+    expect(input?.type).toBe('search');
   });
 
   it('forwards onInput and debounces committed value', async () => {
@@ -110,7 +124,7 @@ describe('Input — Behavior', () => {
     expect(committedValues).toEqual(['northwind']);
   });
 
-  it('should cancel pending debounced input on unmount', () => {
+  it('cancels pending debounced input on unmount', () => {
     vi.useFakeTimers();
 
     const committedValues: string[] = [];
@@ -127,7 +141,7 @@ describe('Input — Behavior', () => {
     input.dispatchEvent(new Event('input', { bubbles: true }));
 
     unmount(container);
-    container = undefined as unknown as HTMLElement;
+    container = undefined;
 
     vi.advanceTimersByTime(250);
 
