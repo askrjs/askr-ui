@@ -10,19 +10,14 @@ import type {
   FieldSelectTriggerProps,
   FieldSwitchProps,
 } from './field-types';
-import type { InjectedFieldProps } from './field-shared';
 import { resolveFieldState } from './field-shared';
 
-export function FieldInput(props: FieldInputProps & InjectedFieldProps) {
+export function FieldInput(props: FieldInputProps) {
   const {
     fieldId,
     invalid,
     required,
     disabled,
-    __fieldId,
-    __fieldInvalid,
-    __fieldRequired,
-    __fieldDisabled,
     ...rest
   } = props;
   const {
@@ -36,10 +31,6 @@ export function FieldInput(props: FieldInputProps & InjectedFieldProps) {
     invalid,
     required,
     disabled,
-    __fieldId,
-    __fieldInvalid,
-    __fieldRequired,
-    __fieldDisabled,
   });
 
   return (
@@ -61,17 +52,13 @@ export function FieldInput(props: FieldInputProps & InjectedFieldProps) {
 }
 
 export function FieldSelectTrigger(
-  props: FieldSelectTriggerProps & InjectedFieldProps
+  props: FieldSelectTriggerProps
 ) {
   const {
     fieldId,
     invalid,
     required,
     disabled,
-    __fieldId,
-    __fieldInvalid,
-    __fieldRequired,
-    __fieldDisabled,
     ...rest
   } = props;
   const {
@@ -85,10 +72,6 @@ export function FieldSelectTrigger(
     invalid,
     required,
     disabled,
-    __fieldId,
-    __fieldInvalid,
-    __fieldRequired,
-    __fieldDisabled,
   });
 
   return (
@@ -108,16 +91,12 @@ export function FieldSelectTrigger(
   );
 }
 
-export function FieldCheckbox(props: FieldCheckboxProps & InjectedFieldProps) {
+export function FieldCheckbox(props: FieldCheckboxProps) {
   const {
     fieldId,
     invalid,
     required,
     disabled,
-    __fieldId,
-    __fieldInvalid,
-    __fieldRequired,
-    __fieldDisabled,
     ...rest
   } = props;
   const {
@@ -131,10 +110,6 @@ export function FieldCheckbox(props: FieldCheckboxProps & InjectedFieldProps) {
     invalid,
     required,
     disabled,
-    __fieldId,
-    __fieldInvalid,
-    __fieldRequired,
-    __fieldDisabled,
   });
 
   return (
@@ -155,16 +130,12 @@ export function FieldCheckbox(props: FieldCheckboxProps & InjectedFieldProps) {
   );
 }
 
-export function FieldSwitch(props: FieldSwitchProps & InjectedFieldProps) {
+export function FieldSwitch(props: FieldSwitchProps) {
   const {
     fieldId,
     invalid,
     required,
     disabled,
-    __fieldId,
-    __fieldInvalid,
-    __fieldRequired,
-    __fieldDisabled,
     ...rest
   } = props;
   const {
@@ -178,10 +149,6 @@ export function FieldSwitch(props: FieldSwitchProps & InjectedFieldProps) {
     invalid,
     required,
     disabled,
-    __fieldId,
-    __fieldInvalid,
-    __fieldRequired,
-    __fieldDisabled,
   });
 
   return (
@@ -203,17 +170,13 @@ export function FieldSwitch(props: FieldSwitchProps & InjectedFieldProps) {
 }
 
 export function FieldRadioGroup(
-  props: FieldRadioGroupProps & InjectedFieldProps
+  props: FieldRadioGroupProps
 ) {
   const {
     fieldId,
     invalid,
     required,
     disabled,
-    __fieldId,
-    __fieldInvalid,
-    __fieldRequired,
-    __fieldDisabled,
     ...rest
   } = props;
   const {
@@ -227,10 +190,6 @@ export function FieldRadioGroup(
     invalid,
     required,
     disabled,
-    __fieldId,
-    __fieldInvalid,
-    __fieldRequired,
-    __fieldDisabled,
   });
 
   return (

@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test';
-import { createIsland } from '@askrjs/askr';
 import {
   Field,
   FieldCheckbox,
@@ -13,31 +12,15 @@ import {
   FieldSwitch,
   Fieldset,
 } from '../../../src/components/composites/field/field';
-import { RadioGroupItem } from '../../../src/components/primitives/radio-group/radio-group';
+import { RadioGroupItem } from '../../../src/components/primitives/radio-group';
+import { mount, unmount } from '../../test-utils';
 
-function mount(element: JSX.Element): HTMLElement {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-  createIsland({
-    root: container,
-    component: () => element,
-  });
-  return container;
-}
-
-function unmount(container: HTMLElement) {
-  if (container.parentNode) {
-    container.parentNode.removeChild(container);
-  }
-}
-
-describe('Field — Behavior', () => {
-  let container: HTMLElement;
+describe('Field - Behavior', () => {
+  let container: HTMLElement | undefined;
 
   afterEach(() => {
-    if (container) {
-      unmount(container);
-    }
+    unmount(container);
+    container = undefined;
   });
 
   it('wires field metadata onto its control', () => {
@@ -62,16 +45,16 @@ describe('Field — Behavior', () => {
     expect(input?.getAttribute('aria-required')).toBe('true');
   });
 
-  it('should allow nested field text when fieldId is explicit', () => {
+  it('wires nested field parts through context without explicit fieldId plumbing', () => {
     container = mount(
       <Field id="alerts">
         <div>
-          <FieldLabel fieldId="alerts">Incident alerts</FieldLabel>
-          <FieldDescription fieldId="alerts">
+          <FieldLabel>Incident alerts</FieldLabel>
+          <FieldDescription>
             Receive critical service incident notifications.
           </FieldDescription>
         </div>
-        <FieldSwitch fieldId="alerts" checked />
+        <FieldSwitch checked />
       </Field>
     );
 
@@ -86,6 +69,31 @@ describe('Field — Behavior', () => {
     expect(switchButton?.getAttribute('aria-describedby')).toBe(
       'alerts-description'
     );
+  });
+
+  it('inherits disabled semantics from fieldset for custom and native controls', () => {
+    container = mount(
+      <Fieldset disabled>
+        <Field id="email">
+          <FieldLabel>Email</FieldLabel>
+          <FieldInput />
+        </Field>
+        <Field id="alerts">
+          <FieldRow>
+            <span>Incident alerts</span>
+            <FieldSwitch checked />
+          </FieldRow>
+        </Field>
+      </Fieldset>
+    );
+
+    const input = container.querySelector('[data-slot="field-input"]') as HTMLInputElement | null;
+    const switchButton = container.querySelector('[data-slot="field-switch"]');
+
+    expect(input?.disabled).toBe(true);
+    expect(input?.getAttribute('data-disabled')).toBe('true');
+    expect(switchButton?.getAttribute('aria-disabled')).toBe('true');
+    expect(switchButton?.getAttribute('data-disabled')).toBe('true');
   });
 
   it('throws when a field subcomponent is rendered without a field', () => {
