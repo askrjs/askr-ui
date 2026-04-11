@@ -234,6 +234,10 @@ export function Menubar(props: MenubarProps) {
       focusSelectedCollectionItem(getCompositeCollection(menubarId), index);
     },
   });
+  const portalHosts: Array<{
+    key: string;
+    Host: ReturnType<typeof getPersistentPortal>;
+  }> = [];
   const enhancedChildren = mapJsxTree(children, (element) => {
     if (element.type !== MenubarMenu) {
       return element;
@@ -242,6 +246,13 @@ export function Menubar(props: MenubarProps) {
     const index = menuIndex;
     menuIndex += 1;
     const menuKey = element.props?.value ?? `menu-${index}`;
+    const portalKey = resolvePartId(menubarId, `portal-${index}`);
+    const portal = getPersistentPortal(portalKey);
+
+    portalHosts.push({
+      key: portalKey,
+      Host: portal,
+    });
 
     return {
       ...element,
@@ -255,9 +266,7 @@ export function Menubar(props: MenubarProps) {
         __setCurrentTriggerIndex: currentTriggerIndexState.set,
         __triggerCount: triggers.length,
         __disabledTriggerIndexes: disabledIndexes(triggers),
-        __portal: getPersistentPortal(
-          resolvePartId(menubarId, `portal-${index}`)
-        ),
+        __portal: portal,
         __menuKey: menuKey,
         __menuIndex: index,
         __triggerId: resolvePartId(menubarId, `trigger-${index}`),
@@ -273,7 +282,14 @@ export function Menubar(props: MenubarProps) {
     'data-menubar': 'true',
   });
 
-  return <div {...finalProps}>{enhancedChildren}</div>;
+  return (
+    <>
+      <div {...finalProps}>{enhancedChildren}</div>
+      {portalHosts.map(({ key, Host }) => (
+        <Host key={key} />
+      ))}
+    </>
+  );
 }
 
 export function MenubarMenu(
@@ -427,9 +443,11 @@ export function MenubarTrigger(
 export function MenubarPortal(
   props: MenubarPortalProps & MenubarMenuInjectedProps
 ): JSX.Element | null {
-  readMenubarMenuInjectedProps(props);
+  const injected = readMenubarMenuInjectedProps(props);
 
-  return <>{props.children}</>;
+  return injected.__portal.render({
+    children: props.children,
+  }) as JSX.Element | null;
 }
 
 function enhanceMenubarContentChildren(

@@ -1,46 +1,37 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test';
-import { createIsland } from '@askrjs/askr';
 import { Label } from '../../../src/components/primitives/label/label';
+import { mount, unmount } from '../../test-utils';
 
-function mount(element: JSX.Element): HTMLElement {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-  createIsland({
-    root: container,
-    component: () => element,
-  });
-  return container;
-}
-
-function unmount(container: HTMLElement) {
-  if (container.parentNode) {
-    container.parentNode.removeChild(container);
-  }
-}
-
-describe('Label — Behavior', () => {
-  let container: HTMLElement;
+describe('Label - Behavior', () => {
+  let container: HTMLElement | undefined;
 
   afterEach(() => {
-    if (container) {
-      unmount(container);
-    }
+    unmount(container);
+    container = undefined;
   });
 
   it('renders a native label by default', () => {
     container = mount(<Label htmlFor="email">Email</Label>);
     const label = container.querySelector('label') as HTMLLabelElement | null;
-    expect(label?.textContent).toBe('Email');
+
     expect(label).toBeTruthy();
+    expect(label?.textContent).toBe('Email');
+    expect(label?.getAttribute('for')).toBe('email');
+    expect(label?.getAttribute('data-slot')).toBe('label');
   });
 
-  it('supports asChild composition', () => {
+  it('supports asChild composition and merges host props', () => {
     container = mount(
-      <Label asChild data-testid="composed-label">
-        <span>Email</span>
+      <Label asChild data-testid="email-label" data-from-label="yes">
+        <span data-from-child="yes">Email</span>
       </Label>
     );
     const span = container.querySelector('span');
-    expect(span?.getAttribute('data-testid')).toBe('composed-label');
+
+    expect(span?.textContent).toBe('Email');
+    expect(span?.getAttribute('data-testid')).toBe('email-label');
+    expect(span?.getAttribute('data-from-label')).toBe('yes');
+    expect(span?.getAttribute('data-from-child')).toBe('yes');
+    expect(span?.getAttribute('data-slot')).toBe('label');
   });
 });

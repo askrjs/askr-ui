@@ -1,8 +1,15 @@
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { defineConfig } from 'vite-plus';
+import type { ESBuildOptions } from 'vite';
 
-const srcRoot = resolve(__dirname, 'src');
+const currentDir = dirname(fileURLToPath(import.meta.url));
+const srcRoot = resolve(currentDir, 'src');
+const jsxEsbuildOptions = {
+  jsx: 'automatic',
+  jsxImportSource: '@askrjs/askr',
+} as ESBuildOptions;
 
 export default defineConfig({
   fmt: {
@@ -12,10 +19,7 @@ export default defineConfig({
     printWidth: 80,
     tabWidth: 2,
   },
-  esbuild: {
-    jsx: 'automatic',
-    jsxImportSource: '@askrjs/askr',
-  },
+  esbuild: jsxEsbuildOptions,
   build: {
     minify: false,
     sourcemap: true,
