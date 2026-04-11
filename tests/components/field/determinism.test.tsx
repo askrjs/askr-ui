@@ -10,6 +10,7 @@ import {
   FieldRadioGroup,
   FieldRow,
   FieldSwitch,
+  FieldTextarea,
   Fieldset,
 } from '../../../src/components/composites/field/field';
 import { RadioGroupItem } from '../../../src/components/primitives/radio-group/radio-group';
@@ -25,6 +26,10 @@ describe('Field - Determinism', () => {
           <FieldInput />
           <FieldDescription>Used for login</FieldDescription>
           <FieldError>Required</FieldError>
+        </Field>
+        <Field id="bio">
+          <FieldLabel>Bio</FieldLabel>
+          <FieldTextarea />
         </Field>
         <Field id="updates">
           <FieldRow>

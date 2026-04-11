@@ -65,12 +65,12 @@ A component is ready to close when all of the following are true:
 | Component   | Status      | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf    | Docs/Exports | Notes                                                                          |
 | ----------- | ----------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | ------------------------------------------------------------------------------ |
 | Textarea    | in progress | review     | done          | review  | review       | done    | covered | done         | Shares Input's field-control `asChild` question                                |
-| Checkbox    | in progress | review     | done          | done    | review       | done    | covered | done         | Controlled-only API and manual `asChild` interaction still diverge from Switch |
+| Checkbox    | in progress | done       | done          | done    | review       | done    | covered | done         | Controlled and uncontrolled parity now matches Switch; `asChild` still uses bespoke interaction wiring |
 | Switch      | in progress | done       | done          | done    | review       | done    | covered | done         | Uncontrolled rendering after press still needs deeper follow-up                |
 | Toggle      | done        | done       | done          | done    | done         | done    | covered | done         | Pressed-state contract and `asChild` semantics locked                          |
-| RadioGroup  | in progress | done       | done          | done    | review       | done    | covered | done         | Direct-child cloning and compound injection still need a deeper review         |
+| RadioGroup  | in progress | done       | done          | done    | review       | done    | covered | done         | Context replaces cloned item injection and the file is split; root still scans item metadata pending shared collection cleanup |
 | Slider      | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Validate input semantics and perf                                              |
-| ToggleGroup | in progress | done       | done          | done    | review       | done    | covered | done         | Compound injection path and keyboard-focus contract still need a deeper review |
+| ToggleGroup | in progress | done       | done          | done    | review       | done    | covered | done         | Context replaces item injection and the file is split; root still scans item metadata pending shared collection cleanup |
 | Select      | in progress | review     | done          | done    | review       | done    | covered | review       | Context replaces injected props and group rewriting; item metadata still uses collection scanning |
 
 ## Phase 5 — Infrastructure Composites
@@ -80,7 +80,7 @@ A component is ready to close when all of the following are true:
 | FocusRing        | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Lock focus-visible contract            |
 | FocusScope       | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Lock trap and restore semantics        |
 | DismissableLayer | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Lock outside-interaction rules         |
-| Field            | in progress | review  | done          | done    | done         | done    | covered | review       | Context replaces injected props; wrapper-based Field control API still needs consolidation |
+| Field            | in progress | review  | done          | done    | done         | done    | covered | review       | Context replaces injected props; FieldTextarea and a shared control adapter now consolidate the wrapper layer |
 
 ## Phase 6 — Disclosure Composites
 

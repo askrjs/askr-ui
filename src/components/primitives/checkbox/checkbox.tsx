@@ -1,4 +1,4 @@
-import { Slot, mergeProps } from '@askrjs/askr/foundations';
+import { Slot, controllableState, mergeProps } from '@askrjs/askr/foundations';
 import type {
   CheckboxInputProps,
   CheckboxAsChildProps,
@@ -11,16 +11,16 @@ import type {
  * ## Responsibilities
  * - Apply aria-checked for checkbox state signaling
  * - Handle indeterminate state for native and asChild hosts
+ * - Support controlled and uncontrolled checked state
  * - Forward props and refs to native input or child element
  * - Preserve native checkbox semantics and apply checkbox behavior to asChild hosts
  *
  * ## Non-Responsibilities
- * - Checked state ownership (consumer manages state)
  * - Form submission orchestration beyond native input props
  *
  * ## Invariants
  * - MUST NOT add role="button" (native inputs are role="checkbox")
- * - checked state is CONTROLLED (consumer manages state)
+ * - checked state may be controlled or uncontrolled
  * - indeterminate overrides checked for state signaling
  * - For asChild, consumer MUST provide role="checkbox"
  *
@@ -51,7 +51,9 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
     asChild,
     children,
     onPress,
-    checked = false,
+    checked,
+    defaultChecked = false,
+    onCheckedChange,
     indeterminate = false,
     disabled = false,
     required = false,
@@ -61,10 +63,32 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
     ...rest
   } = props;
 
-  const ariaChecked = indeterminate ? 'mixed' : checked ? 'true' : 'false';
+  const checkedState = controllableState({
+    value: checked,
+    defaultValue: defaultChecked,
+    onChange: onCheckedChange,
+  });
+  const isControlled = checked !== undefined;
+
+  const toggleChecked = (event: PressEvent) => {
+    onPress?.(event);
+
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    checkedState.set(!checkedState());
+  };
+
+  const currentChecked = checkedState();
+  const ariaChecked = indeterminate
+    ? 'mixed'
+    : currentChecked
+      ? 'true'
+      : 'false';
   const dataState = indeterminate
     ? 'indeterminate'
-    : checked
+    : currentChecked
       ? 'checked'
       : 'unchecked';
 
@@ -77,26 +101,39 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
       : {
           onClick: onPress
             ? (e: Event) => {
-                onPress(e as PressEvent);
+                toggleChecked(e as PressEvent);
               }
-            : undefined,
+            : (e: Event) => {
+                toggleChecked(e as PressEvent);
+              },
           onKeyDown: onPress
             ? (e: KeyboardEvent) => {
                 if (e.key === ' ') {
                   e.preventDefault();
                 }
                 if (e.key === 'Enter') {
-                  onPress(e as unknown as PressEvent);
+                  toggleChecked(e as unknown as PressEvent);
                 }
               }
-            : undefined,
+            : (e: KeyboardEvent) => {
+                if (e.key === ' ') {
+                  e.preventDefault();
+                }
+                if (e.key === 'Enter') {
+                  toggleChecked(e as unknown as PressEvent);
+                }
+              },
           onKeyUp: onPress
             ? (e: KeyboardEvent) => {
                 if (e.key === ' ') {
-                  onPress(e as unknown as PressEvent);
+                  toggleChecked(e as unknown as PressEvent);
                 }
               }
-            : undefined,
+            : (e: KeyboardEvent) => {
+                if (e.key === ' ') {
+                  toggleChecked(e as unknown as PressEvent);
+                }
+              },
           tabIndex: 0,
         };
 
@@ -114,9 +151,16 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
 
   const finalProps = mergeProps(rest, {
     ref,
-    onClick: onPress
+    onClick: (e: Event) => {
+      toggleChecked(e as PressEvent);
+
+      if (isControlled) {
+        (e.currentTarget as HTMLInputElement).checked = checkedState();
+      }
+    },
+    onChange: isControlled
       ? (e: Event) => {
-          onPress(e as PressEvent);
+          (e.currentTarget as HTMLInputElement).checked = checkedState();
         }
       : undefined,
     'aria-checked': indeterminate ? undefined : ariaChecked,
@@ -129,7 +173,7 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
   return (
     <input
       type="checkbox"
-      checked={checked}
+      checked={currentChecked}
       indeterminate={indeterminate}
       disabled={disabled}
       required={required}

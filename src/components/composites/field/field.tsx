@@ -6,6 +6,7 @@ import {
   FieldRadioGroup,
   FieldSelectTrigger,
   FieldSwitch,
+  FieldTextarea,
 } from './field-controls';
 
 export {
@@ -20,5 +21,6 @@ export {
   FieldRow,
   FieldSelectTrigger,
   FieldSwitch,
+  FieldTextarea,
   Fieldset,
 };

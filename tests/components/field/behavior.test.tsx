@@ -10,6 +10,7 @@ import {
   FieldRadioGroup,
   FieldRow,
   FieldSwitch,
+  FieldTextarea,
   Fieldset,
 } from '../../../src/components/composites/field/field';
 import { RadioGroupItem } from '../../../src/components/primitives/radio-group';
@@ -43,6 +44,26 @@ describe('Field - Behavior', () => {
     );
     expect(input?.getAttribute('aria-invalid')).toBe('true');
     expect(input?.getAttribute('aria-required')).toBe('true');
+  });
+
+  it('wires textarea metadata through the field API', () => {
+    container = mount(
+      <Field id="bio" invalid required>
+        <FieldLabel>Bio</FieldLabel>
+        <FieldTextarea />
+        <FieldDescription>Tell people about your role.</FieldDescription>
+        <FieldError>Bio is required</FieldError>
+      </Field>
+    );
+
+    const textarea = container.querySelector('textarea');
+
+    expect(textarea?.getAttribute('id')).toBe('bio-control');
+    expect(textarea?.getAttribute('aria-describedby')).toBe(
+      'bio-description bio-error'
+    );
+    expect(textarea?.getAttribute('aria-invalid')).toBe('true');
+    expect(textarea?.getAttribute('aria-required')).toBe('true');
   });
 
   it('wires nested field parts through context without explicit fieldId plumbing', () => {

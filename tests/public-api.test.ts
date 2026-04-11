@@ -86,6 +86,7 @@ describe('Public API', () => {
     expect(primitiveButton.Button).toBeDefined();
     expect(compositeField.Field).toBeDefined();
     expect(compositeField.FieldInput).toBeDefined();
+    expect(compositeField.FieldTextarea).toBeDefined();
     expect(patternDataTable.DataTableRoot).toBeDefined();
     expect(patternDataTable.createDataTable).toBeDefined();
   });

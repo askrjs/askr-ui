@@ -66,6 +66,32 @@ describe('RadioGroup - Behavior', () => {
     );
   });
 
+  it('supports nested radio items without relying on direct child cloning', async () => {
+    container = mount(
+      <RadioGroup name="size" defaultValue="small">
+        <div>
+          <RadioGroupItem value="small">Small</RadioGroupItem>
+        </div>
+        <div>
+          <RadioGroupItem value="medium">Medium</RadioGroupItem>
+        </div>
+      </RadioGroup>
+    );
+
+    getRadioByText(container, 'Medium').click();
+    await flushUpdates();
+
+    expect(getRadioByText(container, 'Small').getAttribute('aria-checked')).toBe(
+      'false'
+    );
+    expect(getRadioByText(container, 'Medium').getAttribute('aria-checked')).toBe(
+      'true'
+    );
+    expect(container.querySelector('input[type="hidden"]')?.getAttribute('value')).toBe(
+      'medium'
+    );
+  });
+
   it('treats value as controlled state when provided', async () => {
     const onValueChange = vi.fn();
 
