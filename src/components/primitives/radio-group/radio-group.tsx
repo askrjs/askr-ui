@@ -21,6 +21,7 @@ type InjectedRadioGroupItemProps = {
   __itemIndex?: number;
   __itemCount?: number;
   __itemValues?: string[];
+  __disabledIndexes?: number[];
 };
 
 function isJsxElement(value: unknown): value is JSXElement {
@@ -37,6 +38,17 @@ function toChildArray(children: unknown): unknown[] {
     return children;
   }
   return children === undefined || children === null ? [] : [children];
+}
+
+function firstEnabledIndex(items: Array<{ disabled: boolean }>): number {
+  const index = items.findIndex((item) => !item.disabled);
+  return index === -1 ? 0 : index;
+}
+
+function disabledIndexes(items: Array<{ disabled: boolean }>): number[] {
+  return items
+    .map((item, index) => (item.disabled ? index : -1))
+    .filter((index) => index !== -1);
 }
 
 function cloneRadioItemChild(
@@ -83,15 +95,23 @@ export function RadioGroup(props: RadioGroupProps) {
     (child): child is JSXElement =>
       isJsxElement(child) && child.type === RadioGroupItem
   );
-  const itemValues = itemChildren.map((child) =>
-    String(child.props.value ?? '')
-  );
-  const currentIndex = Math.max(0, itemValues.indexOf(currentValue()));
+  const itemMetadata = itemChildren.map((child) => ({
+    value: String(child.props.value ?? ''),
+    disabled: disabled || Boolean(child.props.disabled),
+  }));
+  const itemValues = itemMetadata.map((item) => item.value);
+  const disabledItemIndexes = disabledIndexes(itemMetadata);
+  const selectedIndex = itemValues.indexOf(currentValue());
+  const currentIndex =
+    selectedIndex >= 0 && !itemMetadata[selectedIndex]?.disabled
+      ? selectedIndex
+      : firstEnabledIndex(itemMetadata);
   const nav = rovingFocus({
     currentIndex,
     itemCount: Math.max(itemValues.length, 1),
     orientation,
     loop,
+    isDisabled: (index) => disabledItemIndexes.includes(index),
     onNavigate: (index) => {
       const next = itemValues[index];
       if (next) {
@@ -110,6 +130,7 @@ export function RadioGroup(props: RadioGroupProps) {
       __itemIndex: index,
       __itemCount: itemValues.length,
       __itemValues: itemValues,
+      __disabledIndexes: disabledItemIndexes,
     })
   );
 
@@ -159,6 +180,7 @@ export function RadioGroupItem(
     __itemIndex = 0,
     __itemCount = 1,
     __itemValues = [value],
+    __disabledIndexes = [],
     ...rest
   } = props;
 
@@ -173,6 +195,7 @@ export function RadioGroupItem(
     itemCount: Math.max(__itemCount, 1),
     orientation: __groupOrientation,
     loop: __groupLoop,
+    isDisabled: (index) => __disabledIndexes.includes(index),
     onNavigate: (nextIndex) => {
       const next = __itemValues[nextIndex];
       if (next) {
@@ -196,6 +219,7 @@ export function RadioGroupItem(
     'data-slot': 'radio-group-item',
     'data-disabled': __groupDisabled || disabled ? 'true' : undefined,
     'data-state': checked ? 'checked' : 'unchecked',
+    tabIndex: (__groupDisabled || disabled) && asChild ? -1 : undefined,
     value,
   });
 

@@ -147,12 +147,17 @@ export function ToggleGroup(props: ToggleGroupProps) {
   const selectedIndex = items.findIndex((item) =>
     isDisclosureValueOpen(type, valueState(), item.value)
   );
+  const initialCurrentIndex =
+    selectedIndex >= 0 && !items[selectedIndex]?.disabled
+      ? selectedIndex
+      : firstEnabledCompositeIndex(items);
   const currentIndexState = state(
-    selectedIndex >= 0 ? selectedIndex : firstEnabledCompositeIndex(items)
+    initialCurrentIndex
   );
-  const currentIndex = items[currentIndexState()]
-    ? currentIndexState()
-    : firstEnabledCompositeIndex(items);
+  const currentIndex =
+    items[currentIndexState()] && !items[currentIndexState()]?.disabled
+      ? currentIndexState()
+      : firstEnabledCompositeIndex(items);
   let itemIndex = 0;
   const enhancedChildren = mapJsxTree(children, (element) => {
     if (element.type !== ToggleGroupItem) {
@@ -319,6 +324,7 @@ export function ToggleGroupItem(
     'data-slot': 'toggle-group-item',
     'data-state': pressed ? 'on' : 'off',
     'data-disabled': isDisabled ? 'true' : undefined,
+    tabIndex: isDisabled && asChild ? -1 : undefined,
   });
 
   if (asChild) {
