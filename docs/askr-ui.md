@@ -18,7 +18,7 @@ visual styling. Pair it with `askr-themes` for visual defaults, or supply your o
 | Status     | Badge, Progress, ProgressCircle, Toast, Skeleton, Spinner                                                                           | `@askrjs/askr-ui` or bucketed subpaths |
 | Identity   | Avatar                                                                                                                              | `@askrjs/askr-ui` or `@askrjs/askr-ui/primitives/*` |
 | Navigation | Breadcrumb, Pagination, Menubar, NavigationMenu                                                                                     | `@askrjs/askr-ui` or `@askrjs/askr-ui/composites/*` |
-| Layout     | Container, Stack, Inline, Grid, Center, Spacer, SidebarLayout, TopbarLayout, DataTable                                              | `@askrjs/askr-ui` or bucketed subpaths |
+| Layout     | Container, Flex, Grid, Spacer, SidebarLayout, TopbarLayout, DataTable                                              | `@askrjs/askr-ui` or bucketed subpaths |
 
 ## Import style
 

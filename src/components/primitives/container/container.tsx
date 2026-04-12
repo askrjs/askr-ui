@@ -11,8 +11,6 @@ export function Container(props: ContainerDivProps | ContainerAsChildProps) {
   const {
     asChild,
     children,
-    centered = true,
-    fluid = true,
     maxWidth,
     padding,
     size,
@@ -23,19 +21,17 @@ export function Container(props: ContainerDivProps | ContainerAsChildProps) {
 
   const layoutStyle: Record<string, string | number> = {
     boxSizing: 'border-box',
+    width: '100%',
+    marginInline: 'auto',
   };
-  if (fluid) layoutStyle.width = '100%';
   if (isCssLength(maxWidth)) layoutStyle.maxWidth = maxWidth!;
   if (isCssLength(padding)) layoutStyle.paddingInline = padding!;
-  if (centered) layoutStyle.marginInline = 'auto';
 
   const finalProps = mergeProps(rest, {
     ref,
     'data-slot': 'container',
     'data-max-width': maxWidth,
     'data-padding': padding,
-    'data-centered': centered !== undefined ? String(centered) : undefined,
-    'data-fluid': fluid !== undefined ? String(fluid) : undefined,
     'data-size': size,
     style: mergeLayoutStyles(layoutStyle, userStyle),
   });

@@ -140,23 +140,17 @@ import {
   type TooltipTriggerAsChildProps,
   type TooltipTriggerProps,
   Container,
-  Stack,
-  Inline,
+  Flex,
   Grid,
-  Center,
   Spacer,
   SidebarLayout,
   TopbarLayout,
   type ContainerProps,
   type ContainerAsChildProps,
-  type StackProps,
-  type StackAsChildProps,
-  type InlineProps,
-  type InlineAsChildProps,
+  type FlexProps,
+  type FlexAsChildProps,
   type GridProps,
   type GridAsChildProps,
-  type CenterProps,
-  type CenterAsChildProps,
   type SpacerProps,
   type SpacerAsChildProps,
   type SidebarLayoutProps,
@@ -177,10 +171,8 @@ import { Switch as SwitchSubpath } from '@askrjs/askr-ui/primitives/switch';
 import { Toggle as ToggleSubpath } from '@askrjs/askr-ui/primitives/toggle';
 import { Tooltip as TooltipSubpath } from '@askrjs/askr-ui/composites/tooltip';
 import { Container as ContainerSubpath } from '@askrjs/askr-ui/primitives/container';
-import { Stack as StackSubpath } from '@askrjs/askr-ui/primitives/stack';
-import { Inline as InlineSubpath } from '@askrjs/askr-ui/primitives/inline';
+import { Flex as FlexSubpath } from '@askrjs/askr-ui/primitives/flex';
 import { Grid as GridSubpath } from '@askrjs/askr-ui/primitives/grid';
-import { Center as CenterSubpath } from '@askrjs/askr-ui/primitives/center';
 import { Spacer as SpacerSubpath } from '@askrjs/askr-ui/primitives/spacer';
 import { SidebarLayout as SidebarLayoutSubpath } from '@askrjs/askr-ui/patterns/sidebar-layout';
 import { TopbarLayout as TopbarLayoutSubpath } from '@askrjs/askr-ui/patterns/topbar-layout';
@@ -207,10 +199,8 @@ const radioGroupItemFromRoot: typeof RadioGroupItem = RadioGroupItem;
 const switchFromSubpath: typeof Switch = SwitchSubpath;
 const toggleFromSubpath: typeof Toggle = ToggleSubpath;
 const containerFromSubpath: typeof Container = ContainerSubpath;
-const stackFromSubpath: typeof Stack = StackSubpath;
-const inlineFromSubpath: typeof Inline = InlineSubpath;
+const flexFromSubpath: typeof Flex = FlexSubpath;
 const gridFromSubpath: typeof Grid = GridSubpath;
-const centerFromSubpath: typeof Center = CenterSubpath;
 const spacerFromSubpath: typeof Spacer = SpacerSubpath;
 const sidebarLayoutFromSubpath: typeof SidebarLayout = SidebarLayoutSubpath;
 const topbarLayoutFromSubpath: typeof TopbarLayout = TopbarLayoutSubpath;
@@ -223,23 +213,13 @@ const containerAsChildProps: ContainerAsChildProps = {
   asChild: true,
   children: slotChild,
 };
-const stackProps: StackProps = { gap: '1rem' };
-const stackAsChildProps: StackAsChildProps = {
-  asChild: true,
-  children: slotChild,
-};
-const inlineProps: InlineProps = { gap: '0.5rem' };
-const inlineAsChildProps: InlineAsChildProps = {
+const flexProps: FlexProps = { gap: '1rem' };
+const flexAsChildProps: FlexAsChildProps = {
   asChild: true,
   children: slotChild,
 };
 const gridProps: GridProps = { columns: 3 };
 const gridAsChildProps: GridAsChildProps = {
-  asChild: true,
-  children: slotChild,
-};
-const centerProps: CenterProps = { axis: 'both' };
-const centerAsChildProps: CenterAsChildProps = {
   asChild: true,
   children: slotChild,
 };
@@ -676,31 +656,23 @@ void [
   selectItemAsChildProps,
   fieldProps,
   containerFromSubpath,
-  stackFromSubpath,
-  inlineFromSubpath,
+  flexFromSubpath,
   gridFromSubpath,
-  centerFromSubpath,
   spacerFromSubpath,
   sidebarLayoutFromSubpath,
   topbarLayoutFromSubpath,
   Container,
-  Stack,
-  Inline,
+  Flex,
   Grid,
-  Center,
   Spacer,
   SidebarLayout,
   TopbarLayout,
   containerProps,
   containerAsChildProps,
-  stackProps,
-  stackAsChildProps,
-  inlineProps,
-  inlineAsChildProps,
+  flexProps,
+  flexAsChildProps,
   gridProps,
   gridAsChildProps,
-  centerProps,
-  centerAsChildProps,
   spacerProps,
   spacerAsChildProps,
   sidebarLayoutProps,

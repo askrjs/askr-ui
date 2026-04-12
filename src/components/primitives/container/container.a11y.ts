@@ -3,8 +3,6 @@ export const CONTAINER_A11Y_CONTRACT = {
     slot: 'data-slot' as const,
     maxWidth: 'data-max-width' as const,
     padding: 'data-padding' as const,
-    centered: 'data-centered' as const,
-    fluid: 'data-fluid' as const,
     size: 'data-size' as const,
   },
   SLOT_VALUES: {

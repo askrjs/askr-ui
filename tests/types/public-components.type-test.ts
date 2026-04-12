@@ -124,18 +124,14 @@ import {
   type ToggleGroupMultipleProps,
   type ToggleGroupSingleProps,
   Container,
-  Stack,
-  Inline,
+  Flex,
   Grid,
-  Center,
   Spacer,
   SidebarLayout,
   TopbarLayout,
   type ContainerProps,
-  type StackProps,
-  type InlineProps,
+  type FlexProps,
   type GridProps,
-  type CenterProps,
   type SpacerProps,
   type SidebarLayoutProps,
   type TopbarLayoutProps,
@@ -157,10 +153,8 @@ import { Tabs as TabsSubpath } from '@askrjs/askr-ui/composites/tabs';
 import { ToastProvider as ToastSubpath } from '@askrjs/askr-ui/composites/toast';
 import { ToggleGroup as ToggleGroupSubpath } from '@askrjs/askr-ui/primitives/toggle-group';
 import { Container as ContainerSubpath } from '@askrjs/askr-ui/primitives/container';
-import { Stack as StackSubpath } from '@askrjs/askr-ui/primitives/stack';
-import { Inline as InlineSubpath } from '@askrjs/askr-ui/primitives/inline';
+import { Flex as FlexSubpath } from '@askrjs/askr-ui/primitives/flex';
 import { Grid as GridSubpath } from '@askrjs/askr-ui/primitives/grid';
-import { Center as CenterSubpath } from '@askrjs/askr-ui/primitives/center';
 import { Spacer as SpacerSubpath } from '@askrjs/askr-ui/primitives/spacer';
 import { SidebarLayout as SidebarLayoutSubpath } from '@askrjs/askr-ui/patterns/sidebar-layout';
 import { TopbarLayout as TopbarLayoutSubpath } from '@askrjs/askr-ui/patterns/topbar-layout';
@@ -186,22 +180,15 @@ const toggleGroupFromSubpath: typeof ToggleGroup = ToggleGroupSubpath;
 const menubarFromRoot: typeof Menubar = askrUi.Menubar;
 const navigationMenuFromRoot: typeof NavigationMenu = askrUi.NavigationMenu;
 const containerFromSubpath: typeof Container = ContainerSubpath;
-const stackFromSubpath: typeof Stack = StackSubpath;
-const inlineFromSubpath: typeof Inline = InlineSubpath;
+const flexFromSubpath: typeof Flex = FlexSubpath;
 const gridFromSubpath: typeof Grid = GridSubpath;
-const centerFromSubpath: typeof Center = CenterSubpath;
 const spacerFromSubpath: typeof Spacer = SpacerSubpath;
 const sidebarLayoutFromSubpath: typeof SidebarLayout = SidebarLayoutSubpath;
 const topbarLayoutFromSubpath: typeof TopbarLayout = TopbarLayoutSubpath;
 
 const containerLayoutProps: ContainerProps = { maxWidth: '64rem' };
-const stackLayoutProps: StackProps = { gap: '1rem', align: 'center' };
-const inlineLayoutProps: InlineProps = { gap: '0.5rem', wrap: 'wrap' };
+const flexLayoutProps: FlexProps = { gap: '1rem', align: 'center' };
 const gridLayoutProps: GridProps = { columns: 3, gap: '1rem' };
-const centerLayoutProps: CenterProps = {
-  axis: 'horizontal',
-  minHeight: '100vh',
-};
 const spacerLayoutProps: SpacerProps = { grow: 1 };
 const sidebarLayoutLayoutProps: SidebarLayoutProps = {
   sidebarWidth: '20rem',
@@ -540,26 +527,20 @@ void [
   toastCloseAsChildProps,
   sliderProps,
   containerFromSubpath,
-  stackFromSubpath,
-  inlineFromSubpath,
+  flexFromSubpath,
   gridFromSubpath,
-  centerFromSubpath,
   spacerFromSubpath,
   sidebarLayoutFromSubpath,
   topbarLayoutFromSubpath,
   Container,
-  Stack,
-  Inline,
+  Flex,
   Grid,
-  Center,
   Spacer,
   SidebarLayout,
   TopbarLayout,
   containerLayoutProps,
-  stackLayoutProps,
-  inlineLayoutProps,
+  flexLayoutProps,
   gridLayoutProps,
-  centerLayoutProps,
   spacerLayoutProps,
   sidebarLayoutLayoutProps,
   topbarLayoutLayoutProps,
