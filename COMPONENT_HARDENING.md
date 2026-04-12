@@ -2,6 +2,73 @@
 
 This file tracks the component-by-component hardening program.
 
+## Operating Mode
+
+This document is now the execution control plane for hardening, not just a status board.
+
+- Sequencing strategy: risk-first.
+- Timeline strategy: quality-driven (no fixed deadline).
+- Closure strategy: evidence-based only.
+
+## Current Inventory
+
+The current hardening scope is the exported surface from `src/components/index.ts` and `tests/public-api.test.ts`.
+
+- Primitives: 23
+- Composites: 18
+- Patterns: 3
+- Total shipping surface tracked here: 44 component families
+
+Do not add scorecard rows for removed or non-exported components.
+
+## World-Class Policies
+
+### Performance Budget Policy
+
+- Every component pass must either:
+	- include benchmark coverage for its hot paths, or
+	- record a temporary waiver with rationale and expiry date.
+- Any benchmarked component that regresses by more than 10% from the prior accepted baseline is blocked from closing until investigated.
+- Perf budgets are enforced at category level:
+	- Presentational and layout primitives: stable mount/update path with no avoidable work spikes.
+	- Form and selection primitives: stable interaction throughput under repeated input events.
+	- Overlay and navigation composites: stable open/close and item navigation paths.
+	- Pattern components: explicit scenario benchmarks for realistic row/layout counts.
+
+### API Stability Policy
+
+- After a component reaches done, only the following changes are allowed without deprecation:
+	- additive non-breaking props,
+	- additive data attributes,
+	- bug fixes that preserve documented behavior.
+- Breaking API or semantic behavior changes require:
+	- a deprecation note in docs,
+	- migration guidance,
+	- updated type tests and contract tests,
+	- explicit sign-off in this file notes.
+- Public API, docs, and type contract parity is mandatory before close.
+
+## Global Phase Gates
+
+No phase can close unless all gates below are green:
+
+1. Build gate: npm run build
+2. Test gate: npm test
+3. Type gate: npm run test:types
+4. API contract gate: tests/public-api.test.ts and tests/types/public-api.type-test.ts
+5. Docs contract gate: tests/docs-contract.test.ts
+6. Performance gate: benchmark evidence or active waiver record per component
+
+## Execution Metadata
+
+Each component row must be backed by execution metadata in notes (or linked issue) before closure:
+
+- Risk tier: high, medium, low
+- Dependency state: clear, blocked-dependency, blocked-architecture, blocked-decision
+- Workstream owner
+- Last reviewed date
+- Evidence links (tests, bench output, docs/export updates)
+
 ## Done Bar
 
 A component is ready to close when all of the following are true:
@@ -14,19 +81,89 @@ A component is ready to close when all of the following are true:
 - Performance coverage is present for hot paths or explicitly tracked as a gap.
 - Docs and exports stay aligned with the public surface.
 
+## Ready-To-Close Evidence
+
+Before changing a component status to done, capture all of the following:
+
+1. Contract: behavior and accessibility assertions updated for current semantics.
+2. Determinism: deterministic render and interaction guarantees verified.
+3. Performance: benchmark proof or waiver with expiry.
+4. Surface: public API exports, docs imports, and type tests aligned.
+5. Notes: open decisions resolved or explicitly tracked as blockers.
+
 ## Workflow
 
 1. Standardize
 2. Test
 3. Optimize
-4. Ready to commit
+4. Verify gates
+5. Ready to commit
 
 ## Status Legend
 
 - `pending`: not started
 - `in progress`: active component pass
 - `done`: pass complete
-- `blocked`: waiting on a dependency or follow-up decision
+- `blocked`: legacy blocked marker (prefer scoped blocked states)
+- `blocked-dependency`: waiting on another component or shared primitive
+- `blocked-architecture`: waiting on architecture decision or refactor pattern
+- `blocked-decision`: waiting on product/API semantics decision
+
+## Dependency Map
+
+- Dialog -> AlertDialog
+- FocusScope + DismissableLayer -> Dialog, Popover, Tooltip, NavigationMenu
+- Popover + Menu-family overlay semantics -> NavigationMenu
+- Collapsible -> Accordion
+- Collapsible + collection patterns -> Tabs hardening close
+- Field control adapter decision -> Input, Textarea, Checkbox, Switch
+
+## Risk-First Execution Queue
+
+### Track A: Architecture Unblockers
+
+1. Input and Textarea field-control asChild decision
+2. Checkbox and Switch uncontrolled semantics lock
+3. Determinism rules for delayed and async overlay interactions
+
+### Track B: High-Risk Composites
+
+1. Dialog
+2. AlertDialog
+3. Popover
+4. Tooltip
+5. NavigationMenu
+
+### Track C: Parallel Low-Risk Closures
+
+1. Spinner
+2. Skeleton
+3. Avatar
+4. Progress
+5. ProgressCircle
+6. VisuallyHidden
+
+## Waiver Record Template
+
+Use this format when a component cannot immediately satisfy a gate:
+
+- Component:
+- Gate:
+- Reason:
+- Mitigation in place:
+- Expiry date:
+- Owner:
+- Follow-up issue:
+
+## Weekly Governance Loop
+
+Run this loop every week until all phases are complete:
+
+1. Re-rank high-risk components and blockers.
+2. Validate dependency map against current work.
+3. Verify gate evidence for components moved to done.
+4. Expire or renew waivers with explicit rationale.
+5. Update notes with resolved decisions and regressions.
 
 ## Phase 1 — Reference Primitives
 
@@ -53,12 +190,10 @@ A component is ready to close when all of the following are true:
 
 | Component | Status  | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf | Docs/Exports | Notes                                 |
 | --------- | ------- | ---------- | ------------- | ------- | ------------ | ------- | ---- | ------------ | ------------------------------------- |
-| Center    | pending | pending    | pending       | pending | pending      | pending | gap  | pending      | Add or justify missing bench coverage |
+| Flex      | pending | pending    | pending       | pending | pending      | pending | gap  | pending      | Add or justify missing bench coverage |
 | Container | pending | pending    | pending       | pending | pending      | pending | gap  | pending      | Add or justify missing bench coverage |
-| Inline    | pending | pending    | pending       | pending | pending      | pending | gap  | pending      | Add or justify missing bench coverage |
 | Grid      | pending | pending    | pending       | pending | pending      | pending | gap  | pending      | Add or justify missing bench coverage |
 | Spacer    | pending | pending    | pending       | pending | pending      | pending | gap  | pending      | Add or justify missing bench coverage |
-| Stack     | pending | pending    | pending       | pending | pending      | pending | gap  | pending      | Add or justify missing bench coverage |
 
 ## Phase 4 — Form And Selection Primitives
 

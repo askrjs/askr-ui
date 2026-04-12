@@ -49,18 +49,27 @@ describe('Input - Behavior', () => {
     expect(input?.getAttribute('data-slot')).toBe('input');
   });
 
-  it('applies disabled semantics to asChild hosts', () => {
+  it('applies native disabled semantics to asChild input hosts', () => {
     container = mount(
       <Input asChild disabled>
-        <div role="textbox">Custom input</div>
+        <input aria-label="Email" />
       </Input>
     );
 
-    const host = container.querySelector('[role="textbox"]');
+    const host = container.querySelector('input') as HTMLInputElement | null;
 
-    expect(host?.getAttribute('aria-disabled')).toBe('true');
-    expect(host?.getAttribute('tabindex')).toBe('-1');
+    expect(host?.disabled).toBe(true);
     expect(host?.getAttribute('data-disabled')).toBe('true');
+  });
+
+  it('fails loudly when asChild does not receive a native input host', () => {
+    expect(() =>
+      mount(
+        <Input asChild>
+          <div role="textbox">Custom input</div>
+        </Input>
+      )
+    ).toThrow('Input `asChild` requires a native <input> host.');
   });
 
   it('uses search as the default debounced input type', () => {

@@ -1,4 +1,9 @@
-import { Slot, controllableState, mergeProps } from '@askrjs/askr/foundations';
+import {
+  Slot,
+  controllableState,
+  mergeProps,
+  pressable,
+} from '@askrjs/askr/foundations';
 import type {
   CheckboxInputProps,
   CheckboxAsChildProps,
@@ -93,49 +98,11 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
       : 'unchecked';
 
   if (asChild) {
-    const interactionProps = disabled
-      ? {
-          'aria-disabled': 'true' as const,
-          tabIndex: -1,
-        }
-      : {
-          onClick: onPress
-            ? (e: Event) => {
-                toggleChecked(e as PressEvent);
-              }
-            : (e: Event) => {
-                toggleChecked(e as PressEvent);
-              },
-          onKeyDown: onPress
-            ? (e: KeyboardEvent) => {
-                if (e.key === ' ') {
-                  e.preventDefault();
-                }
-                if (e.key === 'Enter') {
-                  toggleChecked(e as unknown as PressEvent);
-                }
-              }
-            : (e: KeyboardEvent) => {
-                if (e.key === ' ') {
-                  e.preventDefault();
-                }
-                if (e.key === 'Enter') {
-                  toggleChecked(e as unknown as PressEvent);
-                }
-              },
-          onKeyUp: onPress
-            ? (e: KeyboardEvent) => {
-                if (e.key === ' ') {
-                  toggleChecked(e as unknown as PressEvent);
-                }
-              }
-            : (e: KeyboardEvent) => {
-                if (e.key === ' ') {
-                  toggleChecked(e as unknown as PressEvent);
-                }
-              },
-          tabIndex: 0,
-        };
+    const interactionProps = pressable({
+      disabled,
+      onPress: toggleChecked,
+      isNativeButton: false,
+    });
 
     const finalProps = mergeProps(rest, {
       ...interactionProps,

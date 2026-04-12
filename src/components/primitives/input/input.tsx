@@ -1,5 +1,6 @@
 import { debounceEvent } from '@askrjs/askr/fx';
 import { Slot, focusable, mergeProps } from '@askrjs/askr/foundations';
+import { hasJsxIntrinsicType } from '../../_internal/jsx';
 import type {
   DebouncedInputProps,
   InputAsChildProps,
@@ -12,11 +13,16 @@ export function Input(props: InputAsChildProps): JSX.Element;
 export function Input(props: InputInputProps | InputAsChildProps) {
   const { asChild, children, disabled = false, ref, tabIndex, ...rest } = props;
 
+  if (asChild && !hasJsxIntrinsicType(children, 'input')) {
+    throw new Error('Input `asChild` requires a native <input> host.');
+  }
+
   const focusProps = focusable({ disabled, tabIndex });
   const finalProps = mergeProps(rest, {
     ...focusProps,
     'data-slot': 'input',
     'data-disabled': disabled ? 'true' : undefined,
+    disabled,
     ref,
   });
 
