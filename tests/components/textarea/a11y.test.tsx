@@ -36,20 +36,20 @@ describe('Textarea - Accessibility', () => {
     }
   });
 
-  it('uses aria-disabled and removes disabled asChild hosts from tab order', () => {
+  it('uses native disabled semantics for disabled asChild textarea hosts', () => {
     const container = mount(
       <Textarea asChild disabled>
-        <div role="textbox">Notes</div>
+        <textarea aria-label="Notes" />
       </Textarea>
     );
 
     try {
-      const host = container.querySelector('[role="textbox"]');
+      const host = container.querySelector('textarea') as HTMLTextAreaElement | null;
 
+      expect(host?.disabled).toBe(true);
       expect(
-        host?.getAttribute(TEXTAREA_A11Y_CONTRACT.DISABLED_ATTRIBUTES.asChild)
-      ).toBe('true');
-      expect(host?.getAttribute('tabindex')).toBe('-1');
+        host?.getAttribute(TEXTAREA_A11Y_CONTRACT.DISABLED_ATTRIBUTES.native)
+      ).toBe('');
     } finally {
       unmount(container);
     }

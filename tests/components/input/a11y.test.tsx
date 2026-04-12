@@ -32,20 +32,18 @@ describe('Input - Accessibility', () => {
     }
   });
 
-  it('uses aria-disabled and removes disabled asChild hosts from tab order', () => {
+  it('uses native disabled semantics for disabled asChild input hosts', () => {
     const container = mount(
       <Input asChild disabled>
-        <div role="textbox">Custom input</div>
+        <input aria-label="Email" />
       </Input>
     );
 
     try {
-      const host = container.querySelector('[role="textbox"]');
+      const host = container.querySelector('input') as HTMLInputElement | null;
 
-      expect(
-        host?.getAttribute(INPUT_A11Y_CONTRACT.DISABLED_ATTRIBUTES.asChild)
-      ).toBe('true');
-      expect(host?.getAttribute('tabindex')).toBe('-1');
+      expect(host?.disabled).toBe(true);
+      expect(host?.getAttribute(INPUT_A11Y_CONTRACT.DISABLED_ATTRIBUTES.native)).toBe('');
     } finally {
       unmount(container);
     }

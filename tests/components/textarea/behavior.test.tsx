@@ -51,17 +51,26 @@ describe('Textarea - Behavior', () => {
     expect(textarea?.getAttribute('data-slot')).toBe('textarea');
   });
 
-  it('applies disabled semantics to asChild hosts', () => {
+  it('applies native disabled semantics to asChild textarea hosts', () => {
     container = mount(
       <Textarea asChild disabled>
-        <div role="textbox">Notes</div>
+        <textarea aria-label="Notes" />
       </Textarea>
     );
 
-    const host = container.querySelector('[role="textbox"]');
+    const host = container.querySelector('textarea') as HTMLTextAreaElement | null;
 
-    expect(host?.getAttribute('aria-disabled')).toBe('true');
-    expect(host?.getAttribute('tabindex')).toBe('-1');
+    expect(host?.disabled).toBe(true);
     expect(host?.getAttribute('data-disabled')).toBe('true');
+  });
+
+  it('fails loudly when asChild does not receive a native textarea host', () => {
+    expect(() =>
+      mount(
+        <Textarea asChild>
+          <div role="textbox">Notes</div>
+        </Textarea>
+      )
+    ).toThrow('Textarea `asChild` requires a native <textarea> host.');
   });
 });

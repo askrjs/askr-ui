@@ -25,7 +25,8 @@ If a component fails that bar, it does not ship as public API.
 - Disclosure and content: `Collapsible`, `Accordion`, `Tabs`
 - Status and identity: `Badge`, `Avatar`, `Skeleton`, `Progress`, `ProgressCircle`, `Spinner`, `Toast`
 - Basic navigation and utility: `Breadcrumb`, `Pagination`, `ToggleGroup`, `Slider`, `Menubar`, `NavigationMenu`
-- Layout primitives (structural/headless only — no colors, borders, or theme tokens): `Container`, `Stack`, `Inline`, `Grid`, `Center`, `Spacer`, `SidebarLayout`, `TopbarLayout`
+- Layout primitives (structural/headless only — no colors, borders, or theme tokens): `Container`, `Flex`, `Grid`, `Spacer`
+- Patterns: `DataTable`, `SidebarLayout`, `TopbarLayout`
 
 Responsive theme contract:
 
