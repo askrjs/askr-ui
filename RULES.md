@@ -72,12 +72,19 @@ No silent no-ops.
 
 ---
 
-## 5. Deterministic Effects Only
+## 5. Side Effects Only When Justified and Tested
 
-- No timers
-- No layout reads
-- No async side effects
-- All behavior runs in scheduler-safe events
+- Event handlers are scheduler-safe by default
+- Timers (`setTimeout`, `setInterval`), layout reads (`getBoundingClientRect`), and async operations are allowed only when necessary for correct behavior
+- Every such usage must be commented at the call site and covered by a determinism test
+
+```tsx
+// GOOD — timer is necessary for auto-dismiss; covered by determinism test
+const id = setTimeout(() => dismiss(toastId), duration);
+
+// BAD — timer used to defer state without documented justification
+setTimeout(() => setOpen(false), 0);
+```
 
 ---
 
@@ -108,11 +115,20 @@ No silent no-ops.
 
 ---
 
-## 9. No Styling, Ever
+## 9. Headless by Default; Structural Layout Allowed
 
-- No classes
-- No inline styles
-- No CSS variables
+- No color classes, theme tokens, or visual CSS variables
+- No inline styles driven by visual design decisions
+- Structural layout behavior (e.g., flex display, flex-direction) is allowed in layout-primitive components when it is the headless semantic, not visual styling
+- All theme-driven styling remains the consumer's responsibility
+
+```tsx
+// GOOD — structural behavior owned by layout primitive
+<div style={{ display: 'flex', flexDirection: direction }} />
+
+// BAD — visual styling injected by the component
+<div style={{ backgroundColor: 'blue', borderRadius: '4px' }} />
+```
 
 ---
 
@@ -129,7 +145,7 @@ No silent no-ops.
 ```tsx
 // component.tsx
 
-import { createContext, readContext } from '@fgrzl/askr';
+import { createContext, readContext } from '@askrjs/askr';
 import { Slot } from '../slot';
 
 /* ---------------------------------------------

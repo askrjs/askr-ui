@@ -34,6 +34,13 @@ Responsive theme contract:
 - Official themes interpret `data-collapse-below` using the canonical breakpoint names `sm`, `md`, `lg`, and `xl`.
 - Responsive styling remains theme-owned and mobile first: narrow screens are the base, larger layouts layer on with additive media queries.
 
+## Component Tiers
+
+The public surface has two tiers. **Core** is what the library cannot remove without breaking its promise. **Patterns** are higher-level compositions built on core. The distinction is enforced in docs, scorecards, and design reviews.
+
+- **Core**: all primitives and composites listed under Supported Public Surface except Patterns. Core components must remain minimal, composable, and free from pattern-driven complexity.
+- **Patterns**: `DataTable`, `SidebarLayout`, `TopbarLayout`. Patterns combine core primitives into opinionated compositions for common scenarios. Pattern complexity must not drive complexity into core.
+
 ## Design Rules
 
 - Components are headless by default.
@@ -46,6 +53,8 @@ Responsive theme contract:
 - `*Portal` parts stay public only when they perform tested, intentional portal-slot behavior.
 - Internal injected props use the `__*` prefix and must be stripped before DOM props are merged.
 - Shared internal helpers are preferred over component-specific state or ID patterns.
+- API surface must remain minimal: fewer parts and props are better unless the missing surface forces users to rebuild behavior the library owns. Implementation-driven surface area is not added.
+- Cross-family consistency is required: sibling families use the same naming conventions, prop patterns, and composition model. Inconsistency is a design defect, not a style preference.
 
 ## Runtime Contract
 

@@ -8,6 +8,7 @@ Headless Askr UI components.
 - [Foundations](./foundations.md) — Low-level behavior primitives
 - [Components](./components.md) — Full component reference
 - [Composition](./composition.md) — Patterns for composing primitives
+- [Original Design Program](../ORIGINAL_DESIGN_PLAN.md) — Design philosophy and cleaner-library execution plan
 
 ## Quick start
 
