@@ -12,10 +12,9 @@ export type NavigationMenuRootContextValue = {
   openPath: string[];
   setOpenPath: (path: string[]) => void;
   loop: boolean;
+  registerItem: (itemKey: string) => number;
   currentTriggerIndex: number;
   setCurrentTriggerIndex: (index: number) => void;
-  triggerCount: number;
-  disabledTriggerIndexes: number[];
   portal: OverlayPortal;
 };
 
@@ -28,11 +27,13 @@ export type NavigationMenuItemContextValue = {
 };
 
 export type NavigationMenuContentContextValue = {
+  contentPath: string[];
   contentCurrentIndex: number;
   setContentCurrentIndex: (index: number) => void;
   contentItemCount: number;
   contentDisabledIndexes: number[];
   contentId: string;
+  registerSurface: (surfaceKey: string) => number;
 };
 
 export const NavigationMenuRootContext =

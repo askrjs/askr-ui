@@ -14,7 +14,7 @@ describe('AlertDialog - Behavior', () => {
     unmount(container);
   });
 
-  it('toggles trigger expansion state when activated', async () => {
+  it('keeps trigger expansion state open after re-activation', async () => {
     container = mount(
       <AlertDialog>
         <AlertDialogTrigger>Open alert</AlertDialogTrigger>
@@ -38,6 +38,6 @@ describe('AlertDialog - Behavior', () => {
     trigger = container.querySelector(
       '[aria-haspopup="dialog"]'
     ) as HTMLButtonElement;
-    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
   });
 });

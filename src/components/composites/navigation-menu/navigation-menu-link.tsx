@@ -33,6 +33,9 @@ export function NavigationMenuLink(
   const content = readNavigationMenuContentContext();
 
   const collection = getCompositeCollection(content.contentId);
+  const href = (rest as { href?: string }).href;
+  const surfaceKey = `link:${item.path.join('/')}:${href ?? String(children)}`;
+  const surfaceIndex = content.registerSurface(surfaceKey);
   const nav = rovingFocus({
     currentIndex: content.contentCurrentIndex,
     itemCount: Math.max(content.contentItemCount, 1),
@@ -45,8 +48,6 @@ export function NavigationMenuLink(
     },
   });
 
-  // Generate surface ID for this link
-  const surfaceIndex = content.contentCurrentIndex;
   const surfaceId = resolvePartId(content.contentId, `item-${surfaceIndex}`);
 
   const finalProps = mergeProps(stripInternalProps(rest), {

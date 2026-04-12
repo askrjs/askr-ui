@@ -179,12 +179,12 @@ Run this loop every week until all phases are complete:
 | Component      | Status  | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf    | Docs/Exports | Notes                                        |
 | -------------- | ------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | -------------------------------------------- |
 | Badge          | done    | done       | done          | done    | done         | done    | covered | done         | Passive variant hooks and asChild contract locked |
-| Spinner        | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Verify loading semantics stay minimal        |
-| Skeleton       | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Check slot contract and deterministic markup |
-| Avatar         | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Validate fallback and image composition      |
-| Progress       | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Verify value semantics and output hooks      |
-| ProgressCircle | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Verify value semantics and output hooks      |
-| VisuallyHidden | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Keep behavior invisible and deterministic    |
+| Spinner        | done    | done       | done          | done    | done         | done    | covered | done         | Alias contract remains intentionally minimal and stable; focused behavior, a11y, and determinism suites are green |
+| Skeleton       | done    | done       | done          | done    | done         | done    | covered | done         | Slot contract is minimal and deterministic; focused behavior, a11y, and determinism suites are green |
+| Avatar         | done    | done       | done          | done    | done         | done    | covered | done         | Scoped-context root/image/fallback flow replaced child scanning and hidden injected props while preserving load/fallback semantics |
+| Progress       | done    | done       | done          | done    | done         | done    | covered | done         | Scoped-context root/indicator contract replaced tree rewriting and hidden injected props; focused suites are green |
+| ProgressCircle | done    | done       | done          | done    | done         | done    | covered | done         | Scoped-context root/indicator contract replaced tree rewriting and hidden injected props; Spinner alias remains stable on top |
+| VisuallyHidden | done    | done       | done          | done    | done         | done    | covered | done         | Hidden-content contract is stable and deterministic; focused behavior, a11y, and determinism suites are green |
 
 ## Phase 3 — Layout Primitives
 
@@ -212,8 +212,8 @@ Run this loop every week until all phases are complete:
 
 | Component        | Status  | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf    | Docs/Exports | Notes                                  |
 | ---------------- | ------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | -------------------------------------- |
-| FocusRing        | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Lock focus-visible contract            |
-| FocusScope       | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Lock trap and restore semantics        |
+| FocusRing        | done    | done       | done          | done    | done         | done    | covered | done         | Focus modality and `data-focus-visible` semantics are locked; focused behavior, a11y, and determinism suites are green |
+| FocusScope       | done    | done       | done          | done    | done         | done    | covered | done         | Trap/loop/restore semantics are locked; focused behavior, a11y, and determinism suites are green |
 | DismissableLayer | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Lock outside-interaction rules         |
 | Field            | in progress | review  | done          | done    | done         | done    | covered | review       | Context replaces injected props; FieldTextarea and a shared control adapter now consolidate the wrapper layer |
 
@@ -240,11 +240,11 @@ Run this loop every week until all phases are complete:
 
 | Component      | Status  | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf    | Docs/Exports | Notes                                                           |
 | -------------- | ------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | --------------------------------------------------------------- |
-| Breadcrumb     | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Keep semantics passive and minimal                              |
-| Pagination     | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Verify navigation semantics and naming                          |
+| Breadcrumb     | done    | done       | done          | done    | done         | done    | covered | done         | Passive semantics locked; root/default labelling and asChild composition are covered by focused behavior, a11y, and determinism suites |
+| Pagination     | done    | done       | done          | done    | done         | done    | covered | done         | Scoped-context refactor removed tree rewriting and hidden injected props; focused behavior, a11y, and determinism suites are green |
 | Menubar        | done    | done       | done          | done    | done         | done    | covered | done         | Split root/menu/content/item/group/shared files replace injected props; declaration-backed metadata plus an explicit fallback-portal sync keep nested submenu rendering deterministic |
-| NavigationMenu | pending | pending    | pending       | pending | pending      | pending | covered | pending      | High-risk architecture pass                                     |
-| Toast          | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Verify announcement and portal behavior                         |
+| NavigationMenu | done    | done       | done          | done    | done         | done    | covered | done         | Root/content now use registration-backed scoped context metadata instead of element-type scanning or placeholder indexes; focused behavior, a11y, and determinism suites are green |
+| Toast          | done    | done       | done          | done    | done         | done    | covered | done         | Provider/toast scoped contexts replaced tree rewriting and hidden injected props; behavior, a11y, and determinism suites are green |
 
 ## Phase 9 — Patterns
 

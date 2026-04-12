@@ -16,11 +16,8 @@ export function NavigationMenuItem(props: NavigationMenuItemProps) {
   const { children } = props;
   const root = readNavigationMenuRootContext();
 
-  // Derive item index from the props - it should be passed or derived from position
-  // For now, we'll calculate based on children position
-  // This will be set properly by the root component scanning children
-  const itemIndex = 0; // Placeholder - will be overridden by proper implementation
-  const itemKey = props.value ?? `item-${itemIndex}`;
+  const itemKey = props.value ?? `item-${String(children)}`;
+  const itemIndex = root.registerItem(itemKey);
   const triggerId = resolvePartId(root.navigationMenuId, `trigger-${itemIndex}`);
   const contentId = resolvePartId(root.navigationMenuId, `content-${itemIndex}`);
   const path = [itemKey];

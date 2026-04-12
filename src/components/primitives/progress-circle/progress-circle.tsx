@@ -1,7 +1,7 @@
+import { defineContext, readContext } from '@askrjs/askr';
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
-import { mergeCssVar } from '../../_internal/style';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
-import { mapJsxTree } from '../../_internal/jsx';
+import { mergeCssVar } from '../../_internal/style';
 import {
   defaultProgressValueLabel,
   normalizeProgressMax,
@@ -15,32 +15,33 @@ import type {
   SpinnerProps,
 } from './progress-circle.types';
 
-type InjectedProgressCircleProps = {
-  __progressCircleId?: string;
-  __value?: number | null;
-  __max?: number;
-  __valueLabel?: string;
+type ProgressCircleRootContextValue = {
+  progressCircleId: string;
+  value: number | null;
+  max: number;
+  valueLabel: string;
 };
 
-function readInjectedProgressCircleProps(
-  props: InjectedProgressCircleProps
-): Required<InjectedProgressCircleProps> {
-  if (
-    !props.__progressCircleId ||
-    props.__max === undefined ||
-    !props.__valueLabel
-  ) {
+const ProgressCircleRootContext =
+  defineContext<ProgressCircleRootContextValue | null>(null);
+
+function readProgressCircleRootContext(): ProgressCircleRootContextValue {
+  const context = readContext(ProgressCircleRootContext);
+
+  if (!context) {
     throw new Error(
       'ProgressCircleIndicator must be used within <ProgressCircle>'
     );
   }
 
-  return {
-    __progressCircleId: props.__progressCircleId,
-    __value: props.__value ?? null,
-    __max: props.__max,
-    __valueLabel: props.__valueLabel,
-  };
+  return context;
+}
+
+function ProgressCircleRootScopeView(props: {
+  finalProps: Record<string, unknown>;
+  children?: unknown;
+}) {
+  return <div {...props.finalProps}>{props.children}</div>;
 }
 
 export function ProgressCircle(props: ProgressCircleProps) {
@@ -52,22 +53,6 @@ export function ProgressCircle(props: ProgressCircleProps) {
     getValueLabel?.(normalizedValue, normalizedMax) ??
     defaultProgressValueLabel(normalizedValue, normalizedMax);
   const percentage = progressPercentage(normalizedValue, normalizedMax);
-  const enhancedChildren = mapJsxTree(children, (element) => {
-    if (element.type !== ProgressCircleIndicator) {
-      return element;
-    }
-
-    return {
-      ...element,
-      props: {
-        ...element.props,
-        __progressCircleId: progressCircleId,
-        __value: normalizedValue,
-        __max: normalizedMax,
-        __valueLabel: valueLabel,
-      },
-    };
-  });
   const finalProps = mergeProps(rest, {
     ref,
     id: progressCircleId,
@@ -86,8 +71,22 @@ export function ProgressCircle(props: ProgressCircleProps) {
     'data-progress-circle': 'true',
     'data-state': normalizedValue === null ? 'indeterminate' : 'determinate',
   });
+  const rootContext: ProgressCircleRootContextValue = {
+    progressCircleId,
+    value: normalizedValue,
+    max: normalizedMax,
+    valueLabel,
+  };
 
-  return <div {...finalProps}>{enhancedChildren}</div>;
+  return (
+    <ProgressCircleRootContext.Scope value={rootContext}>
+      <ProgressCircleRootScopeView
+        finalProps={finalProps as Record<string, unknown>}
+      >
+        {children}
+      </ProgressCircleRootScopeView>
+    </ProgressCircleRootContext.Scope>
+  );
 }
 
 export function ProgressCircleIndicator(
@@ -98,35 +97,20 @@ export function ProgressCircleIndicator(
 ): JSX.Element;
 export function ProgressCircleIndicator(
   props:
-    | (ProgressCircleIndicatorProps & InjectedProgressCircleProps)
-    | (ProgressCircleIndicatorAsChildProps & InjectedProgressCircleProps)
+    | ProgressCircleIndicatorProps
+    | ProgressCircleIndicatorAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    ref,
-    __progressCircleId,
-    __value,
-    __max,
-    __valueLabel,
-    ...rest
-  } = props;
-  const injected = readInjectedProgressCircleProps({
-    __progressCircleId,
-    __value,
-    __max,
-    __valueLabel,
-  });
-  const percentage = progressPercentage(injected.__value, injected.__max);
+  const { asChild, children, ref, ...rest } = props;
+  const root = readProgressCircleRootContext();
+  const percentage = progressPercentage(root.value, root.max);
   const finalProps = mergeProps(rest, {
     ref,
-    id: resolvePartId(injected.__progressCircleId, 'indicator'),
+    id: resolvePartId(root.progressCircleId, 'indicator'),
     'data-slot': 'progress-circle-indicator',
     'data-progress-circle-indicator': 'true',
-    'data-state': injected.__value === null ? 'indeterminate' : 'determinate',
-    'data-value':
-      injected.__value === null ? undefined : String(injected.__value),
-    'data-max': String(injected.__max),
+    'data-state': root.value === null ? 'indeterminate' : 'determinate',
+    'data-value': root.value === null ? undefined : String(root.value),
+    'data-max': String(root.max),
     'data-percentage': percentage === null ? undefined : String(percentage),
   });
 

@@ -1,5 +1,8 @@
 import { Slot, mergeProps, rovingFocus } from '@askrjs/askr/foundations';
-import { getCompositeCollection } from '../../_internal/composite';
+import {
+  getCompositeCollection,
+  getCompositeCollectionItems,
+} from '../../_internal/composite';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import { stripInternalProps } from '../../_internal/props';
 import { readNavigationMenuRootContext } from './navigation-menu.shared';
@@ -20,13 +23,18 @@ export function NavigationMenuList(
   const { asChild, children, ref, ...rest } = props;
   const root = readNavigationMenuRootContext();
   const collection = getCompositeCollection(root.navigationMenuId);
+  const triggerItems = getCompositeCollectionItems(collection);
+  const disabledTriggerIndexes = triggerItems
+    .filter((entry) => entry.disabled)
+    .map((entry) => entry.index);
+  const triggerCount = triggerItems.length;
 
   const nav = rovingFocus({
     currentIndex: root.currentTriggerIndex,
-    itemCount: Math.max(root.triggerCount, 1),
+    itemCount: Math.max(triggerCount, 1),
     orientation: 'horizontal',
     loop: root.loop,
-    isDisabled: (index) => root.disabledTriggerIndexes.includes(index),
+    isDisabled: (index) => disabledTriggerIndexes.includes(index),
     onNavigate: (index) => {
       root.setCurrentTriggerIndex(index);
       focusSelectedCollectionItem(collection, index);
