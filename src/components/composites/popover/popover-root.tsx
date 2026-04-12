@@ -43,8 +43,7 @@ export function Popover(props: PopoverProps) {
   const contentId = resolvePartId(popoverId, 'content');
   const portal = getPersistentPortal(popoverId);
   const overlayNodes = getOverlayNodes(popoverId);
-  let contentPosition: PopoverPositionOptions =
-    resolvePopoverPositionOptions();
+  let contentPosition: PopoverPositionOptions = resolvePopoverPositionOptions();
 
   const rootContext: PopoverRootContextValue = {
     popoverId,

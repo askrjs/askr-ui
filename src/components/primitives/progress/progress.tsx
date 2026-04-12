@@ -21,7 +21,9 @@ type ProgressRootContextValue = {
   valueLabel: string;
 };
 
-const ProgressRootContext = defineContext<ProgressRootContextValue | null>(null);
+const ProgressRootContext = defineContext<ProgressRootContextValue | null>(
+  null
+);
 
 function readProgressRootContext(): ProgressRootContextValue {
   const context = readContext(ProgressRootContext);

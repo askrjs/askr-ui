@@ -6,15 +6,10 @@ import {
 import { TOGGLE_GROUP_A11Y_CONTRACT } from '../../../src/components/primitives/toggle-group/toggle-group.a11y';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
-function getToggleByText(
-  container: HTMLElement,
-  text: string
-): HTMLElement {
+function getToggleByText(container: HTMLElement, text: string): HTMLElement {
   const button = Array.from(
     container.querySelectorAll('[data-slot="toggle-group-item"]')
-  ).find(
-    (element) => element.textContent?.trim() === text
-  );
+  ).find((element) => element.textContent?.trim() === text);
 
   if (!(button instanceof HTMLElement)) {
     throw new Error(`Unable to find toggle item with text "${text}"`);
@@ -42,7 +37,9 @@ describe('ToggleGroup - Behavior', () => {
     const left = getToggleByText(container, 'Left');
     const right = getToggleByText(container, 'Right');
 
-    expect(group?.getAttribute('role')).toBe(TOGGLE_GROUP_A11Y_CONTRACT.GROUP_ROLE);
+    expect(group?.getAttribute('role')).toBe(
+      TOGGLE_GROUP_A11Y_CONTRACT.GROUP_ROLE
+    );
     expect(group?.getAttribute('data-orientation')).toBe('vertical');
     expect(group?.getAttribute('data-toggle-group')).toBe('true');
     expect(left.getAttribute('aria-pressed')).toBe('true');
@@ -124,12 +121,12 @@ describe('ToggleGroup - Behavior', () => {
     getToggleByText(container, 'Right').click();
     await flushUpdates();
 
-    expect(getToggleByText(container, 'Left').getAttribute('aria-pressed')).toBe(
-      'false'
-    );
-    expect(getToggleByText(container, 'Right').getAttribute('aria-pressed')).toBe(
-      'true'
-    );
+    expect(
+      getToggleByText(container, 'Left').getAttribute('aria-pressed')
+    ).toBe('false');
+    expect(
+      getToggleByText(container, 'Right').getAttribute('aria-pressed')
+    ).toBe('true');
   });
 
   it('emits normalized values for single and multiple groups', async () => {
@@ -176,7 +173,11 @@ describe('ToggleGroup - Behavior', () => {
 
     container = mount(
       <div>
-        <ToggleGroup disabled defaultValue="left" onValueChange={onGroupValueChange}>
+        <ToggleGroup
+          disabled
+          defaultValue="left"
+          onValueChange={onGroupValueChange}
+        >
           <ToggleGroupItem value="left">Group left</ToggleGroupItem>
           <ToggleGroupItem value="right">Group right</ToggleGroupItem>
         </ToggleGroup>
@@ -188,8 +189,14 @@ describe('ToggleGroup - Behavior', () => {
         </ToggleGroup>
       </div>
     );
-    const groupRight = getToggleByText(container, 'Group right') as HTMLButtonElement;
-    const itemLeft = getToggleByText(container, 'Item left') as HTMLButtonElement;
+    const groupRight = getToggleByText(
+      container,
+      'Group right'
+    ) as HTMLButtonElement;
+    const itemLeft = getToggleByText(
+      container,
+      'Item left'
+    ) as HTMLButtonElement;
     const itemRight = getToggleByText(container, 'Item right');
 
     expect(groupRight.disabled).toBe(true);
@@ -219,7 +226,9 @@ describe('ToggleGroup - Behavior', () => {
     );
     const host = getToggleByText(container, 'Left');
 
-    expect(host.getAttribute('role')).toBe(TOGGLE_GROUP_A11Y_CONTRACT.ITEM_ROLE);
+    expect(host.getAttribute('role')).toBe(
+      TOGGLE_GROUP_A11Y_CONTRACT.ITEM_ROLE
+    );
     expect(host.getAttribute('data-testid')).toBe('toggle-item');
     expect(host.getAttribute('data-from-toggle')).toBe('yes');
     expect(host.getAttribute('data-from-child')).toBe('yes');
@@ -239,7 +248,9 @@ describe('ToggleGroup - Behavior', () => {
         </ToggleGroupItem>
       </ToggleGroup>
     );
-    const group = container.querySelector('[data-slot="toggle-group"]') as HTMLDivElement | null;
+    const group = container.querySelector(
+      '[data-slot="toggle-group"]'
+    ) as HTMLDivElement | null;
     const nativeItem = getToggleByText(container, 'Left') as HTMLButtonElement;
 
     expect(groupRef).toBe(group);
@@ -275,12 +286,12 @@ describe('ToggleGroup - Behavior', () => {
     await flushUpdates();
 
     expect(onValueChange).toHaveBeenCalledWith('right');
-    expect(getToggleByText(container, 'Left').getAttribute('aria-pressed')).toBe(
-      'true'
-    );
-    expect(getToggleByText(container, 'Right').getAttribute('aria-pressed')).toBe(
-      'false'
-    );
+    expect(
+      getToggleByText(container, 'Left').getAttribute('aria-pressed')
+    ).toBe('true');
+    expect(
+      getToggleByText(container, 'Right').getAttribute('aria-pressed')
+    ).toBe('false');
   });
 
   it('does not wrap roving focus at boundaries when loop is false', async () => {
@@ -322,14 +333,14 @@ describe('ToggleGroup - Behavior', () => {
     );
     await flushUpdates();
 
-    expect(getToggleByText(container, 'Left').getAttribute('aria-pressed')).toBe(
-      'true'
-    );
-    expect(getToggleByText(container, 'Right').getAttribute('aria-pressed')).toBe(
-      'false'
-    );
-    expect(getToggleByText(container, 'Middle').getAttribute('aria-pressed')).toBe(
-      'false'
-    );
+    expect(
+      getToggleByText(container, 'Left').getAttribute('aria-pressed')
+    ).toBe('true');
+    expect(
+      getToggleByText(container, 'Right').getAttribute('aria-pressed')
+    ).toBe('false');
+    expect(
+      getToggleByText(container, 'Middle').getAttribute('aria-pressed')
+    ).toBe('false');
   });
 });

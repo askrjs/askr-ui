@@ -63,7 +63,9 @@ describe('DropdownMenu - Behavior', () => {
 
     await flushUpdates();
 
-    const items = Array.from(document.body.querySelectorAll('[role="menuitem"]'));
+    const items = Array.from(
+      document.body.querySelectorAll('[role="menuitem"]')
+    );
 
     expect(items).toHaveLength(2);
     expect(items[0]?.getAttribute('tabindex')).toBe('0');
@@ -94,12 +96,14 @@ describe('DropdownMenu - Behavior', () => {
     await flushUpdates();
 
     const trigger = container.querySelector('[aria-haspopup="menu"]');
-    const items = Array.from(document.body.querySelectorAll('[role="menuitem"]'));
+    const items = Array.from(
+      document.body.querySelectorAll('[role="menuitem"]')
+    );
 
     expect(trigger?.getAttribute('aria-expanded')).toBe('true');
     expect(items).toHaveLength(2);
-    expect(items.every((item) => item.getAttribute('aria-disabled') === 'true')).toBe(
-      true
-    );
+    expect(
+      items.every((item) => item.getAttribute('aria-disabled') === 'true')
+    ).toBe(true);
   });
 });

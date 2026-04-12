@@ -56,7 +56,8 @@ export function DropdownMenuItem(
   }
 
   const itemId = resolvePartId(root.dropdownMenuId, `item-${itemIndex}`);
-  const { items, currentIndex, disabledIndexes } = resolveDropdownMenuState(root);
+  const { items, currentIndex, disabledIndexes } =
+    resolveDropdownMenuState(root);
   const hasEnabledItems = items.some(
     (_item, index) => !disabledIndexes.includes(index)
   );

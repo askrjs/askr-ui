@@ -22,8 +22,9 @@ export type TooltipRootContextValue = {
   clearPosition: () => void;
 };
 
-export const TooltipRootContext =
-  defineContext<TooltipRootContextValue | null>(null);
+export const TooltipRootContext = defineContext<TooltipRootContextValue | null>(
+  null
+);
 
 export function readTooltipRootContext(): TooltipRootContextValue {
   const context = readContext(TooltipRootContext);

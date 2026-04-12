@@ -27,15 +27,7 @@ function FieldsetView(props: {
 }
 
 export function Field(props: FieldProps) {
-  const {
-    children,
-    ref,
-    id,
-    invalid,
-    required,
-    disabled,
-    ...rest
-  } = props;
+  const { children, ref, id, invalid, required, disabled, ...rest } = props;
   const fieldState = createFieldContextValue({
     id,
     invalid,
@@ -60,14 +52,7 @@ export function Field(props: FieldProps) {
 }
 
 export function Fieldset(props: FieldsetProps) {
-  const {
-    children,
-    ref,
-    invalid,
-    required,
-    disabled,
-    ...rest
-  } = props;
+  const { children, ref, invalid, required, disabled, ...rest } = props;
   const fieldsetState = createFieldsetContextValue({
     invalid,
     required,

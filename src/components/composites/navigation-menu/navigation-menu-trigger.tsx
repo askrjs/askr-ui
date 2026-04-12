@@ -1,4 +1,10 @@
-import { Slot, composeRefs, mergeProps, pressable, rovingFocus } from '@askrjs/askr/foundations';
+import {
+  Slot,
+  composeRefs,
+  mergeProps,
+  pressable,
+  rovingFocus,
+} from '@askrjs/askr/foundations';
 import {
   registerCompositeNode,
   getCompositeCollection,
@@ -17,14 +23,14 @@ import type {
   NavigationMenuTriggerAsChildProps,
 } from './navigation-menu.types';
 
-export function NavigationMenuTrigger(props: NavigationMenuTriggerProps): JSX.Element;
+export function NavigationMenuTrigger(
+  props: NavigationMenuTriggerProps
+): JSX.Element;
 export function NavigationMenuTrigger(
   props: NavigationMenuTriggerAsChildProps
 ): JSX.Element;
 export function NavigationMenuTrigger(
-  props:
-    | NavigationMenuTriggerProps
-    | NavigationMenuTriggerAsChildProps
+  props: NavigationMenuTriggerProps | NavigationMenuTriggerAsChildProps
 ) {
   const {
     asChild,
@@ -74,17 +80,14 @@ export function NavigationMenuTrigger(
   const finalProps = mergeProps(stripInternalProps(rest), {
     ...interactionProps,
     ...nav.item(item.itemIndex),
-    ref: composeRefs(
-      ref as any,
-      (node: HTMLElement | null) => {
-        overlayNodes.trigger = node;
-        registerCompositeNode(item.triggerId, collection, node, {
-          index: item.itemIndex,
-          disabled,
-          value: item.itemKey,
-        });
-      }
-    ),
+    ref: composeRefs(ref as any, (node: HTMLElement | null) => {
+      overlayNodes.trigger = node;
+      registerCompositeNode(item.triggerId, collection, node, {
+        index: item.itemIndex,
+        disabled,
+        value: item.itemKey,
+      });
+    }),
     id: item.triggerId,
     'aria-expanded': open ? 'true' : 'false',
     'aria-controls': item.contentId,

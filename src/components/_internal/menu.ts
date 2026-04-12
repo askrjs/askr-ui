@@ -38,7 +38,10 @@ export function beginMenuItemDeclaration(id: string) {
   menuItemMetadata.set(id, []);
 }
 
-export function declareMenuItemMetadata(id: string, metadata: MenuItemMetadata) {
+export function declareMenuItemMetadata(
+  id: string,
+  metadata: MenuItemMetadata
+) {
   const items = menuItemMetadata.get(id) ?? [];
 
   items[metadata.index] = metadata;

@@ -25,10 +25,10 @@ export type TabsRenderContextValue = {
   claimTriggerIndex: () => number;
 };
 
-export const TabsRootContext =
-  defineContext<TabsRootContextValue | null>(null);
-export const TabsRenderContext =
-  defineContext<TabsRenderContextValue | null>(null);
+export const TabsRootContext = defineContext<TabsRootContextValue | null>(null);
+export const TabsRenderContext = defineContext<TabsRenderContextValue | null>(
+  null
+);
 
 export function readTabsRootContext(): TabsRootContextValue {
   const context = readContext(TabsRootContext);

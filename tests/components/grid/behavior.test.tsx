@@ -84,9 +84,9 @@ describe('Grid - Behavior', () => {
   it('should not set gridTemplateColumns for invalid minItemWidth tokens', () => {
     container = mount(<Grid minItemWidth="sm" autoFit={false} />);
     const el = container.querySelector('[data-slot="grid"]') as HTMLElement;
-    expect(el?.getAttribute(GRID_A11Y_CONTRACT.DATA_ATTRIBUTES.minItemWidth)).toBe(
-      'sm'
-    );
+    expect(
+      el?.getAttribute(GRID_A11Y_CONTRACT.DATA_ATTRIBUTES.minItemWidth)
+    ).toBe('sm');
     expect(el.style.gridTemplateColumns).toBe('');
   });
 

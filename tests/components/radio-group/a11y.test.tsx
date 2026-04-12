@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { RadioGroup, RadioGroupItem } from '../../../src/components/primitives/radio-group';
+import {
+  RadioGroup,
+  RadioGroupItem,
+} from '../../../src/components/primitives/radio-group';
 import { RADIO_GROUP_A11Y_CONTRACT } from '../../../src/components/primitives/radio-group/radio-group.a11y';
 import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';
@@ -46,9 +49,9 @@ describe('RadioGroup - Accessibility', () => {
       expect(group?.getAttribute('role')).toBe(
         RADIO_GROUP_A11Y_CONTRACT.GROUP_ROLE
       );
-      expect(group?.getAttribute(RADIO_GROUP_A11Y_CONTRACT.ORIENTATION_ATTRIBUTE)).toBe(
-        'horizontal'
-      );
+      expect(
+        group?.getAttribute(RADIO_GROUP_A11Y_CONTRACT.ORIENTATION_ATTRIBUTE)
+      ).toBe('horizontal');
       expect(items[0]?.getAttribute('role')).toBe(
         RADIO_GROUP_A11Y_CONTRACT.ITEM_ROLE
       );
@@ -65,7 +68,11 @@ describe('RadioGroup - Accessibility', () => {
 
   it('omits aria-orientation when orientation is both', () => {
     const container = mount(
-      <RadioGroup aria-label="Two dimensional" orientation="both" defaultValue="center">
+      <RadioGroup
+        aria-label="Two dimensional"
+        orientation="both"
+        defaultValue="center"
+      >
         <RadioGroupItem value="center">Center</RadioGroupItem>
       </RadioGroup>
     );
@@ -73,9 +80,9 @@ describe('RadioGroup - Accessibility', () => {
     try {
       const group = container.querySelector('[data-slot="radio-group"]');
 
-      expect(group?.hasAttribute(RADIO_GROUP_A11Y_CONTRACT.ORIENTATION_ATTRIBUTE)).toBe(
-        false
-      );
+      expect(
+        group?.hasAttribute(RADIO_GROUP_A11Y_CONTRACT.ORIENTATION_ATTRIBUTE)
+      ).toBe(false);
     } finally {
       unmount(container);
     }

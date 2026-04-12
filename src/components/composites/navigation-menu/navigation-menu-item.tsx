@@ -6,9 +6,7 @@ import {
 } from './navigation-menu.shared';
 import type { NavigationMenuItemProps } from './navigation-menu.types';
 
-function NavigationMenuItemScopeView(props: {
-  children?: unknown;
-}) {
+function NavigationMenuItemScopeView(props: { children?: unknown }) {
   return <>{props.children}</>;
 }
 
@@ -18,8 +16,14 @@ export function NavigationMenuItem(props: NavigationMenuItemProps) {
 
   const itemKey = props.value ?? `item-${String(children)}`;
   const itemIndex = root.registerItem(itemKey);
-  const triggerId = resolvePartId(root.navigationMenuId, `trigger-${itemIndex}`);
-  const contentId = resolvePartId(root.navigationMenuId, `content-${itemIndex}`);
+  const triggerId = resolvePartId(
+    root.navigationMenuId,
+    `trigger-${itemIndex}`
+  );
+  const contentId = resolvePartId(
+    root.navigationMenuId,
+    `content-${itemIndex}`
+  );
   const path = [itemKey];
 
   const itemContext: NavigationMenuItemContextValue = {

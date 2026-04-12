@@ -54,8 +54,9 @@ describe('Dialog - Behavior', () => {
 
     await flushUpdates();
 
-    const content = Array.from(document.body.querySelectorAll('[role="dialog"]'))
-      .find((element) => element.textContent?.includes('Body')) as HTMLElement;
+    const content = Array.from(
+      document.body.querySelectorAll('[role="dialog"]')
+    ).find((element) => element.textContent?.includes('Body')) as HTMLElement;
 
     expect(content.getAttribute('aria-label')).toBe('Preferences');
     expect(content.getAttribute('aria-labelledby')).toBeNull();
@@ -80,12 +81,18 @@ describe('Dialog - Behavior', () => {
       document.body.querySelectorAll('[data-slot="dialog-content"]')
     ).find((element) => element.textContent?.includes('Body')) as HTMLElement;
 
-    content.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    content.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+    );
     await flushUpdates();
 
-    const trigger = container.querySelector('[data-slot="dialog-trigger"]') as HTMLElement;
+    const trigger = container.querySelector(
+      '[data-slot="dialog-trigger"]'
+    ) as HTMLElement;
     expect(onDismiss).toHaveBeenCalledTimes(1);
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
-    expect(document.body.querySelector('[data-slot="dialog-content"]')).not.toBeNull();
+    expect(
+      document.body.querySelector('[data-slot="dialog-content"]')
+    ).not.toBeNull();
   });
 });

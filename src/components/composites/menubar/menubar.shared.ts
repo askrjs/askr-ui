@@ -77,18 +77,21 @@ export type MenubarContentResolvedState = {
   disabledItemIndexes: number[];
 };
 
-export const MenubarRootContext =
-  defineContext<MenubarRootContextValue | null>(null);
+export const MenubarRootContext = defineContext<MenubarRootContextValue | null>(
+  null
+);
 export const MenubarRootRenderContext =
   defineContext<MenubarRootRenderContextValue | null>(null);
-export const MenubarMenuContext =
-  defineContext<MenubarMenuContextValue | null>(null);
+export const MenubarMenuContext = defineContext<MenubarMenuContextValue | null>(
+  null
+);
 export const MenubarContentContext =
   defineContext<MenubarContentContextValue | null>(null);
 export const MenubarContentRenderContext =
   defineContext<MenubarContentRenderContextValue | null>(null);
-export const MenubarSubContext =
-  defineContext<MenubarSubContextValue | null>(null);
+export const MenubarSubContext = defineContext<MenubarSubContextValue | null>(
+  null
+);
 export const MenubarDeclarationContext = defineContext<boolean>(false);
 
 export function beginMenubarTriggerDeclaration(menubarId: string) {

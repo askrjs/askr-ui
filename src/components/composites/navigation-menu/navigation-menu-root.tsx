@@ -1,9 +1,7 @@
 import { state } from '@askrjs/askr';
 import { mergeProps } from '@askrjs/askr/foundations';
 import { resolveCompoundId } from '../../_internal/id';
-import {
-  getPersistentPortal,
-} from '../../_internal/overlay';
+import { getPersistentPortal } from '../../_internal/overlay';
 import { stripInternalProps } from '../../_internal/props';
 import {
   NavigationMenuRootContext,

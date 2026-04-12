@@ -1,8 +1,5 @@
 import { defineContext, readContext } from '@askrjs/askr';
-import {
-  firstEnabledIndex,
-  getMenuItemMetadata,
-} from '../../_internal/menu';
+import { firstEnabledIndex, getMenuItemMetadata } from '../../_internal/menu';
 import type { OverlayPortal } from '../../_internal/overlay';
 
 export type SelectItemMetadata = {
@@ -122,7 +119,8 @@ export function resolveSelectState(
   const currentIndex =
     selectedIndex >= 0 && !effectiveItems[selectedIndex]?.disabled
       ? selectedIndex
-      : effectiveItems[candidateIndex] && !effectiveItems[candidateIndex]?.disabled
+      : effectiveItems[candidateIndex] &&
+          !effectiveItems[candidateIndex]?.disabled
         ? candidateIndex
         : fallbackIndex;
 

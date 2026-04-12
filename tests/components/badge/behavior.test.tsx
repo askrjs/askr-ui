@@ -35,7 +35,12 @@ describe('Badge - Behavior', () => {
 
   it('supports asChild composition and merges host props', () => {
     const container = mount(
-      <Badge asChild data-testid="badge" data-from-badge="yes" variant="outline">
+      <Badge
+        asChild
+        data-testid="badge"
+        data-from-badge="yes"
+        variant="outline"
+      >
         <strong data-from-child="yes">Preview</strong>
       </Badge>
     );
@@ -57,7 +62,9 @@ describe('Badge - Behavior', () => {
   it('forwards refs to native and asChild hosts', () => {
     let nativeRef: HTMLSpanElement | null = null;
     let childRef: HTMLElement | null = null;
-    let container = mount(<Badge ref={(node) => (nativeRef = node)}>Beta</Badge>);
+    let container = mount(
+      <Badge ref={(node) => (nativeRef = node)}>Beta</Badge>
+    );
 
     try {
       const badge = container.querySelector('span') as HTMLSpanElement | null;

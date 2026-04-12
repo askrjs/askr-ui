@@ -8,9 +8,7 @@ import type { TabsContentAsChildProps, TabsContentProps } from './tabs.types';
 
 export function TabsContent(props: TabsContentProps): JSX.Element | null;
 export function TabsContent(props: TabsContentAsChildProps): JSX.Element | null;
-export function TabsContent(
-  props: TabsContentProps | TabsContentAsChildProps
-) {
+export function TabsContent(props: TabsContentProps | TabsContentAsChildProps) {
   const { asChild, children, forceMount = false, ref, value, ...rest } = props;
   const root = readTabsRootContext();
   const selected = root.value === value;

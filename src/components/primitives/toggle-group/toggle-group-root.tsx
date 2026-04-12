@@ -1,5 +1,9 @@
 import { state } from '@askrjs/askr';
-import { controllableState, mergeProps, rovingFocus } from '@askrjs/askr/foundations';
+import {
+  controllableState,
+  mergeProps,
+  rovingFocus,
+} from '@askrjs/askr/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import {
   disabledIndexes,
@@ -122,17 +126,13 @@ export function ToggleGroup(props: ToggleGroupProps) {
   const setValue = (nextValue: string | string[]) => {
     if (type === 'multiple') {
       (valueState.set as (value: string[]) => void)(
-        Array.isArray(nextValue)
-          ? nextValue
-          : nextValue
-            ? [nextValue]
-            : []
+        Array.isArray(nextValue) ? nextValue : nextValue ? [nextValue] : []
       );
       return;
     }
 
     (valueState.set as (value: string) => void)(
-      Array.isArray(nextValue) ? nextValue[0] ?? '' : nextValue
+      Array.isArray(nextValue) ? (nextValue[0] ?? '') : nextValue
     );
   };
   const selectedIndex = items.findIndex((item) =>

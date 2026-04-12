@@ -64,11 +64,7 @@ import {
   PopoverContent,
   PopoverPortal,
 } from '@askrjs/askr-ui';
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from '@askrjs/askr-ui';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@askrjs/askr-ui';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -118,22 +114,14 @@ import { Avatar } from '@askrjs/askr-ui';
 ## Navigation components
 
 ```ts
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-} from '@askrjs/askr-ui';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@askrjs/askr-ui';
 import {
   Pagination,
   PaginationItem,
   PaginationPrev,
   PaginationNext,
 } from '@askrjs/askr-ui';
-import {
-  Menubar,
-  MenubarMenu,
-  MenubarTrigger,
-} from '@askrjs/askr-ui';
+import { Menubar, MenubarMenu, MenubarTrigger } from '@askrjs/askr-ui';
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -145,22 +133,13 @@ import {
 ## Layout primitives
 
 ```ts
-import {
-  Container,
-  Flex,
-  Grid,
-  Spacer,
-} from '@askrjs/askr-ui';
+import { Container, Flex, Grid, Spacer } from '@askrjs/askr-ui';
 ```
 
 ## Pattern components
 
 ```ts
-import {
-  DataTable,
-  SidebarLayout,
-  TopbarLayout,
-} from '@askrjs/askr-ui';
+import { DataTable, SidebarLayout, TopbarLayout } from '@askrjs/askr-ui';
 ```
 
 ## See also

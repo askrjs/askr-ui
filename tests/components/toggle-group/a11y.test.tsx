@@ -44,7 +44,9 @@ describe('ToggleGroup - Accessibility', () => {
         container.querySelectorAll('[data-slot="toggle-group-item"]')
       );
 
-      expect(group?.getAttribute('role')).toBe(TOGGLE_GROUP_A11Y_CONTRACT.GROUP_ROLE);
+      expect(group?.getAttribute('role')).toBe(
+        TOGGLE_GROUP_A11Y_CONTRACT.GROUP_ROLE
+      );
       expect(group?.getAttribute('aria-label')).toBe('Text alignment');
       expect(items.map((item) => item.getAttribute('aria-pressed'))).toEqual([
         'true',
@@ -67,7 +69,9 @@ describe('ToggleGroup - Accessibility', () => {
     try {
       const host = container.querySelector('[data-slot="toggle-group-item"]');
 
-      expect(host?.getAttribute('role')).toBe(TOGGLE_GROUP_A11Y_CONTRACT.ITEM_ROLE);
+      expect(host?.getAttribute('role')).toBe(
+        TOGGLE_GROUP_A11Y_CONTRACT.ITEM_ROLE
+      );
       expect(host?.getAttribute('aria-pressed')).toBe('true');
     } finally {
       unmount(container);

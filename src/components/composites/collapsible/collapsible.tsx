@@ -168,12 +168,7 @@ export function CollapsibleTrigger(
 export function CollapsibleTrigger(
   props: CollapsibleTriggerProps | CollapsibleTriggerAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    ref,
-    ...rest
-  } = props;
+  const { asChild, children, ref, ...rest } = props;
   const root = readCollapsibleRootContext();
   const restoreFocusRef = (node: HTMLElement | null) => {
     if (node && pendingFocusRestoreId === root.contentId) {
@@ -251,17 +246,9 @@ export function CollapsibleContent(
   props: CollapsibleContentAsChildProps
 ): JSX.Element | null;
 export function CollapsibleContent(
-  props:
-    | CollapsibleContentProps
-    | CollapsibleContentAsChildProps
+  props: CollapsibleContentProps | CollapsibleContentAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    forceMount = false,
-    ref,
-    ...rest
-  } = props;
+  const { asChild, children, forceMount = false, ref, ...rest } = props;
   const root = readCollapsibleRootContext();
   const finalProps = mergeProps(rest, {
     ref,

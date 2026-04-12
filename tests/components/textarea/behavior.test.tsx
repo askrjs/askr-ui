@@ -69,7 +69,9 @@ describe('Textarea - Behavior', () => {
       </Textarea>
     );
 
-    const host = container.querySelector('textarea') as HTMLTextAreaElement | null;
+    const host = container.querySelector(
+      'textarea'
+    ) as HTMLTextAreaElement | null;
 
     expect(host?.disabled).toBe(true);
     expect(host?.getAttribute('data-disabled')).toBe('true');
@@ -82,7 +84,9 @@ describe('Textarea - Behavior', () => {
       </Textarea>
     );
 
-    const host = container.querySelector('textarea') as HTMLTextAreaElement | null;
+    const host = container.querySelector(
+      'textarea'
+    ) as HTMLTextAreaElement | null;
 
     expect(host?.readOnly).toBe(true);
     expect(host?.hasAttribute('readonly')).toBe(true);

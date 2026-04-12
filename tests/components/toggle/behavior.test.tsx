@@ -12,7 +12,9 @@ describe('Toggle - Behavior', () => {
 
   it('renders a native toggle button by default', () => {
     container = mount(<Toggle>Mute</Toggle>);
-    const button = container.querySelector('button') as HTMLButtonElement | null;
+    const button = container.querySelector(
+      'button'
+    ) as HTMLButtonElement | null;
 
     expect(button).toBeTruthy();
     expect(button?.type).toBe('button');
@@ -28,7 +30,9 @@ describe('Toggle - Behavior', () => {
         Save
       </Toggle>
     );
-    const button = container.querySelector('button') as HTMLButtonElement | null;
+    const button = container.querySelector(
+      'button'
+    ) as HTMLButtonElement | null;
 
     expect(button?.type).toBe('submit');
     expect(button?.getAttribute('aria-pressed')).toBe('true');
@@ -39,7 +43,9 @@ describe('Toggle - Behavior', () => {
     const onPress = vi.fn();
 
     container = mount(<Toggle onPress={onPress}>Mute</Toggle>);
-    const button = container.querySelector('button') as HTMLButtonElement | null;
+    const button = container.querySelector(
+      'button'
+    ) as HTMLButtonElement | null;
 
     button?.click();
 
@@ -54,7 +60,9 @@ describe('Toggle - Behavior', () => {
         Mute
       </Toggle>
     );
-    const button = container.querySelector('button') as HTMLButtonElement | null;
+    const button = container.querySelector(
+      'button'
+    ) as HTMLButtonElement | null;
 
     expect(button?.disabled).toBe(true);
     expect(button?.getAttribute('aria-disabled')).toBe('true');
@@ -66,7 +74,12 @@ describe('Toggle - Behavior', () => {
 
   it('supports asChild composition and merges host props', () => {
     container = mount(
-      <Toggle asChild pressed data-testid="custom-toggle" data-from-toggle="yes">
+      <Toggle
+        asChild
+        pressed
+        data-testid="custom-toggle"
+        data-from-toggle="yes"
+      >
         <span data-from-child="yes">Mute</span>
       </Toggle>
     );
@@ -89,7 +102,9 @@ describe('Toggle - Behavior', () => {
         <span>Mute</span>
       </Toggle>
     );
-    const host = container.querySelector('[role="button"]') as HTMLElement | null;
+    const host = container.querySelector(
+      '[role="button"]'
+    ) as HTMLElement | null;
 
     host?.click();
 
@@ -104,7 +119,9 @@ describe('Toggle - Behavior', () => {
         <span>Mute</span>
       </Toggle>
     );
-    const host = container.querySelector('[role="button"]') as HTMLElement | null;
+    const host = container.querySelector(
+      '[role="button"]'
+    ) as HTMLElement | null;
 
     expect(host?.getAttribute('aria-disabled')).toBe('true');
     expect(host?.getAttribute('tabindex')).toBe('-1');
@@ -120,7 +137,9 @@ describe('Toggle - Behavior', () => {
     let childRef: HTMLElement | null = null;
 
     container = mount(<Toggle ref={(node) => (nativeRef = node)}>Mute</Toggle>);
-    const button = container.querySelector('button') as HTMLButtonElement | null;
+    const button = container.querySelector(
+      'button'
+    ) as HTMLButtonElement | null;
 
     expect(nativeRef).toBe(button);
 
@@ -130,7 +149,9 @@ describe('Toggle - Behavior', () => {
         <span>Mute</span>
       </Toggle>
     );
-    const host = container.querySelector('[role="button"]') as HTMLElement | null;
+    const host = container.querySelector(
+      '[role="button"]'
+    ) as HTMLElement | null;
 
     expect(childRef).toBe(host);
   });

@@ -168,9 +168,7 @@ describe('NavigationMenu - Behavior', () => {
           <NavigationMenuItem value="docs">
             <NavigationMenuTrigger>Docs</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <NavigationMenuLink href="/docs/start">
-                Start
-              </NavigationMenuLink>
+              <NavigationMenuLink href="/docs/start">Start</NavigationMenuLink>
             </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>
@@ -195,4 +193,3 @@ describe('NavigationMenu - Behavior', () => {
     expect(document.body.textContent).toContain('Start');
   });
 });
-

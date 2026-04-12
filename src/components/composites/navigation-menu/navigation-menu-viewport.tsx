@@ -13,9 +13,7 @@ export function NavigationMenuViewport(
   props: NavigationMenuViewportAsChildProps
 ): JSX.Element;
 export function NavigationMenuViewport(
-  props:
-    | NavigationMenuViewportProps
-    | NavigationMenuViewportAsChildProps
+  props: NavigationMenuViewportProps | NavigationMenuViewportAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
   const root = readNavigationMenuRootContext();

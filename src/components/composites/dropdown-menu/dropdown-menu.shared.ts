@@ -1,5 +1,9 @@
 import { defineContext, readContext } from '@askrjs/askr';
-import { firstEnabledIndex, getMenuItemMetadata, type MenuItemMetadata } from '../../_internal/menu';
+import {
+  firstEnabledIndex,
+  getMenuItemMetadata,
+  type MenuItemMetadata,
+} from '../../_internal/menu';
 import type { OverlayPortal } from '../../_internal/overlay';
 
 export type DropdownMenuRootContextValue = {

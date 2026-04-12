@@ -91,7 +91,9 @@ describe('Slider - Behavior', () => {
     );
 
     let thumb = container.querySelector('[role="slider"]') as HTMLDivElement;
-    const input = container.querySelector('input[type="hidden"]') as HTMLInputElement;
+    const input = container.querySelector(
+      'input[type="hidden"]'
+    ) as HTMLInputElement;
 
     thumb.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'PageUp', bubbles: true })
@@ -161,7 +163,9 @@ describe('Slider - Behavior', () => {
     await flushUpdates();
 
     const thumb = container.querySelector('[role="slider"]') as HTMLDivElement;
-    const input = container.querySelector('input[type="hidden"]') as HTMLInputElement;
+    const input = container.querySelector(
+      'input[type="hidden"]'
+    ) as HTMLInputElement;
 
     thumb.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })

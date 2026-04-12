@@ -202,12 +202,12 @@ Run this loop every week until all phases are complete:
 
 ## Phase 3 — Layout Primitives
 
-| Component | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf | Docs/Exports | Notes                                                                                             |
-| --------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ---- | ------------ | ------------------------------------------------------------------------------------------------- |
-| Flex      | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated layout benchmark coverage now lives in `benches/components/flex.bench.tsx` |
+| Component | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                                               |
+| --------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Flex      | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated layout benchmark coverage now lives in `benches/components/flex.bench.tsx`      |
 | Container | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated layout benchmark coverage now lives in `benches/components/container.bench.tsx` |
-| Grid      | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated layout benchmark coverage now lives in `benches/components/grid.bench.tsx` |
-| Spacer    | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated layout benchmark coverage now lives in `benches/components/spacer.bench.tsx` |
+| Grid      | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated layout benchmark coverage now lives in `benches/components/grid.bench.tsx`      |
+| Spacer    | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated layout benchmark coverage now lives in `benches/components/spacer.bench.tsx`    |
 
 ## Phase 4 — Form And Selection Primitives
 
@@ -262,8 +262,8 @@ Run this loop every week until all phases are complete:
 
 ## Phase 9 — Patterns
 
-| Component     | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf | Docs/Exports | Notes                                                                                                       |
-| ------------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ---- | ------------ | ----------------------------------------------------------------------------------------------------------- |
+| Component     | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                                                                                                                                 |
+| ------------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | DataTable     | done   | done       | done          | done | done         | done  | covered | done         | Core state and view contracts are stable with focused suites green; dedicated scenario benchmarks now live in `benches/components/data-table.bench.tsx`; scoped-context architecture replaces tree-rewriting and injected `__*` props |
-| SidebarLayout | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated scenario benchmarks now live in `benches/components/sidebar-layout.bench.tsx` |
-| TopbarLayout  | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated scenario benchmarks now live in `benches/components/topbar-layout.bench.tsx` |
+| SidebarLayout | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated scenario benchmarks now live in `benches/components/sidebar-layout.bench.tsx`                                                                                     |
+| TopbarLayout  | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated scenario benchmarks now live in `benches/components/topbar-layout.bench.tsx`                                                                                      |

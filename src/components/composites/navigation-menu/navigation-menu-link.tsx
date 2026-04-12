@@ -1,4 +1,9 @@
-import { Slot, composeRefs, mergeProps, rovingFocus } from '@askrjs/askr/foundations';
+import {
+  Slot,
+  composeRefs,
+  mergeProps,
+  rovingFocus,
+} from '@askrjs/askr/foundations';
 import {
   registerCompositeNode,
   getCompositeCollection,
@@ -22,9 +27,7 @@ export function NavigationMenuLink(
   props: NavigationMenuLinkAsChildProps
 ): JSX.Element;
 export function NavigationMenuLink(
-  props:
-    | NavigationMenuLinkProps
-    | NavigationMenuLinkAsChildProps
+  props: NavigationMenuLinkProps | NavigationMenuLinkAsChildProps
 ) {
   const { asChild, children, disabled = false, ref, ...rest } = props;
 
@@ -52,15 +55,12 @@ export function NavigationMenuLink(
 
   const finalProps = mergeProps(stripInternalProps(rest), {
     ...nav.item(surfaceIndex),
-    ref: composeRefs(
-      ref as any,
-      (node: HTMLElement | null) => {
-        registerCompositeNode(surfaceId, collection, node, {
-          index: surfaceIndex,
-          disabled,
-        });
-      }
-    ),
+    ref: composeRefs(ref as any, (node: HTMLElement | null) => {
+      registerCompositeNode(surfaceId, collection, node, {
+        index: surfaceIndex,
+        disabled,
+      });
+    }),
     id: surfaceId,
     'data-slot': 'navigation-menu-link',
     'data-navigation-menu-link': 'true',

@@ -26,9 +26,9 @@ describe('Breadcrumb - Behavior', () => {
       const nav = container.querySelector('nav');
 
       expect(nav?.getAttribute('aria-label')).toBe('Breadcrumb');
-      expect(nav?.getAttribute(BREADCRUMB_A11Y_CONTRACT.DATA_ATTRIBUTES.slot)).toBe(
-        'breadcrumb'
-      );
+      expect(
+        nav?.getAttribute(BREADCRUMB_A11Y_CONTRACT.DATA_ATTRIBUTES.slot)
+      ).toBe('breadcrumb');
     } finally {
       unmount(container);
     }

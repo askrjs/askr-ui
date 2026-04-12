@@ -128,7 +128,9 @@ describe('Checkbox - Behavior', () => {
         <div role="checkbox">Agree</div>
       </Checkbox>
     );
-    let host = container.querySelector('[role="checkbox"]') as HTMLElement | null;
+    let host = container.querySelector(
+      '[role="checkbox"]'
+    ) as HTMLElement | null;
 
     expect(host?.getAttribute('aria-checked')).toBe('true');
 
@@ -160,7 +162,9 @@ describe('Checkbox - Behavior', () => {
         <div role="checkbox">Agree</div>
       </Checkbox>
     );
-    let host = container.querySelector('[role="checkbox"]') as HTMLElement | null;
+    let host = container.querySelector(
+      '[role="checkbox"]'
+    ) as HTMLElement | null;
 
     host?.click();
     await flushUpdates();

@@ -1,4 +1,10 @@
-import { Slot, composeRefs, mergeProps, pressable, rovingFocus } from '@askrjs/askr/foundations';
+import {
+  Slot,
+  composeRefs,
+  mergeProps,
+  pressable,
+  rovingFocus,
+} from '@askrjs/askr/foundations';
 import {
   registerCompositeNode,
   getCompositeCollection,
@@ -24,9 +30,7 @@ export function NavigationMenuSubTrigger(
   props: NavigationMenuSubTriggerAsChildProps
 ): JSX.Element;
 export function NavigationMenuSubTrigger(
-  props:
-    | NavigationMenuSubTriggerProps
-    | NavigationMenuSubTriggerAsChildProps
+  props: NavigationMenuSubTriggerProps | NavigationMenuSubTriggerAsChildProps
 ) {
   const {
     asChild,
@@ -74,16 +78,13 @@ export function NavigationMenuSubTrigger(
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     ...nav.item(surfaceIndex),
-    ref: composeRefs(
-      ref as any,
-      (node: HTMLElement | null) => {
-        overlayNodes.trigger = node;
-        registerCompositeNode(item.triggerId, collection, node, {
-          index: surfaceIndex,
-          disabled: isDisabled,
-        });
-      }
-    ),
+    ref: composeRefs(ref as any, (node: HTMLElement | null) => {
+      overlayNodes.trigger = node;
+      registerCompositeNode(item.triggerId, collection, node, {
+        index: surfaceIndex,
+        disabled: isDisabled,
+      });
+    }),
     id: item.triggerId,
     'aria-haspopup': 'menu',
     'aria-expanded': open ? 'true' : 'false',

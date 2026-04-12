@@ -29,19 +29,25 @@ describe('Flex - Behavior', () => {
   it('should default direction to row', () => {
     container = mount(<Flex />);
     const el = container.querySelector('[data-slot="flex"]');
-    expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.direction)).toBe('row');
+    expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.direction)).toBe(
+      'row'
+    );
   });
 
   it('should emit data-direction attribute when set to column', () => {
     container = mount(<Flex direction="column" />);
     const el = container.querySelector('[data-slot="flex"]');
-    expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.direction)).toBe('column');
+    expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.direction)).toBe(
+      'column'
+    );
   });
 
   it('should emit data-gap attribute', () => {
     container = mount(<Flex gap="1rem" />);
     const el = container.querySelector('[data-slot="flex"]');
-    expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.gap)).toBe('1rem');
+    expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.gap)).toBe(
+      '1rem'
+    );
   });
 
   it('should set gap inline style for valid CSS lengths', () => {
@@ -72,25 +78,33 @@ describe('Flex - Behavior', () => {
   it('should emit data-align attribute', () => {
     container = mount(<Flex align="center" />);
     const el = container.querySelector('[data-slot="flex"]');
-    expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.align)).toBe('center');
+    expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.align)).toBe(
+      'center'
+    );
   });
 
   it('should emit data-justify attribute', () => {
     container = mount(<Flex justify="space-between" />);
     const el = container.querySelector('[data-slot="flex"]');
-    expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.justify)).toBe('space-between');
+    expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.justify)).toBe(
+      'space-between'
+    );
   });
 
   it('should emit data-wrap attribute', () => {
     container = mount(<Flex wrap="wrap" />);
     const el = container.querySelector('[data-slot="flex"]');
-    expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.wrap)).toBe('wrap');
+    expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.wrap)).toBe(
+      'wrap'
+    );
   });
 
   it('should emit data-collapse-below attribute', () => {
     container = mount(<Flex collapseBelow="sm" />);
     const el = container.querySelector('[data-slot="flex"]');
-    expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.collapseBelow)).toBe('sm');
+    expect(
+      el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.collapseBelow)
+    ).toBe('sm');
   });
 
   it('should let user style override computed layout style', () => {

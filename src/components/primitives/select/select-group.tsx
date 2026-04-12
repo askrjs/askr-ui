@@ -37,9 +37,7 @@ function SelectGroupScopeView(props: {
 
 export function SelectGroup(props: SelectGroupProps): JSX.Element;
 export function SelectGroup(props: SelectGroupAsChildProps): JSX.Element;
-export function SelectGroup(
-  props: SelectGroupProps | SelectGroupAsChildProps
-) {
+export function SelectGroup(props: SelectGroupProps | SelectGroupAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
 
   if (readSelectDeclarationContext()) {
@@ -74,12 +72,8 @@ export function SelectGroup(
 }
 
 export function SelectLabel(props: SelectLabelProps): JSX.Element | null;
-export function SelectLabel(
-  props: SelectLabelAsChildProps
-): JSX.Element | null;
-export function SelectLabel(
-  props: SelectLabelProps | SelectLabelAsChildProps
-) {
+export function SelectLabel(props: SelectLabelAsChildProps): JSX.Element | null;
+export function SelectLabel(props: SelectLabelProps | SelectLabelAsChildProps) {
   if (readSelectDeclarationContext()) {
     return null;
   }
@@ -100,7 +94,9 @@ export function SelectLabel(
   return <div {...finalProps}>{children}</div>;
 }
 
-export function SelectSeparator(props: SelectSeparatorProps): JSX.Element | null;
+export function SelectSeparator(
+  props: SelectSeparatorProps
+): JSX.Element | null;
 export function SelectSeparator(
   props: SelectSeparatorAsChildProps
 ): JSX.Element | null;

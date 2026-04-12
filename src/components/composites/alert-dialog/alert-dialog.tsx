@@ -35,8 +35,9 @@ export const AlertDialogTrigger = DialogTrigger as (
   props: AlertDialogTriggerProps | AlertDialogTriggerAsChildProps
 ) => JSX.Element;
 
-export const AlertDialogPortal =
-  DialogPortal as (props: AlertDialogPortalProps) => JSX.Element | null;
+export const AlertDialogPortal = DialogPortal as (
+  props: AlertDialogPortalProps
+) => JSX.Element | null;
 
 export const AlertDialogOverlay = DialogOverlay as (
   props: AlertDialogOverlayProps | AlertDialogOverlayAsChildProps

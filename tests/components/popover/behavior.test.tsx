@@ -203,6 +203,8 @@ describe('Popover - Behavior', () => {
 
     expect(popoverTrigger.getAttribute('aria-expanded')).toBe('false');
     expect(dialogTrigger.getAttribute('aria-expanded')).toBe('true');
-    expect(document.body.querySelector('[data-slot="dialog-content"]')).not.toBeNull();
+    expect(
+      document.body.querySelector('[data-slot="dialog-content"]')
+    ).not.toBeNull();
   });
 });

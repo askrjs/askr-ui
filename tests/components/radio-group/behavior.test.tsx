@@ -1,5 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
-import { RadioGroup, RadioGroupItem } from '../../../src/components/primitives/radio-group';
+import {
+  RadioGroup,
+  RadioGroupItem,
+} from '../../../src/components/primitives/radio-group';
 import { RADIO_GROUP_A11Y_CONTRACT } from '../../../src/components/primitives/radio-group/radio-group.a11y';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
@@ -34,10 +37,14 @@ describe('RadioGroup - Behavior', () => {
     const small = getRadioByText(container, 'Small');
     const medium = getRadioByText(container, 'Medium');
 
-    expect(group?.getAttribute('role')).toBe(RADIO_GROUP_A11Y_CONTRACT.GROUP_ROLE);
+    expect(group?.getAttribute('role')).toBe(
+      RADIO_GROUP_A11Y_CONTRACT.GROUP_ROLE
+    );
     expect(group?.getAttribute('data-orientation')).toBe('horizontal');
     expect(group?.getAttribute('aria-orientation')).toBe('horizontal');
-    expect(small.getAttribute('role')).toBe(RADIO_GROUP_A11Y_CONTRACT.ITEM_ROLE);
+    expect(small.getAttribute('role')).toBe(
+      RADIO_GROUP_A11Y_CONTRACT.ITEM_ROLE
+    );
     expect(small.getAttribute('aria-checked')).toBe('false');
     expect(small.getAttribute('data-state')).toBe('unchecked');
     expect(medium.getAttribute('aria-checked')).toBe('true');
@@ -55,15 +62,15 @@ describe('RadioGroup - Behavior', () => {
     getRadioByText(container, 'Medium').click();
     await flushUpdates();
 
-    expect(getRadioByText(container, 'Small').getAttribute('aria-checked')).toBe(
-      'false'
-    );
-    expect(getRadioByText(container, 'Medium').getAttribute('aria-checked')).toBe(
-      'true'
-    );
-    expect(container.querySelector('input[type="hidden"]')?.getAttribute('value')).toBe(
-      'medium'
-    );
+    expect(
+      getRadioByText(container, 'Small').getAttribute('aria-checked')
+    ).toBe('false');
+    expect(
+      getRadioByText(container, 'Medium').getAttribute('aria-checked')
+    ).toBe('true');
+    expect(
+      container.querySelector('input[type="hidden"]')?.getAttribute('value')
+    ).toBe('medium');
   });
 
   it('supports nested radio items without relying on direct child cloning', async () => {
@@ -81,15 +88,15 @@ describe('RadioGroup - Behavior', () => {
     getRadioByText(container, 'Medium').click();
     await flushUpdates();
 
-    expect(getRadioByText(container, 'Small').getAttribute('aria-checked')).toBe(
-      'false'
-    );
-    expect(getRadioByText(container, 'Medium').getAttribute('aria-checked')).toBe(
-      'true'
-    );
-    expect(container.querySelector('input[type="hidden"]')?.getAttribute('value')).toBe(
-      'medium'
-    );
+    expect(
+      getRadioByText(container, 'Small').getAttribute('aria-checked')
+    ).toBe('false');
+    expect(
+      getRadioByText(container, 'Medium').getAttribute('aria-checked')
+    ).toBe('true');
+    expect(
+      container.querySelector('input[type="hidden"]')?.getAttribute('value')
+    ).toBe('medium');
   });
 
   it('treats value as controlled state when provided', async () => {
@@ -106,12 +113,12 @@ describe('RadioGroup - Behavior', () => {
     await flushUpdates();
 
     expect(onValueChange).toHaveBeenCalledWith('medium');
-    expect(getRadioByText(container, 'Small').getAttribute('aria-checked')).toBe(
-      'true'
-    );
-    expect(getRadioByText(container, 'Medium').getAttribute('aria-checked')).toBe(
-      'false'
-    );
+    expect(
+      getRadioByText(container, 'Small').getAttribute('aria-checked')
+    ).toBe('true');
+    expect(
+      getRadioByText(container, 'Medium').getAttribute('aria-checked')
+    ).toBe('false');
   });
 
   it('blocks interaction when the group or item is disabled', async () => {
@@ -120,7 +127,11 @@ describe('RadioGroup - Behavior', () => {
 
     container = mount(
       <div>
-        <RadioGroup disabled defaultValue="small" onValueChange={onGroupValueChange}>
+        <RadioGroup
+          disabled
+          defaultValue="small"
+          onValueChange={onGroupValueChange}
+        >
           <RadioGroupItem value="small">Group small</RadioGroupItem>
           <RadioGroupItem value="medium">Group medium</RadioGroupItem>
         </RadioGroup>
@@ -132,8 +143,14 @@ describe('RadioGroup - Behavior', () => {
         </RadioGroup>
       </div>
     );
-    const groupMedium = getRadioByText(container, 'Group medium') as HTMLButtonElement;
-    const itemSmall = getRadioByText(container, 'Item small') as HTMLButtonElement;
+    const groupMedium = getRadioByText(
+      container,
+      'Group medium'
+    ) as HTMLButtonElement;
+    const itemSmall = getRadioByText(
+      container,
+      'Item small'
+    ) as HTMLButtonElement;
 
     expect(groupMedium.disabled).toBe(true);
     expect(itemSmall.disabled).toBe(true);
@@ -144,9 +161,9 @@ describe('RadioGroup - Behavior', () => {
 
     expect(onGroupValueChange).not.toHaveBeenCalled();
     expect(onItemValueChange).not.toHaveBeenCalled();
-    expect(getRadioByText(container, 'Item medium').getAttribute('aria-checked')).toBe(
-      'true'
-    );
+    expect(
+      getRadioByText(container, 'Item medium').getAttribute('aria-checked')
+    ).toBe('true');
   });
 
   it('supports asChild item composition and merges host props', () => {
@@ -184,7 +201,9 @@ describe('RadioGroup - Behavior', () => {
         </RadioGroupItem>
       </RadioGroup>
     );
-    const group = container.querySelector('[data-slot="radio-group"]') as HTMLDivElement | null;
+    const group = container.querySelector(
+      '[data-slot="radio-group"]'
+    ) as HTMLDivElement | null;
     const nativeItem = getRadioByText(container, 'Left') as HTMLButtonElement;
 
     expect(groupRef).toBe(group);
@@ -218,7 +237,9 @@ describe('RadioGroup - Behavior', () => {
         </RadioGroup>
       </div>
     );
-    const inputs = Array.from(container.querySelectorAll('input[type="hidden"]'));
+    const inputs = Array.from(
+      container.querySelectorAll('input[type="hidden"]')
+    );
 
     expect(inputs).toHaveLength(1);
     expect(inputs[0]?.getAttribute('name')).toBe('named-size');
@@ -240,12 +261,12 @@ describe('RadioGroup - Behavior', () => {
     );
     await flushUpdates();
 
-    expect(getRadioByText(container, 'Small').getAttribute('aria-checked')).toBe(
-      'true'
-    );
-    expect(getRadioByText(container, 'Medium').getAttribute('aria-checked')).toBe(
-      'false'
-    );
+    expect(
+      getRadioByText(container, 'Small').getAttribute('aria-checked')
+    ).toBe('true');
+    expect(
+      getRadioByText(container, 'Medium').getAttribute('aria-checked')
+    ).toBe('false');
   });
 
   it('does not activate disabled items during keyboard navigation attempts', async () => {
@@ -269,14 +290,14 @@ describe('RadioGroup - Behavior', () => {
     );
     await flushUpdates();
 
-    expect(getRadioByText(container, 'Small').getAttribute('aria-checked')).toBe(
-      'true'
-    );
-    expect(getRadioByText(container, 'Medium').getAttribute('aria-checked')).toBe(
-      'false'
-    );
-    expect(getRadioByText(container, 'Large').getAttribute('aria-checked')).toBe(
-      'false'
-    );
+    expect(
+      getRadioByText(container, 'Small').getAttribute('aria-checked')
+    ).toBe('true');
+    expect(
+      getRadioByText(container, 'Medium').getAttribute('aria-checked')
+    ).toBe('false');
+    expect(
+      getRadioByText(container, 'Large').getAttribute('aria-checked')
+    ).toBe('false');
   });
 });
