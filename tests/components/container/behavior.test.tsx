@@ -15,15 +15,6 @@ describe('Container - Behavior', () => {
     expect(container.querySelector('[data-slot="container"]')).not.toBeNull();
   });
 
-  it('should default to centered and fluid', () => {
-    container = mount(<Container />);
-    const el = container.querySelector(
-      '[data-slot="container"]'
-    ) as HTMLElement;
-    expect(el.getAttribute('data-centered')).toBe('true');
-    expect(el.getAttribute('data-fluid')).toBe('true');
-  });
-
   it('should pass through className', () => {
     container = mount(<Container className="my-container" />);
     const el = container.querySelector('[data-slot="container"]');

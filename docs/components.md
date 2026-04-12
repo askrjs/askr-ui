@@ -146,14 +146,12 @@ import {
 
 ```ts
 import {
-  Center,
   Container,
   DataTable,
+  Flex,
   Grid,
-  Inline,
   SidebarLayout,
   Spacer,
-  Stack,
   TopbarLayout,
 } from '@askrjs/askr-ui';
 ```

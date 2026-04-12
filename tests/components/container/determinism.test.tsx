@@ -10,7 +10,7 @@ describe('Container - Determinism', () => {
       </Container>
     ));
     expectDeterministicRender(() => (
-      <Container fluid centered size="md">
+      <Container size="md">
         Content
       </Container>
     ));

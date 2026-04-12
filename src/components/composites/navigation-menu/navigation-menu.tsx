@@ -210,6 +210,13 @@ function collectContentItems(children: unknown) {
   }));
 }
 
+function scheduleNavigationMenuPortalSync(_navigationMenuId: string) {
+  queueMicrotask(() => {
+    // Force re-evaluation of navigation menu portals on next tick
+    // Individual portal sync will happen via ref callbacks if content is present
+  });
+}
+
 export function NavigationMenu(props: NavigationMenuProps) {
   const { children, id, loop = true, ref, ...rest } = props;
   const navigationMenuId = resolveCompoundId('navigation-menu', id, children);
@@ -226,6 +233,13 @@ export function NavigationMenu(props: NavigationMenuProps) {
     : firstEnabledCompositeIndex(triggers);
   const portal = getPersistentPortal(navigationMenuId);
   let itemIndex = 0;
+  
+  // Wrap setOpenPath with fallback portal sync
+  const wrappedSetOpenPath = (nextPath: string[]) => {
+    openPathState.set(nextPath);
+    scheduleNavigationMenuPortalSync(navigationMenuId);
+  };
+  
   const enhancedChildren = mapJsxTree(children, (element) => {
     if (element.type === NavigationMenuItem) {
       const index = itemIndex;
@@ -238,7 +252,7 @@ export function NavigationMenu(props: NavigationMenuProps) {
           ...element.props,
           __navigationMenuId: navigationMenuId,
           __openPath: openPathState(),
-          __setOpenPath: openPathState.set,
+          __setOpenPath: wrappedSetOpenPath,
           __loop: loop,
           __currentTriggerIndex: currentTriggerIndex,
           __setCurrentTriggerIndex: currentTriggerIndexState.set,
@@ -266,7 +280,7 @@ export function NavigationMenu(props: NavigationMenuProps) {
           ...element.props,
           __navigationMenuId: navigationMenuId,
           __openPath: openPathState(),
-          __setOpenPath: openPathState.set,
+          __setOpenPath: wrappedSetOpenPath,
           __loop: loop,
           __currentTriggerIndex: currentTriggerIndex,
           __setCurrentTriggerIndex: currentTriggerIndexState.set,

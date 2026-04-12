@@ -1,13 +1,14 @@
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
 import { isCssLength, mergeLayoutStyles } from '../../_internal/layout';
-import type { InlineAsChildProps, InlineDivProps } from './inline.types';
+import type { FlexAsChildProps, FlexDivProps } from './flex.types';
 
-export function Inline(props: InlineDivProps): JSX.Element;
-export function Inline(props: InlineAsChildProps): JSX.Element;
-export function Inline(props: InlineDivProps | InlineAsChildProps) {
+export function Flex(props: FlexDivProps): JSX.Element;
+export function Flex(props: FlexAsChildProps): JSX.Element;
+export function Flex(props: FlexDivProps | FlexAsChildProps) {
   const {
     asChild,
     children,
+    direction = 'row',
     gap,
     align,
     justify,
@@ -20,7 +21,7 @@ export function Inline(props: InlineDivProps | InlineAsChildProps) {
 
   const layoutStyle: Record<string, string | number> = {
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: direction,
   };
   if (isCssLength(gap)) layoutStyle.gap = gap!;
   if (align) layoutStyle.alignItems = align;
@@ -29,7 +30,8 @@ export function Inline(props: InlineDivProps | InlineAsChildProps) {
 
   const finalProps = mergeProps(rest, {
     ref,
-    'data-slot': 'inline',
+    'data-slot': 'flex',
+    'data-direction': direction,
     'data-gap': gap,
     'data-align': align,
     'data-justify': justify,

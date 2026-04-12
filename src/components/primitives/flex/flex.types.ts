@@ -1,6 +1,8 @@
 import type { JSXElement, Ref } from '@askrjs/askr/foundations';
 
-export type InlineOwnProps = {
+export type FlexOwnProps = {
+  /** Flex direction. Defaults to 'row'. */
+  direction?: 'row' | 'column';
   /** CSS gap value or named spacing token. Inline style only applied for real CSS lengths. */
   gap?: string;
   /** CSS align-items value. */
@@ -10,27 +12,27 @@ export type InlineOwnProps = {
   /** CSS flex-wrap value. */
   wrap?: 'wrap' | 'nowrap' | 'wrap-reverse';
   /**
-   * Named breakpoint below which the row layout collapses to a column.
+   * Named breakpoint below which a row layout collapses to a column.
    * Official themes recognize `sm`, `md`, `lg`, and `xl`.
    */
   collapseBelow?: string;
   children?: unknown;
 };
 
-export type InlineDivProps = Omit<
+export type FlexDivProps = Omit<
   JSX.IntrinsicElements['div'],
   'children' | 'ref'
 > &
-  InlineOwnProps & {
+  FlexOwnProps & {
     asChild?: false;
     ref?: Ref<HTMLDivElement>;
   };
 
-export type InlineAsChildProps = InlineOwnProps & {
+export type FlexAsChildProps = FlexOwnProps & {
   asChild: true;
   children: JSXElement;
   ref?: Ref<unknown>;
   style?: JSX.IntrinsicElements['div']['style'];
 };
 
-export type InlineProps = InlineDivProps | InlineAsChildProps;
+export type FlexProps = FlexDivProps | FlexAsChildProps;
