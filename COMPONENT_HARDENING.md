@@ -107,7 +107,7 @@ A component is ready to close when all of the following are true:
 | -------------- | ------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | --------------------------------------------------------------- |
 | Breadcrumb     | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Keep semantics passive and minimal                              |
 | Pagination     | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Verify navigation semantics and naming                          |
-| Menubar        | pending | pending    | pending       | pending | pending      | pending | covered | pending      | High-risk architecture pass; portal-child a11y regression fixed |
+| Menubar        | done    | done       | done          | done    | done         | done    | covered | done         | Split root/menu/content/item/group/shared files replace injected props; declaration-backed metadata plus an explicit fallback-portal sync keep nested submenu rendering deterministic |
 | NavigationMenu | pending | pending    | pending       | pending | pending      | pending | covered | pending      | High-risk architecture pass                                     |
 | Toast          | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Verify announcement and portal behavior                         |
 
