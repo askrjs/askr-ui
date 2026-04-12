@@ -10,7 +10,17 @@ const compositeCollections = new Map<
   string,
   ReturnType<typeof createCollection<HTMLElement, CompositeCollectionMetadata>>
 >();
-const compositeUnregisters = new Map<string, () => void>();
+const compositeRegistrations = new Map<
+  string,
+  {
+    collection: ReturnType<
+      typeof createCollection<HTMLElement, CompositeCollectionMetadata>
+    >;
+    node: HTMLElement;
+    metadata: CompositeCollectionMetadata;
+    unregister: () => void;
+  }
+>();
 
 export function getCompositeCollection(id: string) {
   const existing = compositeCollections.get(id);
@@ -24,6 +34,28 @@ export function getCompositeCollection(id: string) {
   return created;
 }
 
+export function getCompositeCollectionItems(
+  collection: ReturnType<
+    typeof createCollection<HTMLElement, CompositeCollectionMetadata>
+  >
+): CompositeCollectionMetadata[] {
+  return collection
+    .items()
+    .map((item) => item.metadata)
+    .sort((left, right) => left.index - right.index);
+}
+
+function isSameCompositeMetadata(
+  left: CompositeCollectionMetadata,
+  right: CompositeCollectionMetadata
+): boolean {
+  return (
+    left.index === right.index &&
+    left.disabled === right.disabled &&
+    left.value === right.value
+  );
+}
+
 export function registerCompositeNode(
   key: string,
   collection: ReturnType<
@@ -31,15 +63,39 @@ export function registerCompositeNode(
   >,
   node: HTMLElement | null,
   metadata: CompositeCollectionMetadata
-) {
-  compositeUnregisters.get(key)?.();
+): boolean {
+  const existing = compositeRegistrations.get(key);
 
   if (!node) {
-    compositeUnregisters.delete(key);
-    return;
+    existing?.unregister();
+    compositeRegistrations.delete(key);
+    return Boolean(existing);
   }
 
-  compositeUnregisters.set(key, collection.register(node, metadata));
+  const metadataChanged =
+    !existing || !isSameCompositeMetadata(existing.metadata, metadata);
+
+  if (
+    existing &&
+    existing.collection === collection &&
+    existing.node === node &&
+    !metadataChanged
+  ) {
+    return false;
+  }
+
+  existing?.unregister();
+
+  const unregister = collection.register(node, metadata);
+
+  compositeRegistrations.set(key, {
+    collection,
+    node,
+    metadata,
+    unregister,
+  });
+
+  return metadataChanged;
 }
 
 export function firstEnabledCompositeIndex(

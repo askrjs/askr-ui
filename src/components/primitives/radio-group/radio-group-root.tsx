@@ -9,15 +9,14 @@ import {
   disabledIndexes,
   firstEnabledCompositeIndex,
   getCompositeCollection,
+  getCompositeCollectionItems,
 } from '../../_internal/composite';
 import { resolveCompoundId } from '../../_internal/id';
-import { collectJsxElements } from '../../_internal/jsx';
-import { RadioGroupItem } from './radio-group-item';
 import {
   createRadioGroupRenderContext,
+  readRadioGroupRootContext,
   RadioGroupRenderContext,
   RadioGroupRootContext,
-  type RadioGroupItemMetadata,
   type RadioGroupRootContextValue,
 } from './radio-group.shared';
 import type { RadioGroupProps } from './radio-group.types';
@@ -105,20 +104,33 @@ export function RadioGroup(props: RadioGroupProps) {
     typeof id === 'string' ? id : undefined,
     children
   );
+  const collection = getCompositeCollection(groupId);
+  const itemsVersion = state(0);
+  itemsVersion();
   const valueState = controllableState({
     value,
     defaultValue,
     onChange: onValueChange,
   });
-  const items = collectJsxElements(
-    children,
-    (element) => element.type === RadioGroupItem
-  ).map(
-    (element): RadioGroupItemMetadata => ({
-      value: String(element.props?.value ?? ''),
-      disabled: disabled || Boolean(element.props?.disabled),
-    })
-  );
+  const items = getCompositeCollectionItems(collection).map((item) => ({
+    value: String(item.value ?? ''),
+    disabled: item.disabled,
+  }));
+  let itemsSyncQueued = false;
+  const notifyItemsChanged = () => {
+    itemsVersion.set((currentVersion) => currentVersion + 1);
+  };
+  const scheduleItemsSync = () => {
+    if (itemsSyncQueued) {
+      return;
+    }
+
+    itemsSyncQueued = true;
+    queueMicrotask(() => {
+      itemsSyncQueued = false;
+      notifyItemsChanged();
+    });
+  };
   const selectedIndex = items.findIndex((item) => item.value === valueState());
   const fallbackIndex = firstEnabledCompositeIndex(items);
   const currentIndexState = state(
@@ -137,6 +149,8 @@ export function RadioGroup(props: RadioGroupProps) {
     groupId,
     value: valueState(),
     setValue: valueState.set,
+    notifyItemsChanged,
+    scheduleItemsSync,
     orientation,
     loop,
     disabled,
@@ -167,5 +181,3 @@ export function RadioGroup(props: RadioGroupProps) {
     </RadioGroupRootContext.Scope>
   );
 }
-
-import { readRadioGroupRootContext } from './radio-group.shared';

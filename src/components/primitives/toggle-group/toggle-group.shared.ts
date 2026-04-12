@@ -10,6 +10,8 @@ export type ToggleGroupRootContextValue = {
   type: 'single' | 'multiple';
   value: string | string[];
   setValue: (value: string | string[]) => void;
+  notifyItemsChanged: () => void;
+  scheduleItemsSync: () => void;
   orientation: 'horizontal' | 'vertical';
   loop: boolean;
   disabled: boolean;

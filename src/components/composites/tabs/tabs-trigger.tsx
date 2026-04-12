@@ -12,25 +12,20 @@ import {
   registerCompositeNode,
 } from '../../_internal/composite';
 import {
-  isDisclosureValueOpen,
-  toggleDisclosureValue,
-} from '../../_internal/disclosure';
-import { resolvePartId } from '../../_internal/id';
-import {
-  readToggleGroupRenderContext,
-  readToggleGroupRootContext,
-} from './toggle-group.shared';
+  getTabsContentId,
+  getTabsTriggerId,
+  readTabsRenderContext,
+  readTabsRootContext,
+} from './tabs.shared';
 import type {
-  ToggleGroupItemAsChildProps,
-  ToggleGroupItemProps,
-} from './toggle-group.types';
+  TabsTriggerAsChildProps,
+  TabsTriggerProps,
+} from './tabs.types';
 
-export function ToggleGroupItem(props: ToggleGroupItemProps): JSX.Element;
-export function ToggleGroupItem(
-  props: ToggleGroupItemAsChildProps
-): JSX.Element;
-export function ToggleGroupItem(
-  props: ToggleGroupItemProps | ToggleGroupItemAsChildProps
+export function TabsTrigger(props: TabsTriggerProps): JSX.Element;
+export function TabsTrigger(props: TabsTriggerAsChildProps): JSX.Element;
+export function TabsTrigger(
+  props: TabsTriggerProps | TabsTriggerAsChildProps
 ) {
   const {
     asChild,
@@ -42,12 +37,13 @@ export function ToggleGroupItem(
     value,
     ...rest
   } = props;
-  const root = readToggleGroupRootContext();
-  const renderContext = readToggleGroupRenderContext();
-  const itemIndex = renderContext.claimItemIndex();
-  const itemId = resolvePartId(root.groupId, `item-${itemIndex}`);
-  const collection = getCompositeCollection(root.groupId);
-  const isDisabled = root.disabled || disabled;
+  const root = readTabsRootContext();
+  const renderContext = readTabsRenderContext();
+  const itemIndex = renderContext.claimTriggerIndex();
+  const triggerId = getTabsTriggerId(root.tabsId, value);
+  const contentId = getTabsContentId(root.tabsId, value);
+  const collection = getCompositeCollection(root.tabsId);
+  const isDisabled = disabled;
   const disabledItemIndexes = disabledIndexes(root.items);
   const nav = rovingFocus({
     currentIndex: root.currentIndex,
@@ -60,16 +56,14 @@ export function ToggleGroupItem(
       focusSelectedCollectionItem(collection, index);
     },
   });
-  const pressed = isDisclosureValueOpen(root.type, root.value, value);
+  const selected = root.value === value;
   const interactionProps = pressable({
     disabled: isDisabled,
     onPress: (event) => {
       onPress?.(event);
 
       if (!event.defaultPrevented) {
-        root.setValue(
-          toggleDisclosureValue(root.type, root.value, value, true)
-        );
+        root.setValue(value);
         root.setCurrentIndex(itemIndex);
       }
     },
@@ -85,7 +79,7 @@ export function ToggleGroupItem(
         | null
         | undefined,
       (node: HTMLElement | null) => {
-        const changed = registerCompositeNode(itemId, collection, node, {
+        const changed = registerCompositeNode(triggerId, collection, node, {
           index: itemIndex,
           disabled: isDisabled,
           value,
@@ -96,12 +90,20 @@ export function ToggleGroupItem(
         }
       }
     ),
-    id: itemId,
-    'aria-pressed': pressed ? 'true' : 'false',
-    'data-slot': 'toggle-group-item',
-    'data-state': pressed ? 'on' : 'off',
+    id: triggerId,
+    role: 'tab',
+    'aria-selected': selected ? 'true' : 'false',
+    'aria-controls': contentId,
+    'data-slot': 'tabs-trigger',
+    'data-state': selected ? 'active' : 'inactive',
     'data-disabled': isDisabled ? 'true' : undefined,
-    tabIndex: isDisabled && asChild ? -1 : undefined,
+    onFocus: () => {
+      root.setCurrentIndex(itemIndex);
+
+      if (root.activationMode === 'automatic' && !isDisabled) {
+        root.setValue(value);
+      }
+    },
   });
 
   if (asChild) {

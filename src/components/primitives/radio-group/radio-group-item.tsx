@@ -32,6 +32,7 @@ export function RadioGroupItem(
   const itemIndex = renderContext.claimItemIndex();
   const itemId = resolvePartId(root.groupId, `item-${itemIndex}`);
   const collection = getCompositeCollection(root.groupId);
+  const isDisabled = root.disabled || disabled;
   const disabledItemIndexes = disabledIndexes(root.items);
   const nav = rovingFocus({
     currentIndex: root.currentIndex,
@@ -50,7 +51,6 @@ export function RadioGroupItem(
       }
     },
   });
-  const isDisabled = root.disabled || disabled;
   const checked = root.value === value;
   const interactionProps = pressable({
     disabled: isDisabled,
@@ -70,11 +70,15 @@ export function RadioGroupItem(
         | null
         | undefined,
       (node: HTMLElement | null) => {
-        registerCompositeNode(itemId, collection, node, {
+        const changed = registerCompositeNode(itemId, collection, node, {
           index: itemIndex,
           disabled: isDisabled,
           value,
         });
+
+        if (changed) {
+          root.scheduleItemsSync();
+        }
       }
     ),
     id: itemId,

@@ -68,9 +68,9 @@ A component is ready to close when all of the following are true:
 | Checkbox    | in progress | done       | done          | done    | review       | done    | covered | done         | Controlled and uncontrolled parity now matches Switch; `asChild` still uses bespoke interaction wiring |
 | Switch      | in progress | done       | done          | done    | review       | done    | covered | done         | Uncontrolled rendering after press still needs deeper follow-up                |
 | Toggle      | done        | done       | done          | done    | done         | done    | covered | done         | Pressed-state contract and `asChild` semantics locked                          |
-| RadioGroup  | in progress | done       | done          | done    | review       | done    | covered | done         | Context replaces cloned item injection and the file is split; root still scans item metadata pending shared collection cleanup |
+| RadioGroup  | done        | done       | done          | done    | done         | done    | covered | done         | Context replaces cloned item injection and the file is split; live collection snapshots now drive item metadata |
 | Slider      | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Validate input semantics and perf                                              |
-| ToggleGroup | in progress | done       | done          | done    | review       | done    | covered | done         | Context replaces item injection and the file is split; root still scans item metadata pending shared collection cleanup |
+| ToggleGroup | done        | done       | done          | done    | done         | done    | covered | done         | Context replaces item injection and the file is split; live collection snapshots now drive item metadata |
 | Select      | in progress | review     | done          | done    | review       | done    | covered | review       | Context replaces injected props and group rewriting; item metadata still uses collection scanning |
 
 ## Phase 5 — Infrastructure Composites
@@ -88,7 +88,7 @@ A component is ready to close when all of the following are true:
 | ----------- | ------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | --------------------------------------------- |
 | Collapsible | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Reference for simple open-state compound APIs |
 | Accordion   | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Check grouped disclosure consistency          |
-| Tabs        | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Reference for compound selection semantics    |
+| Tabs        | in progress | review  | done          | done    | review       | done    | covered | done         | Context replaces injected props and the file is split; live collection snapshots drive runtime metadata, with a narrow initial fallback scan only when uncontrolled and no default value is provided |
 
 ## Phase 7 — Overlay And Menu Composites
 

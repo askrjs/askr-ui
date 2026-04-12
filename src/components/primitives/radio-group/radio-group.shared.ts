@@ -9,6 +9,8 @@ export type RadioGroupRootContextValue = {
   groupId: string;
   value: string;
   setValue: (value: string) => void;
+  notifyItemsChanged: () => void;
+  scheduleItemsSync: () => void;
   orientation: 'horizontal' | 'vertical' | 'both';
   loop: boolean;
   disabled: boolean;

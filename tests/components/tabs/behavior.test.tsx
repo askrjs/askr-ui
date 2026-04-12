@@ -24,10 +24,11 @@ function getButtonByText(
 }
 
 describe('Tabs - Behavior', () => {
-  let container: HTMLElement;
+  let container: HTMLElement | undefined;
 
   afterEach(() => {
     unmount(container);
+    container = undefined;
   });
 
   it('should support automatic and manual activation', async () => {
@@ -76,5 +77,59 @@ describe('Tabs - Behavior', () => {
         container.querySelectorAll(`[role="${TABS_A11Y_CONTRACT.PANEL_ROLE}"]`)
       ).some((panel) => panel.textContent?.includes('Settings manual panel'))
     ).toBe(true);
+  });
+
+  it('supports nested trigger and content composition through context', async () => {
+    container = mount(
+      <Tabs defaultValue="overview">
+        <TabsList>
+          <div>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+          </div>
+          <div>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </div>
+        </TabsList>
+        <section>
+          <TabsContent value="overview">Overview panel</TabsContent>
+        </section>
+        <section>
+          <TabsContent value="settings">Settings panel</TabsContent>
+        </section>
+      </Tabs>
+    );
+
+    const settingsButton = getButtonByText(container, 'Settings');
+
+    settingsButton.click();
+    await flushUpdates();
+
+    expect(
+      container.querySelector(`[role="${TABS_A11Y_CONTRACT.PANEL_ROLE}"]`)
+        ?.textContent
+    ).toContain('Settings panel');
+  });
+
+  it('selects the first enabled tab when uncontrolled and no default value is provided', async () => {
+    container = mount(
+      <Tabs>
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview">Overview panel</TabsContent>
+        <TabsContent value="settings">Settings panel</TabsContent>
+      </Tabs>
+    );
+
+    await flushUpdates();
+
+    expect(
+      container.querySelector(`[role="${TABS_A11Y_CONTRACT.PANEL_ROLE}"]`)
+        ?.textContent
+    ).toContain('Overview panel');
+    expect(getButtonByText(container, 'Overview').getAttribute('aria-selected')).toBe(
+      'true'
+    );
   });
 });
