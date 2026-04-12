@@ -1,4 +1,4 @@
-import { collectJsxElements } from '../../_internal/jsx';
+import { state } from '@askrjs/askr';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import {
   clearOverlayPosition,
@@ -15,7 +15,6 @@ import {
   type DialogPositionOptions,
   type DialogRootContextValue,
 } from './dialog.shared';
-import { DialogTitle } from './dialog-title';
 import type { DialogProps } from './dialog.types';
 
 function scheduleDialogPortalSync(callback: () => void) {
@@ -55,14 +54,8 @@ export function Dialog(props: DialogProps) {
   const portal = getPersistentPortal(dialogId);
   const overlayNodes = getOverlayNodes(dialogId);
   const position: DialogPositionOptions = resolveDialogPositionOptions();
-  const hasTitle = collectJsxElements(
-    children,
-    (element) => element.type === DialogTitle
-  ).length > 0;
-  const hasDescription = collectJsxElements(
-    children,
-    (element) => element.type === DialogDescription
-  ).length > 0;
+  const hasTitleState = state(false);
+  const hasDescriptionState = state(false);
 
   const rootContext: DialogRootContextValue = {
     dialogId,
@@ -85,9 +78,19 @@ export function Dialog(props: DialogProps) {
     contentId,
     titleId,
     descriptionId,
-    hasTitle,
-    hasDescription,
+    hasTitle: hasTitleState(),
+    hasDescription: hasDescriptionState(),
     portal,
+    setTitleNode: (node: HTMLElement | null) => {
+      if (node && !hasTitleState()) {
+        hasTitleState.set(true);
+      }
+    },
+    setDescriptionNode: (node: HTMLElement | null) => {
+      if (node && !hasDescriptionState()) {
+        hasDescriptionState.set(true);
+      }
+    },
     setTriggerNode: (node: HTMLElement | null) => {
       overlayNodes.trigger = node;
     },

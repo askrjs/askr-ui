@@ -1,4 +1,5 @@
 import {
+  composeRefs,
   Slot,
   mergeProps,
 } from '@askrjs/askr/foundations';
@@ -18,7 +19,16 @@ export function DialogDescription(
   const { asChild, children, ref, ...rest } = props;
   const root = readDialogRootContext();
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: composeRefs(
+      ref as
+        | ((value: HTMLElement | null) => void)
+        | { current: HTMLElement | null }
+        | null
+        | undefined,
+      (node: HTMLElement | null) => {
+        root.setDescriptionNode(node);
+      }
+    ),
     id: root.descriptionId,
     'data-slot': 'dialog-description',
   });
