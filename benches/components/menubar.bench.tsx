@@ -6,7 +6,7 @@ import {
   MenubarMenu,
   MenubarPortal,
   MenubarTrigger,
-} from '../../src/components/menubar';
+} from '../../src/components';
 
 describe('Menubar benches', () => {
   bench('create menubar', () => {

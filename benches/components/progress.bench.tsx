@@ -1,5 +1,5 @@
 import { bench, describe } from 'vite-plus/test';
-import { Progress, ProgressIndicator } from '../../src/components/progress';
+import { Progress, ProgressIndicator } from '../../src/components';
 
 describe('Progress benches', () => {
   bench('create progress', () => {

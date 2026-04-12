@@ -4,7 +4,7 @@ import {
   BreadcrumbCurrent,
   BreadcrumbItem,
   BreadcrumbList,
-} from '../../src/components/breadcrumb';
+} from '../../src/components';
 
 describe('Breadcrumb benches', () => {
   bench('create breadcrumb', () => {

@@ -4,7 +4,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from '../../src/components/toast';
+} from '../../src/components';
 
 describe('Toast benches', () => {
   bench('create toast stack', () => {
