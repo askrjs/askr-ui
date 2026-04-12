@@ -439,9 +439,3 @@ export type DataTableErrorOwnProps = {
 export type DataTableErrorProps = BoxProps<'div', HTMLDivElement> &
   DataTableErrorOwnProps;
 
-// ─── Injected props (internal) ───
-
-export type InjectedDataTableProps<T> = {
-  __table?: DataTableInstance<T>;
-  __tableId?: string;
-};

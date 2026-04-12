@@ -1,18 +1,17 @@
 import { mergeProps } from '@askrjs/askr/foundations';
 import { DATA_TABLE_A11Y_CONTRACT } from './data-table.a11y';
+import { readDataTableRootContext } from './data-table.shared';
 import type {
   DataTableEmptyProps,
   DataTableErrorProps,
   DataTableLoadingProps,
-  InjectedDataTableProps,
 } from './data-table.types';
 
 const SLOTS = DATA_TABLE_A11Y_CONTRACT.SLOTS;
 
-export function DataTableEmpty<T>(
-  props: DataTableEmptyProps & InjectedDataTableProps<T>
-) {
-  const { children, ref, __table, __tableId, ...rest } = props;
+export function DataTableEmpty(props: DataTableEmptyProps) {
+  const { children, ref, ...rest } = props;
+  readDataTableRootContext();
 
   const finalProps = mergeProps(rest, {
     ref,
@@ -22,10 +21,9 @@ export function DataTableEmpty<T>(
   return <div {...finalProps}>{children ?? 'No data available'}</div>;
 }
 
-export function DataTableLoading<T>(
-  props: DataTableLoadingProps & InjectedDataTableProps<T>
-) {
-  const { children, ref, __table, __tableId, ...rest } = props;
+export function DataTableLoading(props: DataTableLoadingProps) {
+  const { children, ref, ...rest } = props;
+  readDataTableRootContext();
 
   const finalProps = mergeProps(rest, {
     ref,
@@ -36,10 +34,9 @@ export function DataTableLoading<T>(
   return <div {...finalProps}>{children ?? 'Loading...'}</div>;
 }
 
-export function DataTableError<T>(
-  props: DataTableErrorProps & InjectedDataTableProps<T>
-) {
-  const { children, ref, __table, __tableId, ...rest } = props;
+export function DataTableError(props: DataTableErrorProps) {
+  const { children, ref, ...rest } = props;
+  readDataTableRootContext();
 
   const finalProps = mergeProps(rest, {
     ref,

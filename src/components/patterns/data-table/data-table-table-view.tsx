@@ -1,5 +1,6 @@
 import { mergeProps, pressable } from '@askrjs/askr/foundations';
 import { DATA_TABLE_A11Y_CONTRACT } from './data-table.a11y';
+import { readDataTableRootContext } from './data-table.shared';
 import type {
   DataTableCellProps,
   DataTableExpandedRowProps,
@@ -9,21 +10,19 @@ import type {
   DataTableTableBodyProps,
   DataTableTableHeaderProps,
   DataTableTableViewProps,
-  InjectedDataTableProps,
 } from './data-table.types';
 
 const SLOTS = DATA_TABLE_A11Y_CONTRACT.SLOTS;
 
-export function DataTableTableView<T>(
-  props: DataTableTableViewProps & InjectedDataTableProps<T>
-) {
-  const { children, ref, __table, __tableId, ...rest } = props;
+export function DataTableTableView(props: DataTableTableViewProps) {
+  const { children, ref, ...rest } = props;
+  const { table } = readDataTableRootContext();
 
   const finalProps = mergeProps(rest, {
     ref,
     'data-slot': SLOTS.table,
     'data-responsive-view': 'table',
-    'aria-busy': __table?.getDataState() === 'loading' ? 'true' : undefined,
+    'aria-busy': table.getDataState() === 'loading' ? 'true' : undefined,
   });
 
   if (children !== undefined && children !== null) {
@@ -33,18 +32,17 @@ export function DataTableTableView<T>(
   // Auto-render default table structure
   return (
     <table {...finalProps}>
-      <DataTableTableHeader __table={__table} __tableId={__tableId}>
-        <DataTableHeaderRow __table={__table} __tableId={__tableId} />
+      <DataTableTableHeader>
+        <DataTableHeaderRow />
       </DataTableTableHeader>
-      <DataTableTableBody __table={__table} __tableId={__tableId} />
+      <DataTableTableBody />
     </table>
   );
 }
 
-export function DataTableTableHeader<T>(
-  props: DataTableTableHeaderProps & InjectedDataTableProps<T>
-) {
-  const { children, ref, __table, __tableId, ...rest } = props;
+export function DataTableTableHeader(props: DataTableTableHeaderProps) {
+  const { children, ref, ...rest } = props;
+  readDataTableRootContext();
 
   const finalProps = mergeProps(rest, {
     ref,
@@ -54,10 +52,9 @@ export function DataTableTableHeader<T>(
   return <thead {...finalProps}>{children}</thead>;
 }
 
-export function DataTableTableBody<T>(
-  props: DataTableTableBodyProps & InjectedDataTableProps<T>
-) {
-  const { children, ref, __table, __tableId, ...rest } = props;
+export function DataTableTableBody(props: DataTableTableBodyProps) {
+  const { children, ref, ...rest } = props;
+  const { table } = readDataTableRootContext();
 
   const finalProps = mergeProps(rest, {
     ref,
@@ -69,23 +66,16 @@ export function DataTableTableBody<T>(
   }
 
   // Auto-render rows
-  const pageRows = __table?.getPageRows() ?? [];
+  const pageRows = table.getPageRows();
 
   return (
     <tbody {...finalProps}>
       {pageRows.map((row) => [
-        <DataTableRow
-          key={row.id}
-          row={row}
-          __table={__table}
-          __tableId={__tableId}
-        />,
+        <DataTableRow key={row.id} row={row} />,
         row.isExpanded() ? (
           <DataTableExpandedRow
             key={`${row.id}-expanded`}
             row={row}
-            __table={__table}
-            __tableId={__tableId}
           />
         ) : null,
       ])}
@@ -93,10 +83,9 @@ export function DataTableTableBody<T>(
   );
 }
 
-export function DataTableHeaderRow<T>(
-  props: DataTableHeaderRowProps & InjectedDataTableProps<T>
-) {
-  const { children, ref, __table, __tableId, ...rest } = props;
+export function DataTableHeaderRow(props: DataTableHeaderRowProps) {
+  const { children, ref, ...rest } = props;
+  const { table } = readDataTableRootContext();
 
   const finalProps = mergeProps(rest, {
     ref,
@@ -108,7 +97,7 @@ export function DataTableHeaderRow<T>(
   }
 
   // Auto-render header cells
-  const columns = __table?.getVisibleColumns() ?? [];
+  const columns = table.getVisibleColumns();
 
   return (
     <tr {...finalProps}>
@@ -116,21 +105,18 @@ export function DataTableHeaderRow<T>(
         <DataTableHead
           key={col.id}
           column={col}
-          __table={__table}
-          __tableId={__tableId}
         />
       ))}
     </tr>
   );
 }
 
-export function DataTableHead<T>(
-  props: DataTableHeadProps & InjectedDataTableProps<T>
-) {
-  const { children, column, ref, __table, __tableId, ...rest } = props;
+export function DataTableHead(props: DataTableHeadProps) {
+  const { children, column, ref, ...rest } = props;
+  const { table } = readDataTableRootContext();
 
   const sortDirection = column
-    ? __table?.getColumnSortDirection(column.id)
+    ? table.getColumnSortDirection(column.id)
     : false;
 
   const ariaSortValue =
@@ -154,10 +140,10 @@ export function DataTableHead<T>(
     children ??
     (typeof column?.header === 'function' ? column.header() : column?.header);
 
-  if (column?.sortable && __table) {
+  if (column?.sortable) {
     const interactionProps = pressable({
       disabled: false,
-      onPress: () => __table.toggleSort(column.id),
+      onPress: () => table.toggleSort(column.id),
       isNativeButton: true,
     });
 
@@ -177,10 +163,9 @@ export function DataTableHead<T>(
   return <th {...finalProps}>{headerContent}</th>;
 }
 
-export function DataTableRow<T>(
-  props: DataTableRowProps<T> & InjectedDataTableProps<T>
-) {
-  const { children, row, ref, __table, __tableId, ...rest } = props;
+export function DataTableRow<T>(props: DataTableRowProps<T>) {
+  const { children, row, ref, ...rest } = props;
+  readDataTableRootContext();
 
   const finalProps = mergeProps(rest, {
     ref,
@@ -201,21 +186,15 @@ export function DataTableRow<T>(
   return (
     <tr {...finalProps}>
       {cells.map((cell) => (
-        <DataTableCell
-          key={cell.id}
-          cell={cell}
-          __table={__table}
-          __tableId={__tableId}
-        />
+        <DataTableCell key={cell.id} cell={cell} />
       ))}
     </tr>
   );
 }
 
-export function DataTableCell<T>(
-  props: DataTableCellProps<T> & InjectedDataTableProps<T>
-) {
-  const { children, cell, ref, __table, __tableId, ...rest } = props;
+export function DataTableCell<T>(props: DataTableCellProps<T>) {
+  const { children, cell, ref, ...rest } = props;
+  readDataTableRootContext();
 
   const finalProps = mergeProps(rest, {
     ref,
@@ -226,11 +205,10 @@ export function DataTableCell<T>(
   return <td {...finalProps}>{children ?? cell.renderValue()}</td>;
 }
 
-export function DataTableExpandedRow<T>(
-  props: DataTableExpandedRowProps<T> & InjectedDataTableProps<T>
-) {
-  const { children, row, ref, __table, __tableId, ...rest } = props;
-  const colCount = __table?.getVisibleColumns().length ?? 1;
+export function DataTableExpandedRow<T>(props: DataTableExpandedRowProps<T>) {
+  const { children, row, ref, ...rest } = props;
+  const { table } = readDataTableRootContext();
+  const colCount = table.getVisibleColumns().length;
 
   const finalProps = mergeProps(rest, {
     ref,
