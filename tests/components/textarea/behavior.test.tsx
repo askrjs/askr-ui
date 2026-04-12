@@ -34,6 +34,17 @@ describe('Textarea - Behavior', () => {
     expect(textarea?.getAttribute('data-disabled')).toBe('true');
   });
 
+  it('preserves readonly semantics on native textareas', () => {
+    container = mount(<Textarea readOnly>Locked notes</Textarea>);
+
+    const textarea = container.querySelector(
+      'textarea'
+    ) as HTMLTextAreaElement | null;
+
+    expect(textarea?.readOnly).toBe(true);
+    expect(textarea?.hasAttribute('readonly')).toBe(true);
+  });
+
   it('supports asChild composition and merges host props', () => {
     container = mount(
       <Textarea asChild data-testid="custom-textarea" data-from-textarea="yes">
@@ -62,6 +73,19 @@ describe('Textarea - Behavior', () => {
 
     expect(host?.disabled).toBe(true);
     expect(host?.getAttribute('data-disabled')).toBe('true');
+  });
+
+  it('preserves readonly semantics on asChild textarea hosts', () => {
+    container = mount(
+      <Textarea asChild readOnly>
+        <textarea aria-label="Notes" />
+      </Textarea>
+    );
+
+    const host = container.querySelector('textarea') as HTMLTextAreaElement | null;
+
+    expect(host?.readOnly).toBe(true);
+    expect(host?.hasAttribute('readonly')).toBe(true);
   });
 
   it('fails loudly when asChild does not receive a native textarea host', () => {

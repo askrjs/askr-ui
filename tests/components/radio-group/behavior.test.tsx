@@ -224,4 +224,59 @@ describe('RadioGroup - Behavior', () => {
     expect(inputs[0]?.getAttribute('name')).toBe('named-size');
     expect(inputs[0]?.getAttribute('value')).toBe('medium');
   });
+
+  it('does not wrap selection at boundaries when loop is false', async () => {
+    container = mount(
+      <RadioGroup defaultValue="small" orientation="horizontal" loop={false}>
+        <RadioGroupItem value="small">Small</RadioGroupItem>
+        <RadioGroupItem value="medium">Medium</RadioGroupItem>
+      </RadioGroup>
+    );
+
+    const small = getRadioByText(container, 'Small');
+    small.focus();
+    small.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true })
+    );
+    await flushUpdates();
+
+    expect(getRadioByText(container, 'Small').getAttribute('aria-checked')).toBe(
+      'true'
+    );
+    expect(getRadioByText(container, 'Medium').getAttribute('aria-checked')).toBe(
+      'false'
+    );
+  });
+
+  it('does not activate disabled items during keyboard navigation attempts', async () => {
+    container = mount(
+      <RadioGroup defaultValue="small" orientation="vertical">
+        <RadioGroupItem value="small">Small</RadioGroupItem>
+        <RadioGroupItem value="medium" disabled>
+          Medium
+        </RadioGroupItem>
+        <RadioGroupItem value="large">Large</RadioGroupItem>
+      </RadioGroup>
+    );
+
+    const small = getRadioByText(container, 'Small');
+    small.focus();
+    small.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
+    );
+    small.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })
+    );
+    await flushUpdates();
+
+    expect(getRadioByText(container, 'Small').getAttribute('aria-checked')).toBe(
+      'true'
+    );
+    expect(getRadioByText(container, 'Medium').getAttribute('aria-checked')).toBe(
+      'false'
+    );
+    expect(getRadioByText(container, 'Large').getAttribute('aria-checked')).toBe(
+      'false'
+    );
+  });
 });
