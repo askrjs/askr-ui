@@ -214,15 +214,15 @@ Run this loop every week until all phases are complete:
 | ---------------- | ------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | -------------------------------------- |
 | FocusRing        | done    | done       | done          | done    | done         | done    | covered | done         | Focus modality and `data-focus-visible` semantics are locked; focused behavior, a11y, and determinism suites are green |
 | FocusScope       | done    | done       | done          | done    | done         | done    | covered | done         | Trap/loop/restore semantics are locked; focused behavior, a11y, and determinism suites are green |
-| DismissableLayer | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Lock outside-interaction rules         |
+| DismissableLayer | done    | done       | done          | done    | done         | done    | covered | done         | Outside-interaction dismissal rules are locked; focused behavior, a11y, and determinism suites are green |
 | Field            | in progress | review  | done          | done    | done         | done    | covered | review       | Context replaces injected props; FieldTextarea and a shared control adapter now consolidate the wrapper layer |
 
 ## Phase 6 — Disclosure Composites
 
 | Component   | Status  | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf    | Docs/Exports | Notes                                         |
 | ----------- | ------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | --------------------------------------------- |
-| Collapsible | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Reference for simple open-state compound APIs |
-| Accordion   | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Check grouped disclosure consistency          |
+| Collapsible | done    | done       | done          | done    | done         | done    | covered | done         | Root/trigger/content now use scoped context instead of hidden injected props; focused behavior, a11y, and determinism suites are green |
+| Accordion   | done    | done       | done          | done    | done         | done    | covered | done         | Root/item/parts now use scoped context instead of hidden injected props and tree rewriting; focused behavior, a11y, and determinism suites are green |
 | Tabs        | in progress | review  | done          | done    | review       | done    | covered | done         | Context replaces injected props and the file is split; live collection snapshots drive runtime metadata, with a narrow initial fallback scan only when uncontrolled and no default value is provided |
 
 ## Phase 7 — Overlay And Menu Composites
@@ -233,8 +233,8 @@ Run this loop every week until all phases are complete:
 | DropdownMenu | done    | done       | done          | done    | done         | done    | covered | done         | Split root/trigger/portal/content/item/group/shared files align with Menu while preserving overlay semantics |
 | Dialog       | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Lock title/description semantics                      |
 | AlertDialog  | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Align with Dialog while preserving stricter semantics |
-| Popover      | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Verify default labelling rules                        |
-| Tooltip      | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Verify delayed/open semantics stay deterministic      |
+| Popover      | done    | done       | done          | done    | done         | done    | covered | done         | Scoped root context and split files preserve overlay semantics; focused behavior, a11y, and determinism suites are green |
+| Tooltip      | done    | done       | done          | done    | done         | done    | covered | done         | Scoped root context and split files preserve delayed/open behavior; focused behavior, a11y, and determinism suites are green |
 
 ## Phase 8 — Navigation And Feedback Composites
 
