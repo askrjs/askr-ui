@@ -26,26 +26,26 @@ Do not add scorecard rows for removed or non-exported components.
 ### Performance Budget Policy
 
 - Every component pass must either:
-	- include benchmark coverage for its hot paths, or
-	- record a temporary waiver with rationale and expiry date.
+  - include benchmark coverage for its hot paths, or
+  - record a temporary waiver with rationale and expiry date.
 - Any benchmarked component that regresses by more than 10% from the prior accepted baseline is blocked from closing until investigated.
 - Perf budgets are enforced at category level:
-	- Presentational and layout primitives: stable mount/update path with no avoidable work spikes.
-	- Form and selection primitives: stable interaction throughput under repeated input events.
-	- Overlay and navigation composites: stable open/close and item navigation paths.
-	- Pattern components: explicit scenario benchmarks for realistic row/layout counts.
+  - Presentational and layout primitives: stable mount/update path with no avoidable work spikes.
+  - Form and selection primitives: stable interaction throughput under repeated input events.
+  - Overlay and navigation composites: stable open/close and item navigation paths.
+  - Pattern components: explicit scenario benchmarks for realistic row/layout counts.
 
 ### API Stability Policy
 
 - After a component reaches done, only the following changes are allowed without deprecation:
-	- additive non-breaking props,
-	- additive data attributes,
-	- bug fixes that preserve documented behavior.
+  - additive non-breaking props,
+  - additive data attributes,
+  - bug fixes that preserve documented behavior.
 - Breaking API or semantic behavior changes require:
-	- a deprecation note in docs,
-	- migration guidance,
-	- updated type tests and contract tests,
-	- explicit sign-off in this file notes.
+  - a deprecation note in docs,
+  - migration guidance,
+  - updated type tests and contract tests,
+  - explicit sign-off in this file notes.
 - Public API, docs, and type contract parity is mandatory before close.
 
 ## Global Phase Gates
@@ -155,6 +155,64 @@ Use this format when a component cannot immediately satisfy a gate:
 - Owner:
 - Follow-up issue:
 
+## Active Waivers
+
+- Component: Flex
+- Gate: Performance
+- Reason: Dedicated benchmark coverage for layout primitive update throughput has not been added yet.
+- Mitigation in place: Focused behavior, accessibility, and determinism suites are green.
+- Expiry date: 2026-05-31
+- Owner: hardening-program
+- Follow-up issue: Add `benches/components/flex.bench.tsx` and baseline report.
+
+- Component: Container
+- Gate: Performance
+- Reason: Dedicated benchmark coverage for mount/update cost has not been added yet.
+- Mitigation in place: Focused behavior, accessibility, and determinism suites are green.
+- Expiry date: 2026-05-31
+- Owner: hardening-program
+- Follow-up issue: Add `benches/components/container.bench.tsx` and baseline report.
+
+- Component: Grid
+- Gate: Performance
+- Reason: Dedicated benchmark coverage for responsive layout updates has not been added yet.
+- Mitigation in place: Focused behavior, accessibility, and determinism suites are green.
+- Expiry date: 2026-05-31
+- Owner: hardening-program
+- Follow-up issue: Add `benches/components/grid.bench.tsx` and baseline report.
+
+- Component: Spacer
+- Gate: Performance
+- Reason: Dedicated benchmark coverage for spacing utility mount/update cost has not been added yet.
+- Mitigation in place: Focused behavior, accessibility, and determinism suites are green.
+- Expiry date: 2026-05-31
+- Owner: hardening-program
+- Follow-up issue: Add `benches/components/spacer.bench.tsx` and baseline report.
+
+- Component: DataTable
+- Gate: Performance
+- Reason: Pattern-level benchmark scenarios are not yet covering realistic row and interaction loads.
+- Mitigation in place: State and view contract suites are green with broad functional coverage.
+- Expiry date: 2026-05-31
+- Owner: hardening-program
+- Follow-up issue: Expand `benches/components/forms.bench.tsx` with data-table scenarios or add dedicated data-table bench suite.
+
+- Component: SidebarLayout
+- Gate: Performance
+- Reason: Pattern-level benchmark coverage for composition and update throughput is not present yet.
+- Mitigation in place: Focused behavior, accessibility, and determinism suites are green.
+- Expiry date: 2026-05-31
+- Owner: hardening-program
+- Follow-up issue: Add `benches/components/sidebar-layout.bench.tsx` scenario coverage.
+
+- Component: TopbarLayout
+- Gate: Performance
+- Reason: Pattern-level benchmark coverage for composition and update throughput is not present yet.
+- Mitigation in place: Focused behavior, accessibility, and determinism suites are green.
+- Expiry date: 2026-05-31
+- Owner: hardening-program
+- Follow-up issue: Add `benches/components/topbar-layout.bench.tsx` scenario coverage.
+
 ## Weekly Governance Loop
 
 Run this loop every week until all phases are complete:
@@ -167,89 +225,89 @@ Run this loop every week until all phases are complete:
 
 ## Phase 1 — Reference Primitives
 
-| Component | Status      | API/Naming | Slots/Styling | A11y   | Architecture | Tests | Perf    | Docs/Exports | Notes                                                               |
-| --------- | ----------- | ---------- | ------------- | ------ | ------------ | ----- | ------- | ------------ | ------------------------------------------------------------------- |
-| Button    | done        | done       | done          | done   | done         | done  | covered | done         | Interaction contract and `asChild` behavior locked                  |
-| Label     | done        | done       | done          | done   | done         | done  | covered | done         | Native label contract and `asChild` merge path locked               |
-| Input     | done        | done       | done          | done   | done         | done  | covered | done         | `asChild` now fails loudly unless the host is a native `<input>`; targeted behavior, a11y, and determinism suites are green |
-| Separator | done        | done       | done          | done   | done         | done  | covered | done         | Semantic vs decorative separator contract locked                    |
+| Component | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                       |
+| --------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| Button    | done   | done       | done          | done | done         | done  | covered | done         | Interaction contract and `asChild` behavior locked                                                                          |
+| Label     | done   | done       | done          | done | done         | done  | covered | done         | Native label contract and `asChild` merge path locked                                                                       |
+| Input     | done   | done       | done          | done | done         | done  | covered | done         | `asChild` now fails loudly unless the host is a native `<input>`; targeted behavior, a11y, and determinism suites are green |
+| Separator | done   | done       | done          | done | done         | done  | covered | done         | Semantic vs decorative separator contract locked                                                                            |
 
 ## Phase 2 — Presentational Primitives
 
-| Component      | Status  | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf    | Docs/Exports | Notes                                        |
-| -------------- | ------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | -------------------------------------------- |
-| Badge          | done    | done       | done          | done    | done         | done    | covered | done         | Passive variant hooks and asChild contract locked |
-| Spinner        | done    | done       | done          | done    | done         | done    | covered | done         | Alias contract remains intentionally minimal and stable; focused behavior, a11y, and determinism suites are green |
-| Skeleton       | done    | done       | done          | done    | done         | done    | covered | done         | Slot contract is minimal and deterministic; focused behavior, a11y, and determinism suites are green |
-| Avatar         | done    | done       | done          | done    | done         | done    | covered | done         | Scoped-context root/image/fallback flow replaced child scanning and hidden injected props while preserving load/fallback semantics |
-| Progress       | done    | done       | done          | done    | done         | done    | covered | done         | Scoped-context root/indicator contract replaced tree rewriting and hidden injected props; focused suites are green |
-| ProgressCircle | done    | done       | done          | done    | done         | done    | covered | done         | Scoped-context root/indicator contract replaced tree rewriting and hidden injected props; Spinner alias remains stable on top |
-| VisuallyHidden | done    | done       | done          | done    | done         | done    | covered | done         | Hidden-content contract is stable and deterministic; focused behavior, a11y, and determinism suites are green |
+| Component      | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                              |
+| -------------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Badge          | done   | done       | done          | done | done         | done  | covered | done         | Passive variant hooks and asChild contract locked                                                                                  |
+| Spinner        | done   | done       | done          | done | done         | done  | covered | done         | Alias contract remains intentionally minimal and stable; focused behavior, a11y, and determinism suites are green                  |
+| Skeleton       | done   | done       | done          | done | done         | done  | covered | done         | Slot contract is minimal and deterministic; focused behavior, a11y, and determinism suites are green                               |
+| Avatar         | done   | done       | done          | done | done         | done  | covered | done         | Scoped-context root/image/fallback flow replaced child scanning and hidden injected props while preserving load/fallback semantics |
+| Progress       | done   | done       | done          | done | done         | done  | covered | done         | Scoped-context root/indicator contract replaced tree rewriting and hidden injected props; focused suites are green                 |
+| ProgressCircle | done   | done       | done          | done | done         | done  | covered | done         | Scoped-context root/indicator contract replaced tree rewriting and hidden injected props; Spinner alias remains stable on top      |
+| VisuallyHidden | done   | done       | done          | done | done         | done  | covered | done         | Hidden-content contract is stable and deterministic; focused behavior, a11y, and determinism suites are green                      |
 
 ## Phase 3 — Layout Primitives
 
-| Component | Status  | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf | Docs/Exports | Notes                                 |
-| --------- | ------- | ---------- | ------------- | ------- | ------------ | ------- | ---- | ------------ | ------------------------------------- |
-| Flex      | done    | done       | done          | done    | done         | done    | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit |
-| Container | done    | done       | done          | done    | done         | done    | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit |
-| Grid      | done    | done       | done          | done    | done         | done    | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit |
-| Spacer    | done    | done       | done          | done    | done         | done    | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit |
+| Component | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf | Docs/Exports | Notes                                                                                             |
+| --------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ---- | ------------ | ------------------------------------------------------------------------------------------------- |
+| Flex      | done   | done       | done          | done | done         | done  | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit |
+| Container | done   | done       | done          | done | done         | done  | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit |
+| Grid      | done   | done       | done          | done | done         | done  | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit |
+| Spacer    | done   | done       | done          | done | done         | done  | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit |
 
 ## Phase 4 — Form And Selection Primitives
 
-| Component   | Status      | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf    | Docs/Exports | Notes                                                                          |
-| ----------- | ----------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | ------------------------------------------------------------------------------ |
-| Textarea    | done        | done       | done          | done    | done         | done    | covered | done         | `asChild` now fails loudly unless the host is a native `<textarea>`; targeted behavior, a11y, and determinism suites are green |
-| Checkbox    | done        | done       | done          | done    | done         | done    | covered | done         | `asChild` now delegates activation through shared press semantics while preserving checkbox role and mixed-state hooks |
-| Switch      | done        | done       | done          | done    | done         | done    | covered | done         | Hidden form input reflection after uncontrolled presses is now explicitly locked by behavior coverage |
-| Toggle      | done        | done       | done          | done    | done         | done    | covered | done         | Pressed-state contract and `asChild` semantics locked                          |
-| RadioGroup  | done        | done       | done          | done    | done         | done    | covered | done         | Context replaces cloned item injection and the file is split; live collection snapshots now drive item metadata |
-| Slider      | done        | done       | done          | done    | done         | done    | covered | done         | Scoped root context replaced hidden injected props and JSX tree rewriting; focused behavior, a11y, and determinism suites are green |
-| ToggleGroup | done        | done       | done          | done    | done         | done    | covered | done         | Context replaces item injection and the file is split; live collection snapshots now drive item metadata |
-| Select      | done        | done       | done          | done    | done         | done    | covered | done         | File split plus declaration-backed metadata store remove the root item scan while preserving closed trigger text and overlay semantics |
+| Component   | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                                  |
+| ----------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Textarea    | done   | done       | done          | done | done         | done  | covered | done         | `asChild` now fails loudly unless the host is a native `<textarea>`; targeted behavior, a11y, and determinism suites are green         |
+| Checkbox    | done   | done       | done          | done | done         | done  | covered | done         | `asChild` now delegates activation through shared press semantics while preserving checkbox role and mixed-state hooks                 |
+| Switch      | done   | done       | done          | done | done         | done  | covered | done         | Hidden form input reflection after uncontrolled presses is now explicitly locked by behavior coverage                                  |
+| Toggle      | done   | done       | done          | done | done         | done  | covered | done         | Pressed-state contract and `asChild` semantics locked                                                                                  |
+| RadioGroup  | done   | done       | done          | done | done         | done  | covered | done         | Context replaces cloned item injection and the file is split; live collection snapshots now drive item metadata                        |
+| Slider      | done   | done       | done          | done | done         | done  | covered | done         | Scoped root context replaced hidden injected props and JSX tree rewriting; focused behavior, a11y, and determinism suites are green    |
+| ToggleGroup | done   | done       | done          | done | done         | done  | covered | done         | Context replaces item injection and the file is split; live collection snapshots now drive item metadata                               |
+| Select      | done   | done       | done          | done | done         | done  | covered | done         | File split plus declaration-backed metadata store remove the root item scan while preserving closed trigger text and overlay semantics |
 
 ## Phase 5 — Infrastructure Composites
 
-| Component        | Status  | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf    | Docs/Exports | Notes                                  |
-| ---------------- | ------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | -------------------------------------- |
-| FocusRing        | done    | done       | done          | done    | done         | done    | covered | done         | Focus modality and `data-focus-visible` semantics are locked; focused behavior, a11y, and determinism suites are green |
-| FocusScope       | done    | done       | done          | done    | done         | done    | covered | done         | Trap/loop/restore semantics are locked; focused behavior, a11y, and determinism suites are green |
-| DismissableLayer | done    | done       | done          | done    | done         | done    | covered | done         | Outside-interaction dismissal rules are locked; focused behavior, a11y, and determinism suites are green |
-| Field            | done        | done    | done          | done    | done         | done    | covered | done         | Context replaces injected props; FieldTextarea and a shared control adapter consolidate the wrapper layer, with focused behavior, a11y, and determinism suites green |
+| Component        | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                                                                |
+| ---------------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FocusRing        | done   | done       | done          | done | done         | done  | covered | done         | Focus modality and `data-focus-visible` semantics are locked; focused behavior, a11y, and determinism suites are green                                               |
+| FocusScope       | done   | done       | done          | done | done         | done  | covered | done         | Trap/loop/restore semantics are locked; focused behavior, a11y, and determinism suites are green                                                                     |
+| DismissableLayer | done   | done       | done          | done | done         | done  | covered | done         | Outside-interaction dismissal rules are locked; focused behavior, a11y, and determinism suites are green                                                             |
+| Field            | done   | done       | done          | done | done         | done  | covered | done         | Context replaces injected props; FieldTextarea and a shared control adapter consolidate the wrapper layer, with focused behavior, a11y, and determinism suites green |
 
 ## Phase 6 — Disclosure Composites
 
-| Component   | Status  | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf    | Docs/Exports | Notes                                         |
-| ----------- | ------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | --------------------------------------------- |
-| Collapsible | done    | done       | done          | done    | done         | done    | covered | done         | Root/trigger/content now use scoped context instead of hidden injected props; focused behavior, a11y, and determinism suites are green |
-| Accordion   | done    | done       | done          | done    | done         | done    | covered | done         | Root/item/parts now use scoped context instead of hidden injected props and tree rewriting; focused behavior, a11y, and determinism suites are green |
-| Tabs        | done        | done    | done          | done    | done         | done    | covered | done         | Context replaces injected props and the file is split; live collection snapshots drive runtime metadata with a narrow uncontrolled no-default fallback scan, and focused behavior, a11y, and determinism suites are green |
+| Component   | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                                                                                                                     |
+| ----------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Collapsible | done   | done       | done          | done | done         | done  | covered | done         | Root/trigger/content now use scoped context instead of hidden injected props; focused behavior, a11y, and determinism suites are green                                                                                    |
+| Accordion   | done   | done       | done          | done | done         | done  | covered | done         | Root/item/parts now use scoped context instead of hidden injected props and tree rewriting; focused behavior, a11y, and determinism suites are green                                                                      |
+| Tabs        | done   | done       | done          | done | done         | done  | covered | done         | Context replaces injected props and the file is split; live collection snapshots drive runtime metadata with a narrow uncontrolled no-default fallback scan, and focused behavior, a11y, and determinism suites are green |
 
 ## Phase 7 — Overlay And Menu Composites
 
-| Component    | Status  | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf    | Docs/Exports | Notes                                                 |
-| ------------ | ------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | ----------------------------------------------------- |
-| Menu         | done    | done       | done          | done    | done         | done    | covered | done         | Split root/content/item/group/shared files and declaration-backed metadata replace injected props plus JSX tree rewriting |
-| DropdownMenu | done    | done       | done          | done    | done         | done    | covered | done         | Split root/trigger/portal/content/item/group/shared files align with Menu while preserving overlay semantics |
-| Dialog       | done    | done       | done          | done    | done         | done    | covered | done         | Title/description semantics now come from scoped registration callbacks instead of root child-type scans; focused behavior, a11y, and determinism suites are green |
-| AlertDialog  | done    | done       | done          | done    | done         | done    | covered | done         | Dialog-aligned wrapper contract with strict alert semantics is locked; focused behavior, a11y, and determinism suites are green |
-| Popover      | done    | done       | done          | done    | done         | done    | covered | done         | Scoped root context and split files preserve overlay semantics; focused behavior, a11y, and determinism suites are green |
-| Tooltip      | done    | done       | done          | done    | done         | done    | covered | done         | Scoped root context and split files preserve delayed/open behavior; focused behavior, a11y, and determinism suites are green |
+| Component    | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                                                              |
+| ------------ | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Menu         | done   | done       | done          | done | done         | done  | covered | done         | Split root/content/item/group/shared files and declaration-backed metadata replace injected props plus JSX tree rewriting                                          |
+| DropdownMenu | done   | done       | done          | done | done         | done  | covered | done         | Split root/trigger/portal/content/item/group/shared files align with Menu while preserving overlay semantics                                                       |
+| Dialog       | done   | done       | done          | done | done         | done  | covered | done         | Title/description semantics now come from scoped registration callbacks instead of root child-type scans; focused behavior, a11y, and determinism suites are green |
+| AlertDialog  | done   | done       | done          | done | done         | done  | covered | done         | Dialog-aligned wrapper contract with strict alert semantics is locked; focused behavior, a11y, and determinism suites are green                                    |
+| Popover      | done   | done       | done          | done | done         | done  | covered | done         | Scoped root context and split files preserve overlay semantics; focused behavior, a11y, and determinism suites are green                                           |
+| Tooltip      | done   | done       | done          | done | done         | done  | covered | done         | Scoped root context and split files preserve delayed/open behavior; focused behavior, a11y, and determinism suites are green                                       |
 
 ## Phase 8 — Navigation And Feedback Composites
 
-| Component      | Status  | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf    | Docs/Exports | Notes                                                           |
-| -------------- | ------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | --------------------------------------------------------------- |
-| Breadcrumb     | done    | done       | done          | done    | done         | done    | covered | done         | Passive semantics locked; root/default labelling and asChild composition are covered by focused behavior, a11y, and determinism suites |
-| Pagination     | done    | done       | done          | done    | done         | done    | covered | done         | Scoped-context refactor removed tree rewriting and hidden injected props; focused behavior, a11y, and determinism suites are green |
-| Menubar        | done    | done       | done          | done    | done         | done    | covered | done         | Split root/menu/content/item/group/shared files replace injected props; declaration-backed metadata plus an explicit fallback-portal sync keep nested submenu rendering deterministic |
-| NavigationMenu | done    | done       | done          | done    | done         | done    | covered | done         | Root/content now use registration-backed scoped context metadata instead of element-type scanning or placeholder indexes; focused behavior, a11y, and determinism suites are green |
-| Toast          | done    | done       | done          | done    | done         | done    | covered | done         | Provider/toast scoped contexts replaced tree rewriting and hidden injected props; behavior, a11y, and determinism suites are green |
+| Component      | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                                                                                 |
+| -------------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Breadcrumb     | done   | done       | done          | done | done         | done  | covered | done         | Passive semantics locked; root/default labelling and asChild composition are covered by focused behavior, a11y, and determinism suites                                                |
+| Pagination     | done   | done       | done          | done | done         | done  | covered | done         | Scoped-context refactor removed tree rewriting and hidden injected props; focused behavior, a11y, and determinism suites are green                                                    |
+| Menubar        | done   | done       | done          | done | done         | done  | covered | done         | Split root/menu/content/item/group/shared files replace injected props; declaration-backed metadata plus an explicit fallback-portal sync keep nested submenu rendering deterministic |
+| NavigationMenu | done   | done       | done          | done | done         | done  | covered | done         | Root/content now use registration-backed scoped context metadata instead of element-type scanning or placeholder indexes; focused behavior, a11y, and determinism suites are green    |
+| Toast          | done   | done       | done          | done | done         | done  | covered | done         | Provider/toast scoped contexts replaced tree rewriting and hidden injected props; behavior, a11y, and determinism suites are green                                                    |
 
 ## Phase 9 — Patterns
 
-| Component     | Status  | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf | Docs/Exports | Notes                                 |
-| ------------- | ------- | ---------- | ------------- | ------- | ------------ | ------- | ---- | ------------ | ------------------------------------- |
-| DataTable     | done    | done       | done          | done    | done         | done    | gap  | done         | Core state and view contracts are stable with focused suites green; benchmark coverage gap remains explicit |
-| SidebarLayout | done    | done       | done          | done    | done         | done    | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit |
-| TopbarLayout  | done    | done       | done          | done    | done         | done    | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit |
+| Component     | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf | Docs/Exports | Notes                                                                                                       |
+| ------------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ---- | ------------ | ----------------------------------------------------------------------------------------------------------- |
+| DataTable     | done   | done       | done          | done | done         | done  | gap  | done         | Core state and view contracts are stable with focused suites green; benchmark coverage gap remains explicit |
+| SidebarLayout | done   | done       | done          | done | done         | done  | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit           |
+| TopbarLayout  | done   | done       | done          | done | done         | done  | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit           |
