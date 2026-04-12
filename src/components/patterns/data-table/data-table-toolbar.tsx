@@ -1,17 +1,16 @@
 import { mergeProps } from '@askrjs/askr/foundations';
 import { DATA_TABLE_A11Y_CONTRACT } from './data-table.a11y';
+import { readDataTableRootContext } from './data-table.shared';
 import type {
   DataTableSearchProps,
   DataTableToolbarProps,
-  InjectedDataTableProps,
 } from './data-table.types';
 
 const SLOTS = DATA_TABLE_A11Y_CONTRACT.SLOTS;
 
-export function DataTableToolbar<T>(
-  props: DataTableToolbarProps & InjectedDataTableProps<T>
-) {
-  const { children, ref, __table, __tableId, ...rest } = props;
+export function DataTableToolbar(props: DataTableToolbarProps) {
+  const { children, ref, ...rest } = props;
+  readDataTableRootContext();
 
   const finalProps = mergeProps(rest, {
     ref,
@@ -21,22 +20,19 @@ export function DataTableToolbar<T>(
   return <div {...finalProps}>{children}</div>;
 }
 
-export function DataTableSearch<T>(
-  props: DataTableSearchProps & InjectedDataTableProps<T>
-) {
+export function DataTableSearch(props: DataTableSearchProps) {
   const {
     placeholder,
     debounceMs = 300,
     ref,
-    __table,
-    __tableId,
     ...rest
   } = props;
+  const { table, tableId } = readDataTableRootContext();
 
   let debounceTimer: ReturnType<typeof setTimeout> | undefined;
   const providedName = (rest as { name?: string }).name;
   const providedId = (rest as { id?: string }).id;
-  const fallbackFieldId = __tableId ? `${__tableId}-search` : undefined;
+  const fallbackFieldId = `${tableId}-search`;
 
   const handleInput = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -44,11 +40,12 @@ export function DataTableSearch<T>(
 
     if (debounceMs > 0) {
       clearTimeout(debounceTimer);
+      // Timer is necessary for input debounce; covered by determinism test
       debounceTimer = setTimeout(() => {
-        __table?.setGlobalFilter(value);
+        table.setGlobalFilter(value);
       }, debounceMs);
     } else {
-      __table?.setGlobalFilter(value);
+      table.setGlobalFilter(value);
     }
   };
 

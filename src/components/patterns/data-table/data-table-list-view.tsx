@@ -1,5 +1,6 @@
 import { mergeProps } from '@askrjs/askr/foundations';
 import { DATA_TABLE_A11Y_CONTRACT } from './data-table.a11y';
+import { readDataTableRootContext } from './data-table.shared';
 import type {
   DataTableListActionsProps,
   DataTableListExpandedProps,
@@ -7,15 +8,13 @@ import type {
   DataTableListMainProps,
   DataTableListMetaProps,
   DataTableListViewProps,
-  InjectedDataTableProps,
 } from './data-table.types';
 
 const SLOTS = DATA_TABLE_A11Y_CONTRACT.SLOTS;
 
-export function DataTableListView<T>(
-  props: DataTableListViewProps & InjectedDataTableProps<T>
-) {
-  const { children, ref, __table, __tableId, ...rest } = props;
+export function DataTableListView(props: DataTableListViewProps) {
+  const { children, ref, ...rest } = props;
+  const { table } = readDataTableRootContext();
 
   const finalProps = mergeProps(rest, {
     ref,
@@ -29,26 +28,20 @@ export function DataTableListView<T>(
   }
 
   // Auto-render list items
-  const pageRows = __table?.getPageRows() ?? [];
+  const pageRows = table.getPageRows();
 
   return (
     <ul {...finalProps}>
       {pageRows.map((row) => (
-        <DataTableListItem
-          key={row.id}
-          row={row}
-          __table={__table}
-          __tableId={__tableId}
-        />
+        <DataTableListItem key={row.id} row={row} />
       ))}
     </ul>
   );
 }
 
-export function DataTableListItem<T>(
-  props: DataTableListItemProps<T> & InjectedDataTableProps<T>
-) {
-  const { children, row, ref, __table, __tableId, ...rest } = props;
+export function DataTableListItem<T>(props: DataTableListItemProps<T>) {
+  const { children, row, ref, ...rest } = props;
+  readDataTableRootContext();
 
   const finalProps = mergeProps(rest, {
     ref,
