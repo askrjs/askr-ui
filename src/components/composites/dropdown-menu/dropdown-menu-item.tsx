@@ -57,14 +57,22 @@ export function DropdownMenuItem(
 
   const itemId = resolvePartId(root.dropdownMenuId, `item-${itemIndex}`);
   const { items, currentIndex, disabledIndexes } = resolveDropdownMenuState(root);
+  const hasEnabledItems = items.some(
+    (_item, index) => !disabledIndexes.includes(index)
+  );
   const collection = getMenuCollection(root.dropdownMenuId);
   const nav = rovingFocus({
     currentIndex,
     itemCount: Math.max(items.length, 1),
     orientation: 'vertical',
     loop: true,
-    isDisabled: (index) => disabledIndexes.includes(index),
+    isDisabled: (index) =>
+      hasEnabledItems ? disabledIndexes.includes(index) : false,
     onNavigate: (index) => {
+      if (!hasEnabledItems) {
+        return;
+      }
+
       root.setCurrentIndex(index);
       focusSelectedCollectionItem(collection, index);
     },

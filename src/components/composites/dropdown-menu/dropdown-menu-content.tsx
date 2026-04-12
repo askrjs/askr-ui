@@ -50,6 +50,9 @@ export function DropdownMenuContent(
 
   const root = readDropdownMenuRootContext();
   const { items, currentIndex, disabledIndexes } = resolveDropdownMenuState(root);
+  const hasEnabledItems = items.some(
+    (_item, index) => !disabledIndexes.includes(index)
+  );
   const overlayNodes = getOverlayNodes(root.dropdownMenuId);
   const collection = getMenuCollection(root.dropdownMenuId);
   const nav = rovingFocus({
@@ -57,8 +60,13 @@ export function DropdownMenuContent(
     itemCount: Math.max(items.length, 1),
     orientation: 'vertical',
     loop: true,
-    isDisabled: (index) => disabledIndexes.includes(index),
+    isDisabled: (index) =>
+      hasEnabledItems ? disabledIndexes.includes(index) : false,
     onNavigate: (index) => {
+      if (!hasEnabledItems) {
+        return;
+      }
+
       root.setCurrentIndex(index);
       focusSelectedCollectionItem(collection, index);
     },
@@ -83,7 +91,7 @@ export function DropdownMenuContent(
           clearOverlayPosition(root.dropdownMenuId);
         }
 
-        if (node && root.open) {
+        if (node && root.open && hasEnabledItems) {
           focusSelectedCollectionItem(collection, currentIndex);
         }
       }
