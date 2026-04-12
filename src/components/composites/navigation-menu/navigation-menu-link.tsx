@@ -4,7 +4,8 @@ import {
   getCompositeCollection,
 } from '../../_internal/composite';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
-import { getOverlayNodes, resolvePartId } from '../../_internal/overlay';
+import { getOverlayNodes } from '../../_internal/overlay';
+import { resolvePartId } from '../../_internal/id';
 import { stripInternalProps } from '../../_internal/props';
 import {
   readNavigationMenuRootContext,
@@ -45,7 +46,7 @@ export function NavigationMenuLink(
   });
 
   // Generate surface ID for this link
-  const surfaceIndex = 0; // This would need to be tracked properly in real implementation
+  const surfaceIndex = content.contentCurrentIndex;
   const surfaceId = resolvePartId(content.contentId, `item-${surfaceIndex}`);
 
   const finalProps = mergeProps(stripInternalProps(rest), {

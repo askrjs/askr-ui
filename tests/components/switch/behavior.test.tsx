@@ -93,6 +93,29 @@ describe('Switch - Behavior', () => {
     expect(input?.checked).toBe(true);
   });
 
+  it('keeps the hidden form input in sync after uncontrolled presses', async () => {
+    container = mount(
+      <Switch name="notifications" defaultChecked={false}>
+        Notifications
+      </Switch>
+    );
+
+    const button = container.querySelector('button') as HTMLButtonElement | null;
+    const input = container.querySelector(
+      'input[type="checkbox"]'
+    ) as HTMLInputElement | null;
+
+    expect(button?.getAttribute('aria-checked')).toBe('false');
+    expect(input?.checked).toBe(false);
+
+    button?.click();
+    await flushUpdates();
+
+    expect(button?.getAttribute('aria-checked')).toBe('true');
+    expect(button?.getAttribute('data-state')).toBe('checked');
+    expect(input?.checked).toBe(true);
+  });
+
   it('supports asChild composition and merges host props', () => {
     container = mount(
       <Switch

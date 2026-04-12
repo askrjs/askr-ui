@@ -29,30 +29,44 @@ import {
   readNavigationMenuRootContext,
   readNavigationMenuItemContext,
 } from './navigation-menu.shared';
+import { NavigationMenuLink } from './navigation-menu-link';
+import { NavigationMenuSub } from './navigation-menu-sub';
+import { NavigationMenuSubContent } from './navigation-menu-sub-content';
+import { NavigationMenuSubTrigger } from './navigation-menu-sub-trigger';
 import type {
   NavigationMenuContentProps,
   NavigationMenuContentAsChildProps,
 } from './navigation-menu.types';
 
-const NavigationMenuLink = Symbol('NavigationMenuLink');
-const NavigationMenuSub = Symbol('NavigationMenuSub');
-const NavigationMenuSubContent = Symbol('NavigationMenuSubContent');
-const NavigationMenuSubTrigger = Symbol('NavigationMenuSubTrigger');
+function NavigationMenuContentScopeView(props: {
+  node: JSX.Element;
+  contentContextValue: NavigationMenuContentContextValue;
+}) {
+  return (
+    <NavigationMenuContentContext.Scope value={props.contentContextValue}>
+      <NavigationMenuContentRuntimeNodeView node={props.node} />
+    </NavigationMenuContentContext.Scope>
+  );
+}
+
+function NavigationMenuContentRuntimeNodeView(props: { node: JSX.Element }) {
+  return props.node;
+}
 
 function collectContentItems(children: unknown) {
   return collectSurfaceElements(
     children,
     (element) =>
-      element?.type?.name === 'NavigationMenuLink' || element?.type?.name === 'NavigationMenuSub',
-    (element) => element?.type?.name === 'NavigationMenuSubContent'
+      element.type === NavigationMenuLink || element.type === NavigationMenuSub,
+    (element) => element.type === NavigationMenuSubContent
   ).map((element) => ({
     disabled:
-      element?.type?.name === 'NavigationMenuLink'
+      element.type === NavigationMenuLink
         ? Boolean(element.props?.disabled)
         : Boolean(
             collectJsxElements(
               element.props?.children,
-              (child) => child?.type?.name === 'NavigationMenuSubTrigger'
+              (child) => child.type === NavigationMenuSubTrigger
             )[0]?.props?.disabled
           ),
   }));
@@ -159,9 +173,10 @@ export function NavigationMenuContent(
             root.setOpenPath(item.path.slice(0, -1));
           }}
         >
-          <NavigationMenuContentContext.Scope value={contentContextValue}>
-            {contentNode}
-          </NavigationMenuContentContext.Scope>
+          <NavigationMenuContentScopeView
+            contentContextValue={contentContextValue}
+            node={contentNode}
+          />
         </DismissableLayer>
       </FocusScope>
     </Presence>
