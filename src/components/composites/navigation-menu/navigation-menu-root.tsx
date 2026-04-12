@@ -14,27 +14,29 @@ import {
   NavigationMenuRootContext,
   type NavigationMenuRootContextValue,
 } from './navigation-menu.shared';
+import { NavigationMenuTrigger } from './navigation-menu-trigger';
 import type { NavigationMenuProps } from './navigation-menu.types';
+
+function NavigationMenuRootView(props: {
+  children?: unknown;
+  finalProps: Record<string, unknown>;
+  portalHost: (() => JSX.Element | null) | null;
+}) {
+  const PortalHost = props.portalHost;
+
+  return (
+    <nav {...props.finalProps}>
+      {props.children}
+      {PortalHost ? <PortalHost /> : null}
+    </nav>
+  );
+}
 
 function scheduleNavigationMenuPortalSync(_navigationMenuId: string) {
   queueMicrotask(() => {
     // Force re-evaluation of navigation menu portals on next tick
     // Individual portal sync will happen via ref callbacks if content is present
   });
-}
-
-// Forward declare component types
-const NavigationMenuTrigger = Symbol('NavigationMenuTrigger');
-const NavigationMenuList = Symbol('NavigationMenuList');
-const NavigationMenuViewport = Symbol('NavigationMenuViewport');
-const NavigationMenuIndicator = Symbol('NavigationMenuIndicator');
-
-function isNavigationMenuTrigger(element: any): boolean {
-  return element?.type?.name === 'NavigationMenuTrigger' || element?.type?.$$id === 'NavigationMenuTrigger';
-}
-
-function isNavigationMenuList(element: any): boolean {
-  return element?.type?.name === 'NavigationMenuList' || element?.type?.$$id === 'NavigationMenuList';
 }
 
 export function NavigationMenu(props: NavigationMenuProps) {
@@ -44,12 +46,10 @@ export function NavigationMenu(props: NavigationMenuProps) {
   const openPathState = state<string[]>([]);
   const currentTriggerIndexState = state(0);
   
-  // Collect triggers to determine count and disabled indexes
-  const triggers = collectJsxElements(children, (element) => {
-    return element?.type?.name === 'NavigationMenuTrigger' || 
-           (element?.props?.children && Array.isArray(element.props.children) && 
-            element.props.children.some((child: any) => child?.type?.name === 'NavigationMenuTrigger'));
-  }).map((element) => ({
+  const triggers = collectJsxElements(
+    children,
+    (element) => element.type === NavigationMenuTrigger
+  ).map((element) => ({
     disabled: Boolean(element.props?.disabled),
   }));
   
@@ -82,14 +82,14 @@ export function NavigationMenu(props: NavigationMenuProps) {
     'data-navigation-menu': 'true',
   });
 
-  const PortalHost = portal;
-
   return (
-    <nav {...finalProps}>
-      <NavigationMenuRootContext.Scope value={rootContext}>
+    <NavigationMenuRootContext.Scope value={rootContext}>
+      <NavigationMenuRootView
+        finalProps={finalProps as Record<string, unknown>}
+        portalHost={portal}
+      >
         {children}
-        {PortalHost ? <PortalHost /> : null}
-      </NavigationMenuRootContext.Scope>
-    </nav>
+      </NavigationMenuRootView>
+    </NavigationMenuRootContext.Scope>
   );
 }

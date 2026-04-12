@@ -171,7 +171,7 @@ Run this loop every week until all phases are complete:
 | --------- | ----------- | ---------- | ------------- | ------ | ------------ | ----- | ------- | ------------ | ------------------------------------------------------------------- |
 | Button    | done        | done       | done          | done   | done         | done  | covered | done         | Interaction contract and `asChild` behavior locked                  |
 | Label     | done        | done       | done          | done   | done         | done  | covered | done         | Native label contract and `asChild` merge path locked               |
-| Input     | in progress | review     | done          | review | review       | done  | covered | done         | Shared field-control question: keep `asChild` open to native hosts? |
+| Input     | done        | done       | done          | done   | done         | done  | covered | done         | `asChild` now fails loudly unless the host is a native `<input>`; targeted behavior, a11y, and determinism suites are green |
 | Separator | done        | done       | done          | done   | done         | done  | covered | done         | Semantic vs decorative separator contract locked                    |
 
 ## Phase 2 — Presentational Primitives
@@ -199,9 +199,9 @@ Run this loop every week until all phases are complete:
 
 | Component   | Status      | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf    | Docs/Exports | Notes                                                                          |
 | ----------- | ----------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | ------------------------------------------------------------------------------ |
-| Textarea    | in progress | review     | done          | review  | review       | done    | covered | done         | Shares Input's field-control `asChild` question                                |
-| Checkbox    | in progress | done       | done          | done    | review       | done    | covered | done         | Controlled and uncontrolled parity now matches Switch; `asChild` still uses bespoke interaction wiring |
-| Switch      | in progress | done       | done          | done    | review       | done    | covered | done         | Uncontrolled rendering after press still needs deeper follow-up                |
+| Textarea    | done        | done       | done          | done    | done         | done    | covered | done         | `asChild` now fails loudly unless the host is a native `<textarea>`; targeted behavior, a11y, and determinism suites are green |
+| Checkbox    | done        | done       | done          | done    | done         | done    | covered | done         | `asChild` now delegates activation through shared press semantics while preserving checkbox role and mixed-state hooks |
+| Switch      | done        | done       | done          | done    | done         | done    | covered | done         | Hidden form input reflection after uncontrolled presses is now explicitly locked by behavior coverage |
 | Toggle      | done        | done       | done          | done    | done         | done    | covered | done         | Pressed-state contract and `asChild` semantics locked                          |
 | RadioGroup  | done        | done       | done          | done    | done         | done    | covered | done         | Context replaces cloned item injection and the file is split; live collection snapshots now drive item metadata |
 | Slider      | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Validate input semantics and perf                                              |

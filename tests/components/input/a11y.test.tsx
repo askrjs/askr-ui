@@ -43,7 +43,9 @@ describe('Input - Accessibility', () => {
       const host = container.querySelector('input') as HTMLInputElement | null;
 
       expect(host?.disabled).toBe(true);
-      expect(host?.getAttribute(INPUT_A11Y_CONTRACT.DISABLED_ATTRIBUTES.native)).toBe('');
+      expect(
+        host?.getAttribute(INPUT_A11Y_CONTRACT.DISABLED_ATTRIBUTES.asChild)
+      ).toBe('true');
     } finally {
       unmount(container);
     }
@@ -53,7 +55,7 @@ describe('Input - Accessibility', () => {
     expect(INPUT_A11Y_CONTRACT.HOST_ELEMENT).toBe('input');
     expect(INPUT_A11Y_CONTRACT.DISABLED_ATTRIBUTES).toEqual({
       native: 'disabled',
-      asChild: 'aria-disabled',
+      asChild: 'disabled',
     });
     expect(INPUT_A11Y_CONTRACT.DATA_ATTRIBUTES).toEqual({
       disabled: 'data-disabled',

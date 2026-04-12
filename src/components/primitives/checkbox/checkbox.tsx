@@ -106,6 +106,7 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
 
     const finalProps = mergeProps(rest, {
       ...interactionProps,
+      role: 'checkbox',
       'aria-checked': ariaChecked,
       'data-slot': 'checkbox',
       'data-disabled': disabled ? 'true' : undefined,

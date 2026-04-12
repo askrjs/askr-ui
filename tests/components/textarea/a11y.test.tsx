@@ -48,8 +48,8 @@ describe('Textarea - Accessibility', () => {
 
       expect(host?.disabled).toBe(true);
       expect(
-        host?.getAttribute(TEXTAREA_A11Y_CONTRACT.DISABLED_ATTRIBUTES.native)
-      ).toBe('');
+        host?.getAttribute(TEXTAREA_A11Y_CONTRACT.DISABLED_ATTRIBUTES.asChild)
+      ).toBe('true');
     } finally {
       unmount(container);
     }
@@ -59,7 +59,7 @@ describe('Textarea - Accessibility', () => {
     expect(TEXTAREA_A11Y_CONTRACT.HOST_ELEMENT).toBe('textarea');
     expect(TEXTAREA_A11Y_CONTRACT.DISABLED_ATTRIBUTES).toEqual({
       native: 'disabled',
-      asChild: 'aria-disabled',
+      asChild: 'disabled',
     });
     expect(TEXTAREA_A11Y_CONTRACT.DATA_ATTRIBUTES).toEqual({
       disabled: 'data-disabled',

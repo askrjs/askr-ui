@@ -6,6 +6,12 @@ import {
 } from './navigation-menu.shared';
 import type { NavigationMenuItemProps } from './navigation-menu.types';
 
+function NavigationMenuItemScopeView(props: {
+  children?: unknown;
+}) {
+  return <>{props.children}</>;
+}
+
 export function NavigationMenuItem(props: NavigationMenuItemProps) {
   const { children } = props;
   const root = readNavigationMenuRootContext();
@@ -29,7 +35,7 @@ export function NavigationMenuItem(props: NavigationMenuItemProps) {
 
   return (
     <NavigationMenuItemContext.Scope value={itemContext}>
-      {children}
+      <NavigationMenuItemScopeView>{children}</NavigationMenuItemScopeView>
     </NavigationMenuItemContext.Scope>
   );
 }

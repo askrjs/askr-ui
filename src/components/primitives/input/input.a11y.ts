@@ -6,7 +6,7 @@ export const INPUT_A11Y_CONTRACT = {
   HOST_ELEMENT: 'input' as const,
   DISABLED_ATTRIBUTES: {
     native: 'disabled' as const,
-    asChild: 'aria-disabled' as const,
+    asChild: 'disabled' as const,
   },
   DATA_ATTRIBUTES: {
     disabled: 'data-disabled' as const,

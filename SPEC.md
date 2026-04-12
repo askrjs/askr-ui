@@ -42,6 +42,7 @@ Responsive theme contract:
   - value roots use `value`, `defaultValue`, `onValueChange`
   - boolean roots use `checked`, `defaultChecked`, `onCheckedChange`
 - `asChild` is allowed only on wrapper-style or interactive composition parts.
+- `Input` and `Textarea` preserve native form semantics when composed: `asChild` is allowed only with matching native `<input>` and `<textarea>` hosts.
 - `*Portal` parts stay public only when they perform tested, intentional portal-slot behavior.
 - Internal injected props use the `__*` prefix and must be stripped before DOM props are merged.
 - Shared internal helpers are preferred over component-specific state or ID patterns.
