@@ -5,17 +5,15 @@ import {
   disabledIndexes,
   firstEnabledCompositeIndex,
   getCompositeCollection,
+  getCompositeCollectionItems,
 } from '../../_internal/composite';
 import { isDisclosureValueOpen } from '../../_internal/disclosure';
 import { resolveCompoundId } from '../../_internal/id';
-import { collectJsxElements } from '../../_internal/jsx';
-import { ToggleGroupItem } from './toggle-group-item';
 import {
   createToggleGroupRenderContext,
   readToggleGroupRootContext,
   ToggleGroupRenderContext,
   ToggleGroupRootContext,
-  type ToggleGroupItemMetadata,
   type ToggleGroupRootContextValue,
 } from './toggle-group.shared';
 import type {
@@ -98,16 +96,29 @@ export function ToggleGroup(props: ToggleGroupProps) {
     typeof id === 'string' ? id : undefined,
     children
   );
-  const items = collectJsxElements(
-    children,
-    (element) => element.type === ToggleGroupItem
-  ).map(
-    (element): ToggleGroupItemMetadata => ({
-      value: element.props?.value as string,
-      disabled: disabled || Boolean(element.props?.disabled),
-    })
-  );
+  const collection = getCompositeCollection(groupId);
+  const itemsVersion = state(0);
+  itemsVersion();
+  const items = getCompositeCollectionItems(collection).map((item) => ({
+    value: item.value as string,
+    disabled: item.disabled,
+  }));
   const valueState = createToggleGroupValueState(props);
+  let itemsSyncQueued = false;
+  const notifyItemsChanged = () => {
+    itemsVersion.set((currentVersion) => currentVersion + 1);
+  };
+  const scheduleItemsSync = () => {
+    if (itemsSyncQueued) {
+      return;
+    }
+
+    itemsSyncQueued = true;
+    queueMicrotask(() => {
+      itemsSyncQueued = false;
+      notifyItemsChanged();
+    });
+  };
   const setValue = (nextValue: string | string[]) => {
     if (type === 'multiple') {
       (valueState.set as (value: string[]) => void)(
@@ -142,6 +153,8 @@ export function ToggleGroup(props: ToggleGroupProps) {
     type,
     value: valueState(),
     setValue,
+    notifyItemsChanged,
+    scheduleItemsSync,
     orientation,
     loop,
     disabled,
