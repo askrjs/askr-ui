@@ -157,29 +157,7 @@ Use this format when a component cannot immediately satisfy a gate:
 
 ## Active Waivers
 
-- Component: DataTable
-- Gate: Performance
-- Reason: Pattern-level benchmark scenarios are not yet covering realistic row and interaction loads.
-- Mitigation in place: State and view contract suites are green with broad functional coverage.
-- Expiry date: 2026-05-31
-- Owner: hardening-program
-- Follow-up issue: Expand `benches/components/forms.bench.tsx` with data-table scenarios or add dedicated data-table bench suite.
-
-- Component: SidebarLayout
-- Gate: Performance
-- Reason: Pattern-level benchmark coverage for composition and update throughput is not present yet.
-- Mitigation in place: Focused behavior, accessibility, and determinism suites are green.
-- Expiry date: 2026-05-31
-- Owner: hardening-program
-- Follow-up issue: Add `benches/components/sidebar-layout.bench.tsx` scenario coverage.
-
-- Component: TopbarLayout
-- Gate: Performance
-- Reason: Pattern-level benchmark coverage for composition and update throughput is not present yet.
-- Mitigation in place: Focused behavior, accessibility, and determinism suites are green.
-- Expiry date: 2026-05-31
-- Owner: hardening-program
-- Follow-up issue: Add `benches/components/topbar-layout.bench.tsx` scenario coverage.
+- None.
 
 ## Weekly Governance Loop
 
@@ -276,6 +254,6 @@ Run this loop every week until all phases are complete:
 
 | Component     | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf | Docs/Exports | Notes                                                                                                       |
 | ------------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ---- | ------------ | ----------------------------------------------------------------------------------------------------------- |
-| DataTable     | done   | done       | done          | done | done         | done  | gap  | done         | Core state and view contracts are stable with focused suites green; benchmark coverage gap remains explicit |
-| SidebarLayout | done   | done       | done          | done | done         | done  | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit           |
-| TopbarLayout  | done   | done       | done          | done | done         | done  | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit           |
+| DataTable     | done   | done       | done          | done | done         | done  | covered | done         | Core state and view contracts are stable with focused suites green; dedicated scenario benchmarks now live in `benches/components/data-table.bench.tsx` |
+| SidebarLayout | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated scenario benchmarks now live in `benches/components/sidebar-layout.bench.tsx` |
+| TopbarLayout  | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated scenario benchmarks now live in `benches/components/topbar-layout.bench.tsx` |
