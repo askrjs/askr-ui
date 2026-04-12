@@ -48,6 +48,13 @@ Do not add scorecard rows for removed or non-exported components.
   - explicit sign-off in this file notes.
 - Public API, docs, and type contract parity is mandatory before close.
 
+### Design Coherence Policy
+
+- The public API surface must remain minimal and free from implementation-driven parts or props.
+- API naming and prop patterns must be consistent across sibling component families.
+- Pattern components (`DataTable`, `SidebarLayout`, `TopbarLayout`) must not drive complexity into core primitives.
+- Any proposed addition to the public surface must be justified against the irreducible core definition in ORIGINAL_DESIGN_PLAN.md before it ships.
+
 ## Global Phase Gates
 
 No phase can close unless all gates below are green:
@@ -58,6 +65,7 @@ No phase can close unless all gates below are green:
 4. API contract gate: tests/public-api.test.ts and tests/types/public-api.type-test.ts
 5. Docs contract gate: tests/docs-contract.test.ts
 6. Performance gate: benchmark evidence or active waiver record per component
+7. Design coherence gate: API surface is minimal, cross-family consistent, and free from implementation-driven parts or props
 
 ## Execution Metadata
 
@@ -80,6 +88,7 @@ A component is ready to close when all of the following are true:
 - Behavior, accessibility, and determinism tests reflect the current contract.
 - Performance coverage is present for hot paths or explicitly tracked as a gap.
 - Docs and exports stay aligned with the public surface.
+- API surface is minimal and does not expose implementation-driven parts or props.
 
 ## Ready-To-Close Evidence
 
@@ -90,6 +99,7 @@ Before changing a component status to done, capture all of the following:
 3. Performance: benchmark proof or waiver with expiry.
 4. Surface: public API exports, docs imports, and type tests aligned.
 5. Notes: open decisions resolved or explicitly tracked as blockers.
+6. Design: API minimality and cross-family consistency reviewed (gate 7 green).
 
 ## Workflow
 

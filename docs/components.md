@@ -142,16 +142,23 @@ import {
 } from '@askrjs/askr-ui';
 ```
 
-## Layout components
+## Layout primitives
 
 ```ts
 import {
   Container,
-  DataTable,
   Flex,
   Grid,
-  SidebarLayout,
   Spacer,
+} from '@askrjs/askr-ui';
+```
+
+## Pattern components
+
+```ts
+import {
+  DataTable,
+  SidebarLayout,
   TopbarLayout,
 } from '@askrjs/askr-ui';
 ```

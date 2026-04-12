@@ -24,6 +24,16 @@ askr-ui is curated as a headless component library, not a milestone tracker. A c
 
 - Additional primitives only after the 1.0 contract remains stable under change
 
+## Original Design Program
+
+See [ORIGINAL_DESIGN_PLAN.md](../ORIGINAL_DESIGN_PLAN.md) for the full 10-step governance program.
+
+All future additions to the public surface must:
+
+- preserve the smaller core (pattern complexity must not drive core complexity)
+- maintain tier separation between core primitives/composites and pattern components
+- clear design gate 7 in COMPONENT_HARDENING.md before shipping
+
 ## Release Gate
 
 - `npm run build`

@@ -18,7 +18,10 @@ visual styling. Pair it with `askr-themes` for visual defaults, or supply your o
 | Status     | Badge, Progress, ProgressCircle, Toast, Skeleton, Spinner                                                                           | `@askrjs/askr-ui` or bucketed subpaths |
 | Identity   | Avatar                                                                                                                              | `@askrjs/askr-ui` or `@askrjs/askr-ui/primitives/*` |
 | Navigation | Breadcrumb, Pagination, Menubar, NavigationMenu                                                                                     | `@askrjs/askr-ui` or `@askrjs/askr-ui/composites/*` |
-| Layout     | Container, Flex, Grid, Spacer, SidebarLayout, TopbarLayout, DataTable                                              | `@askrjs/askr-ui` or bucketed subpaths |
+| Layout     | Container, Flex, Grid, Spacer                                                                                               | `@askrjs/askr-ui` or bucketed subpaths |
+| Patterns   | DataTable, SidebarLayout, TopbarLayout                                                                                      | `@askrjs/askr-ui` or bucketed subpaths |
+
+askr-ui has two component tiers. **Core** components (all rows above Patterns) are behavioral primitives and composites — minimal, composable, and free from pattern-driven complexity. **Pattern** components (`DataTable`, `SidebarLayout`, `TopbarLayout`) are higher-level compositions for common scenarios; they build on core but are not part of core. Pattern requirements must not drive API changes in core.
 
 ## Import style
 
