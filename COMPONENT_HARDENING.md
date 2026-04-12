@@ -71,7 +71,7 @@ A component is ready to close when all of the following are true:
 | RadioGroup  | done        | done       | done          | done    | done         | done    | covered | done         | Context replaces cloned item injection and the file is split; live collection snapshots now drive item metadata |
 | Slider      | pending     | pending    | pending       | pending | pending      | pending | covered | pending      | Validate input semantics and perf                                              |
 | ToggleGroup | done        | done       | done          | done    | done         | done    | covered | done         | Context replaces item injection and the file is split; live collection snapshots now drive item metadata |
-| Select      | in progress | review     | done          | done    | review       | done    | covered | review       | Context replaces injected props and group rewriting; item metadata still uses collection scanning |
+| Select      | done        | done       | done          | done    | done         | done    | covered | done         | File split plus declaration-backed metadata store remove the root item scan while preserving closed trigger text and overlay semantics |
 
 ## Phase 5 — Infrastructure Composites
 
@@ -94,8 +94,8 @@ A component is ready to close when all of the following are true:
 
 | Component    | Status  | API/Naming | Slots/Styling | A11y    | Architecture | Tests   | Perf    | Docs/Exports | Notes                                                 |
 | ------------ | ------- | ---------- | ------------- | ------- | ------------ | ------- | ------- | ------------ | ----------------------------------------------------- |
-| Menu         | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Shared menu helper pressure point                     |
-| DropdownMenu | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Align with Menu without duplicating drift             |
+| Menu         | done    | done       | done          | done    | done         | done    | covered | done         | Split root/content/item/group/shared files and declaration-backed metadata replace injected props plus JSX tree rewriting |
+| DropdownMenu | done    | done       | done          | done    | done         | done    | covered | done         | Split root/trigger/portal/content/item/group/shared files align with Menu while preserving overlay semantics |
 | Dialog       | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Lock title/description semantics                      |
 | AlertDialog  | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Align with Dialog while preserving stricter semantics |
 | Popover      | pending | pending    | pending       | pending | pending      | pending | covered | pending      | Verify default labelling rules                        |

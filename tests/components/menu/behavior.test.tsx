@@ -32,4 +32,24 @@ describe('Menu - Behavior', () => {
     expect(items[0].getAttribute('tabindex')).toBe('0');
     expect(items[1].getAttribute('tabindex')).toBe('-1');
   });
+
+  it('supports nested menu item composition without direct child injection', () => {
+    container = mount(
+      <Menu>
+        <MenuContent>
+          <div>
+            <MenuItem>One</MenuItem>
+          </div>
+          <div>
+            <MenuItem>Two</MenuItem>
+          </div>
+        </MenuContent>
+      </Menu>
+    );
+
+    const items = container.querySelectorAll('[role="menuitem"]');
+
+    expect(items[0].getAttribute('tabindex')).toBe('0');
+    expect(items[1].getAttribute('tabindex')).toBe('-1');
+  });
 });
