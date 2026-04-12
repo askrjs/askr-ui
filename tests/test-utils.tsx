@@ -1,8 +1,10 @@
 import { createIsland } from '@askrjs/askr';
 import { DefaultPortal } from '@askrjs/askr/foundations';
+import { resetOverlayState } from '../src/components/_internal/overlay';
 
 export function resetTestState() {
   DefaultPortal.render({ children: undefined });
+  resetOverlayState();
   document
     .querySelectorAll('[data-key="__default_portal"]')
     .forEach((node) => node.parentNode?.removeChild(node));

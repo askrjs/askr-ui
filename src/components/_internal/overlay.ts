@@ -55,6 +55,16 @@ export function getPersistentPortal(id: string) {
   return created;
 }
 
+export function resetOverlayState() {
+  overlayNodes.clear();
+
+  overlayPortals.forEach((portal) => {
+    portal.render({ children: null });
+  });
+
+  overlayPortals.clear();
+}
+
 export function getOverlayNodes(id: string): OverlayNodes {
   const existing = overlayNodes.get(id);
 
