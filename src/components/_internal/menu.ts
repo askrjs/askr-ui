@@ -1,6 +1,13 @@
 import { createCollection } from '@askrjs/askr/foundations';
 import { collectJsxElements, extractTextContent } from './jsx';
 
+export type MenuItemMetadata = {
+  index: number;
+  disabled: boolean;
+  value?: string;
+  text: string;
+};
+
 export type MenuCollectionMetadata = {
   index: number;
   disabled: boolean;
@@ -13,6 +20,7 @@ const menuCollections = new Map<
   ReturnType<typeof createCollection<HTMLElement, MenuCollectionMetadata>>
 >();
 const menuCollectionUnregisters = new Map<string, () => void>();
+const menuItemMetadata = new Map<string, Array<MenuItemMetadata | undefined>>();
 
 export function getMenuCollection(id: string) {
   const existing = menuCollections.get(id);
@@ -24,6 +32,32 @@ export function getMenuCollection(id: string) {
   const created = createCollection<HTMLElement, MenuCollectionMetadata>();
   menuCollections.set(id, created);
   return created;
+}
+
+export function beginMenuItemDeclaration(id: string) {
+  menuItemMetadata.set(id, []);
+}
+
+export function declareMenuItemMetadata(id: string, metadata: MenuItemMetadata) {
+  const items = menuItemMetadata.get(id) ?? [];
+
+  items[metadata.index] = metadata;
+  menuItemMetadata.set(id, items);
+}
+
+export function getMenuItemMetadata(id: string): MenuItemMetadata[] {
+  return (menuItemMetadata.get(id) ?? []).filter(
+    (item): item is MenuItemMetadata => item !== undefined
+  );
+}
+
+export function resolveMenuItemText(
+  children: unknown,
+  textValue?: string
+): string {
+  return typeof textValue === 'string'
+    ? textValue
+    : extractTextContent(children).trim();
 }
 
 export function collectItemMetadata(
@@ -39,10 +73,10 @@ export function collectItemMetadata(
       typeof element.props?.value === 'string'
         ? element.props.value
         : undefined,
-    text:
-      typeof element.props?.textValue === 'string'
-        ? element.props.textValue
-        : extractTextContent(element.props?.children).trim(),
+    text: resolveMenuItemText(
+      element.props?.children,
+      element.props?.textValue as string | undefined
+    ),
   }));
 }
 

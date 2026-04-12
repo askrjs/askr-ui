@@ -43,4 +43,30 @@ describe('DropdownMenu - Behavior', () => {
     ) as HTMLButtonElement;
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
+
+  it('supports nested menu item composition without direct child injection', async () => {
+    container = mount(
+      <DropdownMenu defaultOpen>
+        <DropdownMenuTrigger>Open menu</DropdownMenuTrigger>
+        <DropdownMenuPortal>
+          <DropdownMenuContent>
+            <div>
+              <DropdownMenuItem>Archive</DropdownMenuItem>
+            </div>
+            <div>
+              <DropdownMenuItem>Delete</DropdownMenuItem>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenuPortal>
+      </DropdownMenu>
+    );
+
+    await flushUpdates();
+
+    const items = Array.from(document.body.querySelectorAll('[role="menuitem"]'));
+
+    expect(items).toHaveLength(2);
+    expect(items[0]?.getAttribute('tabindex')).toBe('0');
+    expect(items[1]?.getAttribute('tabindex')).toBe('-1');
+  });
 });

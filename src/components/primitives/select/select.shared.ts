@@ -1,4 +1,8 @@
 import { defineContext, readContext } from '@askrjs/askr';
+import {
+  firstEnabledIndex,
+  getMenuItemMetadata,
+} from '../../_internal/menu';
 import type { OverlayPortal } from '../../_internal/overlay';
 
 export type SelectItemMetadata = {
@@ -15,11 +19,9 @@ export type SelectRootContextValue = {
   portal: OverlayPortal;
   value: string;
   setValue: (value: string) => void;
-  currentIndex: number;
+  currentIndexCandidate: number;
   setCurrentIndex: (index: number) => void;
-  items: SelectItemMetadata[];
   disabled: boolean;
-  selectedText: string;
 };
 
 export type SelectRenderContextValue = {
@@ -32,6 +34,12 @@ export type SelectGroupContextValue = {
   labelId: string;
 };
 
+export type SelectResolvedState = {
+  items: SelectItemMetadata[];
+  currentIndex: number;
+  selectedText: string;
+};
+
 export const SelectRootContext = defineContext<SelectRootContextValue | null>(
   null
 );
@@ -40,6 +48,7 @@ export const SelectRenderContext =
 export const SelectGroupContext = defineContext<SelectGroupContextValue | null>(
   null
 );
+export const SelectDeclarationContext = defineContext<boolean>(false);
 
 export function readSelectRootContext(): SelectRootContextValue {
   const context = readContext(SelectRootContext);
@@ -63,6 +72,10 @@ export function readSelectRenderContext(): SelectRenderContextValue {
 
 export function readSelectGroupContext(): SelectGroupContextValue | null {
   return readContext(SelectGroupContext);
+}
+
+export function readSelectDeclarationContext(): boolean {
+  return Boolean(readContext(SelectDeclarationContext));
 }
 
 export function createSelectRenderContext(): SelectRenderContextValue {
@@ -90,4 +103,32 @@ export function getSelectDisabledIndexes(
   return items
     .map((item, index) => (disabled || item.disabled ? index : -1))
     .filter((index) => index !== -1);
+}
+
+export function resolveSelectState(
+  root: SelectRootContextValue
+): SelectResolvedState {
+  const items = getMenuItemMetadata(root.selectId).map((item) => ({
+    disabled: item.disabled,
+    value: item.value,
+    text: item.text,
+  }));
+  const effectiveItems = items.map((item) => ({
+    disabled: root.disabled || item.disabled,
+  }));
+  const selectedIndex = items.findIndex((item) => item.value === root.value);
+  const fallbackIndex = firstEnabledIndex(effectiveItems);
+  const candidateIndex = root.currentIndexCandidate;
+  const currentIndex =
+    selectedIndex >= 0 && !effectiveItems[selectedIndex]?.disabled
+      ? selectedIndex
+      : effectiveItems[candidateIndex] && !effectiveItems[candidateIndex]?.disabled
+        ? candidateIndex
+        : fallbackIndex;
+
+  return {
+    items,
+    currentIndex,
+    selectedText: items.find((item) => item.value === root.value)?.text ?? '',
+  };
 }
