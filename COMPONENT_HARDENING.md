@@ -157,38 +157,6 @@ Use this format when a component cannot immediately satisfy a gate:
 
 ## Active Waivers
 
-- Component: Flex
-- Gate: Performance
-- Reason: Dedicated benchmark coverage for layout primitive update throughput has not been added yet.
-- Mitigation in place: Focused behavior, accessibility, and determinism suites are green.
-- Expiry date: 2026-05-31
-- Owner: hardening-program
-- Follow-up issue: Add `benches/components/flex.bench.tsx` and baseline report.
-
-- Component: Container
-- Gate: Performance
-- Reason: Dedicated benchmark coverage for mount/update cost has not been added yet.
-- Mitigation in place: Focused behavior, accessibility, and determinism suites are green.
-- Expiry date: 2026-05-31
-- Owner: hardening-program
-- Follow-up issue: Add `benches/components/container.bench.tsx` and baseline report.
-
-- Component: Grid
-- Gate: Performance
-- Reason: Dedicated benchmark coverage for responsive layout updates has not been added yet.
-- Mitigation in place: Focused behavior, accessibility, and determinism suites are green.
-- Expiry date: 2026-05-31
-- Owner: hardening-program
-- Follow-up issue: Add `benches/components/grid.bench.tsx` and baseline report.
-
-- Component: Spacer
-- Gate: Performance
-- Reason: Dedicated benchmark coverage for spacing utility mount/update cost has not been added yet.
-- Mitigation in place: Focused behavior, accessibility, and determinism suites are green.
-- Expiry date: 2026-05-31
-- Owner: hardening-program
-- Follow-up issue: Add `benches/components/spacer.bench.tsx` and baseline report.
-
 - Component: DataTable
 - Gate: Performance
 - Reason: Pattern-level benchmark scenarios are not yet covering realistic row and interaction loads.
@@ -248,10 +216,10 @@ Run this loop every week until all phases are complete:
 
 | Component | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf | Docs/Exports | Notes                                                                                             |
 | --------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ---- | ------------ | ------------------------------------------------------------------------------------------------- |
-| Flex      | done   | done       | done          | done | done         | done  | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit |
-| Container | done   | done       | done          | done | done         | done  | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit |
-| Grid      | done   | done       | done          | done | done         | done  | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit |
-| Spacer    | done   | done       | done          | done | done         | done  | gap  | done         | Focused behavior, a11y, and determinism suites are green; benchmark coverage gap remains explicit |
+| Flex      | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated layout benchmark coverage now lives in `benches/components/flex.bench.tsx` |
+| Container | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated layout benchmark coverage now lives in `benches/components/container.bench.tsx` |
+| Grid      | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated layout benchmark coverage now lives in `benches/components/grid.bench.tsx` |
+| Spacer    | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated layout benchmark coverage now lives in `benches/components/spacer.bench.tsx` |
 
 ## Phase 4 — Form And Selection Primitives
 
