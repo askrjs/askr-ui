@@ -3,10 +3,8 @@ import { Slot, composeRefs, mergeProps, rovingFocus, Presence } from '@askrjs/as
 import { DismissableLayer } from '../../composites/dismissable-layer';
 import { FocusScope } from '../../composites/focus-scope';
 import {
-  registerCompositeNode,
   getCompositeCollection,
-  firstEnabledCompositeIndex,
-  disabledIndexes,
+  getCompositeCollectionItems,
 } from '../../_internal/composite';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import {
@@ -17,22 +15,15 @@ import {
 } from '../../_internal/overlay';
 import { resolvePartId } from '../../_internal/id';
 import {
-  collectSurfaceElements,
   pathIsOpen,
 } from '../../_internal/hierarchical-menu';
 import { stripInternalProps } from '../../_internal/props';
-import { collectJsxElements } from '../../_internal/jsx';
 import {
   NavigationMenuContentContext,
   type NavigationMenuContentContextValue,
-  type NavigationMenuPositionOptions,
   readNavigationMenuRootContext,
   readNavigationMenuItemContext,
 } from './navigation-menu.shared';
-import { NavigationMenuLink } from './navigation-menu-link';
-import { NavigationMenuSub } from './navigation-menu-sub';
-import { NavigationMenuSubContent } from './navigation-menu-sub-content';
-import { NavigationMenuSubTrigger } from './navigation-menu-sub-trigger';
 import type {
   NavigationMenuContentProps,
   NavigationMenuContentAsChildProps,
@@ -51,25 +42,6 @@ function NavigationMenuContentScopeView(props: {
 
 function NavigationMenuContentRuntimeNodeView(props: { node: JSX.Element }) {
   return props.node;
-}
-
-function collectContentItems(children: unknown) {
-  return collectSurfaceElements(
-    children,
-    (element) =>
-      element.type === NavigationMenuLink || element.type === NavigationMenuSub,
-    (element) => element.type === NavigationMenuSubContent
-  ).map((element) => ({
-    disabled:
-      element.type === NavigationMenuLink
-        ? Boolean(element.props?.disabled)
-        : Boolean(
-            collectJsxElements(
-              element.props?.children,
-              (child) => child.type === NavigationMenuSubTrigger
-            )[0]?.props?.disabled
-          ),
-  }));
 }
 
 export function NavigationMenuContent(
@@ -97,32 +69,60 @@ export function NavigationMenuContent(
   const root = readNavigationMenuRootContext();
   const item = readNavigationMenuItemContext();
 
-  const items = collectContentItems(children);
-  const currentIndexState = state(firstEnabledCompositeIndex(items));
-  const currentIndex = items[currentIndexState()]
+  const collection = getCompositeCollection(item.contentId);
+  const surfaceItems = getCompositeCollectionItems(collection);
+  const orderedSurfaceItems = [...surfaceItems].sort(
+    (left, right) => left.index - right.index
+  );
+  const firstEnabledIndex =
+    orderedSurfaceItems.find((entry) => !entry.disabled)?.index ?? 0;
+  const currentIndexState = state(firstEnabledIndex);
+  const currentIndex = orderedSurfaceItems.some(
+    (entry) => entry.index === currentIndexState() && !entry.disabled
+  )
     ? currentIndexState()
-    : firstEnabledCompositeIndex(items);
+    : firstEnabledIndex;
+
+  const surfaceIndexMap = new Map<string, number>();
+  let nextSurfaceIndex = 0;
+  const registerSurface = (surfaceKey: string): number => {
+    const existingIndex = surfaceIndexMap.get(surfaceKey);
+
+    if (existingIndex !== undefined) {
+      return existingIndex;
+    }
+
+    const nextIndex = nextSurfaceIndex;
+    surfaceIndexMap.set(surfaceKey, nextIndex);
+    nextSurfaceIndex += 1;
+    return nextIndex;
+  };
+
+  const contentDisabledIndexes = orderedSurfaceItems
+    .filter((entry) => entry.disabled)
+    .map((entry) => entry.index);
 
   const contentContextValue: NavigationMenuContentContextValue = {
+    contentPath: item.path,
     contentCurrentIndex: currentIndex,
     setContentCurrentIndex: currentIndexState.set,
-    contentItemCount: items.length,
-    contentDisabledIndexes: disabledIndexes(items),
+    contentItemCount: orderedSurfaceItems.length,
+    contentDisabledIndexes,
     contentId: item.contentId,
+    registerSurface,
   };
 
   const open = pathIsOpen(root.openPath, item.path);
   const overlayId = item.triggerId;
   const portal = getPersistentPortal(overlayId);
   const overlayNodes = getOverlayNodes(overlayId);
-  const collection = getCompositeCollection(item.contentId);
 
   const nav = rovingFocus({
     currentIndex,
-    itemCount: Math.max(items.length, 1),
+    itemCount: Math.max(orderedSurfaceItems.length, 1),
     orientation: 'vertical',
     loop: true,
-    isDisabled: (index) => disabledIndexes(items).includes(index),
+    isDisabled: (index) => contentDisabledIndexes.includes(index),
     onNavigate: (index) => {
       currentIndexState.set(index);
       focusSelectedCollectionItem(collection, index);

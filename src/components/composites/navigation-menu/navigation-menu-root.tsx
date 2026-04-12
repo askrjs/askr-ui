@@ -1,11 +1,6 @@
 import { state } from '@askrjs/askr';
 import { mergeProps } from '@askrjs/askr/foundations';
-import { collectJsxElements } from '../../_internal/jsx';
-import { resolveCompoundId, resolvePartId } from '../../_internal/id';
-import {
-  disabledIndexes,
-  firstEnabledCompositeIndex,
-} from '../../_internal/composite';
+import { resolveCompoundId } from '../../_internal/id';
 import {
   getPersistentPortal,
 } from '../../_internal/overlay';
@@ -14,7 +9,6 @@ import {
   NavigationMenuRootContext,
   type NavigationMenuRootContextValue,
 } from './navigation-menu.shared';
-import { NavigationMenuTrigger } from './navigation-menu-trigger';
 import type { NavigationMenuProps } from './navigation-menu.types';
 
 function NavigationMenuRootView(props: {
@@ -42,21 +36,27 @@ function scheduleNavigationMenuPortalSync(_navigationMenuId: string) {
 export function NavigationMenu(props: NavigationMenuProps) {
   const { children, id, loop = true, ref, ...rest } = props;
   const navigationMenuId = resolveCompoundId('navigation-menu', id, children);
-  
+
   const openPathState = state<string[]>([]);
   const currentTriggerIndexState = state(0);
-  
-  const triggers = collectJsxElements(
-    children,
-    (element) => element.type === NavigationMenuTrigger
-  ).map((element) => ({
-    disabled: Boolean(element.props?.disabled),
-  }));
-  
-  const currentTriggerIndex = triggers[currentTriggerIndexState()]
-    ? currentTriggerIndexState()
-    : firstEnabledCompositeIndex(triggers);
-  
+  const itemIndexMap = new Map<string, number>();
+  let nextItemIndex = 0;
+
+  const registerItem = (itemKey: string): number => {
+    const existingIndex = itemIndexMap.get(itemKey);
+
+    if (existingIndex !== undefined) {
+      return existingIndex;
+    }
+
+    const nextIndex = nextItemIndex;
+    itemIndexMap.set(itemKey, nextIndex);
+    nextItemIndex += 1;
+    return nextIndex;
+  };
+
+  const currentTriggerIndex = Math.max(0, currentTriggerIndexState());
+
   const portal = getPersistentPortal(navigationMenuId);
 
   const wrappedSetOpenPath = (nextPath: string[]) => {
@@ -69,10 +69,9 @@ export function NavigationMenu(props: NavigationMenuProps) {
     openPath: openPathState(),
     setOpenPath: wrappedSetOpenPath,
     loop,
+    registerItem,
     currentTriggerIndex,
     setCurrentTriggerIndex: currentTriggerIndexState.set,
-    triggerCount: Math.max(triggers.length, 1),
-    disabledTriggerIndexes: disabledIndexes(triggers),
     portal,
   };
 

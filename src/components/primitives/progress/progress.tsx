@@ -1,7 +1,7 @@
+import { defineContext, readContext } from '@askrjs/askr';
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
-import { mergeCssVar } from '../../_internal/style';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
-import { mapJsxTree } from '../../_internal/jsx';
+import { mergeCssVar } from '../../_internal/style';
 import {
   defaultProgressValueLabel,
   normalizeProgressMax,
@@ -14,26 +14,30 @@ import type {
   ProgressProps,
 } from './progress.types';
 
-type InjectedProgressProps = {
-  __progressId?: string;
-  __value?: number | null;
-  __max?: number;
-  __valueLabel?: string;
+type ProgressRootContextValue = {
+  progressId: string;
+  value: number | null;
+  max: number;
+  valueLabel: string;
 };
 
-function readInjectedProgressProps(
-  props: InjectedProgressProps
-): Required<InjectedProgressProps> {
-  if (!props.__progressId || props.__max === undefined || !props.__valueLabel) {
+const ProgressRootContext = defineContext<ProgressRootContextValue | null>(null);
+
+function readProgressRootContext(): ProgressRootContextValue {
+  const context = readContext(ProgressRootContext);
+
+  if (!context) {
     throw new Error('ProgressIndicator must be used within <Progress>');
   }
 
-  return {
-    __progressId: props.__progressId,
-    __value: props.__value ?? null,
-    __max: props.__max,
-    __valueLabel: props.__valueLabel,
-  };
+  return context;
+}
+
+function ProgressRootScopeView(props: {
+  finalProps: Record<string, unknown>;
+  children?: unknown;
+}) {
+  return <div {...props.finalProps}>{props.children}</div>;
 }
 
 export function Progress(props: ProgressProps) {
@@ -45,22 +49,6 @@ export function Progress(props: ProgressProps) {
     getValueLabel?.(normalizedValue, normalizedMax) ??
     defaultProgressValueLabel(normalizedValue, normalizedMax);
   const percentage = progressPercentage(normalizedValue, normalizedMax);
-  const enhancedChildren = mapJsxTree(children, (element) => {
-    if (element.type !== ProgressIndicator) {
-      return element;
-    }
-
-    return {
-      ...element,
-      props: {
-        ...element.props,
-        __progressId: progressId,
-        __value: normalizedValue,
-        __max: normalizedMax,
-        __valueLabel: valueLabel,
-      },
-    };
-  });
   const finalProps = mergeProps(rest, {
     ref,
     id: progressId,
@@ -79,8 +67,20 @@ export function Progress(props: ProgressProps) {
     'data-progress': 'true',
     'data-state': normalizedValue === null ? 'indeterminate' : 'determinate',
   });
+  const rootContext: ProgressRootContextValue = {
+    progressId,
+    value: normalizedValue,
+    max: normalizedMax,
+    valueLabel,
+  };
 
-  return <div {...finalProps}>{enhancedChildren}</div>;
+  return (
+    <ProgressRootContext.Scope value={rootContext}>
+      <ProgressRootScopeView finalProps={finalProps as Record<string, unknown>}>
+        {children}
+      </ProgressRootScopeView>
+    </ProgressRootContext.Scope>
+  );
 }
 
 export function ProgressIndicator(props: ProgressIndicatorProps): JSX.Element;
@@ -88,36 +88,19 @@ export function ProgressIndicator(
   props: ProgressIndicatorAsChildProps
 ): JSX.Element;
 export function ProgressIndicator(
-  props:
-    | (ProgressIndicatorProps & InjectedProgressProps)
-    | (ProgressIndicatorAsChildProps & InjectedProgressProps)
+  props: ProgressIndicatorProps | ProgressIndicatorAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    ref,
-    __progressId,
-    __value,
-    __max,
-    __valueLabel,
-    ...rest
-  } = props;
-  const injected = readInjectedProgressProps({
-    __progressId,
-    __value,
-    __max,
-    __valueLabel,
-  });
-  const percentage = progressPercentage(injected.__value, injected.__max);
+  const { asChild, children, ref, ...rest } = props;
+  const root = readProgressRootContext();
+  const percentage = progressPercentage(root.value, root.max);
   const finalProps = mergeProps(rest, {
     ref,
-    id: resolvePartId(injected.__progressId, 'indicator'),
+    id: resolvePartId(root.progressId, 'indicator'),
     'data-slot': 'progress-indicator',
     'data-progress-indicator': 'true',
-    'data-state': injected.__value === null ? 'indeterminate' : 'determinate',
-    'data-value':
-      injected.__value === null ? undefined : String(injected.__value),
-    'data-max': String(injected.__max),
+    'data-state': root.value === null ? 'indeterminate' : 'determinate',
+    'data-value': root.value === null ? undefined : String(root.value),
+    'data-max': String(root.max),
     'data-percentage': percentage === null ? undefined : String(percentage),
   });
 

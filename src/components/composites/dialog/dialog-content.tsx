@@ -23,6 +23,7 @@ export function DialogContent(
     asChild,
     children,
     forceMount = false,
+    role = 'dialog',
     ref,
     onEscapeKeyDown,
     onPointerDownOutside,
@@ -49,7 +50,7 @@ export function DialogContent(
       }
     ),
     id: root.contentId,
-    role: 'dialog',
+    role,
     'aria-modal': root.modal ? 'true' : undefined,
     'aria-labelledby': root.hasTitle ? root.titleId : undefined,
     'aria-describedby': root.hasDescription ? root.descriptionId : undefined,

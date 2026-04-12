@@ -58,7 +58,7 @@ export function NavigationMenuSubTrigger(
   const isDisabled = disabled;
   const open = pathIsOpen(root.openPath, item.path);
   const overlayNodes = getOverlayNodes(item.triggerId);
-  const surfaceIndex = 0; // Would be tracked properly
+  const surfaceIndex = content.registerSurface(`sub:${item.itemKey}`);
 
   const interactionProps = pressable({
     disabled: isDisabled,

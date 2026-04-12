@@ -34,6 +34,7 @@ export type DialogOverlayAsChildProps = BoxAsChildProps & DialogOverlayOwnProps;
 
 export type DialogContentOwnProps = {
   forceMount?: boolean;
+  role?: 'dialog' | 'alertdialog';
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
   onPointerDownOutside?: (event: PointerEvent) => void;
   onInteractOutside?: (event: Event) => void;
