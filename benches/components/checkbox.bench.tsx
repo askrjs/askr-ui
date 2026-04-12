@@ -3,7 +3,7 @@ import {
   Checkbox,
   type CheckboxAsChildProps,
   type CheckboxInputProps,
-} from '../../src/components/checkbox';
+} from '../../src/components';
 
 describe('Checkbox benches', () => {
   bench('create native <input type="checkbox">', () => {

@@ -3,7 +3,7 @@ import {
   Collapsible,
   CollapsibleTrigger,
   CollapsibleContent,
-} from '../../src/components/collapsible';
+} from '../../src/components';
 
 describe('Collapsible benches', () => {
   bench('create closed collapsible', () => {

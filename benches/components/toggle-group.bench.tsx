@@ -1,8 +1,5 @@
 import { bench, describe } from 'vite-plus/test';
-import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from '../../src/components/toggle-group';
+import { ToggleGroup, ToggleGroupItem } from '../../src/components';
 
 describe('ToggleGroup benches', () => {
   bench('create toggle group', () => {

@@ -38,7 +38,9 @@ describe('FocusScope - Behavior', () => {
       </FocusScope>
     );
 
-    const buttons = Array.from(container.querySelectorAll('button')) as HTMLButtonElement[];
+    const buttons = Array.from(
+      container.querySelectorAll('button')
+    ) as HTMLButtonElement[];
     const first = buttons[0];
     const second = buttons[1];
 

@@ -5,8 +5,8 @@ import {
   DropdownMenuItem,
   DropdownMenuPortal,
   DropdownMenuTrigger,
-} from '../../src/components/dropdown-menu';
-import { Menu, MenuContent, MenuItem } from '../../src/components/menu';
+} from '../../src/components';
+import { Menu, MenuContent, MenuItem } from '../../src/components';
 import {
   Select,
   SelectContent,
@@ -14,7 +14,7 @@ import {
   SelectPortal,
   SelectTrigger,
   SelectValue,
-} from '../../src/components/select';
+} from '../../src/components';
 
 describe('Menu and Select benches', () => {
   bench('create Menu tree', () => {

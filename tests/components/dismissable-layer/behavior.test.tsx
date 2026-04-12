@@ -40,7 +40,9 @@ describe('DismissableLayer - Behavior', () => {
       </DismissableLayer>
     );
 
-    const layers = container.querySelectorAll('[data-dismissable-layer="true"]');
+    const layers = container.querySelectorAll(
+      '[data-dismissable-layer="true"]'
+    );
     const top = layers[1] as HTMLElement;
 
     top.dispatchEvent(
@@ -60,7 +62,9 @@ describe('DismissableLayer - Behavior', () => {
       </DismissableLayer>
     );
 
-    const layer = container.querySelector('[data-dismissable-layer="true"]') as HTMLElement;
+    const layer = container.querySelector(
+      '[data-dismissable-layer="true"]'
+    ) as HTMLElement;
     layer.dispatchEvent(
       new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' })
     );

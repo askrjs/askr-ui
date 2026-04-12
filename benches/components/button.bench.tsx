@@ -1,5 +1,5 @@
 import { bench, describe } from 'vite-plus/test';
-import { Button, type ButtonButtonProps } from '../../src/components/button';
+import { Button, type ButtonButtonProps } from '../../src/components';
 
 describe('Button benches', () => {
   bench('create native <button>', () => {

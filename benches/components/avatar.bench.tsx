@@ -1,9 +1,5 @@
 import { bench, describe } from 'vite-plus/test';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '../../src/components/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../../src/components';
 
 describe('Avatar benches', () => {
   bench('create avatar', () => {
