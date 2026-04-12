@@ -29,4 +29,48 @@ describe('FocusScope - Behavior', () => {
 
     expect(document.activeElement).not.toBe(trigger);
   });
+
+  it('wraps keyboard focus when loop is enabled', () => {
+    container = mount(
+      <FocusScope loop>
+        <button type="button">First</button>
+        <button type="button">Second</button>
+      </FocusScope>
+    );
+
+    const buttons = Array.from(container.querySelectorAll('button')) as HTMLButtonElement[];
+    const first = buttons[0];
+    const second = buttons[1];
+
+    second.focus();
+    second.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Tab', bubbles: true })
+    );
+
+    expect(document.activeElement).toBe(first);
+  });
+
+  it('keeps focus trapped within scope on focus-out when trapped is enabled', () => {
+    const outside = document.createElement('button');
+    outside.textContent = 'Outside';
+    document.body.appendChild(outside);
+
+    container = mount(
+      <FocusScope trapped>
+        <button type="button">Inside</button>
+      </FocusScope>
+    );
+
+    const inside = container.querySelector('button') as HTMLButtonElement;
+    inside.focus();
+
+    inside.dispatchEvent(
+      new FocusEvent('focusout', {
+        bubbles: true,
+        relatedTarget: outside,
+      })
+    );
+
+    expect(document.activeElement).toBe(inside);
+  });
 });

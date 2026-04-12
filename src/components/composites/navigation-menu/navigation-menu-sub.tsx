@@ -7,9 +7,7 @@ import {
 } from './navigation-menu.shared';
 import type { NavigationMenuSubProps } from './navigation-menu.types';
 
-function NavigationMenuSubScopeView(props: {
-  children?: unknown;
-}) {
+function NavigationMenuSubScopeView(props: { children?: unknown }) {
   return <>{props.children}</>;
 }
 
@@ -22,8 +20,14 @@ export function NavigationMenuSub(props: NavigationMenuSubProps) {
   const subKey = `sub:${subBaseKey}`;
   const subIndex = parentContent.registerSurface(subKey);
   const subPath = [...parentItem.path, subKey];
-  const subTriggerId = resolvePartId(parentContent.contentId, `sub-trigger-${subIndex}`);
-  const subContentId = resolvePartId(parentContent.contentId, `sub-content-${subIndex}`);
+  const subTriggerId = resolvePartId(
+    parentContent.contentId,
+    `sub-trigger-${subIndex}`
+  );
+  const subContentId = resolvePartId(
+    parentContent.contentId,
+    `sub-content-${subIndex}`
+  );
 
   const itemContext: NavigationMenuItemContextValue = {
     itemKey: subKey,

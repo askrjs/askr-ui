@@ -17,16 +17,11 @@ import {
   readTabsRenderContext,
   readTabsRootContext,
 } from './tabs.shared';
-import type {
-  TabsTriggerAsChildProps,
-  TabsTriggerProps,
-} from './tabs.types';
+import type { TabsTriggerAsChildProps, TabsTriggerProps } from './tabs.types';
 
 export function TabsTrigger(props: TabsTriggerProps): JSX.Element;
 export function TabsTrigger(props: TabsTriggerAsChildProps): JSX.Element;
-export function TabsTrigger(
-  props: TabsTriggerProps | TabsTriggerAsChildProps
-) {
+export function TabsTrigger(props: TabsTriggerProps | TabsTriggerAsChildProps) {
   const {
     asChild,
     children,

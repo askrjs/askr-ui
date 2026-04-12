@@ -23,8 +23,9 @@ export type PopoverRootContextValue = {
   clearPosition: () => void;
 };
 
-export const PopoverRootContext =
-  defineContext<PopoverRootContextValue | null>(null);
+export const PopoverRootContext = defineContext<PopoverRootContextValue | null>(
+  null
+);
 
 export function readPopoverRootContext(): PopoverRootContextValue {
   const context = readContext(PopoverRootContext);

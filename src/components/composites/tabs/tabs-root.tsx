@@ -23,7 +23,9 @@ function TabsScopeView(props: {
 }) {
   return (
     <TabsRenderContext.Scope value={props.renderContext}>
-      <TabsRootView finalProps={props.finalProps}>{props.children}</TabsRootView>
+      <TabsRootView finalProps={props.finalProps}>
+        {props.children}
+      </TabsRootView>
     </TabsRenderContext.Scope>
   );
 }

@@ -1,19 +1,10 @@
-import {
-  composeRefs,
-  Slot,
-  mergeProps,
-} from '@askrjs/askr/foundations';
+import { composeRefs, Slot, mergeProps } from '@askrjs/askr/foundations';
 import { readDialogRootContext } from './dialog.shared';
-import type {
-  DialogTitleAsChildProps,
-  DialogTitleProps,
-} from './dialog.types';
+import type { DialogTitleAsChildProps, DialogTitleProps } from './dialog.types';
 
 export function DialogTitle(props: DialogTitleProps): JSX.Element;
 export function DialogTitle(props: DialogTitleAsChildProps): JSX.Element;
-export function DialogTitle(
-  props: DialogTitleProps | DialogTitleAsChildProps
-) {
+export function DialogTitle(props: DialogTitleProps | DialogTitleAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const root = readDialogRootContext();
   const finalProps = mergeProps(rest, {

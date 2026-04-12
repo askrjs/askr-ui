@@ -44,7 +44,9 @@ describe('Textarea - Accessibility', () => {
     );
 
     try {
-      const host = container.querySelector('textarea') as HTMLTextAreaElement | null;
+      const host = container.querySelector(
+        'textarea'
+      ) as HTMLTextAreaElement | null;
 
       expect(host?.disabled).toBe(true);
       expect(

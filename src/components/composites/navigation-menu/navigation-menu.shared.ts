@@ -49,7 +49,9 @@ export function readNavigationMenuRootContext(): NavigationMenuRootContextValue 
   const context = readContext(NavigationMenuRootContext);
 
   if (!context) {
-    throw new Error('NavigationMenu components must be used within <NavigationMenu>');
+    throw new Error(
+      'NavigationMenu components must be used within <NavigationMenu>'
+    );
   }
 
   return context;
@@ -59,7 +61,9 @@ export function readNavigationMenuItemContext(): NavigationMenuItemContextValue 
   const context = readContext(NavigationMenuItemContext);
 
   if (!context) {
-    throw new Error('NavigationMenuItem components must be used within <NavigationMenuItem>');
+    throw new Error(
+      'NavigationMenuItem components must be used within <NavigationMenuItem>'
+    );
   }
 
   return context;
@@ -69,7 +73,9 @@ export function readNavigationMenuContentContext(): NavigationMenuContentContext
   const context = readContext(NavigationMenuContentContext);
 
   if (!context) {
-    throw new Error('NavigationMenu content components must be used within <NavigationMenuContent>');
+    throw new Error(
+      'NavigationMenu content components must be used within <NavigationMenuContent>'
+    );
   }
 
   return context;

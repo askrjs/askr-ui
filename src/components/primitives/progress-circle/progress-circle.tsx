@@ -96,9 +96,7 @@ export function ProgressCircleIndicator(
   props: ProgressCircleIndicatorAsChildProps
 ): JSX.Element;
 export function ProgressCircleIndicator(
-  props:
-    | ProgressCircleIndicatorProps
-    | ProgressCircleIndicatorAsChildProps
+  props: ProgressCircleIndicatorProps | ProgressCircleIndicatorAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
   const root = readProgressCircleRootContext();

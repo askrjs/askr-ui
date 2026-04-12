@@ -50,7 +50,9 @@ function MenubarContentDeclarationRenderScopeView(props: {
 }) {
   return (
     <MenubarContentRenderContext.Scope value={props.renderContext}>
-      <MenubarContentDeclarationPassView contentId={props.contentContext.contentId}>
+      <MenubarContentDeclarationPassView
+        contentId={props.contentContext.contentId}
+      >
         {props.children}
       </MenubarContentDeclarationPassView>
     </MenubarContentRenderContext.Scope>

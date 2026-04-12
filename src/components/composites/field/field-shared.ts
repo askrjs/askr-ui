@@ -33,7 +33,10 @@ function readFieldsetContextValue() {
   return readContext(FieldsetContext);
 }
 
-function buildFieldDescribedBy(baseId: string, invalid: boolean): string | undefined {
+function buildFieldDescribedBy(
+  baseId: string,
+  invalid: boolean
+): string | undefined {
   const describedBy = [
     `${baseId}-description`,
     invalid ? `${baseId}-error` : null,
@@ -100,7 +103,9 @@ export function createFieldContextValue(props: {
 
   return {
     baseId: props.id,
-    describedBy: props.id ? buildFieldDescribedBy(props.id, invalid) : undefined,
+    describedBy: props.id
+      ? buildFieldDescribedBy(props.id, invalid)
+      : undefined,
     invalid,
     required,
     disabled,

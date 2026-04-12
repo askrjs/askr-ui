@@ -1,4 +1,9 @@
-import { Slot, composeRefs, mergeProps, pressable } from '@askrjs/askr/foundations';
+import {
+  Slot,
+  composeRefs,
+  mergeProps,
+  pressable,
+} from '@askrjs/askr/foundations';
 import { getOverlayNodes } from '../../_internal/overlay';
 import {
   readSelectDeclarationContext,
@@ -24,8 +29,15 @@ export function SelectTrigger(
     return null;
   }
 
-  const { asChild, children, disabled = false, onPress, ref, type, ...rest } =
-    props;
+  const {
+    asChild,
+    children,
+    disabled = false,
+    onPress,
+    ref,
+    type,
+    ...rest
+  } = props;
   const root = readSelectRootContext();
   const overlayNodes = getOverlayNodes(root.selectId);
   const isDisabled = root.disabled || disabled;
@@ -72,9 +84,7 @@ export function SelectTrigger(
 
 export function SelectValue(props: SelectValueProps): JSX.Element | null;
 export function SelectValue(props: SelectValueAsChildProps): JSX.Element | null;
-export function SelectValue(
-  props: SelectValueProps | SelectValueAsChildProps
-) {
+export function SelectValue(props: SelectValueProps | SelectValueAsChildProps) {
   if (readSelectDeclarationContext()) {
     return null;
   }

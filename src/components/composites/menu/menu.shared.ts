@@ -1,5 +1,9 @@
 import { defineContext, readContext } from '@askrjs/askr';
-import { firstEnabledIndex, getMenuItemMetadata, type MenuItemMetadata } from '../../_internal/menu';
+import {
+  firstEnabledIndex,
+  getMenuItemMetadata,
+  type MenuItemMetadata,
+} from '../../_internal/menu';
 import type { MenuOwnProps } from './menu.types';
 
 export type MenuRootContextValue = {
@@ -21,7 +25,9 @@ export type MenuResolvedState = {
 };
 
 export const MenuRootContext = defineContext<MenuRootContextValue | null>(null);
-export const MenuRenderContext = defineContext<MenuRenderContextValue | null>(null);
+export const MenuRenderContext = defineContext<MenuRenderContextValue | null>(
+  null
+);
 export const MenuDeclarationContext = defineContext<boolean>(false);
 
 export function readMenuRootContext(): MenuRootContextValue {
@@ -60,7 +66,9 @@ export function createMenuRenderContext(): MenuRenderContextValue {
   };
 }
 
-export function resolveMenuState(root: MenuRootContextValue): MenuResolvedState {
+export function resolveMenuState(
+  root: MenuRootContextValue
+): MenuResolvedState {
   const items = getMenuItemMetadata(root.menuId);
   const fallbackIndex = firstEnabledIndex(items);
   const candidateIndex = root.currentIndexCandidate;

@@ -73,10 +73,7 @@ export function DataTableTableBody(props: DataTableTableBodyProps) {
       {pageRows.map((row) => [
         <DataTableRow key={row.id} row={row} />,
         row.isExpanded() ? (
-          <DataTableExpandedRow
-            key={`${row.id}-expanded`}
-            row={row}
-          />
+          <DataTableExpandedRow key={`${row.id}-expanded`} row={row} />
         ) : null,
       ])}
     </tbody>
@@ -102,10 +99,7 @@ export function DataTableHeaderRow(props: DataTableHeaderRowProps) {
   return (
     <tr {...finalProps}>
       {columns.map((col) => (
-        <DataTableHead
-          key={col.id}
-          column={col}
-        />
+        <DataTableHead key={col.id} column={col} />
       ))}
     </tr>
   );

@@ -21,12 +21,7 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
 }
 
 export function DataTableSearch(props: DataTableSearchProps) {
-  const {
-    placeholder,
-    debounceMs = 300,
-    ref,
-    ...rest
-  } = props;
+  const { placeholder, debounceMs = 300, ref, ...rest } = props;
   const { table, tableId } = readDataTableRootContext();
 
   let debounceTimer: ReturnType<typeof setTimeout> | undefined;

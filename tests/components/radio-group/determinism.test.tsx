@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
-import { RadioGroup, RadioGroupItem } from '../../../src/components/primitives/radio-group';
+import {
+  RadioGroup,
+  RadioGroupItem,
+} from '../../../src/components/primitives/radio-group';
 import { expectDeterministicRender } from '../../determinism';
 import { mount, unmount } from '../../test-utils';
 
@@ -46,9 +49,9 @@ describe('RadioGroup - Determinism', () => {
         'true',
         'false',
       ]);
-      expect(container.querySelector('input[type="hidden"]')?.getAttribute('value')).toBe(
-        'small'
-      );
+      expect(
+        container.querySelector('input[type="hidden"]')?.getAttribute('value')
+      ).toBe('small');
     } finally {
       unmount(container);
     }
@@ -69,9 +72,9 @@ describe('RadioGroup - Determinism', () => {
         'false',
         'true',
       ]);
-      expect(container.querySelector('input[type="hidden"]')?.getAttribute('value')).toBe(
-        'medium'
-      );
+      expect(
+        container.querySelector('input[type="hidden"]')?.getAttribute('value')
+      ).toBe('medium');
     } finally {
       unmount(container);
     }

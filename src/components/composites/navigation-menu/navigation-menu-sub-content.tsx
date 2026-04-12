@@ -12,15 +12,11 @@ export function NavigationMenuSubContent(
   props: NavigationMenuSubContentAsChildProps
 ): JSX.Element | null;
 export function NavigationMenuSubContent(
-  props:
-    | NavigationMenuSubContentProps
-    | NavigationMenuSubContentAsChildProps
+  props: NavigationMenuSubContentProps | NavigationMenuSubContentAsChildProps
 ) {
   const item = readNavigationMenuItemContext();
 
   return (
-    <NavigationMenuContent
-      {...(props as NavigationMenuSubContentProps)}
-    />
+    <NavigationMenuContent {...(props as NavigationMenuSubContentProps)} />
   );
 }

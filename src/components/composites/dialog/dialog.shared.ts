@@ -26,8 +26,9 @@ export type DialogRootContextValue = {
   clearPosition: () => void;
 };
 
-export const DialogRootContext =
-  defineContext<DialogRootContextValue | null>(null);
+export const DialogRootContext = defineContext<DialogRootContextValue | null>(
+  null
+);
 
 export function readDialogRootContext(): DialogRootContextValue {
   const context = readContext(DialogRootContext);

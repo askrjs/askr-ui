@@ -100,7 +100,9 @@ describe('Switch - Behavior', () => {
       </Switch>
     );
 
-    const button = container.querySelector('button') as HTMLButtonElement | null;
+    const button = container.querySelector(
+      'button'
+    ) as HTMLButtonElement | null;
     const input = container.querySelector(
       'input[type="checkbox"]'
     ) as HTMLInputElement | null;

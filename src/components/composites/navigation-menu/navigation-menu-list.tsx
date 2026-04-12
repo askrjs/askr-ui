@@ -16,9 +16,7 @@ export function NavigationMenuList(
   props: NavigationMenuListAsChildProps
 ): JSX.Element;
 export function NavigationMenuList(
-  props:
-    | NavigationMenuListProps
-    | NavigationMenuListAsChildProps
+  props: NavigationMenuListProps | NavigationMenuListAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
   const root = readNavigationMenuRootContext();

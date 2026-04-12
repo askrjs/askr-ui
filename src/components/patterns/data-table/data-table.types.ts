@@ -438,4 +438,3 @@ export type DataTableErrorOwnProps = {
 
 export type DataTableErrorProps = BoxProps<'div', HTMLDivElement> &
   DataTableErrorOwnProps;
-

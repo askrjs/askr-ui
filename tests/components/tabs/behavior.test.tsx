@@ -128,8 +128,8 @@ describe('Tabs - Behavior', () => {
       container.querySelector(`[role="${TABS_A11Y_CONTRACT.PANEL_ROLE}"]`)
         ?.textContent
     ).toContain('Overview panel');
-    expect(getButtonByText(container, 'Overview').getAttribute('aria-selected')).toBe(
-      'true'
-    );
+    expect(
+      getButtonByText(container, 'Overview').getAttribute('aria-selected')
+    ).toBe('true');
   });
 });

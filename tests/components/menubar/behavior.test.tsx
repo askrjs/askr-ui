@@ -121,5 +121,4 @@ describe('Menubar - Behavior', () => {
     await flushPortalUpdates();
     expect(document.body.textContent).not.toContain('New');
   });
-
 });

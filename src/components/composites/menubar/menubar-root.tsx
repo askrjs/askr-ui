@@ -2,9 +2,7 @@ import { state } from '@askrjs/askr';
 import { mergeProps, rovingFocus } from '@askrjs/askr/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import { resolveCompoundId } from '../../_internal/id';
-import {
-  getCompositeCollection,
-} from '../../_internal/composite';
+import { getCompositeCollection } from '../../_internal/composite';
 import { getPersistentPortal } from '../../_internal/overlay';
 import {
   beginMenubarTriggerDeclaration,

@@ -361,9 +361,7 @@ export function ToastDescription(
 
 export function ToastAction(props: ToastActionProps): JSX.Element;
 export function ToastAction(props: ToastActionAsChildProps): JSX.Element;
-export function ToastAction(
-  props: ToastActionProps | ToastActionAsChildProps
-) {
+export function ToastAction(props: ToastActionProps | ToastActionAsChildProps) {
   const {
     asChild,
     children,

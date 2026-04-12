@@ -1,5 +1,8 @@
 import { bench, describe } from 'vite-plus/test';
-import { Spacer, type SpacerDivProps } from '../../src/components/primitives/spacer';
+import {
+  Spacer,
+  type SpacerDivProps,
+} from '../../src/components/primitives/spacer';
 
 describe('Spacer benches', () => {
   bench('create default flex spacer', () => {

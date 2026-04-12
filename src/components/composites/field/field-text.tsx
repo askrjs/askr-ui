@@ -51,9 +51,7 @@ export function FieldDescription(
 
 export function FieldError(props: FieldErrorProps): JSX.Element;
 export function FieldError(props: FieldErrorAsChildProps): JSX.Element;
-export function FieldError(
-  props: FieldErrorProps | FieldErrorAsChildProps
-) {
+export function FieldError(props: FieldErrorProps | FieldErrorAsChildProps) {
   const { asChild, children, ref, fieldId, ...rest } = props;
   const baseId = resolveFieldId(fieldId);
   const finalProps = mergeProps(rest, {

@@ -13,9 +13,7 @@ export function NavigationMenuIndicator(
   props: NavigationMenuIndicatorAsChildProps
 ): JSX.Element;
 export function NavigationMenuIndicator(
-  props:
-    | NavigationMenuIndicatorProps
-    | NavigationMenuIndicatorAsChildProps
+  props: NavigationMenuIndicatorProps | NavigationMenuIndicatorAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
   const root = readNavigationMenuRootContext();

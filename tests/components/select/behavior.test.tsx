@@ -132,8 +132,12 @@ describe('Select - Behavior', () => {
 
     await flushUpdates();
 
-    const group = Array.from(document.body.querySelectorAll('[role="group"]'))[0] as HTMLElement;
-    const label = group.querySelector('[data-select-label="true"]') as HTMLElement;
+    const group = Array.from(
+      document.body.querySelectorAll('[role="group"]')
+    )[0] as HTMLElement;
+    const label = group.querySelector(
+      '[data-select-label="true"]'
+    ) as HTMLElement;
 
     expect(label.id).not.toBe('');
     expect(group.getAttribute('aria-labelledby')).toBe(label.id);
@@ -167,7 +171,9 @@ describe('Select - Behavior', () => {
     solidItem.click();
     await flushUpdates();
 
-    const input = container.querySelector('input[type="hidden"]') as HTMLInputElement;
+    const input = container.querySelector(
+      'input[type="hidden"]'
+    ) as HTMLInputElement;
     const nextTrigger = container.querySelector(
       '[aria-haspopup="listbox"]'
     ) as HTMLButtonElement;
@@ -208,7 +214,9 @@ describe('Select - Behavior', () => {
     disabledItem.click();
     await flushUpdates();
 
-    const input = container.querySelector('input[type="hidden"]') as HTMLInputElement;
+    const input = container.querySelector(
+      'input[type="hidden"]'
+    ) as HTMLInputElement;
     const nextTrigger = container.querySelector(
       '[aria-haspopup="listbox"]'
     ) as HTMLButtonElement;

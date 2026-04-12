@@ -167,7 +167,9 @@ export function Accordion(props: AccordionProps) {
 
   return (
     <AccordionRootContext.Scope value={rootContext}>
-      <AccordionRootScopeView finalProps={finalProps as Record<string, unknown>}>
+      <AccordionRootScopeView
+        finalProps={finalProps as Record<string, unknown>}
+      >
         {children}
       </AccordionRootScopeView>
     </AccordionRootContext.Scope>
@@ -199,7 +201,9 @@ export function AccordionItem(props: AccordionItemProps) {
 
   return (
     <AccordionItemContext.Scope value={itemContext}>
-      <AccordionItemScopeView finalProps={finalProps as Record<string, unknown>}>
+      <AccordionItemScopeView
+        finalProps={finalProps as Record<string, unknown>}
+      >
         {children}
       </AccordionItemScopeView>
     </AccordionItemContext.Scope>

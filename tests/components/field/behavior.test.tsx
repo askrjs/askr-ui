@@ -116,7 +116,9 @@ describe('Field - Behavior', () => {
       </Fieldset>
     );
 
-    const input = container.querySelector('[data-slot="field-input"]') as HTMLInputElement | null;
+    const input = container.querySelector(
+      '[data-slot="field-input"]'
+    ) as HTMLInputElement | null;
     const switchButton = container.querySelector('[data-slot="field-switch"]');
 
     expect(input?.disabled).toBe(true);

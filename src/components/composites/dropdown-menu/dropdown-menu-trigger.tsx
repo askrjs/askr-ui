@@ -1,4 +1,9 @@
-import { Slot, composeRefs, mergeProps, pressable } from '@askrjs/askr/foundations';
+import {
+  Slot,
+  composeRefs,
+  mergeProps,
+  pressable,
+} from '@askrjs/askr/foundations';
 import { getOverlayNodes } from '../../_internal/overlay';
 import {
   readDropdownMenuDeclarationContext,

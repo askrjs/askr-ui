@@ -1,4 +1,10 @@
-import { Slot, composeRefs, mergeProps, pressable, rovingFocus } from '@askrjs/askr/foundations';
+import {
+  Slot,
+  composeRefs,
+  mergeProps,
+  pressable,
+  rovingFocus,
+} from '@askrjs/askr/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import { resolvePartId } from '../../_internal/id';
 import { pathIsOpen } from '../../_internal/hierarchical-menu';
@@ -31,18 +37,14 @@ function MenubarSubScopeView(props: { children?: unknown }) {
   return <>{props.children}</>;
 }
 
-function scheduleMenubarPortalSync(root: {
-  syncPortals: () => void;
-}) {
+function scheduleMenubarPortalSync(root: { syncPortals: () => void }) {
   queueMicrotask(() => {
     root.syncPortals();
   });
 }
 
 export function MenubarItem(props: MenubarItemProps): JSX.Element | null;
-export function MenubarItem(
-  props: MenubarItemAsChildProps
-): JSX.Element | null;
+export function MenubarItem(props: MenubarItemAsChildProps): JSX.Element | null;
 export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
   const {
     asChild,

@@ -20,7 +20,10 @@ import {
   readSelectRootContext,
   resolveSelectState,
 } from './select.shared';
-import type { SelectContentAsChildProps, SelectContentProps } from './select.types';
+import type {
+  SelectContentAsChildProps,
+  SelectContentProps,
+} from './select.types';
 
 export function SelectContent(props: SelectContentProps): JSX.Element | null;
 export function SelectContent(

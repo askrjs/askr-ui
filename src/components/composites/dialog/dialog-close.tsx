@@ -1,19 +1,10 @@
-import {
-  Slot,
-  mergeProps,
-  pressable,
-} from '@askrjs/askr/foundations';
+import { Slot, mergeProps, pressable } from '@askrjs/askr/foundations';
 import { readDialogRootContext } from './dialog.shared';
-import type {
-  DialogCloseAsChildProps,
-  DialogCloseProps,
-} from './dialog.types';
+import type { DialogCloseAsChildProps, DialogCloseProps } from './dialog.types';
 
 export function DialogClose(props: DialogCloseProps): JSX.Element;
 export function DialogClose(props: DialogCloseAsChildProps): JSX.Element;
-export function DialogClose(
-  props: DialogCloseProps | DialogCloseAsChildProps
-) {
+export function DialogClose(props: DialogCloseProps | DialogCloseAsChildProps) {
   const {
     asChild,
     children,

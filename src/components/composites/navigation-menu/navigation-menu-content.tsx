@@ -1,5 +1,11 @@
 import { state } from '@askrjs/askr';
-import { Slot, composeRefs, mergeProps, rovingFocus, Presence } from '@askrjs/askr/foundations';
+import {
+  Slot,
+  composeRefs,
+  mergeProps,
+  rovingFocus,
+  Presence,
+} from '@askrjs/askr/foundations';
 import { DismissableLayer } from '../../composites/dismissable-layer';
 import { FocusScope } from '../../composites/focus-scope';
 import {
@@ -14,9 +20,7 @@ import {
   clearOverlayPosition,
 } from '../../_internal/overlay';
 import { resolvePartId } from '../../_internal/id';
-import {
-  pathIsOpen,
-} from '../../_internal/hierarchical-menu';
+import { pathIsOpen } from '../../_internal/hierarchical-menu';
 import { stripInternalProps } from '../../_internal/props';
 import {
   NavigationMenuContentContext,
@@ -51,9 +55,7 @@ export function NavigationMenuContent(
   props: NavigationMenuContentAsChildProps
 ): JSX.Element | null;
 export function NavigationMenuContent(
-  props:
-    | NavigationMenuContentProps
-    | NavigationMenuContentAsChildProps
+  props: NavigationMenuContentProps | NavigationMenuContentAsChildProps
 ) {
   const {
     asChild,
@@ -131,25 +133,22 @@ export function NavigationMenuContent(
 
   const finalProps = mergeProps(rest, {
     ...nav.container,
-    ref: composeRefs(
-      ref as any,
-      (node: HTMLElement | null) => {
-        overlayNodes.content = node;
-        if (node && open) {
-          syncOverlayPosition(overlayId, {
-            side,
-            align,
-            sideOffset,
-          });
-        } else {
-          clearOverlayPosition(overlayId);
-        }
-
-        if (node && open) {
-          focusSelectedCollectionItem(collection, currentIndex);
-        }
+    ref: composeRefs(ref as any, (node: HTMLElement | null) => {
+      overlayNodes.content = node;
+      if (node && open) {
+        syncOverlayPosition(overlayId, {
+          side,
+          align,
+          sideOffset,
+        });
+      } else {
+        clearOverlayPosition(overlayId);
       }
-    ),
+
+      if (node && open) {
+        focusSelectedCollectionItem(collection, currentIndex);
+      }
+    }),
     id: item.contentId,
     'aria-labelledby': item.triggerId,
     'data-slot': 'navigation-menu-content',
