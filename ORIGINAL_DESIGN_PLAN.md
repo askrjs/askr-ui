@@ -52,9 +52,9 @@ Subcomponents used outside their root throw. Context accessors used without a pr
 
 ### 7. Remove legacy compatibility architecture
 
-Scaffolding that exists to maintain compatibility with pre-1.0 behavior is removed. Hidden injected props (`__*` prefix) are used only when architecturally necessary and are always stripped before DOM merge. Tree-rewriting patterns have been replaced with scoped-context architecture.
+Scaffolding that exists to maintain compatibility with pre-1.0 behavior is removed. Hidden injected props and tree-rewriting are removed from component architecture. Scoped-context architecture is the standard.
 
-**Gate**: No component uses tree-rewriting or hidden-prop injection except where documented and tested. SPEC.md confirms `__*` prefix is the one exception.
+**Gate**: No component uses tree-rewriting or hidden-prop injection.
 
 ### 8. Make accessibility semantics shape the API
 

@@ -57,6 +57,30 @@ describe('Spacer - Behavior', () => {
     expect(style).toContain('2rem');
   });
 
+  it('should set height inline style for block axis with valid CSS basis', () => {
+    container = mount(<Spacer axis="block" basis="3rem" />);
+    const el = container.querySelector('[data-slot="spacer"]') as HTMLElement;
+    expect(el.style.height).toBe('3rem');
+    expect(el.style.width).toBe('');
+  });
+
+  it('should not set width for inline axis when basis is not a CSS length', () => {
+    container = mount(<Spacer axis="inline" basis="sm" />);
+    const el = container.querySelector('[data-slot="spacer"]') as HTMLElement;
+    expect(el?.getAttribute(SPACER_A11Y_CONTRACT.DATA_ATTRIBUTES.basis)).toBe(
+      'sm'
+    );
+    expect(el.style.width).toBe('');
+  });
+
+  it('should default to flex spacer mode when axis is not provided', () => {
+    container = mount(<Spacer basis="sm" />);
+    const el = container.querySelector('[data-slot="spacer"]') as HTMLElement;
+    expect(el.style.flexGrow).toBe('1');
+    expect(el.style.flexShrink).toBe('1');
+    expect(el.style.flexBasis).toBe('auto');
+  });
+
   it('should render the child element when asChild is true', () => {
     container = mount(
       <Spacer asChild>

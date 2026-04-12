@@ -65,6 +65,37 @@ describe('Grid - Behavior', () => {
     ).toBe('200px');
   });
 
+  it('should resolve auto-fit columns when minItemWidth is valid and autoFit is not set', () => {
+    container = mount(<Grid minItemWidth="240px" />);
+    const el = container.querySelector('[data-slot="grid"]') as HTMLElement;
+    expect(el.style.gridTemplateColumns).toBe(
+      'repeat(auto-fit, minmax(240px, 1fr))'
+    );
+  });
+
+  it('should resolve auto-fill columns when minItemWidth is valid and autoFit is false', () => {
+    container = mount(<Grid minItemWidth="240px" autoFit={false} />);
+    const el = container.querySelector('[data-slot="grid"]') as HTMLElement;
+    expect(el.style.gridTemplateColumns).toBe(
+      'repeat(auto-fill, minmax(240px, 1fr))'
+    );
+  });
+
+  it('should not set gridTemplateColumns for invalid minItemWidth tokens', () => {
+    container = mount(<Grid minItemWidth="sm" autoFit={false} />);
+    const el = container.querySelector('[data-slot="grid"]') as HTMLElement;
+    expect(el?.getAttribute(GRID_A11Y_CONTRACT.DATA_ATTRIBUTES.minItemWidth)).toBe(
+      'sm'
+    );
+    expect(el.style.gridTemplateColumns).toBe('');
+  });
+
+  it('should trim numeric string columns when resolving repeat template', () => {
+    container = mount(<Grid columns=" 4 " />);
+    const el = container.querySelector('[data-slot="grid"]') as HTMLElement;
+    expect(el.style.gridTemplateColumns).toBe('repeat(4, minmax(0, 1fr))');
+  });
+
   it('should emit data-gap attribute', () => {
     container = mount(<Grid gap="1rem" />);
     const el = container.querySelector('[data-slot="grid"]');

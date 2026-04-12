@@ -51,7 +51,7 @@ The public surface has two tiers. **Core** is what the library cannot remove wit
 - `asChild` is allowed only on wrapper-style or interactive composition parts.
 - `Input` and `Textarea` preserve native form semantics when composed: `asChild` is allowed only with matching native `<input>` and `<textarea>` hosts.
 - `*Portal` parts stay public only when they perform tested, intentional portal-slot behavior.
-- Internal injected props use the `__*` prefix and must be stripped before DOM props are merged.
+- Hidden injected props and JSX tree-rewriting are not allowed in component architecture.
 - Shared internal helpers are preferred over component-specific state or ID patterns.
 - API surface must remain minimal: fewer parts and props are better unless the missing surface forces users to rebuild behavior the library owns. Implementation-driven surface area is not added.
 - Cross-family consistency is required: sibling families use the same naming conventions, prop patterns, and composition model. Inconsistency is a design defect, not a style preference.

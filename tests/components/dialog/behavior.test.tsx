@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import {
   Dialog,
   DialogPortal,
@@ -60,5 +60,32 @@ describe('Dialog - Behavior', () => {
     expect(content.getAttribute('aria-label')).toBe('Preferences');
     expect(content.getAttribute('aria-labelledby')).toBeNull();
     expect(content.getAttribute('aria-describedby')).toBeNull();
+  });
+
+  it('keeps dialog open when DialogContent onDismiss is provided and handles Escape', async () => {
+    const onDismiss = vi.fn();
+
+    container = mount(
+      <Dialog defaultOpen>
+        <DialogTrigger>Open dialog</DialogTrigger>
+        <DialogPortal>
+          <DialogContent onDismiss={onDismiss}>Body</DialogContent>
+        </DialogPortal>
+      </Dialog>
+    );
+
+    await flushUpdates();
+
+    const content = Array.from(
+      document.body.querySelectorAll('[data-slot="dialog-content"]')
+    ).find((element) => element.textContent?.includes('Body')) as HTMLElement;
+
+    content.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    await flushUpdates();
+
+    const trigger = container.querySelector('[data-slot="dialog-trigger"]') as HTMLElement;
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+    expect(document.body.querySelector('[data-slot="dialog-content"]')).not.toBeNull();
   });
 });

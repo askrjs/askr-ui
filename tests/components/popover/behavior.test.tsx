@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import {
+  Dialog,
+  DialogContent,
+  DialogPortal,
+  DialogTrigger,
+} from '../../../src/components/composites/dialog';
+import {
   Popover,
   PopoverContent,
   PopoverPortal,
@@ -160,5 +166,43 @@ describe('Popover - Behavior', () => {
     expect(content?.dataset.side).toBe('right');
     expect((content as HTMLElement | null)?.style.left).toBe('148px');
     expect((content as HTMLElement | null)?.style.top).toBe('90px');
+  });
+
+  it('closes nested popover without closing parent dialog on Escape', async () => {
+    container = mount(
+      <Dialog defaultOpen>
+        <DialogTrigger>Open dialog</DialogTrigger>
+        <DialogPortal>
+          <DialogContent>
+            <Popover defaultOpen>
+              <PopoverTrigger>Open popover</PopoverTrigger>
+              <PopoverContent>Details</PopoverContent>
+            </Popover>
+          </DialogContent>
+        </DialogPortal>
+      </Dialog>
+    );
+
+    await flushUpdates();
+
+    const popoverContent = document.body.querySelector(
+      '[data-slot="popover-content"]'
+    ) as HTMLElement;
+
+    popoverContent.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+    );
+    await flushUpdates();
+
+    const dialogTrigger = container.querySelector(
+      '[data-slot="dialog-trigger"]'
+    ) as HTMLElement;
+    const popoverTrigger = document.body.querySelector(
+      '[data-slot="popover-trigger"]'
+    ) as HTMLElement;
+
+    expect(popoverTrigger.getAttribute('aria-expanded')).toBe('false');
+    expect(dialogTrigger.getAttribute('aria-expanded')).toBe('true');
+    expect(document.body.querySelector('[data-slot="dialog-content"]')).not.toBeNull();
   });
 });

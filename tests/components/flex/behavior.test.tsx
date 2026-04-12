@@ -50,6 +50,25 @@ describe('Flex - Behavior', () => {
     expect(el.style.gap).toBe('1rem');
   });
 
+  it('should not set gap inline style for non-CSS token values', () => {
+    container = mount(<Flex gap="sm" />);
+    const el = container.querySelector('[data-slot="flex"]') as HTMLElement;
+    expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.gap)).toBe('sm');
+    expect(el.style.gap).toBe('');
+  });
+
+  it('should accept CSS function gap values', () => {
+    container = mount(<Flex gap="clamp(0.5rem, 1vw, 1rem)" />);
+    const el = container.querySelector('[data-slot="flex"]') as HTMLElement;
+    expect(el.style.gap).toBe('clamp(0.5rem, 1vw, 1rem)');
+  });
+
+  it('should treat numeric zero gap as a valid CSS length', () => {
+    container = mount(<Flex gap="0" />);
+    const el = container.querySelector('[data-slot="flex"]') as HTMLElement;
+    expect(el.style.gap).toBe('0px');
+  });
+
   it('should emit data-align attribute', () => {
     container = mount(<Flex align="center" />);
     const el = container.querySelector('[data-slot="flex"]');
@@ -72,6 +91,19 @@ describe('Flex - Behavior', () => {
     container = mount(<Flex collapseBelow="sm" />);
     const el = container.querySelector('[data-slot="flex"]');
     expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.collapseBelow)).toBe('sm');
+  });
+
+  it('should let user style override computed layout style', () => {
+    container = mount(
+      <Flex
+        direction="column"
+        style={{ flexDirection: 'row', justifyContent: 'space-around' }}
+      />
+    );
+
+    const el = container.querySelector('[data-slot="flex"]') as HTMLElement;
+    expect(el.style.flexDirection).toBe('row');
+    expect(el.style.justifyContent).toBe('space-around');
   });
 
   it('should render the child element when asChild is true', () => {
