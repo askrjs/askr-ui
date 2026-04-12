@@ -123,4 +123,34 @@ describe('NavigationMenu - Behavior', () => {
     await flushPortalUpdates();
     expect(document.body.textContent).not.toContain('Core');
   });
+
+  it('keeps custom content positioning through the post-open portal sync', async () => {
+    container = mount(
+      <NavigationMenu>
+        <NavigationMenuList>
+          <NavigationMenuItem value="products">
+            <NavigationMenuTrigger>Products</NavigationMenuTrigger>
+            <NavigationMenuContent side="right" align="end" sideOffset={8}>
+              <NavigationMenuLink href="/products/core">
+                Core
+              </NavigationMenuLink>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    );
+
+    getButtonByText('Products').click();
+    await flushPortalUpdates();
+
+    // Verify custom positioning attributes are present
+    const contentPanel = document.body.querySelector(
+      '[data-slot="navigation-menu-content"]'
+    );
+
+    expect(contentPanel?.getAttribute('data-side')).toBe('right');
+    expect(contentPanel?.getAttribute('data-align')).toBe('end');
+    expect(contentPanel?.getAttribute('data-side-offset')).toBe('8');
+  });
 });
+
