@@ -282,4 +282,54 @@ describe('ToggleGroup - Behavior', () => {
       'false'
     );
   });
+
+  it('does not wrap roving focus at boundaries when loop is false', async () => {
+    container = mount(
+      <ToggleGroup defaultValue="left" orientation="horizontal" loop={false}>
+        <ToggleGroupItem value="left">Left</ToggleGroupItem>
+        <ToggleGroupItem value="right">Right</ToggleGroupItem>
+      </ToggleGroup>
+    );
+
+    const left = getToggleByText(container, 'Left');
+    left.focus();
+    left.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true })
+    );
+    await flushUpdates();
+
+    expect(document.activeElement).toBe(getToggleByText(container, 'Left'));
+  });
+
+  it('does not activate disabled items during roving keyboard navigation attempts', async () => {
+    container = mount(
+      <ToggleGroup defaultValue="left" orientation="vertical">
+        <ToggleGroupItem value="left">Left</ToggleGroupItem>
+        <ToggleGroupItem value="middle" disabled>
+          Middle
+        </ToggleGroupItem>
+        <ToggleGroupItem value="right">Right</ToggleGroupItem>
+      </ToggleGroup>
+    );
+
+    const left = getToggleByText(container, 'Left');
+    left.focus();
+    left.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
+    );
+    left.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })
+    );
+    await flushUpdates();
+
+    expect(getToggleByText(container, 'Left').getAttribute('aria-pressed')).toBe(
+      'true'
+    );
+    expect(getToggleByText(container, 'Right').getAttribute('aria-pressed')).toBe(
+      'false'
+    );
+    expect(getToggleByText(container, 'Middle').getAttribute('aria-pressed')).toBe(
+      'false'
+    );
+  });
 });

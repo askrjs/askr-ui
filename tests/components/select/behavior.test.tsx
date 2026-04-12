@@ -138,4 +138,82 @@ describe('Select - Behavior', () => {
     expect(label.id).not.toBe('');
     expect(group.getAttribute('aria-labelledby')).toBe(label.id);
   });
+
+  it('updates hidden input and closes content when an enabled item is selected', async () => {
+    container = mount(
+      <Select name="framework" defaultValue="askr">
+        <SelectTrigger>
+          <SelectValue placeholder="Choose one" />
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectContent>
+            <SelectItem value="askr">Askr</SelectItem>
+            <SelectItem value="solid">Solid</SelectItem>
+          </SelectContent>
+        </SelectPortal>
+      </Select>
+    );
+
+    const trigger = container.querySelector(
+      '[aria-haspopup="listbox"]'
+    ) as HTMLButtonElement;
+    trigger.click();
+    await flushUpdates();
+
+    const solidItem = Array.from(
+      document.body.querySelectorAll('[data-slot="select-item"]')
+    ).find((element) => element.textContent?.trim() === 'Solid') as HTMLElement;
+
+    solidItem.click();
+    await flushUpdates();
+
+    const input = container.querySelector('input[type="hidden"]') as HTMLInputElement;
+    const nextTrigger = container.querySelector(
+      '[aria-haspopup="listbox"]'
+    ) as HTMLButtonElement;
+
+    expect(input.value).toBe('solid');
+    expect(nextTrigger.textContent).toContain('Solid');
+    expect(nextTrigger.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('does not change value when clicking a disabled item', async () => {
+    container = mount(
+      <Select name="framework" defaultValue="askr">
+        <SelectTrigger>
+          <SelectValue placeholder="Choose one" />
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectContent>
+            <SelectItem value="askr">Askr</SelectItem>
+            <SelectItem value="solid" disabled>
+              Solid
+            </SelectItem>
+          </SelectContent>
+        </SelectPortal>
+      </Select>
+    );
+
+    const trigger = container.querySelector(
+      '[aria-haspopup="listbox"]'
+    ) as HTMLButtonElement;
+    trigger.click();
+    await flushUpdates();
+
+    const disabledItem = Array.from(
+      document.body.querySelectorAll('[data-slot="select-item"]')
+    ).find((element) => element.textContent?.trim() === 'Solid') as HTMLElement;
+
+    expect(disabledItem.getAttribute('aria-disabled')).toBe('true');
+    disabledItem.click();
+    await flushUpdates();
+
+    const input = container.querySelector('input[type="hidden"]') as HTMLInputElement;
+    const nextTrigger = container.querySelector(
+      '[aria-haspopup="listbox"]'
+    ) as HTMLButtonElement;
+
+    expect(input.value).toBe('askr');
+    expect(nextTrigger.textContent).toContain('Askr');
+  });
 });

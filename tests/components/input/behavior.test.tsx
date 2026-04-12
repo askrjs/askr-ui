@@ -34,6 +34,15 @@ describe('Input - Behavior', () => {
     expect(input?.getAttribute('data-disabled')).toBe('true');
   });
 
+  it('preserves readonly semantics on native inputs', () => {
+    container = mount(<Input readOnly aria-label="locked-input" />);
+
+    const input = container.querySelector('input') as HTMLInputElement | null;
+
+    expect(input?.readOnly).toBe(true);
+    expect(input?.hasAttribute('readonly')).toBe(true);
+  });
+
   it('supports asChild composition and merges host props', () => {
     container = mount(
       <Input asChild data-testid="custom-input" data-from-input="yes">
@@ -60,6 +69,19 @@ describe('Input - Behavior', () => {
 
     expect(host?.disabled).toBe(true);
     expect(host?.getAttribute('data-disabled')).toBe('true');
+  });
+
+  it('preserves readonly semantics on asChild input hosts', () => {
+    container = mount(
+      <Input asChild readOnly>
+        <input aria-label="Email" />
+      </Input>
+    );
+
+    const host = container.querySelector('input') as HTMLInputElement | null;
+
+    expect(host?.readOnly).toBe(true);
+    expect(host?.hasAttribute('readonly')).toBe(true);
   });
 
   it('fails loudly when asChild does not receive a native input host', () => {

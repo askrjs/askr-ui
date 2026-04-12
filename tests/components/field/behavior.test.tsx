@@ -9,11 +9,19 @@ import {
   FieldLabel,
   FieldRadioGroup,
   FieldRow,
+  FieldSelectTrigger,
   FieldSwitch,
   FieldTextarea,
   Fieldset,
 } from '../../../src/components/composites/field/field';
 import { RadioGroupItem } from '../../../src/components/primitives/radio-group';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectPortal,
+  SelectValue,
+} from '../../../src/components/primitives/select';
 import { mount, unmount } from '../../test-utils';
 
 describe('Field - Behavior', () => {
@@ -183,5 +191,65 @@ describe('Field - Behavior', () => {
     expect(radioGroup?.getAttribute('aria-describedby')).toBe(
       'size-description size-error'
     );
+  });
+
+  it('wires FieldSelectTrigger metadata from Field context', () => {
+    container = mount(
+      <Field id="framework" invalid required>
+        <FieldLabel>Framework</FieldLabel>
+        <Select defaultValue="askr">
+          <FieldSelectTrigger>
+            <SelectValue placeholder="Choose one" />
+          </FieldSelectTrigger>
+          <SelectPortal>
+            <SelectContent>
+              <SelectItem value="askr">Askr</SelectItem>
+              <SelectItem value="solid">Solid</SelectItem>
+            </SelectContent>
+          </SelectPortal>
+        </Select>
+        <FieldDescription>Choose your framework</FieldDescription>
+        <FieldError>Required</FieldError>
+      </Field>
+    );
+
+    const trigger = container.querySelector(
+      '[data-slot="field-select-trigger"]'
+    );
+
+    expect(trigger?.getAttribute('id')).toBe('framework-control');
+    expect(trigger?.getAttribute('aria-invalid')).toBe('true');
+    expect(trigger?.getAttribute('aria-required')).toBe('true');
+    expect(trigger?.getAttribute('aria-describedby')).toBe(
+      'framework-description framework-error'
+    );
+  });
+
+  it('inherits disabled semantics for FieldSelectTrigger from disabled fieldset', () => {
+    container = mount(
+      <Fieldset disabled>
+        <Field id="framework">
+          <FieldLabel>Framework</FieldLabel>
+          <Select defaultValue="askr">
+            <FieldSelectTrigger>
+              <SelectValue placeholder="Choose one" />
+            </FieldSelectTrigger>
+            <SelectPortal>
+              <SelectContent>
+                <SelectItem value="askr">Askr</SelectItem>
+              </SelectContent>
+            </SelectPortal>
+          </Select>
+        </Field>
+      </Fieldset>
+    );
+
+    const trigger = container.querySelector(
+      '[data-slot="field-select-trigger"]'
+    ) as HTMLButtonElement | null;
+
+    expect(trigger?.disabled).toBe(true);
+    expect(trigger?.getAttribute('aria-disabled')).toBe('true');
+    expect(trigger?.getAttribute('data-disabled')).toBe('true');
   });
 });
