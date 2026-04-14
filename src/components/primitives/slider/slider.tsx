@@ -6,7 +6,6 @@ import {
 } from '@askrjs/askr/foundations';
 import { mergeCssVar } from '../../_internal/style';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
-import { mapJsxTree } from '../../_internal/jsx';
 import {
   rangePercentage,
   snapRangeValue,
@@ -21,6 +20,11 @@ import type {
   SliderTrackAsChildProps,
   SliderTrackProps,
 } from './slider.types';
+import {
+  SliderRootContext,
+  readSliderRootContext,
+  type SliderRootContextValue,
+} from './slider.shared';
 
 type SliderEntry = {
   track: HTMLElement | null;
@@ -29,20 +33,8 @@ type SliderEntry = {
   dragEnd: ((event: PointerEvent) => void) | null;
 };
 
-type InjectedSliderProps = {
-  __sliderId?: string;
-  __value?: number;
-  __setValue?: (value: number) => void;
-  __min?: number;
-  __max?: number;
-  __step?: number;
-  __orientation?: 'horizontal' | 'vertical';
-  __disabled?: boolean;
-  __trackId?: string;
-  __thumbId?: string;
-};
-
 const sliderEntries = new Map<string, SliderEntry>();
+const sliderContexts = new Map<string, SliderRootContextValue>();
 
 function getSliderEntry(sliderId: string) {
   const existing = sliderEntries.get(sliderId);
@@ -61,36 +53,27 @@ function getSliderEntry(sliderId: string) {
   return created;
 }
 
-function readInjectedSliderProps(
-  props: InjectedSliderProps
-): Required<InjectedSliderProps> {
-  if (
-    !props.__sliderId ||
-    props.__value === undefined ||
-    !props.__setValue ||
-    props.__min === undefined ||
-    props.__max === undefined ||
-    props.__step === undefined ||
-    !props.__orientation ||
-    props.__disabled === undefined ||
-    !props.__trackId ||
-    !props.__thumbId
-  ) {
-    throw new Error('Slider parts must be used within <Slider>');
+function getSliderRootContext(sliderId: string): SliderRootContextValue {
+  const existing = sliderContexts.get(sliderId);
+
+  if (existing) {
+    return existing;
   }
 
-  return {
-    __sliderId: props.__sliderId,
-    __value: props.__value,
-    __setValue: props.__setValue,
-    __min: props.__min,
-    __max: props.__max,
-    __step: props.__step,
-    __orientation: props.__orientation,
-    __disabled: props.__disabled,
-    __trackId: props.__trackId,
-    __thumbId: props.__thumbId,
+  const created: SliderRootContextValue = {
+    sliderId,
+    value: 0,
+    setValue: () => {},
+    min: 0,
+    max: 0,
+    step: 1,
+    orientation: 'horizontal',
+    disabled: false,
+    trackId: resolvePartId(sliderId, 'track'),
+    thumbId: resolvePartId(sliderId, 'thumb'),
   };
+  sliderContexts.set(sliderId, created);
+  return created;
 }
 
 function normalizeSliderConfig(props: SliderProps) {
@@ -108,9 +91,9 @@ function normalizeSliderConfig(props: SliderProps) {
 
 function updateSliderValueFromPointer(
   event: PointerEvent,
-  injected: Required<InjectedSliderProps>
+  root: SliderRootContextValue
 ) {
-  const entry = getSliderEntry(injected.__sliderId);
+  const entry = getSliderEntry(root.sliderId);
 
   if (!entry.track) {
     return;
@@ -120,28 +103,28 @@ function updateSliderValueFromPointer(
     valueFromPointer(
       event,
       entry.track.getBoundingClientRect(),
-      injected.__min,
-      injected.__max,
-      injected.__orientation
+      root.min,
+      root.max,
+      root.orientation
     ),
-    injected.__min,
-    injected.__max,
-    injected.__step
+    root.min,
+    root.max,
+    root.step
   );
 
-  injected.__setValue(nextValue);
+  root.setValue(nextValue);
   entry.thumb?.focus?.();
 }
 
-function beginSliderDrag(injected: Required<InjectedSliderProps>) {
-  const entry = getSliderEntry(injected.__sliderId);
+function beginSliderDrag(root: SliderRootContextValue) {
+  const entry = getSliderEntry(root.sliderId);
 
   if (entry.dragMove || entry.dragEnd) {
     return;
   }
 
   entry.dragMove = (event: PointerEvent) => {
-    updateSliderValueFromPointer(event, injected);
+    updateSliderValueFromPointer(event, root);
   };
   entry.dragEnd = () => {
     if (entry.dragMove) {
@@ -157,6 +140,13 @@ function beginSliderDrag(injected: Required<InjectedSliderProps>) {
   };
   window.addEventListener('pointermove', entry.dragMove);
   window.addEventListener('pointerup', entry.dragEnd);
+}
+
+function SliderRootView(props: {
+  children?: unknown;
+  finalProps: Record<string, unknown>;
+}) {
+  return <div {...props.finalProps}>{props.children}</div>;
 }
 
 export function Slider(props: SliderProps) {
@@ -181,35 +171,19 @@ export function Slider(props: SliderProps) {
   });
   const normalizedValue = snapRangeValue(valueState(), min, max, step);
   const percentage = rangePercentage(normalizedValue, min, max);
-  const injectedProps: InjectedSliderProps = {
-    __sliderId: sliderId,
-    __value: normalizedValue,
-    __setValue: valueState.set,
-    __min: min,
-    __max: max,
-    __step: step,
-    __orientation: orientation,
-    __disabled: disabled,
-    __trackId: resolvePartId(sliderId, 'track'),
-    __thumbId: resolvePartId(sliderId, 'thumb'),
+  const rootContext = getSliderRootContext(sliderId);
+  rootContext.sliderId = sliderId;
+  rootContext.value = normalizedValue;
+  rootContext.setValue = (nextValue: number) => {
+    valueState.set(nextValue as never);
   };
-  const enhancedChildren = mapJsxTree(children, (element) => {
-    if (
-      element.type !== SliderTrack &&
-      element.type !== SliderRange &&
-      element.type !== SliderThumb
-    ) {
-      return element;
-    }
-
-    return {
-      ...element,
-      props: {
-        ...element.props,
-        ...injectedProps,
-      },
-    };
-  });
+  rootContext.min = min;
+  rootContext.max = max;
+  rootContext.step = step;
+  rootContext.orientation = orientation;
+  rootContext.disabled = disabled;
+  rootContext.trackId = resolvePartId(sliderId, 'track');
+  rootContext.thumbId = resolvePartId(sliderId, 'thumb');
   const finalProps = mergeProps(rest, {
     ref,
     style: mergeCssVar(
@@ -224,61 +198,31 @@ export function Slider(props: SliderProps) {
   });
 
   return (
-    <div {...finalProps}>
-      {enhancedChildren}
-      {name ? (
-        <input
-          type="hidden"
-          name={name}
-          value={String(normalizedValue)}
-          disabled={disabled}
-        />
-      ) : null}
-    </div>
+    <SliderRootContext.Scope value={rootContext}>
+      <SliderRootView finalProps={finalProps}>
+        {children}
+        {name ? (
+          <input
+            type="hidden"
+            name={name}
+            value={String(normalizedValue)}
+            disabled={disabled}
+          />
+        ) : null}
+      </SliderRootView>
+    </SliderRootContext.Scope>
   );
 }
 
 export function SliderTrack(props: SliderTrackProps): JSX.Element;
 export function SliderTrack(props: SliderTrackAsChildProps): JSX.Element;
 export function SliderTrack(
-  props:
-    | (SliderTrackProps & InjectedSliderProps)
-    | (SliderTrackAsChildProps & InjectedSliderProps)
+  props: SliderTrackProps | SliderTrackAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    ref,
-    __sliderId,
-    __value,
-    __setValue,
-    __min,
-    __max,
-    __step,
-    __orientation,
-    __disabled,
-    __trackId,
-    __thumbId,
-    ...rest
-  } = props;
-  const injected = readInjectedSliderProps({
-    __sliderId,
-    __value,
-    __setValue,
-    __min,
-    __max,
-    __step,
-    __orientation,
-    __disabled,
-    __trackId,
-    __thumbId,
-  });
-  const entry = getSliderEntry(injected.__sliderId);
-  const percentage = rangePercentage(
-    injected.__value,
-    injected.__min,
-    injected.__max
-  );
+  const { asChild, children, ref, ...rest } = props;
+  const root = readSliderRootContext();
+  const entry = getSliderEntry(root.sliderId);
+  const percentage = rangePercentage(root.value, root.min, root.max);
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
       ref as
@@ -290,18 +234,18 @@ export function SliderTrack(
         entry.track = node;
       }
     ),
-    id: injected.__trackId,
+    id: root.trackId,
     'data-slot': 'slider-track',
     'data-slider-track': 'true',
-    'data-orientation': injected.__orientation,
+    'data-orientation': root.orientation,
     'data-percentage': String(percentage),
     onPointerDown: (event: PointerEvent) => {
-      if (injected.__disabled) {
+      if (root.disabled) {
         return;
       }
 
-      updateSliderValueFromPointer(event, injected);
-      beginSliderDrag(injected);
+      updateSliderValueFromPointer(event, root);
+      beginSliderDrag(root);
     },
   });
 
@@ -315,48 +259,16 @@ export function SliderTrack(
 export function SliderRange(props: SliderRangeProps): JSX.Element;
 export function SliderRange(props: SliderRangeAsChildProps): JSX.Element;
 export function SliderRange(
-  props:
-    | (SliderRangeProps & InjectedSliderProps)
-    | (SliderRangeAsChildProps & InjectedSliderProps)
+  props: SliderRangeProps | SliderRangeAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    ref,
-    __sliderId,
-    __value,
-    __setValue,
-    __min,
-    __max,
-    __step,
-    __orientation,
-    __disabled,
-    __trackId,
-    __thumbId,
-    ...rest
-  } = props;
-  const injected = readInjectedSliderProps({
-    __sliderId,
-    __value,
-    __setValue,
-    __min,
-    __max,
-    __step,
-    __orientation,
-    __disabled,
-    __trackId,
-    __thumbId,
-  });
-  const percentage = rangePercentage(
-    injected.__value,
-    injected.__min,
-    injected.__max
-  );
+  const { asChild, children, ref, ...rest } = props;
+  const root = readSliderRootContext();
+  const percentage = rangePercentage(root.value, root.min, root.max);
   const finalProps = mergeProps(rest, {
     ref,
     'data-slot': 'slider-range',
     'data-slider-range': 'true',
-    'data-orientation': injected.__orientation,
+    'data-orientation': root.orientation,
     'data-percentage': String(percentage),
   });
 
@@ -370,44 +282,12 @@ export function SliderRange(
 export function SliderThumb(props: SliderThumbProps): JSX.Element;
 export function SliderThumb(props: SliderThumbAsChildProps): JSX.Element;
 export function SliderThumb(
-  props:
-    | (SliderThumbProps & InjectedSliderProps)
-    | (SliderThumbAsChildProps & InjectedSliderProps)
+  props: SliderThumbProps | SliderThumbAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    ref,
-    __sliderId,
-    __value,
-    __setValue,
-    __min,
-    __max,
-    __step,
-    __orientation,
-    __disabled,
-    __trackId,
-    __thumbId,
-    ...rest
-  } = props;
-  const injected = readInjectedSliderProps({
-    __sliderId,
-    __value,
-    __setValue,
-    __min,
-    __max,
-    __step,
-    __orientation,
-    __disabled,
-    __trackId,
-    __thumbId,
-  });
-  const entry = getSliderEntry(injected.__sliderId);
-  const percentage = rangePercentage(
-    injected.__value,
-    injected.__min,
-    injected.__max
-  );
+  const { asChild, children, ref, ...rest } = props;
+  const root = readSliderRootContext();
+  const entry = getSliderEntry(root.sliderId);
+  const percentage = rangePercentage(root.value, root.min, root.max);
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
       ref as
@@ -419,59 +299,51 @@ export function SliderThumb(
         entry.thumb = node;
       }
     ),
-    id: injected.__thumbId,
+    id: root.thumbId,
     role: 'slider',
-    tabIndex: injected.__disabled ? undefined : 0,
-    'aria-valuemin': String(injected.__min),
-    'aria-valuemax': String(injected.__max),
-    'aria-valuenow': String(injected.__value),
-    'aria-orientation': injected.__orientation,
-    'aria-disabled': injected.__disabled ? 'true' : undefined,
+    tabIndex: root.disabled ? undefined : 0,
+    'aria-valuemin': String(root.min),
+    'aria-valuemax': String(root.max),
+    'aria-valuenow': String(root.value),
+    'aria-orientation': root.orientation,
+    'aria-disabled': root.disabled ? 'true' : undefined,
     'data-slot': 'slider-thumb',
     'data-slider-thumb': 'true',
-    'data-orientation': injected.__orientation,
+    'data-orientation': root.orientation,
     'data-percentage': String(percentage),
     onPointerDown: (event: PointerEvent) => {
-      if (injected.__disabled) {
+      if (root.disabled) {
         return;
       }
 
       event.preventDefault();
-      beginSliderDrag(injected);
+      beginSliderDrag(root);
     },
     onKeyDown: (event: KeyboardEvent) => {
-      if (injected.__disabled) {
+      if (root.disabled) {
         return;
       }
 
       const nextValue =
         event.key === 'ArrowRight' || event.key === 'ArrowUp'
-          ? injected.__value + injected.__step
+          ? root.value + root.step
           : event.key === 'ArrowLeft' || event.key === 'ArrowDown'
-            ? injected.__value - injected.__step
+            ? root.value - root.step
             : event.key === 'Home'
-              ? injected.__min
+              ? root.min
               : event.key === 'End'
-                ? injected.__max
+                ? root.max
                 : event.key === 'PageUp'
-                  ? injected.__value + injected.__step * 10
+                  ? root.value + root.step * 10
                   : event.key === 'PageDown'
-                    ? injected.__value - injected.__step * 10
+                    ? root.value - root.step * 10
                     : null;
 
       if (nextValue === null) {
         return;
       }
-
       event.preventDefault();
-      injected.__setValue(
-        snapRangeValue(
-          nextValue,
-          injected.__min,
-          injected.__max,
-          injected.__step
-        )
-      );
+      root.setValue(snapRangeValue(nextValue, root.min, root.max, root.step));
     },
   });
 

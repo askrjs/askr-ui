@@ -1,11 +1,6 @@
 import { defineContext, readContext } from '@askrjs/askr';
-import { resolvePartId } from '../../_internal/id';
+import type { getCompositeCollection } from '../../_internal/composite';
 import type { TabsActivationMode, TabsOrientation } from './tabs.types';
-
-export type TabsTriggerMetadata = {
-  value: string;
-  disabled: boolean;
-};
 
 export type TabsRootContextValue = {
   tabsId: string;
@@ -18,7 +13,10 @@ export type TabsRootContextValue = {
   loop: boolean;
   currentIndex: number;
   setCurrentIndex: (index: number) => void;
-  items: TabsTriggerMetadata[];
+  items: { value: string; disabled: boolean }[];
+  disabledIndexes: number[];
+  itemCount: number;
+  collection: ReturnType<typeof getCompositeCollection>;
 };
 
 export type TabsRenderContextValue = {
@@ -26,9 +24,8 @@ export type TabsRenderContextValue = {
 };
 
 export const TabsRootContext = defineContext<TabsRootContextValue | null>(null);
-export const TabsRenderContext = defineContext<TabsRenderContextValue | null>(
-  null
-);
+export const TabsRenderContext =
+  defineContext<TabsRenderContextValue | null>(null);
 
 export function readTabsRootContext(): TabsRootContextValue {
   const context = readContext(TabsRootContext);
@@ -63,9 +60,9 @@ export function createTabsRenderContext(): TabsRenderContextValue {
 }
 
 export function getTabsTriggerId(tabsId: string, value: string): string {
-  return resolvePartId(tabsId, `trigger-${value}`);
+  return `${tabsId}--trigger--${value}`;
 }
 
 export function getTabsContentId(tabsId: string, value: string): string {
-  return resolvePartId(tabsId, `content-${value}`);
+  return `${tabsId}--content--${value}`;
 }

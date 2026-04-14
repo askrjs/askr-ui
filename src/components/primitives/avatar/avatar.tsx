@@ -5,8 +5,8 @@ import {
   composeRefs,
   mergeProps,
 } from '@askrjs/askr/foundations';
+import { resource } from '@askrjs/askr/resources';
 import { resolveCompoundId } from '../../_internal/id';
-import { collectJsxElements } from '../../_internal/jsx';
 import type {
   AvatarAsChildProps,
   AvatarFallbackAsChildProps,
@@ -62,17 +62,8 @@ export function Avatar(props: AvatarProps | AvatarAsChildProps) {
   const avatarId = resolveCompoundId('avatar', id, children);
   const entry = getAvatarEntry(avatarId);
   const statusVersion = state(0);
-  const imageSource =
-    collectJsxElements(children, (element) => element.type === AvatarImage)[0]
-      ?.props?.src ?? null;
 
   statusVersion();
-
-  if (entry.src !== imageSource) {
-    entry.src =
-      typeof imageSource === 'string' && imageSource ? imageSource : null;
-    entry.status = entry.src ? 'loading' : 'error';
-  }
 
   const finalProps = mergeProps(rest, {
     ref,
@@ -82,12 +73,10 @@ export function Avatar(props: AvatarProps | AvatarAsChildProps) {
   });
   const context = {
     avatarId,
-    status: entry.status,
+    get status() {
+      return entry.status;
+    },
     setStatus: (status: AvatarLoadingStatus) => {
-      if (entry.status === status) {
-        return;
-      }
-
       entry.status = status;
       statusVersion.set(statusVersion() + 1);
     },
@@ -104,7 +93,24 @@ export function Avatar(props: AvatarProps | AvatarAsChildProps) {
 
 export function AvatarImage(props: AvatarImageProps): JSX.Element {
   const { alt, onLoadingStatusChange, ref, src, ...rest } = props;
-  const { status, setStatus } = readAvatarContext();
+  const { avatarId, setStatus } = readAvatarContext();
+  const entry = getAvatarEntry(avatarId);
+  const normalizedSrc = typeof src === 'string' && src ? src : null;
+  const sourceChanged = entry.src !== normalizedSrc;
+
+  if (sourceChanged) {
+    entry.src = normalizedSrc;
+    entry.status = normalizedSrc ? 'loading' : 'error';
+  }
+
+  resource(() => {
+    if (sourceChanged) {
+      setStatus(entry.status);
+    }
+    return null;
+  }, [avatarId, normalizedSrc, sourceChanged]);
+
+  const status = entry.status;
 
   const updateStatus = (nextStatus: AvatarLoadingStatus) => {
     setStatus(nextStatus);

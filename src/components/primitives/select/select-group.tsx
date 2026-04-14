@@ -1,5 +1,6 @@
+import { state } from '@askrjs/askr';
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
-import { collectJsxElements } from '../../_internal/jsx';
+import { resource } from '@askrjs/askr/resources';
 import { resolvePartId } from '../../_internal/id';
 import {
   readSelectDeclarationContext,
@@ -39,8 +40,10 @@ export function SelectGroup(props: SelectGroupProps): JSX.Element;
 export function SelectGroup(props: SelectGroupAsChildProps): JSX.Element;
 export function SelectGroup(props: SelectGroupProps | SelectGroupAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
+  const labelCount = state(0);
+  const declarationContext = readSelectDeclarationContext();
 
-  if (readSelectDeclarationContext()) {
+  if (declarationContext) {
     return <>{children}</>;
   }
 
@@ -49,9 +52,7 @@ export function SelectGroup(props: SelectGroupProps | SelectGroupAsChildProps) {
   const groupIndex = renderContext.claimGroupIndex();
   const groupId = resolvePartId(root.selectId, `group-${groupIndex}`);
   const labelId = `${groupId}-label`;
-  const containsLabel =
-    collectJsxElements(children, (element) => element.type === SelectLabel)
-      .length > 0;
+  const containsLabel = labelCount() > 0;
   const finalProps = mergeProps(rest, {
     ref,
     id: groupId,
@@ -61,7 +62,18 @@ export function SelectGroup(props: SelectGroupProps | SelectGroupAsChildProps) {
   });
 
   return (
-    <SelectGroupContext.Scope value={{ groupId, labelId }}>
+    <SelectGroupContext.Scope
+      value={{
+        groupId,
+        labelId,
+        addLabel: () => {
+          labelCount.set((currentCount) => currentCount + 1);
+        },
+        removeLabel: () => {
+          labelCount.set((currentCount) => Math.max(0, currentCount - 1));
+        },
+      }}
+    >
       <SelectGroupScopeView
         asChild={asChild}
         finalProps={finalProps as Record<string, unknown>}
@@ -74,12 +86,33 @@ export function SelectGroup(props: SelectGroupProps | SelectGroupAsChildProps) {
 export function SelectLabel(props: SelectLabelProps): JSX.Element | null;
 export function SelectLabel(props: SelectLabelAsChildProps): JSX.Element | null;
 export function SelectLabel(props: SelectLabelProps | SelectLabelAsChildProps) {
-  if (readSelectDeclarationContext()) {
+  const { asChild, children, ref, ...rest } = props;
+  const declarationContext = readSelectDeclarationContext();
+  const groupContext = readSelectGroupContext();
+  resource(
+    ({ signal }) => {
+      if (declarationContext || !groupContext) {
+        return null;
+      }
+
+      groupContext.addLabel();
+      signal.addEventListener(
+        'abort',
+        () => {
+          groupContext.removeLabel();
+        },
+        { once: true }
+      );
+
+      return null;
+    },
+    [declarationContext, groupContext?.groupId, groupContext?.labelId]
+  );
+
+  if (declarationContext) {
     return null;
   }
 
-  const { asChild, children, ref, ...rest } = props;
-  const groupContext = readSelectGroupContext();
   const finalProps = mergeProps(rest, {
     ref,
     id: groupContext?.labelId,

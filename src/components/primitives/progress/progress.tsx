@@ -2,7 +2,6 @@ import { defineContext, readContext } from '@askrjs/askr';
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
 import { mergeCssVar } from '../../_internal/style';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
-import { mapJsxTree } from '../../_internal/jsx';
 import {
   defaultProgressValueLabel,
   normalizeProgressMax,

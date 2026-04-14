@@ -63,7 +63,7 @@ describe('Slider - Behavior', () => {
       new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })
     );
     await flushUpdates();
-    expect(input.value).toBe('81');
+    expect(container.querySelector('input[type="hidden"]')?.value).toBe('81');
   });
 
   it('should emit --ak-slider-percentage as a CSS custom property on the root', () => {
@@ -91,15 +91,12 @@ describe('Slider - Behavior', () => {
     );
 
     let thumb = container.querySelector('[role="slider"]') as HTMLDivElement;
-    const input = container.querySelector(
-      'input[type="hidden"]'
-    ) as HTMLInputElement;
 
     thumb.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'PageUp', bubbles: true })
     );
     await flushUpdates();
-    expect(input.value).toBe('100');
+    expect(container.querySelector('input[type="hidden"]')?.value).toBe('100');
 
     thumb = container.querySelector('[role="slider"]') as HTMLDivElement;
 
@@ -107,7 +104,7 @@ describe('Slider - Behavior', () => {
       new KeyboardEvent('keydown', { key: 'End', bubbles: true })
     );
     await flushUpdates();
-    expect(input.value).toBe('100');
+    expect(container.querySelector('input[type="hidden"]')?.value).toBe('100');
 
     thumb = container.querySelector('[role="slider"]') as HTMLDivElement;
 
@@ -115,7 +112,7 @@ describe('Slider - Behavior', () => {
       new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true })
     );
     await flushUpdates();
-    expect(input.value).toBe('50');
+    expect(container.querySelector('input[type="hidden"]')?.value).toBe('50');
 
     thumb = container.querySelector('[role="slider"]') as HTMLDivElement;
 
@@ -123,7 +120,7 @@ describe('Slider - Behavior', () => {
       new KeyboardEvent('keydown', { key: 'Home', bubbles: true })
     );
     await flushUpdates();
-    expect(input.value).toBe('0');
+    expect(container.querySelector('input[type="hidden"]')?.value).toBe('0');
   });
 
   it('should ignore pointer and keyboard updates when disabled', async () => {

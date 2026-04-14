@@ -1,13 +1,13 @@
 import { state } from '@askrjs/askr';
 import { controllableState, mergeProps } from '@askrjs/askr/foundations';
+import { resource } from '@askrjs/askr/resources';
 import {
   getCompositeCollection,
   getCompositeCollectionItems,
+  disabledIndexes,
   firstEnabledCompositeIndex,
 } from '../../_internal/composite';
 import { resolveCompoundId } from '../../_internal/id';
-import { collectJsxElements } from '../../_internal/jsx';
-import { TabsTrigger } from './tabs-trigger';
 import {
   createTabsRenderContext,
   TabsRenderContext,
@@ -57,32 +57,17 @@ export function Tabs(props: TabsProps) {
   );
   const collection = getCompositeCollection(tabsId);
   const itemsVersion = state(0);
-  itemsVersion();
+  const itemsRevision = itemsVersion();
   const items = getCompositeCollectionItems(collection).map((item) => ({
     value: String(item.value ?? ''),
     disabled: item.disabled,
   }));
-  const initialTriggers =
-    value === undefined && defaultValue === undefined
-      ? collectJsxElements(children, (element) => element.type === TabsTrigger)
-      : [];
-  const initialFallbackValue =
-    initialTriggers.length > 0
-      ? String(
-          initialTriggers[
-            firstEnabledCompositeIndex(
-              initialTriggers.map((element) => ({
-                disabled: Boolean(element.props?.disabled),
-              }))
-            )
-          ]?.props?.value ?? ''
-        )
-      : '';
   const valueState = controllableState({
     value,
-    defaultValue: defaultValue ?? initialFallbackValue,
+    defaultValue: defaultValue ?? '',
     onChange: onValueChange,
   });
+  const initialValueApplied = state(false);
   let itemsSyncQueued = false;
   const notifyItemsChanged = () => {
     itemsVersion.set((currentVersion) => currentVersion + 1);
@@ -109,6 +94,7 @@ export function Tabs(props: TabsProps) {
     items[currentIndexCandidate] && !items[currentIndexCandidate]?.disabled
       ? currentIndexCandidate
       : fallbackIndex;
+  const disabledIndexList = disabledIndexes(items);
   const rootContext: TabsRootContextValue = {
     tabsId,
     value: valueState(),
@@ -121,6 +107,9 @@ export function Tabs(props: TabsProps) {
     currentIndex,
     setCurrentIndex: currentIndexState.set,
     items,
+    disabledIndexes: disabledIndexList,
+    itemCount: items.length,
+    collection,
   };
   const renderContext = createTabsRenderContext();
   const finalProps = mergeProps(rest, {
@@ -129,6 +118,30 @@ export function Tabs(props: TabsProps) {
     'data-tabs': 'true',
     'data-orientation': orientation,
   });
+
+  resource(
+    () => {
+      if (value !== undefined || defaultValue !== undefined) {
+        return null;
+      }
+
+      if (initialValueApplied()) {
+        return null;
+      }
+
+      const firstEnabledIndex = firstEnabledCompositeIndex(items);
+      const firstEnabledItem = items[firstEnabledIndex];
+
+      if (!firstEnabledItem) {
+        return null;
+      }
+
+      initialValueApplied.set(true);
+      valueState.set(firstEnabledItem.value);
+      return null;
+    },
+    [tabsId, value, defaultValue, itemsRevision]
+  );
 
   return (
     <TabsRootContext.Scope value={rootContext}>

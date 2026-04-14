@@ -6,10 +6,11 @@ import {
   mergeProps,
   pressable,
 } from '@askrjs/askr/foundations';
+import { state } from '@askrjs/askr';
 import { resource } from '@askrjs/askr/resources';
 import { DismissableLayer } from '../../composites/dismissable-layer';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
-import { collectJsxElements, mapJsxTree } from '../../_internal/jsx';
+import { collectJsxElements } from '../../_internal/jsx';
 import type {
   ToastActionAsChildProps,
   ToastActionProps,
@@ -24,22 +25,14 @@ import type {
   ToastViewportAsChildProps,
   ToastViewportProps,
 } from './toast.types';
-
-type InjectedToastProviderProps = {
-  __providerId?: string;
-  __duration?: number;
-};
-
-type InjectedToastProps = InjectedToastProviderProps & {
-  __toastId?: string;
-  __titleId?: string;
-  __descriptionId?: string;
-};
-
-type ToastStateInjectedProps = InjectedToastProps & {
-  __open?: boolean;
-  __setOpen?: (open: boolean) => void;
-};
+import {
+  ToastProviderContext,
+  ToastRootContext,
+  readToastProviderContext,
+  readToastRootContext,
+  type ToastProviderContextValue,
+  type ToastRootContextValue,
+} from './toast.shared';
 
 type ToastLifecycleEntry = {
   node: HTMLElement | null;
@@ -48,6 +41,8 @@ type ToastLifecycleEntry = {
 };
 
 const toastEntries = new Map<string, ToastLifecycleEntry>();
+const toastProviderContexts = new Map<string, ToastProviderContextValue>();
+const toastRootContexts = new Map<string, ToastRootContextValue>();
 
 function getToastEntry(toastId: string) {
   const existing = toastEntries.get(toastId);
@@ -88,150 +83,283 @@ function restoreToastFocus(entry: ToastLifecycleEntry) {
   }
 }
 
-function readInjectedToastProviderProps(
-  props: InjectedToastProviderProps
-): Required<InjectedToastProviderProps> {
-  if (!props.__providerId || props.__duration === undefined) {
-    throw new Error('Toast components must be used within <ToastProvider>');
+function getToastProviderContext(providerId: string): ToastProviderContextValue {
+  const existing = toastProviderContexts.get(providerId);
+
+  if (existing) {
+    return existing;
   }
 
-  return {
-    __providerId: props.__providerId,
-    __duration: props.__duration,
+  const created: ToastProviderContextValue = {
+    providerId,
+    duration: 0,
+    toasts: [],
   };
+  toastProviderContexts.set(providerId, created);
+  return created;
 }
 
-function readInjectedToastProps(
-  props: ToastStateInjectedProps
-): Required<ToastStateInjectedProps> {
-  const provider = readInjectedToastProviderProps(props);
+function getToastRootContext(toastId: string): ToastRootContextValue {
+  const existing = toastRootContexts.get(toastId);
 
-  if (
-    !props.__toastId ||
-    props.__open === undefined ||
-    !props.__setOpen ||
-    !props.__titleId ||
-    !props.__descriptionId
-  ) {
-    throw new Error('Toast parts must be used within <Toast>');
+  if (existing) {
+    return existing;
   }
 
-  return {
-    ...provider,
-    __toastId: props.__toastId,
-    __open: props.__open,
-    __setOpen: props.__setOpen,
-    __titleId: props.__titleId,
-    __descriptionId: props.__descriptionId,
+  const created: ToastRootContextValue = {
+    providerId: '',
+    toastId,
+    open: false,
+    setOpen: () => {},
+    titleId: resolvePartId(toastId, 'title'),
+    descriptionId: resolvePartId(toastId, 'description'),
+    hasTitle: false,
+    hasDescription: false,
+    setHasTitle: () => {},
+    setHasDescription: () => {},
+    setNode: () => {},
   };
+  toastRootContexts.set(toastId, created);
+  return created;
 }
 
-function enhanceToastElement(
-  element: JSX.Element,
-  providerProps: Required<InjectedToastProviderProps>,
-  index: number
-) {
+function ToastProviderView(props: {
+  children?: unknown;
+  finalProps: Record<string, unknown>;
+}) {
+  return <div {...props.finalProps}>{props.children}</div>;
+}
+
+function ToastRegistrationView(props: {
+  key?: string;
+  toast: JSX.Element;
+  provider: ToastProviderContextValue;
+  index: number;
+}) {
+  const toastProps = props.toast.props as ToastProps;
+  const {
+    children,
+    open,
+    defaultOpen = true,
+    onOpenChange,
+    duration,
+    variant,
+    ref,
+    id,
+    ...rest
+  } = toastProps;
   const toastId = resolveCompoundId(
     'toast',
-    (element.props?.id as string | undefined) ??
-      `${providerProps.__providerId}-${index}`,
-    element.props?.children
+    typeof id === 'string'
+      ? id
+      : `${props.provider.providerId}-${props.index}`,
+    children
   );
-  const injectedToastProps: InjectedToastProps = {
-    ...providerProps,
-    __toastId: toastId,
-    __titleId: resolvePartId(toastId, 'title'),
-    __descriptionId: resolvePartId(toastId, 'description'),
+  const openState = controllableState({
+    value: open,
+    defaultValue: defaultOpen,
+    onChange: onOpenChange,
+  });
+  const hasTitleState = state(
+    collectJsxElements(children, (element) => element.type === ToastTitle)
+      .length > 0
+  );
+  const hasDescriptionState = state(
+    collectJsxElements(children, (element) => element.type === ToastDescription)
+      .length > 0
+  );
+  const entry = getToastEntry(toastId);
+  const resolvedDuration = duration ?? props.provider.duration;
+  const rootContext = getToastRootContext(toastId);
+  rootContext.providerId = props.provider.providerId;
+  rootContext.toastId = toastId;
+  rootContext.open = openState();
+  rootContext.setOpen = (nextOpen: boolean) => {
+    openState.set(nextOpen);
+  };
+  rootContext.titleId = resolvePartId(toastId, 'title');
+  rootContext.descriptionId = resolvePartId(toastId, 'description');
+  rootContext.variant = variant;
+  rootContext.hasTitle = hasTitleState();
+  rootContext.hasDescription = hasDescriptionState();
+  rootContext.setHasTitle = (present: boolean) => {
+    hasTitleState.set(present);
+  };
+  rootContext.setHasDescription = (present: boolean) => {
+    hasDescriptionState.set(present);
+  };
+  rootContext.setNode = (node: HTMLElement | null) => {
+    entry.node = node;
   };
 
-  return mapJsxTree(element, (node) => {
-    if (
-      node.type !== Toast &&
-      node.type !== ToastTitle &&
-      node.type !== ToastDescription &&
-      node.type !== ToastAction &&
-      node.type !== ToastClose
-    ) {
-      return node;
+  resource(
+    ({ signal }) => {
+      if (!rootContext.open) {
+        return null;
+      }
+
+      if (entry.previousFocused === null) {
+        entry.previousFocused =
+          document.activeElement instanceof HTMLElement
+            ? document.activeElement
+            : null;
+      }
+
+      clearToastTimer(entry);
+
+      const timeoutId = setTimeout(() => {
+        if (entry.timer === timeoutId) {
+          entry.timer = null;
+        }
+
+        rootContext.setOpen(false);
+      }, resolvedDuration);
+
+      entry.timer = timeoutId;
+      signal.addEventListener(
+        'abort',
+        () => {
+          if (entry.timer === timeoutId) {
+            clearTimeout(timeoutId);
+            entry.timer = null;
+          }
+        },
+        { once: true }
+      );
+
+      return null;
+    },
+    [toastId, rootContext.open, resolvedDuration]
+  );
+
+  resource(() => {
+    if (rootContext.open) {
+      return null;
     }
 
-    return {
-      ...node,
-      props: {
-        ...node.props,
-        ...injectedToastProps,
-      },
-    };
+    clearToastTimer(entry);
+    restoreToastFocus(entry);
+    return null;
+  }, [toastId, rootContext.open]);
+
+  resource(
+    ({ signal }) => {
+      signal.addEventListener(
+        'abort',
+        () => {
+          clearToastTimer(entry);
+          restoreToastFocus(entry);
+          entry.node = null;
+          toastEntries.delete(toastId);
+          toastRootContexts.delete(toastId);
+        },
+        { once: true }
+      );
+
+      return null;
+    },
+    [toastId]
+  );
+
+  const finalProps = mergeProps(rest, {
+    ref: composeRefs(
+      ref as
+        | ((value: HTMLElement | null) => void)
+        | { current: HTMLElement | null }
+        | null
+        | undefined,
+      rootContext.setNode
+    ),
+    id: toastId,
+    role: 'status',
+    'aria-live': 'polite',
+    'aria-labelledby': rootContext.hasTitle ? rootContext.titleId : undefined,
+    'aria-describedby': rootContext.hasDescription
+      ? rootContext.descriptionId
+      : undefined,
+    'data-slot': 'toast',
+    'data-state': rootContext.open ? 'open' : 'closed',
+    'data-toast': 'true',
+    'data-variant': variant && variant !== 'default' ? variant : undefined,
   });
+
+  return (
+    <ToastRootContext.Scope value={rootContext}>
+      <Presence present={rootContext.open}>
+        <DismissableLayer
+          onEscapeKeyDown={() => {
+            rootContext.setOpen(false);
+          }}
+          onDismiss={() => {
+            rootContext.setOpen(false);
+          }}
+        >
+          <div {...finalProps}>{children}</div>
+        </DismissableLayer>
+      </Presence>
+    </ToastRootContext.Scope>
+  );
 }
 
 export function ToastProvider(props: ToastProviderProps) {
   const { children, duration = 5000, id, ref, ...rest } = props;
   const providerId = resolveCompoundId('toast-provider', id, children);
-  const providerProps: Required<InjectedToastProviderProps> = {
-    __providerId: providerId,
-    __duration: duration,
-  };
   const toastElements = collectJsxElements(
     children,
     (element) => element.type === Toast
-  ).map((element, index) =>
-    enhanceToastElement(element as JSX.Element, providerProps, index)
   );
-  const enhancedChildren = mapJsxTree(children, (element) => {
-    if (element.type === Toast) {
-      return null;
-    }
-
-    if (element.type !== ToastViewport) {
-      return element;
-    }
-
-    return {
-      ...element,
-      props: {
-        ...element.props,
-        ...providerProps,
-        __toasts: toastElements,
-      },
-    };
-  });
+  const providerContext = getToastProviderContext(providerId);
+  providerContext.providerId = providerId;
+  providerContext.duration = duration;
+  providerContext.toasts = toastElements;
   const finalProps = mergeProps(rest, {
     ref,
     'data-slot': 'toast-provider',
     'data-toast-provider': 'true',
   });
 
-  return <div {...finalProps}>{enhancedChildren}</div>;
-}
+  resource(
+    ({ signal }) => {
+      signal.addEventListener(
+        'abort',
+        () => {
+          toastProviderContexts.delete(providerId);
+        },
+        { once: true }
+      );
 
-type ToastViewportInjectedProps = InjectedToastProviderProps & {
-  __toasts?: unknown[];
-};
+      return null;
+    },
+    [providerId]
+  );
+
+  return (
+    <ToastProviderContext.Scope value={providerContext}>
+      <ToastProviderView finalProps={finalProps}>{children}</ToastProviderView>
+    </ToastProviderContext.Scope>
+  );
+}
 
 export function ToastViewport(props: ToastViewportProps): JSX.Element;
 export function ToastViewport(props: ToastViewportAsChildProps): JSX.Element;
-export function ToastViewport(
-  props:
-    | (ToastViewportProps & ToastViewportInjectedProps)
-    | (ToastViewportAsChildProps & ToastViewportInjectedProps)
-) {
-  const {
-    asChild,
-    children,
-    ref,
-    __providerId,
-    __duration,
-    __toasts = [],
-    ...rest
-  } = props;
-  readInjectedToastProviderProps({
-    __providerId,
-    __duration,
-  });
+export function ToastViewport(props: ToastViewportProps | ToastViewportAsChildProps) {
+  const { asChild, children, ref, ...rest } = props;
+  const provider = readToastProviderContext();
   const content = (
     <>
-      {__toasts}
+      {provider.toasts.map((toast, index) => (
+        <ToastRegistrationView
+          key={resolveCompoundId(
+            'toast',
+            (toast.props?.id as string | undefined) ??
+              `${provider.providerId}-${index}`,
+            toast.props?.children
+          )}
+          toast={toast}
+          provider={provider}
+          index={index}
+        />
+      ))}
       {children}
     </>
   );
@@ -251,127 +379,16 @@ export function ToastViewport(
   return <div {...finalProps}>{content}</div>;
 }
 
-export function Toast(
-  props: ToastProps & InjectedToastProps
-): JSX.Element | null {
-  const {
-    children,
-    open,
-    defaultOpen = true,
-    onOpenChange,
-    duration,
-    variant,
-    ref,
-    __providerId,
-    __duration,
-    __toastId,
-    __titleId,
-    __descriptionId,
-    ...rest
-  } = props;
-  const openState = controllableState({
-    value: open,
-    defaultValue: defaultOpen,
-    onChange: onOpenChange,
-  });
-  const injected = readInjectedToastProps({
-    __providerId,
-    __duration,
-    __toastId,
-    __open: openState(),
-    __setOpen: openState.set,
-    __titleId,
-    __descriptionId,
-  });
-  const entry = getToastEntry(injected.__toastId);
-  const resolvedDuration = duration ?? injected.__duration;
+export function Toast(props: ToastProps): JSX.Element | null {
+  readToastProviderContext();
+  return null;
+}
 
-  resource(
-    ({ signal }) => {
-      if (!injected.__open) {
-        return null;
-      }
-
-      if (entry.previousFocused === null) {
-        entry.previousFocused =
-          document.activeElement instanceof HTMLElement
-            ? document.activeElement
-            : null;
-      }
-
-      clearToastTimer(entry);
-
-      const timeoutId = setTimeout(() => {
-        if (entry.timer === timeoutId) {
-          entry.timer = null;
-        }
-
-        injected.__setOpen(false);
-      }, resolvedDuration);
-
-      entry.timer = timeoutId;
-      signal.addEventListener(
-        'abort',
-        () => {
-          if (entry.timer === timeoutId) {
-            clearTimeout(timeoutId);
-            entry.timer = null;
-          }
-        },
-        { once: true }
-      );
-
-      return null;
-    },
-    [injected.__toastId, injected.__open, resolvedDuration]
-  );
-
-  resource(() => {
-    if (injected.__open) {
-      return null;
-    }
-
-    clearToastTimer(entry);
-    restoreToastFocus(entry);
-    return null;
-  }, [injected.__toastId, injected.__open]);
-
-  resource(
-    ({ signal }) => {
-      signal.addEventListener(
-        'abort',
-        () => {
-          clearToastTimer(entry);
-          restoreToastFocus(entry);
-          entry.node = null;
-          toastEntries.delete(injected.__toastId);
-        },
-        { once: true }
-      );
-
-      return null;
-    },
-    [injected.__toastId]
-  );
-
-  const enhancedChildren = mapJsxTree(children, (element) => {
-    if (
-      element.type !== ToastTitle &&
-      element.type !== ToastDescription &&
-      element.type !== ToastAction &&
-      element.type !== ToastClose
-    ) {
-      return element;
-    }
-
-    return {
-      ...element,
-      props: {
-        ...element.props,
-        ...injected,
-      },
-    };
-  });
+export function ToastTitle(props: ToastTitleProps): JSX.Element;
+export function ToastTitle(props: ToastTitleAsChildProps): JSX.Element;
+export function ToastTitle(props: ToastTitleProps | ToastTitleAsChildProps) {
+  const { asChild, children, ref, ...rest } = props;
+  const root = readToastRootContext();
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
       ref as
@@ -380,68 +397,10 @@ export function Toast(
         | null
         | undefined,
       (node: HTMLElement | null) => {
-        entry.node = node;
+        root.setHasTitle(Boolean(node));
       }
     ),
-    id: injected.__toastId,
-    role: 'status',
-    'aria-live': 'polite',
-    'aria-labelledby': injected.__titleId,
-    'aria-describedby': injected.__descriptionId,
-    'data-slot': 'toast',
-    'data-state': injected.__open ? 'open' : 'closed',
-    'data-toast': 'true',
-    'data-variant': variant && variant !== 'default' ? variant : undefined,
-  });
-
-  return (
-    <Presence present={injected.__open}>
-      <DismissableLayer
-        onEscapeKeyDown={() => {
-          injected.__setOpen(false);
-        }}
-        onDismiss={() => {
-          injected.__setOpen(false);
-        }}
-      >
-        <div {...finalProps}>{enhancedChildren}</div>
-      </DismissableLayer>
-    </Presence>
-  );
-}
-
-export function ToastTitle(props: ToastTitleProps): JSX.Element;
-export function ToastTitle(props: ToastTitleAsChildProps): JSX.Element;
-export function ToastTitle(
-  props:
-    | (ToastTitleProps & ToastStateInjectedProps)
-    | (ToastTitleAsChildProps & ToastStateInjectedProps)
-) {
-  const {
-    asChild,
-    children,
-    ref,
-    __providerId,
-    __duration,
-    __toastId,
-    __open,
-    __setOpen,
-    __titleId,
-    __descriptionId,
-    ...rest
-  } = props;
-  const injected = readInjectedToastProps({
-    __providerId,
-    __duration,
-    __toastId,
-    __open,
-    __setOpen,
-    __titleId,
-    __descriptionId,
-  });
-  const finalProps = mergeProps(rest, {
-    ref,
-    id: injected.__titleId,
+    id: root.titleId,
     'data-slot': 'toast-title',
     'data-toast-title': 'true',
   });
@@ -458,35 +417,22 @@ export function ToastDescription(
   props: ToastDescriptionAsChildProps
 ): JSX.Element;
 export function ToastDescription(
-  props:
-    | (ToastDescriptionProps & ToastStateInjectedProps)
-    | (ToastDescriptionAsChildProps & ToastStateInjectedProps)
+  props: ToastDescriptionProps | ToastDescriptionAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    ref,
-    __providerId,
-    __duration,
-    __toastId,
-    __open,
-    __setOpen,
-    __titleId,
-    __descriptionId,
-    ...rest
-  } = props;
-  const injected = readInjectedToastProps({
-    __providerId,
-    __duration,
-    __toastId,
-    __open,
-    __setOpen,
-    __titleId,
-    __descriptionId,
-  });
+  const { asChild, children, ref, ...rest } = props;
+  const root = readToastRootContext();
   const finalProps = mergeProps(rest, {
-    ref,
-    id: injected.__descriptionId,
+    ref: composeRefs(
+      ref as
+        | ((value: HTMLElement | null) => void)
+        | { current: HTMLElement | null }
+        | null
+        | undefined,
+      (node: HTMLElement | null) => {
+        root.setHasDescription(Boolean(node));
+      }
+    ),
+    id: root.descriptionId,
     'data-slot': 'toast-description',
     'data-toast-description': 'true',
   });
@@ -501,42 +447,18 @@ export function ToastDescription(
 export function ToastAction(props: ToastActionProps): JSX.Element;
 export function ToastAction(props: ToastActionAsChildProps): JSX.Element;
 export function ToastAction(
-  props:
-    | (ToastActionProps & ToastStateInjectedProps)
-    | (ToastActionAsChildProps & ToastStateInjectedProps)
+  props: ToastActionProps | ToastActionAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    disabled = false,
-    onPress,
-    ref,
-    type: typeProp,
-    __providerId,
-    __duration,
-    __toastId,
-    __open,
-    __setOpen,
-    __titleId,
-    __descriptionId,
-    ...rest
-  } = props;
-  const injected = readInjectedToastProps({
-    __providerId,
-    __duration,
-    __toastId,
-    __open,
-    __setOpen,
-    __titleId,
-    __descriptionId,
-  });
+  const { asChild, children, disabled = false, onPress, ref, type: typeProp, ...rest } =
+    props;
+  const root = readToastRootContext();
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
       onPress?.(event);
 
       if (!event.defaultPrevented) {
-        injected.__setOpen(false);
+        root.setOpen(false);
       }
     },
     isNativeButton: !asChild,
@@ -563,42 +485,18 @@ export function ToastAction(
 export function ToastClose(props: ToastCloseProps): JSX.Element;
 export function ToastClose(props: ToastCloseAsChildProps): JSX.Element;
 export function ToastClose(
-  props:
-    | (ToastCloseProps & ToastStateInjectedProps)
-    | (ToastCloseAsChildProps & ToastStateInjectedProps)
+  props: ToastCloseProps | ToastCloseAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    disabled = false,
-    onPress,
-    ref,
-    type: typeProp,
-    __providerId,
-    __duration,
-    __toastId,
-    __open,
-    __setOpen,
-    __titleId,
-    __descriptionId,
-    ...rest
-  } = props;
-  const injected = readInjectedToastProps({
-    __providerId,
-    __duration,
-    __toastId,
-    __open,
-    __setOpen,
-    __titleId,
-    __descriptionId,
-  });
+  const { asChild, children, disabled = false, onPress, ref, type: typeProp, ...rest } =
+    props;
+  const root = readToastRootContext();
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
       onPress?.(event);
 
       if (!event.defaultPrevented) {
-        injected.__setOpen(false);
+        root.setOpen(false);
       }
     },
     isNativeButton: !asChild,
