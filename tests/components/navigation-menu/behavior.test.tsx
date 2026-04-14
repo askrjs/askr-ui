@@ -123,4 +123,73 @@ describe('NavigationMenu - Behavior', () => {
     await flushPortalUpdates();
     expect(document.body.textContent).not.toContain('Core');
   });
+
+  it('keeps custom content positioning through the post-open portal sync', async () => {
+    container = mount(
+      <NavigationMenu>
+        <NavigationMenuList>
+          <NavigationMenuItem value="products">
+            <NavigationMenuTrigger>Products</NavigationMenuTrigger>
+            <NavigationMenuContent side="right" align="end" sideOffset={8}>
+              <NavigationMenuLink href="/products/core">
+                Core
+              </NavigationMenuLink>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    );
+
+    getButtonByText('Products').click();
+    await flushPortalUpdates();
+
+    // Verify custom positioning attributes are present
+    const contentPanel = document.body.querySelector(
+      '[data-slot="navigation-menu-content"]'
+    );
+
+    expect(contentPanel?.getAttribute('data-side')).toBe('right');
+    expect(contentPanel?.getAttribute('data-align')).toBe('end');
+    expect(contentPanel?.getAttribute('data-side-offset')).toBe('8');
+  });
+
+  it('keeps indicator and viewport in sync when quickly switching triggers', async () => {
+    container = mount(
+      <NavigationMenu>
+        <NavigationMenuList>
+          <NavigationMenuItem value="products">
+            <NavigationMenuTrigger>Products</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <NavigationMenuLink href="/products/core">
+                Core
+              </NavigationMenuLink>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          <NavigationMenuItem value="docs">
+            <NavigationMenuTrigger>Docs</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <NavigationMenuLink href="/docs/start">Start</NavigationMenuLink>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+        <NavigationMenuViewport />
+        <NavigationMenuIndicator />
+      </NavigationMenu>
+    );
+
+    getButtonByText('Products').click();
+    getButtonByText('Docs').click();
+    await flushPortalUpdates();
+
+    const viewport = container.querySelector(
+      `[${NAVIGATION_MENU_A11Y_CONTRACT.VIEWPORT_MARKER}="true"]`
+    );
+    const indicator = container.querySelector(
+      `[${NAVIGATION_MENU_A11Y_CONTRACT.INDICATOR_MARKER}="true"]`
+    );
+
+    expect(viewport?.getAttribute('data-state')).toBe('open');
+    expect(indicator?.getAttribute('data-active-item')).toBe('docs');
+    expect(document.body.textContent).toContain('Start');
+  });
 });

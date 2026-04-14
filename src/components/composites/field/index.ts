@@ -12,6 +12,7 @@ export {
   FieldSwitch,
   Fieldset,
 } from './field';
+export { FieldTextarea } from './field-controls-form';
 export { FIELD_A11Y_CONTRACT, type FieldA11yContract } from './field-a11y';
 export type {
   FieldProps,
@@ -28,6 +29,7 @@ export type {
   FieldErrorProps,
   FieldErrorAsChildProps,
   FieldInputProps,
+  FieldTextareaProps,
   FieldRadioGroupProps,
   FieldSelectTriggerProps,
   FieldSwitchProps,

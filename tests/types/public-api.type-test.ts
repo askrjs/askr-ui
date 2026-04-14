@@ -64,8 +64,6 @@ import {
   TooltipContent,
   TooltipPortal,
   TooltipTrigger,
-  createAskRComponent,
-  type AskRComponent,
   type AlertDialogActionAsChildProps,
   type AlertDialogActionProps,
   type AlertDialogCancelAsChildProps,
@@ -101,6 +99,7 @@ import {
   type DropdownMenuItemProps,
   type FieldInputProps,
   type FieldProps,
+  type FieldTextareaProps,
   type FocusRingAsChildProps,
   type FocusRingProps,
   type FocusScopeAsChildProps,
@@ -140,23 +139,19 @@ import {
   type TooltipTriggerAsChildProps,
   type TooltipTriggerProps,
   Container,
-  Stack,
-  Inline,
+  Flex,
   Grid,
+  Stack,
   Center,
   Spacer,
   SidebarLayout,
   TopbarLayout,
   type ContainerProps,
   type ContainerAsChildProps,
-  type StackProps,
-  type StackAsChildProps,
-  type InlineProps,
-  type InlineAsChildProps,
+  type FlexProps,
+  type FlexAsChildProps,
   type GridProps,
   type GridAsChildProps,
-  type CenterProps,
-  type CenterAsChildProps,
   type SpacerProps,
   type SpacerAsChildProps,
   type SidebarLayoutProps,
@@ -178,16 +173,26 @@ import { Toggle as ToggleSubpath } from '@askrjs/askr-ui/primitives/toggle';
 import { Tooltip as TooltipSubpath } from '@askrjs/askr-ui/composites/tooltip';
 import { Container as ContainerSubpath } from '@askrjs/askr-ui/primitives/container';
 import { Stack as StackSubpath } from '@askrjs/askr-ui/primitives/stack';
-import { Inline as InlineSubpath } from '@askrjs/askr-ui/primitives/inline';
+import {
+  Flex as FlexSubpath,
+  type InlineProps,
+  type InlineAsChildProps,
+} from '@askrjs/askr-ui/primitives/inline';
 import { Grid as GridSubpath } from '@askrjs/askr-ui/primitives/grid';
-import { Center as CenterSubpath } from '@askrjs/askr-ui/primitives/center';
+import {
+  Center as CenterSubpath,
+  type CenterProps,
+  type CenterAsChildProps,
+} from '@askrjs/askr-ui/primitives/center';
+import {
+  type StackProps,
+  type StackAsChildProps,
+} from '@askrjs/askr-ui/primitives/stack';
 import { Spacer as SpacerSubpath } from '@askrjs/askr-ui/primitives/spacer';
 import { SidebarLayout as SidebarLayoutSubpath } from '@askrjs/askr-ui/patterns/sidebar-layout';
 import { TopbarLayout as TopbarLayoutSubpath } from '@askrjs/askr-ui/patterns/topbar-layout';
 
 const slotChild = {} as JSXElement;
-
-const askrComponent: AskRComponent = createAskRComponent('button');
 
 const buttonFromSubpath: typeof Button = ButtonSubpath;
 const checkboxFromSubpath: typeof Checkbox = CheckboxSubpath;
@@ -208,10 +213,8 @@ const radioGroupItemFromRoot: typeof RadioGroupItem = RadioGroupItem;
 const switchFromSubpath: typeof Switch = SwitchSubpath;
 const toggleFromSubpath: typeof Toggle = ToggleSubpath;
 const containerFromSubpath: typeof Container = ContainerSubpath;
-const stackFromSubpath: typeof Stack = StackSubpath;
-const inlineFromSubpath: typeof Inline = InlineSubpath;
+const flexFromSubpath: typeof Flex = FlexSubpath;
 const gridFromSubpath: typeof Grid = GridSubpath;
-const centerFromSubpath: typeof Center = CenterSubpath;
 const spacerFromSubpath: typeof Spacer = SpacerSubpath;
 const sidebarLayoutFromSubpath: typeof SidebarLayout = SidebarLayoutSubpath;
 const topbarLayoutFromSubpath: typeof TopbarLayout = TopbarLayoutSubpath;
@@ -288,7 +291,12 @@ const buttonAsChildProps: ButtonAsChildProps = {
   children: slotChild,
 };
 
-const checkboxProps: CheckboxProps = { checked: true, indeterminate: false };
+const checkboxControlledProps: CheckboxProps = {
+  checked: true,
+  indeterminate: false,
+  onCheckedChange: (checked: boolean) => checked,
+};
+const checkboxUncontrolledProps: CheckboxProps = { defaultChecked: true };
 const checkboxInputProps: CheckboxInputProps = { name: 'terms', value: 'yes' };
 const checkboxAsChildProps: CheckboxAsChildProps = {
   asChild: true,
@@ -523,7 +531,6 @@ const _invalidDialogTriggerAsChild: DialogTriggerAsChildProps = {
 const _invalidSelectItem: SelectItemProps = { children: 'Missing value' };
 
 void [
-  askrComponent,
   buttonFromSubpath,
   checkboxFromSubpath,
   collapsibleFromSubpath,
@@ -603,7 +610,8 @@ void [
   buttonProps,
   buttonButtonProps,
   buttonAsChildProps,
-  checkboxProps,
+  checkboxControlledProps,
+  checkboxUncontrolledProps,
   checkboxInputProps,
   checkboxAsChildProps,
   collapsibleProps,
@@ -668,32 +676,30 @@ void [
   selectItemProps,
   selectItemAsChildProps,
   fieldProps,
+  stackProps,
+  stackAsChildProps,
+  centerProps,
+  centerAsChildProps,
   containerFromSubpath,
-  stackFromSubpath,
-  inlineFromSubpath,
+  flexFromSubpath,
   gridFromSubpath,
-  centerFromSubpath,
   spacerFromSubpath,
   sidebarLayoutFromSubpath,
   topbarLayoutFromSubpath,
   Container,
-  Stack,
-  Inline,
+  Flex,
   Grid,
+  Stack,
   Center,
   Spacer,
   SidebarLayout,
   TopbarLayout,
   containerProps,
   containerAsChildProps,
-  stackProps,
-  stackAsChildProps,
   inlineProps,
   inlineAsChildProps,
   gridProps,
   gridAsChildProps,
-  centerProps,
-  centerAsChildProps,
   spacerProps,
   spacerAsChildProps,
   sidebarLayoutProps,

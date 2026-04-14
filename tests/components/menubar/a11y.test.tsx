@@ -10,8 +10,15 @@ import {
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Menubar - Accessibility', () => {
+  let container: HTMLElement | undefined;
+
+  afterEach(() => {
+    unmount(container);
+    container = undefined;
+  });
+
   it('should have no automated axe violations given open menubar content', async () => {
-    await expectNoAxeViolations(
+    container = mount(
       <Menubar>
         <MenubarMenu value="file">
           <MenubarTrigger>File</MenubarTrigger>
@@ -23,5 +30,17 @@ describe('Menubar - Accessibility', () => {
         </MenubarMenu>
       </Menubar>
     );
+
+    (
+      Array.from(document.body.querySelectorAll('button')).find(
+        (element) => element.textContent?.trim() === 'File'
+      ) as HTMLButtonElement
+    ).click();
+    await flushUpdates();
+    await flushUpdates();
+
+    const results = await axe(container);
+
+    expect(results.violations).toEqual([]);
   });
 });

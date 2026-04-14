@@ -6,4 +6,4 @@ export type {
   ToggleOwnProps,
   PressEvent,
 } from './toggle.types';
-export { TOGGLE_A11Y_CONTRACT } from './toggle.a11y';
+export { TOGGLE_A11Y_CONTRACT, type ToggleA11yContract } from './toggle.a11y';

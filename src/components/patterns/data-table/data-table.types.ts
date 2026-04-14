@@ -30,6 +30,11 @@ export type DataState =
   | 'empty'
   | 'filtered-empty';
 
+export type InjectedDataTableProps<T> = {
+  __table?: DataTableInstance<T>;
+  __tableId?: string;
+};
+
 export type DataTableSerializableState = {
   sorting: SortingState;
   filters: FilterState;
@@ -438,10 +443,3 @@ export type DataTableErrorOwnProps = {
 
 export type DataTableErrorProps = BoxProps<'div', HTMLDivElement> &
   DataTableErrorOwnProps;
-
-// ─── Injected props (internal) ───
-
-export type InjectedDataTableProps<T> = {
-  __table?: DataTableInstance<T>;
-  __tableId?: string;
-};

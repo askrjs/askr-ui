@@ -7,9 +7,9 @@ describe('Container - Accessibility', () => {
     await expectNoAxeViolations(<Container>Content</Container>);
   });
 
-  it('should have no automated axe violations given centered fluid container', async () => {
+  it('should have no automated axe violations given container with max-width and padding', async () => {
     await expectNoAxeViolations(
-      <Container centered fluid maxWidth="64rem" padding="1rem">
+      <Container maxWidth="64rem" padding="1rem">
         Content
       </Container>
     );

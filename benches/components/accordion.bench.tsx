@@ -5,7 +5,7 @@ import {
   AccordionHeader,
   AccordionItem,
   AccordionTrigger,
-} from '../../src/components/accordion';
+} from '../../src/components';
 
 describe('Accordion benches', () => {
   bench('create accordion', () => {

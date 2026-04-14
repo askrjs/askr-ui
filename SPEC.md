@@ -25,9 +25,8 @@ If a component fails that bar, it does not ship as public API.
 - Disclosure and content: `Collapsible`, `Accordion`, `Tabs`
 - Status and identity: `Badge`, `Avatar`, `Skeleton`, `Progress`, `ProgressCircle`, `Spinner`, `Toast`
 - Basic navigation and utility: `Breadcrumb`, `Pagination`, `ToggleGroup`, `Slider`, `Menubar`, `NavigationMenu`
-- Layout primitives (structural/headless only — no colors, borders, or theme tokens): `Container`, `Stack`, `Inline`, `Grid`, `Center`, `Spacer`, `SidebarLayout`, `TopbarLayout`
-
-- Icon foundation: `IconBase`, `IconProps`, `IconSizeToken`
+- Layout primitives (structural/headless only — no colors, borders, or theme tokens): `Container`, `Flex`, `Grid`, `Spacer`
+- Patterns: `DataTable`, `SidebarLayout`, `TopbarLayout`
 
 Responsive theme contract:
 
@@ -35,12 +34,12 @@ Responsive theme contract:
 - Official themes interpret `data-collapse-below` using the canonical breakpoint names `sm`, `md`, `lg`, and `xl`.
 - Responsive styling remains theme-owned and mobile first: narrow screens are the base, larger layouts layer on with additive media queries.
 
-Icon contract:
+## Component Tiers
 
-- `IconBase` owns the canonical public icon hooks: `data-slot="icon"`, `data-icon`, semantic `data-size`, `data-decorative`, and `data-color="current"`.
-- Icon sizing and stroke defaults resolve through `--ak-icon-size` and `--ak-icon-stroke-width`, with semantic theme tokens layered underneath.
-- Decorative icons are `aria-hidden="true"` when unlabeled. Labeled icons render `role="img"` with a `<title>`.
-- Explicit `size`, `strokeWidth`, `color`, and `style` props override theme defaults. Raw CSS sizes are consumer overrides; only `sm|md|lg|xl` participate in the shared theme contract.
+The public surface has two tiers. **Core** is what the library cannot remove without breaking its promise. **Patterns** are higher-level compositions built on core. The distinction is enforced in docs, scorecards, and design reviews.
+
+- **Core**: all primitives and composites listed under Supported Public Surface except Patterns. Core components must remain minimal, composable, and free from pattern-driven complexity.
+- **Patterns**: `DataTable`, `SidebarLayout`, `TopbarLayout`. Patterns combine core primitives into opinionated compositions for common scenarios. Pattern complexity must not drive complexity into core.
 
 ## Design Rules
 
@@ -50,9 +49,12 @@ Icon contract:
   - value roots use `value`, `defaultValue`, `onValueChange`
   - boolean roots use `checked`, `defaultChecked`, `onCheckedChange`
 - `asChild` is allowed only on wrapper-style or interactive composition parts.
+- `Input` and `Textarea` preserve native form semantics when composed: `asChild` is allowed only with matching native `<input>` and `<textarea>` hosts.
 - `*Portal` parts stay public only when they perform tested, intentional portal-slot behavior.
-- Internal injected props use the `__*` prefix and must be stripped before DOM props are merged.
+- Hidden injected props and JSX tree-rewriting are not allowed in component architecture.
 - Shared internal helpers are preferred over component-specific state or ID patterns.
+- API surface must remain minimal: fewer parts and props are better unless the missing surface forces users to rebuild behavior the library owns. Implementation-driven surface area is not added.
+- Cross-family consistency is required: sibling families use the same naming conventions, prop patterns, and composition model. Inconsistency is a design defect, not a style preference.
 
 ## Runtime Contract
 

@@ -4,6 +4,7 @@ import type { InputInputProps } from '../../primitives/input';
 import type { RadioGroupProps } from '../../primitives/radio-group';
 import type { SelectTriggerProps } from '../../primitives/select';
 import type { SwitchButtonProps } from '../../primitives/switch';
+import type { TextareaElementProps } from '../../primitives/textarea';
 
 export type FieldOwnProps = {
   id?: string;
@@ -105,6 +106,22 @@ export type FieldErrorAsChildProps = {
 
 export type FieldInputProps = Omit<
   InputInputProps,
+  | 'id'
+  | 'required'
+  | 'disabled'
+  | 'aria-describedby'
+  | 'aria-invalid'
+  | 'aria-required'
+  | 'aria-disabled'
+> & {
+  fieldId?: string;
+  invalid?: boolean;
+  required?: boolean;
+  disabled?: boolean;
+};
+
+export type FieldTextareaProps = Omit<
+  TextareaElementProps,
   | 'id'
   | 'required'
   | 'disabled'

@@ -19,20 +19,18 @@ function unmount(container: HTMLElement) {
 }
 
 describe('Button - Behavior', () => {
-  let container: HTMLElement;
+  let container: HTMLElement | undefined;
 
   afterEach(() => {
-    if (container) {
-      unmount(container);
-    }
+    unmount(container);
+    container = undefined;
   });
 
-  // ========================================
-  // FOUNDATION DELEGATION
-  // ========================================
-  describe('foundation delegation', () => {
-    it('should delegate behavior through pressable given component has no direct event logic', () => {
-      const onPress = vi.fn();
+  it('renders a native button by default', () => {
+    container = mount(<Button>Save</Button>);
+    const button = container.querySelector(
+      'button'
+    ) as HTMLButtonElement | null;
 
       container = mount(<Button onPress={onPress}>Click me</Button>);
       const button = container.querySelector('button') as HTMLButtonElement;
@@ -245,18 +243,13 @@ describe('Button - Behavior', () => {
     });
   });
 
-  // ========================================
-  // COMPOSITION SAFETY
-  // ========================================
-  describe('composition safety', () => {
-    it('should compose props cleanly given mergeProps handles conflicts', () => {
-      const onPress = vi.fn();
+  it('invokes onPress exactly once per native click', () => {
+    const onPress = vi.fn();
 
-      container = mount(
-        <Button onPress={onPress} data-testid="test" className="custom">
-          Click me
-        </Button>
-      );
+    container = mount(<Button onPress={onPress}>Save</Button>);
+    const button = container.querySelector(
+      'button'
+    ) as HTMLButtonElement | null;
 
       const button = container.querySelector('button') as HTMLButtonElement;
 
@@ -299,13 +292,8 @@ describe('Button - Behavior', () => {
     });
   });
 
-  // ========================================
-  // MISUSE PREVENTION
-  // ========================================
-  describe('misuse prevention', () => {
-    it('should not support onClick prop given askr uses onPress', () => {
-      const onClick = vi.fn();
-      const onPress = vi.fn();
+  it('blocks native interaction when disabled', () => {
+    const onPress = vi.fn();
 
       container = mount(
         <Button onClick={onClick} onPress={onPress}>
@@ -313,8 +301,8 @@ describe('Button - Behavior', () => {
         </Button>
       );
 
-      const button = container.querySelector('button')!;
-      button.click();
+    expect(button?.disabled).toBe(true);
+    button?.click();
 
       expect(onPress).toHaveBeenCalledTimes(1);
     });
@@ -354,93 +342,71 @@ describe('Button - Behavior', () => {
     });
   });
 
-  // ========================================
-  // REGRESSION GUARDS
-  // ========================================
-  describe('regression guards', () => {
-    it('should fail if Button adds manual event handlers given behavior must come from foundation', () => {
-      const onPress = vi.fn();
+  it('supports asChild composition and merges host props', () => {
+    container = mount(
+      <Button asChild data-from-button="yes" data-testid="docs-link">
+        <a href="/docs" data-from-child="yes">
+          Docs
+        </a>
+      </Button>
+    );
+    const link = container.querySelector('a') as HTMLAnchorElement | null;
 
       container = mount(<Button onPress={onPress}>Click me</Button>);
       const button = container.querySelector('button') as HTMLButtonElement;
 
-      button.click();
-      expect(onPress).toHaveBeenCalledTimes(1);
+  it('routes interaction through the asChild host element', () => {
+    const onPress = vi.fn();
 
-      button.click();
-      expect(onPress).toHaveBeenCalledTimes(2);
-    });
+    container = mount(
+      <Button asChild onPress={onPress}>
+        <div role="button">Custom</div>
+      </Button>
+    );
+    const element = container.querySelector(
+      '[role="button"]'
+    ) as HTMLElement | null;
 
-    it('should fail if Button implements disabled check given that belongs in foundation', () => {
-      const onPress = vi.fn();
+    element?.click();
 
-      container = mount(
-        <Button disabled={false} onPress={onPress}>
-          Click me
-        </Button>
-      );
-      let button = container.querySelector('button')!;
+    expect(onPress).toHaveBeenCalledTimes(1);
+  });
 
-      button.click();
-      expect(onPress).toHaveBeenCalledTimes(1);
+  it('applies disabled semantics to asChild hosts', () => {
+    const onPress = vi.fn();
 
-      unmount(container);
-      onPress.mockClear();
+    container = mount(
+      <Button asChild disabled onPress={onPress}>
+        <a href="/docs">Docs</a>
+      </Button>
+    );
+    const link = container.querySelector('a') as HTMLAnchorElement | null;
 
-      container = mount(
-        <Button disabled onPress={onPress}>
-          Click me
-        </Button>
-      );
-      button = container.querySelector('button')! as HTMLButtonElement;
+    expect(link?.getAttribute('aria-disabled')).toBe('true');
+    expect(link?.getAttribute('tabindex')).toBe('-1');
 
-      button.click();
-      expect(onPress).not.toHaveBeenCalled();
-    });
+    link?.click();
 
-    it('should fail if Button adds lifecycle hooks given components only compose', () => {
-      const onPress = vi.fn();
+    expect(onPress).not.toHaveBeenCalled();
+  });
 
-      container = mount(<Button onPress={onPress}>Click me</Button>);
-      const button = container.querySelector('button')!;
+  it('does not double-fire press handlers during composed native clicks', () => {
+    const onPress = vi.fn();
 
-      button.click();
-      expect(onPress).toHaveBeenCalledTimes(1);
-    });
+    container = mount(
+      <Button onPress={onPress} data-testid="primary-action" className="cta">
+        Save
+      </Button>
+    );
+    const button = container.querySelector(
+      'button'
+    ) as HTMLButtonElement | null;
 
-    it('should fail if Button duplicates foundation logic given asChild keyboard handling', () => {
-      const onPress = vi.fn();
+    expect(button?.getAttribute('data-testid')).toBe('primary-action');
+    expect(button?.className).toBe('cta');
 
-      container = mount(
-        <Button asChild onPress={onPress}>
-          <span role="button">Custom</span>
-        </Button>
-      );
+    button?.click();
 
-      const span = container.querySelector('span')!;
-
-      expect(span.getAttribute('role')).toBe('button');
-
-      span.click();
-      expect(onPress).toHaveBeenCalledTimes(1);
-    });
-
-    it('should fail if Button manually handles disabled on asChild given foundation responsibility', () => {
-      const onPress = vi.fn();
-
-      container = mount(
-        <Button asChild disabled onPress={onPress}>
-          <a href="/test">Link</a>
-        </Button>
-      );
-
-      const link = container.querySelector('a')!;
-
-      expect(link.getAttribute('aria-disabled')).toBe('true');
-      expect(link.getAttribute('tabindex')).toBe('-1');
-
-      link.click();
-      expect(onPress).not.toHaveBeenCalled();
-    });
+    expect(onPress).toHaveBeenCalledTimes(1);
   });
 });

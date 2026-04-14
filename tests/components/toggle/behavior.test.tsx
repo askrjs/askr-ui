@@ -2,216 +2,157 @@ import { describe, it, expect, vi, afterEach } from 'vite-plus/test';
 import { Toggle } from '../../../src/components/primitives/toggle/toggle';
 import { createIsland } from '@askrjs/askr';
 
-function mount(element: JSX.Element): HTMLElement {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-  createIsland({
-    root: container,
-    component: () => element,
-  });
-  return container;
-}
-
-function unmount(container: HTMLElement) {
-  if (container.parentNode) {
-    container.parentNode.removeChild(container);
-  }
-}
-
-describe('Toggle — Behavior', () => {
-  let container: HTMLElement;
+describe('Toggle - Behavior', () => {
+  let container: HTMLElement | undefined;
 
   afterEach(() => {
-    if (container) {
-      unmount(container);
-    }
+    unmount(container);
+    container = undefined;
   });
 
-  describe('Foundation Delegation', () => {
-    it('should render native button given no asChild', () => {
-      container = mount(<Toggle>Toggle</Toggle>);
-      const button = container.querySelector('button');
-      expect(button).toBeDefined();
-      expect(button?.textContent).toBe('Toggle');
-    });
+  it('renders a native toggle button by default', () => {
+    container = mount(<Toggle>Mute</Toggle>);
+    const button = container.querySelector(
+      'button'
+    ) as HTMLButtonElement | null;
 
-    it('should default type to button given native button', () => {
-      container = mount(<Toggle>Toggle</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.getAttribute('type')).toBe('button');
-    });
-
-    it('should accept explicit type given native button', () => {
-      container = mount(<Toggle type="submit">Submit</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.getAttribute('type')).toBe('submit');
-    });
-
-    it('should call onPress given click when not disabled', () => {
-      const onPress = vi.fn();
-      container = mount(<Toggle onPress={onPress}>Toggle</Toggle>);
-      const button = container.querySelector('button')!;
-      button.click();
-      expect(onPress).toHaveBeenCalledOnce();
-    });
-
-    it('should NOT call onPress given click when disabled', () => {
-      const onPress = vi.fn();
-      container = mount(
-        <Toggle disabled onPress={onPress}>
-          Toggle
-        </Toggle>
-      );
-      const button = container.querySelector('button')!;
-      button.click();
-      expect(onPress).not.toHaveBeenCalled();
-    });
+    expect(button).toBeTruthy();
+    expect(button?.type).toBe('button');
+    expect(button?.textContent).toBe('Mute');
+    expect(button?.getAttribute('aria-pressed')).toBe('false');
+    expect(button?.getAttribute('data-slot')).toBe('toggle');
+    expect(button?.getAttribute('data-state')).toBe('off');
   });
 
-  describe('ARIA Pressed State', () => {
-    it('should set aria-pressed=false given pressed=false', () => {
-      container = mount(<Toggle pressed={false}>Toggle</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.getAttribute('aria-pressed')).toBe('false');
-    });
+  it('preserves an explicit native button type and pressed hooks', () => {
+    container = mount(
+      <Toggle type="submit" pressed>
+        Save
+      </Toggle>
+    );
+    const button = container.querySelector(
+      'button'
+    ) as HTMLButtonElement | null;
 
-    it('should set aria-pressed=true given pressed=true', () => {
-      container = mount(<Toggle pressed={true}>Toggle</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.getAttribute('aria-pressed')).toBe('true');
-    });
-
-    it('should default aria-pressed=false given no pressed prop', () => {
-      container = mount(<Toggle>Toggle</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.getAttribute('aria-pressed')).toBe('false');
-    });
+    expect(button?.type).toBe('submit');
+    expect(button?.getAttribute('aria-pressed')).toBe('true');
+    expect(button?.getAttribute('data-state')).toBe('on');
   });
 
-  describe('asChild Invariant', () => {
-    it('should render child element given asChild=true', () => {
-      container = mount(
-        <Toggle asChild>
-          <span>Custom Toggle</span>
-        </Toggle>
-      );
-      const span = container.querySelector('span');
-      expect(span).toBeDefined();
-      expect(span?.textContent).toBe('Custom Toggle');
-    });
+  it('invokes onPress exactly once per native click', () => {
+    const onPress = vi.fn();
 
-    it('should merge aria-pressed onto child given asChild', () => {
-      container = mount(
-        <Toggle asChild pressed={true}>
-          <span>Toggle</span>
-        </Toggle>
-      );
-      const span = container.querySelector('span');
-      expect(span?.getAttribute('aria-pressed')).toBe('true');
-    });
+    container = mount(<Toggle onPress={onPress}>Mute</Toggle>);
+    const button = container.querySelector(
+      'button'
+    ) as HTMLButtonElement | null;
 
-    it('should call onPress given click on asChild element', () => {
-      const onPress = vi.fn();
-      container = mount(
-        <Toggle asChild onPress={onPress}>
-          <span>Toggle</span>
-        </Toggle>
-      );
-      const span = container.querySelector('span')!;
-      span.click();
-      expect(onPress).toHaveBeenCalledOnce();
-    });
+    button?.click();
 
-    it('should forward custom props given asChild', () => {
-      container = mount(
-        <Toggle asChild data-testid="custom">
-          <div>Toggle</div>
-        </Toggle>
-      );
-      const div = container.querySelector('div');
-      expect(div?.getAttribute('data-testid')).toBe('custom');
-    });
+    expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  describe('Composition Safety', () => {
-    it('should NOT leak onClick prop given onPress', () => {
-      container = mount(<Toggle onPress={() => {}}>Toggle</Toggle>);
-      const button = container.querySelector('button')!;
-      // onClick is added by pressable foundation, not leaked from user
-      expect(button.onclick).toBeDefined();
-    });
+  it('blocks native interaction when disabled', () => {
+    const onPress = vi.fn();
 
-    it('should merge user className with component props', () => {
-      container = mount(<Toggle className="custom">Toggle</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.classList.contains('custom')).toBe(true);
-    });
+    container = mount(
+      <Toggle disabled onPress={onPress}>
+        Mute
+      </Toggle>
+    );
+    const button = container.querySelector(
+      'button'
+    ) as HTMLButtonElement | null;
 
-    it('should preserve user data attributes', () => {
-      container = mount(
-        <Toggle data-foo="bar" data-pressed="custom">
-          Toggle
-        </Toggle>
-      );
-      const button = container.querySelector('button');
-      expect(button?.getAttribute('data-foo')).toBe('bar');
-      expect(button?.getAttribute('data-pressed')).toBe('custom');
-    });
+    expect(button?.disabled).toBe(true);
+    expect(button?.getAttribute('aria-disabled')).toBe('true');
+
+    button?.click();
+
+    expect(onPress).not.toHaveBeenCalled();
   });
 
-  describe('Disabled Semantics', () => {
-    it('should apply disabled attribute given disabled=true on native button', () => {
-      container = mount(<Toggle disabled>Toggle</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.hasAttribute('disabled')).toBe(true);
-    });
+  it('supports asChild composition and merges host props', () => {
+    container = mount(
+      <Toggle
+        asChild
+        pressed
+        data-testid="custom-toggle"
+        data-from-toggle="yes"
+      >
+        <span data-from-child="yes">Mute</span>
+      </Toggle>
+    );
+    const host = container.querySelector('[role="button"]');
 
-    it('should apply aria-disabled given disabled=true', () => {
-      container = mount(<Toggle disabled>Toggle</Toggle>);
-      const button = container.querySelector('button');
-      expect(button?.getAttribute('aria-disabled')).toBe('true');
-    });
-
-    it('should apply aria-disabled on asChild element given disabled', () => {
-      container = mount(
-        <Toggle asChild disabled>
-          <span>Toggle</span>
-        </Toggle>
-      );
-      const span = container.querySelector('span');
-      expect(span?.getAttribute('aria-disabled')).toBe('true');
-    });
-
-    it('should NOT call onPress given disabled and click', () => {
-      const onPress = vi.fn();
-      container = mount(
-        <Toggle disabled onPress={onPress}>
-          Toggle
-        </Toggle>
-      );
-      const button = container.querySelector('button')!;
-      button.click();
-      expect(onPress).not.toHaveBeenCalled();
-    });
+    expect(host?.textContent).toBe('Mute');
+    expect(host?.getAttribute('data-testid')).toBe('custom-toggle');
+    expect(host?.getAttribute('data-from-toggle')).toBe('yes');
+    expect(host?.getAttribute('data-from-child')).toBe('yes');
+    expect(host?.getAttribute('aria-pressed')).toBe('true');
+    expect(host?.getAttribute('data-state')).toBe('on');
+    expect(host?.getAttribute('data-slot')).toBe('toggle');
   });
 
-  describe('Regression Guards', () => {
-    it('should NOT render multiple wrappers given asChild', () => {
-      container = mount(
-        <Toggle asChild>
-          <span>Toggle</span>
-        </Toggle>
-      );
-      // Should only have the span, no extra wrappers
-      expect(container.querySelectorAll('span').length).toBe(1);
-    });
+  it('routes interaction through the asChild host element', () => {
+    const onPress = vi.fn();
 
-    it('should handle onPress=undefined without error', () => {
-      expect(() => {
-        container = mount(<Toggle>Toggle</Toggle>);
-        const button = container.querySelector('button')!;
-        button.click();
-      }).not.toThrow();
-    });
+    container = mount(
+      <Toggle asChild onPress={onPress}>
+        <span>Mute</span>
+      </Toggle>
+    );
+    const host = container.querySelector(
+      '[role="button"]'
+    ) as HTMLElement | null;
+
+    host?.click();
+
+    expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  it('applies disabled semantics to asChild hosts', () => {
+    const onPress = vi.fn();
+
+    container = mount(
+      <Toggle asChild disabled onPress={onPress}>
+        <span>Mute</span>
+      </Toggle>
+    );
+    const host = container.querySelector(
+      '[role="button"]'
+    ) as HTMLElement | null;
+
+    expect(host?.getAttribute('aria-disabled')).toBe('true');
+    expect(host?.getAttribute('tabindex')).toBe('-1');
+    expect(host?.getAttribute('data-disabled')).toBe('true');
+
+    host?.click();
+
+    expect(onPress).not.toHaveBeenCalled();
+  });
+
+  it('forwards refs to native and asChild hosts', () => {
+    let nativeRef: HTMLButtonElement | null = null;
+    let childRef: HTMLElement | null = null;
+
+    container = mount(<Toggle ref={(node) => (nativeRef = node)}>Mute</Toggle>);
+    const button = container.querySelector(
+      'button'
+    ) as HTMLButtonElement | null;
+
+    expect(nativeRef).toBe(button);
+
+    unmount(container);
+    container = mount(
+      <Toggle asChild ref={(node) => (childRef = node as HTMLElement | null)}>
+        <span>Mute</span>
+      </Toggle>
+    );
+    const host = container.querySelector(
+      '[role="button"]'
+    ) as HTMLElement | null;
+
+    expect(childRef).toBe(host);
   });
 });

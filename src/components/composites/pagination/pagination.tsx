@@ -1,3 +1,4 @@
+import { defineContext, readContext } from '@askrjs/askr';
 import {
   Slot,
   controllableState,
@@ -19,34 +20,33 @@ import type {
   PaginationProps,
 } from './pagination.types';
 
-type InjectedPaginationProps = {
-  __paginationId?: string;
-  __page?: number;
-  __setPage?: (page: number) => void;
-  __count?: number;
-  __disabled?: boolean;
+type PaginationRootContextValue = {
+  paginationId: string;
+  page: number;
+  setPage: (page: number) => void;
+  count: number;
+  disabled: boolean;
 };
 
-function readInjectedPaginationProps(
-  props: InjectedPaginationProps
-): Required<InjectedPaginationProps> {
-  if (
-    !props.__paginationId ||
-    props.__page === undefined ||
-    !props.__setPage ||
-    props.__count === undefined ||
-    props.__disabled === undefined
-  ) {
+const PaginationRootContext = defineContext<PaginationRootContextValue | null>(
+  null
+);
+
+function readPaginationRootContext(): PaginationRootContextValue {
+  const context = readContext(PaginationRootContext);
+
+  if (!context) {
     throw new Error('Pagination components must be used within <Pagination>');
   }
 
-  return {
-    __paginationId: props.__paginationId,
-    __page: props.__page,
-    __setPage: props.__setPage,
-    __count: props.__count,
-    __disabled: props.__disabled,
-  };
+  return context;
+}
+
+function PaginationRootView(props: {
+  finalProps: Record<string, unknown>;
+  children?: unknown;
+}) {
+  return <nav {...props.finalProps}>{props.children}</nav>;
 }
 
 export function Pagination(props: PaginationProps) {
@@ -87,68 +87,30 @@ export function Pagination(props: PaginationProps) {
     ),
     <PaginationNext key="next">Next</PaginationNext>,
   ];
-  const pageEntries = model.filter((entry) => entry.type === 'page');
-  let pageCursor = 0;
   const setPage = (nextPage: number) => {
     pageState.set(clampPage(nextPage, count));
   };
-  const enhancedChildren = mapJsxTree(
-    children ?? defaultChildren,
-    (element) => {
-      if (
-        element.type !== PaginationPrevious &&
-        element.type !== PaginationNext &&
-        element.type !== PaginationPage &&
-        element.type !== PaginationEllipsis
-      ) {
-        return element;
-      }
-
-      if (element.type === PaginationPage) {
-        const resolvedPage =
-          typeof element.props?.page === 'number'
-            ? element.props.page
-            : (pageEntries[pageCursor++]?.page ?? currentPage);
-
-        return {
-          ...element,
-          props: {
-            ...element.props,
-            page: resolvedPage,
-            __paginationId: paginationId,
-            __page: currentPage,
-            __setPage: setPage,
-            __count: count,
-            __disabled: disabled,
-          },
-        };
-      }
-
-      if (element.type === PaginationEllipsis) {
-        return element;
-      }
-
-      return {
-        ...element,
-        props: {
-          ...element.props,
-          __paginationId: paginationId,
-          __page: currentPage,
-          __setPage: setPage,
-          __count: count,
-          __disabled: disabled,
-        },
-      };
-    }
-  );
   const finalProps = mergeProps(rest, {
     ref,
     'aria-label': 'Pagination',
     'data-slot': 'pagination',
     'data-pagination': 'true',
   });
+  const rootContext: PaginationRootContextValue = {
+    paginationId,
+    page: currentPage,
+    setPage,
+    count,
+    disabled,
+  };
 
-  return <nav {...finalProps}>{enhancedChildren}</nav>;
+  return (
+    <PaginationRootContext.Scope value={rootContext}>
+      <PaginationRootView finalProps={finalProps as Record<string, unknown>}>
+        {children ?? defaultChildren}
+      </PaginationRootView>
+    </PaginationRootContext.Scope>
+  );
 }
 
 export function PaginationPrevious(props: PaginationPreviousProps): JSX.Element;
@@ -156,9 +118,7 @@ export function PaginationPrevious(
   props: PaginationPreviousAsChildProps
 ): JSX.Element;
 export function PaginationPrevious(
-  props:
-    | (PaginationPreviousProps & InjectedPaginationProps)
-    | (PaginationPreviousAsChildProps & InjectedPaginationProps)
+  props: PaginationPreviousProps | PaginationPreviousAsChildProps
 ) {
   const {
     asChild,
@@ -167,28 +127,17 @@ export function PaginationPrevious(
     onPress,
     ref,
     type: typeProp,
-    __paginationId,
-    __page,
-    __setPage,
-    __count,
-    __disabled,
     ...rest
   } = props;
-  const injected = readInjectedPaginationProps({
-    __paginationId,
-    __page,
-    __setPage,
-    __count,
-    __disabled,
-  });
-  const isDisabled = disabled || injected.__disabled || injected.__page <= 1;
+  const root = readPaginationRootContext();
+  const isDisabled = disabled || root.disabled || root.page <= 1;
   const interactionProps = pressable({
     disabled: isDisabled,
     onPress: (event) => {
       onPress?.(event);
 
       if (!event.defaultPrevented) {
-        injected.__setPage(injected.__page - 1);
+        root.setPage(root.page - 1);
       }
     },
     isNativeButton: !asChild,
@@ -196,7 +145,7 @@ export function PaginationPrevious(
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     ref,
-    id: resolvePartId(injected.__paginationId, 'previous'),
+    id: resolvePartId(root.paginationId, 'previous'),
     'aria-label': 'Previous page',
     'data-slot': 'pagination-previous',
     'data-disabled': isDisabled ? 'true' : undefined,
@@ -216,9 +165,7 @@ export function PaginationPrevious(
 export function PaginationNext(props: PaginationNextProps): JSX.Element;
 export function PaginationNext(props: PaginationNextAsChildProps): JSX.Element;
 export function PaginationNext(
-  props:
-    | (PaginationNextProps & InjectedPaginationProps)
-    | (PaginationNextAsChildProps & InjectedPaginationProps)
+  props: PaginationNextProps | PaginationNextAsChildProps
 ) {
   const {
     asChild,
@@ -227,29 +174,17 @@ export function PaginationNext(
     onPress,
     ref,
     type: typeProp,
-    __paginationId,
-    __page,
-    __setPage,
-    __count,
-    __disabled,
     ...rest
   } = props;
-  const injected = readInjectedPaginationProps({
-    __paginationId,
-    __page,
-    __setPage,
-    __count,
-    __disabled,
-  });
-  const isDisabled =
-    disabled || injected.__disabled || injected.__page >= injected.__count;
+  const root = readPaginationRootContext();
+  const isDisabled = disabled || root.disabled || root.page >= root.count;
   const interactionProps = pressable({
     disabled: isDisabled,
     onPress: (event) => {
       onPress?.(event);
 
       if (!event.defaultPrevented) {
-        injected.__setPage(injected.__page + 1);
+        root.setPage(root.page + 1);
       }
     },
     isNativeButton: !asChild,
@@ -257,7 +192,7 @@ export function PaginationNext(
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     ref,
-    id: resolvePartId(injected.__paginationId, 'next'),
+    id: resolvePartId(root.paginationId, 'next'),
     'aria-label': 'Next page',
     'data-slot': 'pagination-next',
     'data-disabled': isDisabled ? 'true' : undefined,
@@ -274,31 +209,10 @@ export function PaginationNext(
   );
 }
 
-type PaginationPageInjectedProps = InjectedPaginationProps & {
-  page?: number;
-};
-
-function readInjectedPaginationPageProps(
-  props: PaginationPageInjectedProps
-): Required<PaginationPageInjectedProps> {
-  const injected = readInjectedPaginationProps(props);
-
-  if (props.page === undefined) {
-    throw new Error('PaginationPage requires a page number');
-  }
-
-  return {
-    ...injected,
-    page: props.page,
-  };
-}
-
 export function PaginationPage(props: PaginationPageProps): JSX.Element;
 export function PaginationPage(props: PaginationPageAsChildProps): JSX.Element;
 export function PaginationPage(
-  props:
-    | (PaginationPageProps & PaginationPageInjectedProps)
-    | (PaginationPageAsChildProps & PaginationPageInjectedProps)
+  props: PaginationPageProps | PaginationPageAsChildProps
 ) {
   const {
     asChild,
@@ -308,30 +222,24 @@ export function PaginationPage(
     page,
     ref,
     type: typeProp,
-    __paginationId,
-    __page,
-    __setPage,
-    __count,
-    __disabled,
     ...rest
   } = props;
-  const injected = readInjectedPaginationPageProps({
-    page,
-    __paginationId,
-    __page,
-    __setPage,
-    __count,
-    __disabled,
-  });
-  const isDisabled = disabled || injected.__disabled;
-  const selected = injected.__page === injected.page;
+  const root = readPaginationRootContext();
+
+  if (page === undefined) {
+    throw new Error('PaginationPage requires an explicit `page` prop.');
+  }
+
+  const resolvedPage = clampPage(page, root.count);
+  const isDisabled = disabled || root.disabled;
+  const selected = root.page === resolvedPage;
   const interactionProps = pressable({
     disabled: isDisabled,
     onPress: (event) => {
       onPress?.(event);
 
       if (!event.defaultPrevented) {
-        injected.__setPage(injected.page);
+        root.setPage(resolvedPage);
       }
     },
     isNativeButton: !asChild,
@@ -339,12 +247,12 @@ export function PaginationPage(
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     ref,
-    id: resolvePartId(injected.__paginationId, `page-${injected.page}`),
-    'aria-label': `Page ${injected.page}`,
+    id: resolvePartId(root.paginationId, `page-${resolvedPage}`),
+    'aria-label': `Page ${resolvedPage}`,
     'aria-current': selected ? 'page' : undefined,
     'data-slot': 'pagination-page',
     'data-state': selected ? 'active' : 'inactive',
-    'data-page': String(injected.page),
+    'data-page': String(resolvedPage),
     'data-disabled': isDisabled ? 'true' : undefined,
   });
 
@@ -354,7 +262,7 @@ export function PaginationPage(
 
   return (
     <button type={typeProp ?? 'button'} {...finalProps}>
-      {children ?? String(injected.page)}
+      {children ?? String(resolvedPage)}
     </button>
   );
 }
@@ -366,18 +274,7 @@ export function PaginationEllipsis(
 export function PaginationEllipsis(
   props: PaginationEllipsisProps | PaginationEllipsisAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    ref,
-    __paginationId: _paginationId,
-    __page: _page,
-    __setPage: _setPage,
-    __count: _count,
-    __disabled: _disabled,
-    ...rest
-  } = props as (PaginationEllipsisProps | PaginationEllipsisAsChildProps) &
-    Partial<InjectedPaginationProps>;
+  const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
     'aria-hidden': 'true',

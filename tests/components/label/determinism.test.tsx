@@ -3,10 +3,13 @@ import { Label } from '../../../src/components/primitives/label/label';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Label - Determinism', () => {
-  it('should render deterministic label markup', () => {
+  it('renders deterministic native label markup', () => {
     expectDeterministicRender(() => <Label htmlFor="email">Email</Label>);
+  });
+
+  it('renders deterministic asChild label markup', () => {
     expectDeterministicRender(() => (
-      <Label asChild data-testid="composed-label">
+      <Label asChild data-testid="email-label">
         <span>Email</span>
       </Label>
     ));
