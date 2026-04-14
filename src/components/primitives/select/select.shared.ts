@@ -29,6 +29,8 @@ export type SelectRenderContextValue = {
 export type SelectGroupContextValue = {
   groupId: string;
   labelId: string;
+  addLabel: () => void;
+  removeLabel: () => void;
 };
 
 export type SelectResolvedState = {

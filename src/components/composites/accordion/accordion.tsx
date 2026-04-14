@@ -20,7 +20,7 @@ import {
   toggleDisclosureValue,
 } from '../../_internal/disclosure';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
-import { collectJsxElements, mapJsxTree } from '../../_internal/jsx';
+import { collectJsxElements } from '../../_internal/jsx';
 import type {
   AccordionContentAsChildProps,
   AccordionContentProps,
@@ -33,90 +33,16 @@ import type {
   AccordionTriggerAsChildProps,
   AccordionTriggerProps,
 } from './accordion.types';
-
-type AccordionRootInjectedProps = {
-  __accordionId?: string;
-  __type?: 'single' | 'multiple';
-  __value?: string | string[];
-  __setValue?: (value: string | string[]) => void;
-  __orientation?: 'vertical' | 'horizontal';
-  __loop?: boolean;
-  __collapsible?: boolean;
-  __currentIndex?: number;
-  __setCurrentIndex?: (index: number) => void;
-  __disabledIndexes?: number[];
-  __itemCount?: number;
-};
-
-type AccordionItemInjectedProps = AccordionRootInjectedProps & {
-  __itemValue?: string;
-  __itemIndex?: number;
-  __itemDisabled?: boolean;
-  __itemId?: string;
-  __triggerId?: string;
-  __contentId?: string;
-};
-
-function readAccordionRootInjectedProps(
-  props: AccordionRootInjectedProps
-): Required<AccordionRootInjectedProps> {
-  if (
-    !props.__accordionId ||
-    !props.__type ||
-    props.__value === undefined ||
-    !props.__setValue ||
-    !props.__orientation ||
-    props.__loop === undefined ||
-    props.__collapsible === undefined ||
-    props.__currentIndex === undefined ||
-    !props.__setCurrentIndex ||
-    !props.__disabledIndexes ||
-    props.__itemCount === undefined
-  ) {
-    throw new Error('Accordion components must be used within <Accordion>');
-  }
-
-  return {
-    __accordionId: props.__accordionId,
-    __type: props.__type,
-    __value: props.__value,
-    __setValue: props.__setValue,
-    __orientation: props.__orientation,
-    __loop: props.__loop,
-    __collapsible: props.__collapsible,
-    __currentIndex: props.__currentIndex,
-    __setCurrentIndex: props.__setCurrentIndex,
-    __disabledIndexes: props.__disabledIndexes,
-    __itemCount: props.__itemCount,
-  };
-}
-
-function readAccordionItemInjectedProps(
-  props: AccordionItemInjectedProps
-): Required<AccordionItemInjectedProps> {
-  const injected = readAccordionRootInjectedProps(props);
-
-  if (
-    !props.__itemValue ||
-    props.__itemIndex === undefined ||
-    props.__itemDisabled === undefined ||
-    !props.__itemId ||
-    !props.__triggerId ||
-    !props.__contentId
-  ) {
-    throw new Error('AccordionItem must be used within <Accordion>');
-  }
-
-  return {
-    ...injected,
-    __itemValue: props.__itemValue,
-    __itemIndex: props.__itemIndex,
-    __itemDisabled: props.__itemDisabled,
-    __itemId: props.__itemId,
-    __triggerId: props.__triggerId,
-    __contentId: props.__contentId,
-  };
-}
+import {
+  AccordionItemContext,
+  AccordionRenderContext,
+  AccordionRootContext,
+  createAccordionRenderContext,
+  readAccordionItemContext,
+  readAccordionRenderContext,
+  readAccordionRootContext,
+  type AccordionRootContextValue,
+} from './accordion.shared';
 
 function createAccordionValueState(props: AccordionProps) {
   if (props.type === 'multiple') {
@@ -134,6 +60,20 @@ function createAccordionValueState(props: AccordionProps) {
     defaultValue: singleProps.defaultValue ?? '',
     onChange: singleProps.onValueChange,
   });
+}
+
+function AccordionRootView(props: {
+  children?: unknown;
+  finalProps: Record<string, unknown>;
+}) {
+  return <div {...props.finalProps}>{props.children}</div>;
+}
+
+function AccordionItemView(props: {
+  children?: unknown;
+  finalProps: Record<string, unknown>;
+}) {
+  return <div {...props.finalProps}>{props.children}</div>;
 }
 
 export function Accordion(props: AccordionProps) {
@@ -165,41 +105,35 @@ export function Accordion(props: AccordionProps) {
   const currentIndex = items[currentIndexState()]
     ? currentIndexState()
     : firstEnabledCompositeIndex(items);
-  let itemIndex = 0;
-  const enhancedChildren = mapJsxTree(children, (element) => {
-    if (element.type !== AccordionItem) {
-      return element;
+  const collection = getCompositeCollection(accordionId);
+  const disabledIndexList = disabledIndexes(items);
+  const setValue: AccordionRootContextValue['setValue'] = (nextValue) => {
+    if (type === 'multiple') {
+      (valueState.set as (value: string[]) => void)(
+        Array.isArray(nextValue) ? nextValue : nextValue ? [nextValue] : []
+      );
+      return;
     }
 
-    const index = itemIndex;
-    itemIndex += 1;
-    const itemValue = element.props?.value as string;
-    const itemId = resolvePartId(accordionId, `item-${index}`);
-
-    return {
-      ...element,
-      props: {
-        ...element.props,
-        __accordionId: accordionId,
-        __type: type,
-        __value: valueState(),
-        __setValue: valueState.set,
-        __orientation: orientation,
-        __loop: loop,
-        __collapsible: collapsible,
-        __currentIndex: currentIndex,
-        __setCurrentIndex: currentIndexState.set,
-        __disabledIndexes: disabledIndexes(items),
-        __itemCount: items.length,
-        __itemValue: itemValue,
-        __itemIndex: index,
-        __itemDisabled: Boolean(element.props?.disabled),
-        __itemId: itemId,
-        __triggerId: resolvePartId(itemId, 'trigger'),
-        __contentId: resolvePartId(itemId, 'content'),
-      },
-    };
-  });
+    (valueState.set as (value: string) => void)(
+      Array.isArray(nextValue) ? (nextValue[0] ?? '') : nextValue
+    );
+  };
+  const rootContext: AccordionRootContextValue = {
+    accordionId,
+    type,
+    value: valueState(),
+    setValue,
+    orientation,
+    loop,
+    collapsible,
+    currentIndex,
+    setCurrentIndex: currentIndexState.set,
+    disabledIndexes: disabledIndexList,
+    itemCount: items.length,
+    collection,
+  };
+  const renderContext = createAccordionRenderContext();
   const finalProps = mergeProps(rest, {
     ref,
     'data-slot': 'accordion',
@@ -207,85 +141,48 @@ export function Accordion(props: AccordionProps) {
     'data-orientation': orientation,
   });
 
-  return <div {...finalProps}>{enhancedChildren}</div>;
+  return (
+    <AccordionRootContext.Scope value={rootContext}>
+      <AccordionRenderContext.Scope value={renderContext}>
+        <AccordionRootView finalProps={finalProps}>{children}</AccordionRootView>
+      </AccordionRenderContext.Scope>
+    </AccordionRootContext.Scope>
+  );
 }
 
-export function AccordionItem(
-  props: AccordionItemProps & AccordionItemInjectedProps
-) {
-  const {
-    children,
-    ref,
-    __accordionId,
-    __type,
-    __value,
-    __setValue,
-    __orientation,
-    __loop,
-    __collapsible,
-    __currentIndex,
-    __setCurrentIndex,
-    __disabledIndexes,
-    __itemCount,
-    __itemValue,
-    __itemIndex,
-    __itemDisabled,
-    __itemId,
-    __triggerId,
-    __contentId,
-    ...rest
-  } = props;
-  const injected = readAccordionItemInjectedProps({
-    __accordionId,
-    __type,
-    __value,
-    __setValue,
-    __orientation,
-    __loop,
-    __collapsible,
-    __currentIndex,
-    __setCurrentIndex,
-    __disabledIndexes,
-    __itemCount,
-    __itemValue,
-    __itemIndex,
-    __itemDisabled,
-    __itemId,
-    __triggerId,
-    __contentId,
-  });
-  const open = isDisclosureValueOpen(
-    injected.__type,
-    injected.__value,
-    injected.__itemValue
-  );
-  const enhancedChildren = mapJsxTree(children, (element) => {
-    if (
-      element.type !== AccordionHeader &&
-      element.type !== AccordionTrigger &&
-      element.type !== AccordionContent
-    ) {
-      return element;
-    }
-
-    return {
-      ...element,
-      props: {
-        ...element.props,
-        ...injected,
-      },
-    };
-  });
+export function AccordionItem(props: AccordionItemProps): JSX.Element {
+  const { children, disabled = false, ref, value, ...rest } = props;
+  const root = readAccordionRootContext();
+  const renderContext = readAccordionRenderContext();
+  const itemIndex = renderContext.claimItemIndex();
+  const itemId = resolvePartId(root.accordionId, `item-${itemIndex}`);
+  const triggerId = resolvePartId(itemId, 'trigger');
+  const contentId = resolvePartId(itemId, 'content');
+  const itemDisabled = Boolean(disabled);
+  const open = isDisclosureValueOpen(root.type, root.value, value);
+  const itemContext = {
+    accordionId: root.accordionId,
+    itemIndex,
+    itemValue: value,
+    itemDisabled,
+    itemId,
+    triggerId,
+    contentId,
+  };
   const finalProps = mergeProps(rest, {
     ref,
-    id: injected.__itemId,
+    id: itemId,
     'data-slot': 'accordion-item',
     'data-state': open ? 'open' : 'closed',
-    'data-disabled': injected.__itemDisabled ? 'true' : undefined,
-    'data-orientation': injected.__orientation,
+    'data-disabled': itemDisabled ? 'true' : undefined,
+    'data-orientation': root.orientation,
   });
 
-  return <div {...finalProps}>{enhancedChildren}</div>;
+  return (
+    <AccordionItemContext.Scope value={itemContext}>
+      <AccordionItemView finalProps={finalProps}>{children}</AccordionItemView>
+    </AccordionItemContext.Scope>
+  );
 }
 
 export function AccordionHeader(props: AccordionHeaderProps): JSX.Element;
@@ -293,52 +190,9 @@ export function AccordionHeader(
   props: AccordionHeaderAsChildProps
 ): JSX.Element;
 export function AccordionHeader(
-  props:
-    | (AccordionHeaderProps & AccordionItemInjectedProps)
-    | (AccordionHeaderAsChildProps & AccordionItemInjectedProps)
+  props: AccordionHeaderProps | AccordionHeaderAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    ref,
-    __accordionId,
-    __type,
-    __value,
-    __setValue,
-    __orientation,
-    __loop,
-    __collapsible,
-    __currentIndex,
-    __setCurrentIndex,
-    __disabledIndexes,
-    __itemCount,
-    __itemValue,
-    __itemIndex,
-    __itemDisabled,
-    __itemId,
-    __triggerId,
-    __contentId,
-    ...rest
-  } = props;
-  readAccordionItemInjectedProps({
-    __accordionId,
-    __type,
-    __value,
-    __setValue,
-    __orientation,
-    __loop,
-    __collapsible,
-    __currentIndex,
-    __setCurrentIndex,
-    __disabledIndexes,
-    __itemCount,
-    __itemValue,
-    __itemIndex,
-    __itemDisabled,
-    __itemId,
-    __triggerId,
-    __contentId,
-  });
+  const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
     'data-slot': 'accordion-header',
@@ -357,9 +211,7 @@ export function AccordionTrigger(
   props: AccordionTriggerAsChildProps
 ): JSX.Element;
 export function AccordionTrigger(
-  props:
-    | (AccordionTriggerProps & AccordionItemInjectedProps)
-    | (AccordionTriggerAsChildProps & AccordionItemInjectedProps)
+  props: AccordionTriggerProps | AccordionTriggerAsChildProps
 ) {
   const {
     asChild,
@@ -368,84 +220,46 @@ export function AccordionTrigger(
     onPress,
     ref,
     type: typeProp,
-    __accordionId,
-    __type,
-    __value,
-    __setValue,
-    __orientation,
-    __loop,
-    __collapsible,
-    __currentIndex,
-    __setCurrentIndex,
-    __disabledIndexes,
-    __itemCount,
-    __itemValue,
-    __itemIndex,
-    __itemDisabled,
-    __itemId,
-    __triggerId,
-    __contentId,
     ...rest
   } = props;
-  const injected = readAccordionItemInjectedProps({
-    __accordionId,
-    __type,
-    __value,
-    __setValue,
-    __orientation,
-    __loop,
-    __collapsible,
-    __currentIndex,
-    __setCurrentIndex,
-    __disabledIndexes,
-    __itemCount,
-    __itemValue,
-    __itemIndex,
-    __itemDisabled,
-    __itemId,
-    __triggerId,
-    __contentId,
-  });
-  const collection = getCompositeCollection(injected.__accordionId);
+  const root = readAccordionRootContext();
+  const item = readAccordionItemContext();
+  const collection = root.collection;
   const nav = rovingFocus({
-    currentIndex: injected.__currentIndex,
-    itemCount: Math.max(injected.__itemCount, 1),
-    orientation: injected.__orientation,
-    loop: injected.__loop,
-    isDisabled: (index) => injected.__disabledIndexes.includes(index),
+    currentIndex: root.currentIndex,
+    itemCount: Math.max(root.itemCount, 1),
+    orientation: root.orientation,
+    loop: root.loop,
+    isDisabled: (index) => root.disabledIndexes.includes(index),
     onNavigate: (index) => {
-      injected.__setCurrentIndex(index);
+      root.setCurrentIndex(index);
       focusSelectedCollectionItem(collection, index);
     },
   });
-  const open = isDisclosureValueOpen(
-    injected.__type,
-    injected.__value,
-    injected.__itemValue
-  );
-  const isDisabled = disabled || injected.__itemDisabled;
+  const open = isDisclosureValueOpen(root.type, root.value, item.itemValue);
+  const isDisabled = disabled || item.itemDisabled;
   const interactionProps = pressable({
     disabled: isDisabled,
     onPress: (event) => {
       onPress?.(event);
 
       if (!event.defaultPrevented) {
-        injected.__setValue(
+        root.setValue(
           toggleDisclosureValue(
-            injected.__type,
-            injected.__value,
-            injected.__itemValue,
-            injected.__collapsible
+            root.type,
+            root.value,
+            item.itemValue,
+            root.collapsible
           )
         );
-        injected.__setCurrentIndex(injected.__itemIndex);
+        root.setCurrentIndex(item.itemIndex);
       }
     },
     isNativeButton: !asChild,
   });
   const finalProps = mergeProps(rest, {
     ...interactionProps,
-    ...nav.item(injected.__itemIndex),
+    ...nav.item(item.itemIndex),
     ref: composeRefs(
       ref as
         | ((value: HTMLElement | null) => void)
@@ -453,16 +267,16 @@ export function AccordionTrigger(
         | null
         | undefined,
       (node: HTMLElement | null) => {
-        registerCompositeNode(injected.__triggerId, collection, node, {
-          index: injected.__itemIndex,
+        registerCompositeNode(item.triggerId, collection, node, {
+          index: item.itemIndex,
           disabled: isDisabled,
-          value: injected.__itemValue,
+          value: item.itemValue,
         });
       }
     ),
-    id: injected.__triggerId,
+    id: item.triggerId,
     'data-slot': 'accordion-trigger',
-    'aria-controls': injected.__contentId,
+    'aria-controls': item.contentId,
     'aria-expanded': open ? 'true' : 'false',
     'data-state': open ? 'open' : 'closed',
     'data-disabled': isDisabled ? 'true' : undefined,
@@ -486,63 +300,17 @@ export function AccordionContent(
   props: AccordionContentAsChildProps
 ): JSX.Element | null;
 export function AccordionContent(
-  props:
-    | (AccordionContentProps & AccordionItemInjectedProps)
-    | (AccordionContentAsChildProps & AccordionItemInjectedProps)
+  props: AccordionContentProps | AccordionContentAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    forceMount = false,
-    ref,
-    __accordionId,
-    __type,
-    __value,
-    __setValue,
-    __orientation,
-    __loop,
-    __collapsible,
-    __currentIndex,
-    __setCurrentIndex,
-    __disabledIndexes,
-    __itemCount,
-    __itemValue,
-    __itemIndex,
-    __itemDisabled,
-    __itemId,
-    __triggerId,
-    __contentId,
-    ...rest
-  } = props;
-  const injected = readAccordionItemInjectedProps({
-    __accordionId,
-    __type,
-    __value,
-    __setValue,
-    __orientation,
-    __loop,
-    __collapsible,
-    __currentIndex,
-    __setCurrentIndex,
-    __disabledIndexes,
-    __itemCount,
-    __itemValue,
-    __itemIndex,
-    __itemDisabled,
-    __itemId,
-    __triggerId,
-    __contentId,
-  });
-  const open = isDisclosureValueOpen(
-    injected.__type,
-    injected.__value,
-    injected.__itemValue
-  );
+  const { asChild, children, forceMount = false, ref, ...rest } = props;
+  const root = readAccordionRootContext();
+  const item = readAccordionItemContext();
+  const open = isDisclosureValueOpen(root.type, root.value, item.itemValue);
   const finalProps = mergeProps(rest, {
     ref,
-    id: injected.__contentId,
+    id: item.contentId,
     role: 'region',
-    'aria-labelledby': injected.__triggerId,
+    'aria-labelledby': item.triggerId,
     'data-slot': 'accordion-content',
     'data-state': open ? 'open' : 'closed',
   });

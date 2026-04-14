@@ -6,7 +6,6 @@ import {
   pressable,
 } from '@askrjs/askr/foundations';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
-import { mapJsxTree } from '../../_internal/jsx';
 import { buildPaginationModel, clampPage } from '../../_internal/pagination';
 import type {
   PaginationEllipsisAsChildProps,
