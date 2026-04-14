@@ -1,6 +1,5 @@
 import { state } from '@askrjs/askr';
-import { Slot, mergeProps } from '@askrjs/askr/foundations';
-import { resource } from '@askrjs/askr/resources';
+import { Slot, composeRefs, mergeProps } from '@askrjs/askr/foundations';
 import { resolvePartId } from '../../_internal/id';
 import {
   readSelectDeclarationContext,
@@ -17,6 +16,8 @@ import type {
   SelectSeparatorAsChildProps,
   SelectSeparatorProps,
 } from './select.types';
+
+const selectLabelMounts = new Set<string>();
 
 function SelectGroupScopeView(props: {
   asChild?: boolean;
@@ -89,32 +90,37 @@ export function SelectLabel(props: SelectLabelProps | SelectLabelAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const declarationContext = readSelectDeclarationContext();
   const groupContext = readSelectGroupContext();
-  resource(
-    ({ signal }) => {
-      if (declarationContext || !groupContext) {
-        return null;
-      }
-
-      groupContext.addLabel();
-      signal.addEventListener(
-        'abort',
-        () => {
-          groupContext.removeLabel();
-        },
-        { once: true }
-      );
-
-      return null;
-    },
-    [declarationContext, groupContext?.groupId, groupContext?.labelId]
-  );
 
   if (declarationContext) {
     return null;
   }
 
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: composeRefs(
+      ref as
+        | ((value: HTMLElement | null) => void)
+        | { current: HTMLElement | null }
+        | null
+        | undefined,
+      (node: HTMLElement | null) => {
+        if (!groupContext) {
+          return;
+        }
+
+        const mounted = selectLabelMounts.has(groupContext.labelId);
+
+        if (node && !mounted) {
+          selectLabelMounts.add(groupContext.labelId);
+          groupContext.addLabel();
+          return;
+        }
+
+        if (!node && mounted) {
+          selectLabelMounts.delete(groupContext.labelId);
+          groupContext.removeLabel();
+        }
+      }
+    ),
     id: groupContext?.labelId,
     'data-slot': 'select-label',
     'data-select-label': 'true',
