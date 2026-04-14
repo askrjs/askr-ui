@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test';
-import { createIsland } from '@askrjs/askr';
+import { mount, unmount } from '../../test-utils';
 import {
   Field,
   FieldCheckbox,
@@ -13,7 +13,7 @@ import {
   FieldSwitch,
   Fieldset,
 } from '../../../src/components/composites/field/field';
-import { RadioGroupItem } from '../../../src/components/primitives/radio-group/radio-group';
+import { RadioGroupItem } from '../../../src/components/primitives/radio-group';
 
 describe('Field - Behavior', () => {
   let container: HTMLElement | undefined;

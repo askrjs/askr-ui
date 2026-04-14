@@ -1,20 +1,18 @@
 import { mergeProps } from '@askrjs/askr/foundations';
-import { mapJsxTree } from '../../_internal/jsx';
 import type {
   FieldLegendProps,
   FieldProps,
   FieldRowProps,
   FieldsetProps,
 } from './field-types';
-import {
-  FieldCheckbox,
-  FieldInput,
-  FieldRadioGroup,
-  FieldSelectTrigger,
-  FieldSwitch,
-} from './field-controls';
-import { FieldDescription, FieldError, FieldLabel } from './field-text';
-import type { InjectedFieldProps } from './field-shared';
+import { FieldContext } from './field-shared';
+
+function FieldRootView(props: {
+  children?: unknown;
+  finalProps: Record<string, unknown>;
+}) {
+  return <div {...props.finalProps}>{props.children}</div>;
+}
 
 export function Field(props: FieldProps) {
   const {
@@ -26,33 +24,12 @@ export function Field(props: FieldProps) {
     disabled = false,
     ...rest
   } = props;
-
-  const enhancedChildren = mapJsxTree(children, (element) => {
-    if (
-      element.type !== FieldLabel &&
-      element.type !== FieldDescription &&
-      element.type !== FieldError &&
-      element.type !== FieldInput &&
-      element.type !== FieldSelectTrigger &&
-      element.type !== FieldCheckbox &&
-      element.type !== FieldSwitch &&
-      element.type !== FieldRadioGroup &&
-      element.type !== FieldRow
-    ) {
-      return element;
-    }
-
-    return {
-      ...element,
-      props: {
-        ...element.props,
-        __fieldId: id,
-        __fieldInvalid: invalid,
-        __fieldRequired: required,
-        __fieldDisabled: disabled,
-      },
-    };
-  });
+  const fieldContext = {
+    fieldId: id,
+    invalid,
+    required,
+    disabled,
+  };
 
   const finalProps = mergeProps(rest, {
     ref,
@@ -63,7 +40,11 @@ export function Field(props: FieldProps) {
     'data-disabled': disabled ? 'true' : undefined,
   });
 
-  return <div {...finalProps}>{enhancedChildren}</div>;
+  return (
+    <FieldContext.Scope value={fieldContext}>
+      <FieldRootView finalProps={finalProps}>{children}</FieldRootView>
+    </FieldContext.Scope>
+  );
 }
 
 export function Fieldset(props: FieldsetProps) {
@@ -98,47 +79,13 @@ export function FieldLegend(props: FieldLegendProps) {
   return <legend {...finalProps}>{children}</legend>;
 }
 
-export function FieldRow(props: FieldRowProps & InjectedFieldProps) {
-  const {
-    children,
-    ref,
-    __fieldId,
-    __fieldInvalid,
-    __fieldRequired,
-    __fieldDisabled,
-    ...rest
-  } = props;
-
-  const enhancedChildren = mapJsxTree(children, (element) => {
-    if (
-      element.type !== FieldLabel &&
-      element.type !== FieldDescription &&
-      element.type !== FieldError &&
-      element.type !== FieldInput &&
-      element.type !== FieldSelectTrigger &&
-      element.type !== FieldCheckbox &&
-      element.type !== FieldSwitch &&
-      element.type !== FieldRadioGroup
-    ) {
-      return element;
-    }
-
-    return {
-      ...element,
-      props: {
-        ...element.props,
-        __fieldId,
-        __fieldInvalid,
-        __fieldRequired,
-        __fieldDisabled,
-      },
-    };
-  });
+export function FieldRow(props: FieldRowProps) {
+  const { children, ref, ...rest } = props;
 
   const finalProps = mergeProps(rest, {
     ref,
     'data-slot': 'field-row',
   });
 
-  return <label {...finalProps}>{enhancedChildren}</label>;
+  return <label {...finalProps}>{children}</label>;
 }

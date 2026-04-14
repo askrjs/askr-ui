@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test';
-import { createIsland } from '@askrjs/askr';
 import { Label } from '../../../src/components/primitives/label/label';
+import { mount, unmount } from '../../test-utils';
 
 describe('Label - Behavior', () => {
   let container: HTMLElement | undefined;

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vite-plus/test';
 import { Toggle } from '../../../src/components/primitives/toggle/toggle';
-import { createIsland } from '@askrjs/askr';
+import { mount, unmount } from '../../test-utils';
 
 describe('Toggle - Behavior', () => {
   let container: HTMLElement | undefined;

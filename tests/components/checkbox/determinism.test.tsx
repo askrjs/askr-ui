@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach } from 'vite-plus/test';
 import { Checkbox } from '../../../src/components/primitives/checkbox/checkbox';
-import { createIsland } from '@askrjs/askr';
+import { expectDeterministicRender } from '../../determinism';
+import { mount, unmount } from '../../test-utils';
 
 describe('Checkbox - Determinism', () => {
   it('renders deterministic native checkbox markup', () => {

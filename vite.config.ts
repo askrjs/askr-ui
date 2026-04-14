@@ -1,8 +1,9 @@
 import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { defineConfig } from 'vite-plus';
 
-const srcRoot = resolve(__dirname, 'src');
+const srcRoot = fileURLToPath(new URL('./src', import.meta.url));
 
 export default defineConfig({
   fmt: {

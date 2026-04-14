@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vite-plus/test';
 import { Checkbox } from '../../../src/components/primitives/checkbox/checkbox';
-import { createIsland } from '@askrjs/askr';
+import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Checkbox - Behavior', () => {
   let container: HTMLElement | undefined;
@@ -82,19 +82,22 @@ describe('Checkbox - Behavior', () => {
     container = mount(<Checkbox checked indeterminate />);
     const input = container.querySelector('input') as HTMLInputElement | null;
 
-    it('should forward ref prop on asChild', () => {
-      let refNode: HTMLElement | null = null;
-      const refCallback = (node: HTMLElement | null) => {
-        refNode = node;
-      };
-      container = mount(
-        <Checkbox asChild ref={refCallback as never}>
-          <div>Checkbox</div>
-        </Checkbox>
-      );
-      const div = container.querySelector('div') as HTMLElement;
-      expect(div).toBeTruthy();
-      expect(refNode).toBe(div);
-    });
+    expect(input).toBeTruthy();
+    expect(input?.getAttribute('aria-checked')).toBeNull();
+    expect(input?.getAttribute('data-state')).toBe('indeterminate');
+  });
+
+  it('forwards refs to the asChild host', () => {
+    let refNode: HTMLElement | null = null;
+
+    container = mount(
+      <Checkbox asChild ref={(node) => (refNode = node as HTMLElement | null)}>
+        <div>Checkbox</div>
+      </Checkbox>
+    );
+    const div = container.querySelector('div') as HTMLElement | null;
+
+    expect(div).toBeTruthy();
+    expect(refNode).toBe(div);
   });
 });

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test';
-import { createIsland } from '@askrjs/askr';
 import { Textarea } from '../../../src/components/primitives/textarea/textarea';
+import { mount, unmount } from '../../test-utils';
 
 describe('Textarea - Behavior', () => {
   let container: HTMLElement | undefined;

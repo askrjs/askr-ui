@@ -5,6 +5,12 @@ import {
   PopoverPortal,
   PopoverTrigger,
 } from '../../../src/components/composites/popover';
+import {
+  Dialog,
+  DialogContent,
+  DialogPortal,
+  DialogTrigger,
+} from '../../../src/components/composites/dialog';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Popover - Behavior', () => {

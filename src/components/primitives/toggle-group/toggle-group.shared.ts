@@ -1,6 +1,7 @@
 import { defineContext, readContext } from '@askrjs/askr';
+import type { ToggleGroupOrientation } from './toggle-group.types';
 
-export type ToggleGroupItemMetadata = {
+export type ToggleGroupRootItem = {
   value: string;
   disabled: boolean;
 };
@@ -12,12 +13,12 @@ export type ToggleGroupRootContextValue = {
   setValue: (value: string | string[]) => void;
   notifyItemsChanged: () => void;
   scheduleItemsSync: () => void;
-  orientation: 'horizontal' | 'vertical';
+  orientation: ToggleGroupOrientation;
   loop: boolean;
   disabled: boolean;
   currentIndex: number;
   setCurrentIndex: (index: number) => void;
-  items: ToggleGroupItemMetadata[];
+  items: ToggleGroupRootItem[];
 };
 
 export type ToggleGroupRenderContextValue = {
@@ -26,6 +27,7 @@ export type ToggleGroupRenderContextValue = {
 
 export const ToggleGroupRootContext =
   defineContext<ToggleGroupRootContextValue | null>(null);
+
 export const ToggleGroupRenderContext =
   defineContext<ToggleGroupRenderContextValue | null>(null);
 
@@ -33,7 +35,7 @@ export function readToggleGroupRootContext(): ToggleGroupRootContextValue {
   const context = readContext(ToggleGroupRootContext);
 
   if (!context) {
-    throw new Error('ToggleGroupItem must be used within <ToggleGroup>');
+    throw new Error('ToggleGroup components must be used within <ToggleGroup>');
   }
 
   return context;
@@ -50,13 +52,15 @@ export function readToggleGroupRenderContext(): ToggleGroupRenderContextValue {
 }
 
 export function createToggleGroupRenderContext(): ToggleGroupRenderContextValue {
-  let nextItemIndex = 0;
+  let itemIndex = 0;
 
   return {
-    claimItemIndex: () => {
-      const index = nextItemIndex;
-      nextItemIndex += 1;
-      return index;
-    },
+    claimItemIndex: () => itemIndex++,
   };
+}
+
+export const ToggleGroupContext = ToggleGroupRootContext;
+export type ToggleGroupContextValue = ToggleGroupRootContextValue;
+export function readToggleGroupContext(): ToggleGroupRootContextValue {
+  return readToggleGroupRootContext();
 }

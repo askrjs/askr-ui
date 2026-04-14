@@ -2,6 +2,7 @@ import { describe, it } from 'vite-plus/test';
 import { Badge } from '../../../src/components/primitives/badge';
 import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';
+import { BADGE_A11Y_CONTRACT } from '../../../src/components/primitives/badge/badge.a11y';
 
 describe('Badge - Accessibility', () => {
   it('has no automated axe violations for the default badge host', async () => {

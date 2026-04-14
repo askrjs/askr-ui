@@ -15,6 +15,7 @@ export function Input(props: InputInputProps | InputAsChildProps) {
   const focusProps = focusable({ disabled, tabIndex });
   const finalProps = mergeProps(rest, {
     ...focusProps,
+    disabled: disabled ? true : undefined,
     'data-slot': 'input',
     'data-disabled': disabled ? 'true' : undefined,
     ref,

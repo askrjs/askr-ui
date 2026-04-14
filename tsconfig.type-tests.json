@@ -13,9 +13,7 @@
       "@askrjs/askr-ui/composites/*": [
         "./src/components/composites/*/index.ts"
       ],
-      "@askrjs/askr-ui/patterns/*": [
-        "./src/components/patterns/*/index.ts"
-      ]
+      "@askrjs/askr-ui/patterns/*": ["./src/components/patterns/*/index.ts"]
     }
   },
   "include": ["tests/types/**/*.ts", "src/**/*.ts", "src/**/*.tsx"]

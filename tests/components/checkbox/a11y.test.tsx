@@ -2,6 +2,8 @@ import { describe, it, expect, afterEach, vi } from 'vite-plus/test';
 import { Checkbox } from '../../../src/components/primitives/checkbox/checkbox';
 import { createIsland } from '@askrjs/askr';
 import { axe } from 'vitest-axe';
+import { expectNoAxeViolations } from '../../accessibility';
+import { mount, unmount } from '../../test-utils';
 import { CHECKBOX_A11Y_CONTRACT } from '../../../src/components/primitives/checkbox/checkbox.a11y';
 
 describe('Checkbox - Accessibility', () => {

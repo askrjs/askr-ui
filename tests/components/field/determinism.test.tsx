@@ -12,7 +12,7 @@ import {
   FieldSwitch,
   Fieldset,
 } from '../../../src/components/composites/field/field';
-import { RadioGroupItem } from '../../../src/components/primitives/radio-group/radio-group';
+import { RadioGroupItem } from '../../../src/components/primitives/radio-group';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Field - Determinism', () => {

@@ -9,7 +9,7 @@ Askr UI is composed, not configured.
 Rather than `<Button icon="save" iconPosition="left">`, you compose:
 
 ```tsx
-import { Button } from '@askrjs/askr-ui/button';
+import { Button } from '@askrjs/askr-ui';
 import { SaveIcon } from '@askrjs/askr-lucide';
 
 <Button onPress={save}>
@@ -22,8 +22,7 @@ This keeps component APIs narrow. Behavior scales through composition, not prop 
 ## Field + Label composition
 
 ```tsx
-import { Field, FieldLabel } from '@askrjs/askr-ui/field';
-import { Input } from '@askrjs/askr-ui/input';
+import { Field, FieldLabel, Input } from '@askrjs/askr-ui';
 
 <Field id="email">
   <FieldLabel fieldId="email">Email address</FieldLabel>
@@ -46,8 +45,8 @@ import {
   DialogClose,
   DialogPortal,
   DialogOverlay,
-} from '@askrjs/askr-ui/dialog';
-import { Button } from '@askrjs/askr-ui/button';
+} from '@askrjs/askr-ui';
+import { Button } from '@askrjs/askr-ui';
 
 <Dialog>
   <DialogTrigger>
@@ -77,7 +76,7 @@ import {
   SelectPortal,
   SelectContent,
   SelectItem,
-} from '@askrjs/askr-ui/select';
+} from '@askrjs/askr-ui';
 
 <Select value={timezone()} onValueChange={setTimezone}>
   <SelectTrigger aria-label="Timezone">

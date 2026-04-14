@@ -1,4 +1,5 @@
-export { ToggleGroup, ToggleGroupItem } from './toggle-group';
+export { ToggleGroup } from './toggle-group-root';
+export { ToggleGroupItem } from './toggle-group-item';
 export {
   TOGGLE_GROUP_A11Y_CONTRACT,
   type ToggleGroupA11yContract,

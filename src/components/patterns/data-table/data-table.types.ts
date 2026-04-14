@@ -30,11 +30,6 @@ export type DataState =
   | 'empty'
   | 'filtered-empty';
 
-export type InjectedDataTableProps<T> = {
-  __table?: DataTableInstance<T>;
-  __tableId?: string;
-};
-
 export type DataTableSerializableState = {
   sorting: SortingState;
   filters: FilterState;

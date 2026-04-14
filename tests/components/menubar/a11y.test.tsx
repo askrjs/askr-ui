@@ -7,7 +7,9 @@ import {
   MenubarPortal,
   MenubarTrigger,
 } from '../../../src/components/composites/menubar';
+import { axe } from 'vitest-axe';
 import { expectNoAxeViolations } from '../../accessibility';
+import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Menubar - Accessibility', () => {
   let container: HTMLElement | undefined;

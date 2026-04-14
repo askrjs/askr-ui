@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import {
   RadioGroup,
   RadioGroupItem,
-} from '../../../src/components/primitives/radio-group/radio-group';
+} from '../../../src/components/primitives/radio-group';
 import { RADIO_GROUP_A11Y_CONTRACT } from '../../../src/components/primitives/radio-group/radio-group.a11y';
 import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';

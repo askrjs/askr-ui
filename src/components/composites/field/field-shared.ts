@@ -1,8 +1,10 @@
-export type InjectedFieldProps = {
-  __fieldId?: string;
-  __fieldInvalid?: boolean;
-  __fieldRequired?: boolean;
-  __fieldDisabled?: boolean;
+import { defineContext, readContext } from '@askrjs/askr';
+
+export type FieldContextValue = {
+  fieldId?: string;
+  invalid: boolean;
+  required: boolean;
+  disabled: boolean;
 };
 
 export type ResolvedFieldState = {
@@ -13,12 +15,18 @@ export type ResolvedFieldState = {
   resolvedDisabled: boolean;
 };
 
+export const FieldContext = defineContext<FieldContextValue | null>(null);
+
+export function readFieldContext(): FieldContextValue | null {
+  return readContext(FieldContext);
+}
+
 export function resolveFieldId(
   explicitId?: string,
-  injectedFieldId?: string
+  context?: FieldContextValue | null
 ): string {
-  if (injectedFieldId) {
-    return injectedFieldId;
+  if (context?.fieldId) {
+    return context.fieldId;
   }
 
   if (explicitId) {
@@ -35,15 +43,13 @@ export function resolveFieldState(props: {
   invalid?: boolean;
   required?: boolean;
   disabled?: boolean;
-  __fieldId?: string;
-  __fieldInvalid?: boolean;
-  __fieldRequired?: boolean;
-  __fieldDisabled?: boolean;
+  context?: FieldContextValue | null;
 }): ResolvedFieldState {
-  const resolvedInvalid = props.invalid ?? props.__fieldInvalid ?? false;
-  const resolvedRequired = props.required ?? props.__fieldRequired ?? false;
-  const resolvedDisabled = props.disabled ?? props.__fieldDisabled ?? false;
-  const baseId = resolveFieldId(props.fieldId, props.__fieldId);
+  const context = props.context ?? null;
+  const resolvedInvalid = props.invalid ?? context?.invalid ?? false;
+  const resolvedRequired = props.required ?? context?.required ?? false;
+  const resolvedDisabled = props.disabled ?? context?.disabled ?? false;
+  const baseId = resolveFieldId(props.fieldId, context);
   const describedBy = [
     `${baseId}-description`,
     resolvedInvalid ? `${baseId}-error` : null,

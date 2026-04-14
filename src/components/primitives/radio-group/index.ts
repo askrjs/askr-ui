@@ -1,4 +1,5 @@
-export { RadioGroup, RadioGroupItem } from './radio-group';
+export { RadioGroup } from './radio-group-root';
+export { RadioGroupItem } from './radio-group-item';
 export {
   RADIO_GROUP_A11Y_CONTRACT,
   type RadioGroupA11yContract,

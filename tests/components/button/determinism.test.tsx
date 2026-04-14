@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach, vi } from 'vite-plus/test';
 import { Button } from '../../../src/components/primitives/button/button';
 import { createIsland } from '@askrjs/askr';
+import { expectDeterministicRender } from '../../determinism';
 
 function mount(element: JSX.Element): HTMLElement {
   const container = document.createElement('div');
