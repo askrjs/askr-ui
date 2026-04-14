@@ -1,4 +1,4 @@
-import { resolveFieldState } from './field-shared';
+import { readFieldContext, resolveFieldState } from './field-shared';
 
 export type FieldControlStateProps = {
   fieldId?: string;
@@ -17,7 +17,10 @@ export function resolveFieldControlProps(
     resolvedInvalid,
     resolvedRequired,
     resolvedDisabled,
-  } = resolveFieldState(props);
+  } = resolveFieldState({
+    ...props,
+    context: readFieldContext(),
+  });
 
   return {
     resolvedRequired,

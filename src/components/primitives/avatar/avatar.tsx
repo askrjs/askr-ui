@@ -6,7 +6,7 @@ import {
   mergeProps,
 } from '@askrjs/askr/foundations';
 import { resolveCompoundId } from '../../_internal/id';
-import { collectJsxElements, mapJsxTree } from '../../_internal/jsx';
+import { collectJsxElements } from '../../_internal/jsx';
 import type {
   AvatarAsChildProps,
   AvatarFallbackAsChildProps,
@@ -15,16 +15,11 @@ import type {
   AvatarLoadingStatus,
   AvatarProps,
 } from './avatar.types';
+import { AvatarContext, readAvatarContext } from './avatar.shared';
 
 type AvatarEntry = {
   src: string | null;
   status: AvatarLoadingStatus;
-};
-
-type InjectedAvatarProps = {
-  __avatarId?: string;
-  __status?: AvatarLoadingStatus;
-  __setStatus?: (status: AvatarLoadingStatus) => void;
 };
 
 const avatarEntries = new Map<string, AvatarEntry>();
@@ -44,18 +39,20 @@ function getAvatarEntry(avatarId: string) {
   return created;
 }
 
-function readInjectedAvatarProps(
-  props: InjectedAvatarProps
-): Required<InjectedAvatarProps> {
-  if (!props.__avatarId || !props.__status || !props.__setStatus) {
-    throw new Error('Avatar components must be used within <Avatar>');
-  }
-
-  return {
-    __avatarId: props.__avatarId,
-    __status: props.__status,
-    __setStatus: props.__setStatus,
-  };
+function AvatarView(props: {
+  children?: unknown;
+  asChild: boolean;
+  finalProps: Record<string, unknown>;
+}) {
+  return props.asChild ? (
+    <Slot
+      asChild
+      {...props.finalProps}
+      children={props.children as JSX.Element}
+    />
+  ) : (
+    <span {...props.finalProps}>{props.children}</span>
+  );
 }
 
 export function Avatar(props: AvatarProps): JSX.Element;
@@ -77,70 +74,41 @@ export function Avatar(props: AvatarProps | AvatarAsChildProps) {
     entry.status = entry.src ? 'loading' : 'error';
   }
 
-  const enhancedChildren = mapJsxTree(children, (element) => {
-    if (element.type !== AvatarImage && element.type !== AvatarFallback) {
-      return element;
-    }
-
-    return {
-      ...element,
-      props: {
-        ...element.props,
-        __avatarId: avatarId,
-        __status: entry.status,
-        __setStatus: (status: AvatarLoadingStatus) => {
-          if (entry.status === status) {
-            return;
-          }
-
-          entry.status = status;
-          statusVersion.set(statusVersion() + 1);
-        },
-      },
-    };
-  });
   const finalProps = mergeProps(rest, {
     ref,
     'data-slot': 'avatar',
     'data-avatar': 'true',
     'data-state': entry.status,
   });
+  const context = {
+    avatarId,
+    status: entry.status,
+    setStatus: (status: AvatarLoadingStatus) => {
+      if (entry.status === status) {
+        return;
+      }
 
-  if (asChild) {
-    return (
-      <Slot
-        asChild
-        {...finalProps}
-        children={enhancedChildren as JSX.Element}
-      />
-    );
-  }
+      entry.status = status;
+      statusVersion.set(statusVersion() + 1);
+    },
+  };
 
-  return <span {...finalProps}>{enhancedChildren}</span>;
+  return (
+    <AvatarContext.Scope value={context}>
+      <AvatarView asChild={asChild === true} finalProps={finalProps}>
+        {children}
+      </AvatarView>
+    </AvatarContext.Scope>
+  );
 }
 
-export function AvatarImage(
-  props: AvatarImageProps & InjectedAvatarProps
-): JSX.Element {
-  const {
-    alt,
-    onLoadingStatusChange,
-    ref,
-    src,
-    __avatarId,
-    __status,
-    __setStatus,
-    ...rest
-  } = props;
-  const injected = readInjectedAvatarProps({
-    __avatarId,
-    __status,
-    __setStatus,
-  });
+export function AvatarImage(props: AvatarImageProps): JSX.Element {
+  const { alt, onLoadingStatusChange, ref, src, ...rest } = props;
+  const { status, setStatus } = readAvatarContext();
 
-  const setStatus = (status: AvatarLoadingStatus) => {
-    injected.__setStatus(status);
-    onLoadingStatusChange?.(status);
+  const updateStatus = (nextStatus: AvatarLoadingStatus) => {
+    setStatus(nextStatus);
+    onLoadingStatusChange?.(nextStatus);
   };
 
   const finalProps = mergeProps(rest, {
@@ -152,21 +120,21 @@ export function AvatarImage(
         | undefined,
       () => {
         if (!src) {
-          setStatus('error');
+          updateStatus('error');
         }
       }
     ),
     alt,
     src,
-    hidden: injected.__status !== 'loaded' ? true : undefined,
+    hidden: status !== 'loaded',
     'data-slot': 'avatar-image',
     'data-avatar-image': 'true',
-    'data-state': injected.__status,
+    'data-state': status,
     onLoad: () => {
-      setStatus('loaded');
+      updateStatus('loaded');
     },
     onError: () => {
-      setStatus('error');
+      updateStatus('error');
     },
   });
 
@@ -178,26 +146,19 @@ export function AvatarFallback(
   props: AvatarFallbackAsChildProps
 ): JSX.Element | null;
 export function AvatarFallback(
-  props:
-    | (AvatarFallbackProps & InjectedAvatarProps)
-    | (AvatarFallbackAsChildProps & InjectedAvatarProps)
+  props: AvatarFallbackProps | AvatarFallbackAsChildProps
 ) {
-  const { asChild, children, ref, __avatarId, __status, __setStatus, ...rest } =
-    props;
-  const injected = readInjectedAvatarProps({
-    __avatarId,
-    __status,
-    __setStatus,
-  });
+  const { asChild, children, ref, ...rest } = props;
+  const { status } = readAvatarContext();
   const finalProps = mergeProps(rest, {
     ref,
     'data-slot': 'avatar-fallback',
     'data-avatar-fallback': 'true',
-    'data-state': injected.__status,
+    'data-state': status,
   });
 
   return (
-    <Presence present={injected.__status !== 'loaded'}>
+    <Presence present={status !== 'loaded'}>
       {asChild ? (
         <Slot asChild {...finalProps} children={children} />
       ) : (

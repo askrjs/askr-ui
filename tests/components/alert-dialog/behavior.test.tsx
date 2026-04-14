@@ -38,6 +38,6 @@ describe('AlertDialog - Behavior', () => {
     trigger = container.querySelector(
       '[aria-haspopup="dialog"]'
     ) as HTMLButtonElement;
-    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
   });
 });

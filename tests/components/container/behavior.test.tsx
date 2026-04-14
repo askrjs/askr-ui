@@ -15,13 +15,14 @@ describe('Container - Behavior', () => {
     expect(container.querySelector('[data-slot="container"]')).not.toBeNull();
   });
 
-  it('should default to centered and fluid', () => {
+  it('should default to centered layout styles', () => {
     container = mount(<Container />);
     const el = container.querySelector(
       '[data-slot="container"]'
     ) as HTMLElement;
-    expect(el.getAttribute('data-centered')).toBe('true');
-    expect(el.getAttribute('data-fluid')).toBe('true');
+    expect(el.style.boxSizing).toBe('border-box');
+    expect(el.style.width).toBe('100%');
+    expect(el.style.marginInline).toBe('auto');
   });
 
   it('should pass through className', () => {

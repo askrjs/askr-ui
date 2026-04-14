@@ -41,7 +41,10 @@ describe('Public API', () => {
     expect(askrUi.Container).toBeDefined();
     expect(askrUi.CONTAINER_A11Y_CONTRACT).toBeDefined();
     expect(askrUi.Flex).toBeDefined();
+    expect(askrUi.Inline).toBeDefined();
+    expect(askrUi.Inline).toBe(askrUi.Flex);
     expect(askrUi.FLEX_A11Y_CONTRACT).toBeDefined();
+    expect(askrUi.INLINE_A11Y_CONTRACT).toBeDefined();
     expect(askrUi.Grid).toBeDefined();
     expect(askrUi.GRID_A11Y_CONTRACT).toBeDefined();
     expect(askrUi.Spacer).toBeDefined();

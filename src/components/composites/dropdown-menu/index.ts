@@ -1,13 +1,15 @@
+export { DropdownMenu } from './dropdown-menu-root';
 export {
-  DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuPortal,
-  DropdownMenuContent,
-  DropdownMenuItem,
+} from './dropdown-menu-trigger';
+export { DropdownMenuContent } from './dropdown-menu-content';
+export { DropdownMenuItem } from './dropdown-menu-item';
+export {
   DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from './dropdown-menu';
+} from './dropdown-menu-group';
 export {
   DROPDOWN_MENU_A11Y_CONTRACT,
   type DropdownMenuA11yContract,

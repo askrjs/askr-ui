@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
-import { createIsland } from '@askrjs/askr';
 import { Switch } from '../../../src/components/primitives/switch/switch';
+import { mount, unmount } from '../../test-utils';
+import { flushUpdates } from '../../test-utils';
 
 describe('Switch - Behavior', () => {
   let container: HTMLElement | undefined;

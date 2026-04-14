@@ -1,17 +1,8 @@
-export {
-  Menubar,
-  MenubarMenu,
-  MenubarTrigger,
-  MenubarPortal,
-  MenubarContent,
-  MenubarItem,
-  MenubarGroup,
-  MenubarLabel,
-  MenubarSeparator,
-  MenubarSub,
-  MenubarSubTrigger,
-  MenubarSubContent,
-} from './menubar';
+export { Menubar } from './menubar-root';
+export { MenubarMenu, MenubarTrigger, MenubarPortal } from './menubar-menu';
+export { MenubarContent, MenubarSubContent } from './menubar-content';
+export { MenubarItem, MenubarSub, MenubarSubTrigger } from './menubar-item';
+export { MenubarGroup, MenubarLabel, MenubarSeparator } from './menubar-group';
 export {
   MENUBAR_A11Y_CONTRACT,
   type MenubarA11yContract,

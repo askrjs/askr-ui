@@ -2,8 +2,8 @@
 
 Reference for all `@askrjs/askr-ui` components.
 
-> Category-level entry points mirror the package taxonomy. Per-component subpaths remain
-> available when you want the narrowest possible import.
+> The package root re-exports the public surface. Narrower imports remain available
+> through the published `primitives/*`, `composites/*`, and `patterns/*` subpaths.
 
 ## Foundation components
 
@@ -29,13 +29,13 @@ import {
   Toggle,
   ToggleGroup,
   VisuallyHidden,
-} from '@askrjs/askr-ui/foundation';
+} from '@askrjs/askr-ui';
 ```
 
 ## Focus components
 
 ```ts
-import { DismissableLayer, FocusRing, FocusScope } from '@askrjs/askr-ui/focus';
+import { DismissableLayer, FocusRing, FocusScope } from '@askrjs/askr-ui';
 ```
 
 ## Overlay components
@@ -50,32 +50,28 @@ import {
   DialogOverlay,
   DialogPortal,
   DialogClose,
-} from '@askrjs/askr-ui/dialog';
+} from '@askrjs/askr-ui';
 import {
   AlertDialog,
   AlertDialogTrigger,
   AlertDialogContent,
   AlertDialogAction,
   AlertDialogCancel,
-} from '@askrjs/askr-ui/alert-dialog';
+} from '@askrjs/askr-ui';
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
   PopoverPortal,
-} from '@askrjs/askr-ui/popover';
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from '@askrjs/askr-ui/tooltip';
+} from '@askrjs/askr-ui';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@askrjs/askr-ui';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from '@askrjs/askr-ui/dropdown-menu';
-import { Menu, MenuContent, MenuItem } from '@askrjs/askr-ui/overlay';
+} from '@askrjs/askr-ui';
+import { Menu, MenuContent, MenuItem } from '@askrjs/askr-ui';
 ```
 
 ## Disclosure components
@@ -86,57 +82,49 @@ import {
   AccordionItem,
   AccordionTrigger,
   AccordionContent,
-} from '@askrjs/askr-ui/accordion';
+} from '@askrjs/askr-ui';
 import {
   Collapsible,
   CollapsibleTrigger,
   CollapsibleContent,
-} from '@askrjs/askr-ui/collapsible';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@askrjs/askr-ui/tabs';
+} from '@askrjs/askr-ui';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@askrjs/askr-ui';
 ```
 
 ## Status components
 
 ```ts
-import { Badge } from '@askrjs/askr-ui/badge';
-import { Spinner } from '@askrjs/askr-ui/spinner';
-import { Skeleton } from '@askrjs/askr-ui/skeleton';
-import { Progress } from '@askrjs/askr-ui/progress';
-import { ProgressCircle } from '@askrjs/askr-ui/progress-circle';
-import { Toast, ToastProvider } from '@askrjs/askr-ui/toast';
+import { Badge } from '@askrjs/askr-ui';
+import { Spinner } from '@askrjs/askr-ui';
+import { Skeleton } from '@askrjs/askr-ui';
+import { Progress } from '@askrjs/askr-ui';
+import { ProgressCircle } from '@askrjs/askr-ui';
+import { Toast, ToastProvider } from '@askrjs/askr-ui';
 ```
 
 ## Identity components
 
 ```ts
-import { Avatar } from '@askrjs/askr-ui/identity';
+import { Avatar } from '@askrjs/askr-ui';
 ```
 
 ## Navigation components
 
 ```ts
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-} from '@askrjs/askr-ui/breadcrumb';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@askrjs/askr-ui';
 import {
   Pagination,
   PaginationItem,
   PaginationPrev,
   PaginationNext,
-} from '@askrjs/askr-ui/pagination';
-import {
-  Menubar,
-  MenubarMenu,
-  MenubarTrigger,
-} from '@askrjs/askr-ui/navigation';
+} from '@askrjs/askr-ui';
+import { Menubar, MenubarMenu, MenubarTrigger } from '@askrjs/askr-ui';
 import {
   NavigationMenu,
   NavigationMenuList,
   NavigationMenuItem,
   NavigationMenuTrigger,
-} from '@askrjs/askr-ui/navigation';
+} from '@askrjs/askr-ui';
 ```
 
 ## Layout components
@@ -147,12 +135,12 @@ import {
   Container,
   DataTable,
   Grid,
-  Inline,
+  Flex,
   SidebarLayout,
   Spacer,
   Stack,
   TopbarLayout,
-} from '@askrjs/askr-ui/layout';
+} from '@askrjs/askr-ui';
 ```
 
 ## See also
