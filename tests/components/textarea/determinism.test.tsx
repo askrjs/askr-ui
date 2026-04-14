@@ -3,11 +3,14 @@ import { Textarea } from '../../../src/components/primitives/textarea/textarea';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Textarea - Determinism', () => {
-  it('should render deterministic textarea markup', () => {
+  it('renders deterministic native textarea markup', () => {
     expectDeterministicRender(() => <Textarea rows={4}>Notes</Textarea>);
+  });
+
+  it('renders deterministic asChild textarea markup', () => {
     expectDeterministicRender(() => (
       <Textarea asChild>
-        <div role="textbox">Custom notes</div>
+        <textarea aria-label="Notes">Custom notes</textarea>
       </Textarea>
     ));
   });

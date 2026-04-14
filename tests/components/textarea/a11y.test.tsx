@@ -5,15 +5,27 @@ import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';
 
 describe('Textarea - Accessibility', () => {
-  it('should have no automated axe violations given labelled textarea', async () => {
+  it('has no automated axe violations for a labelled native textarea', async () => {
     await expectNoAxeViolations(<Textarea aria-label="Notes" rows={3} />);
   });
 
-  it('should expose aria-disabled when disabled', () => {
-    const container = mount(<Textarea disabled />);
+  it('has no automated axe violations for a labelled asChild textarea', async () => {
+    await expectNoAxeViolations(
+      <Textarea asChild>
+        <textarea aria-label="Notes" rows={3} />
+      </Textarea>
+    );
+  });
+
+  it('uses native disabled semantics for the default host', () => {
+    const container = mount(<Textarea aria-label="Notes" disabled />);
 
     try {
-      const textarea = container.querySelector('textarea');
+      const textarea = container.querySelector(
+        'textarea'
+      ) as HTMLTextAreaElement | null;
+
+      expect(textarea?.disabled).toBe(true);
       expect(
         textarea?.getAttribute(
           TEXTAREA_A11Y_CONTRACT.DISABLED_ATTRIBUTES.asChild
@@ -24,14 +36,44 @@ describe('Textarea - Accessibility', () => {
     }
   });
 
-  it('should preserve native host semantics from contract', () => {
-    const container = mount(<Textarea />);
+  it('uses native disabled semantics for disabled asChild textarea hosts', () => {
+    const container = mount(
+      <Textarea asChild disabled>
+        <textarea aria-label="Notes" />
+      </Textarea>
+    );
 
     try {
-      const host = container.querySelector(TEXTAREA_A11Y_CONTRACT.HOST_ELEMENT);
-      expect(host).toBeTruthy();
+      const host = container.querySelector(
+        'textarea'
+      ) as HTMLTextAreaElement | null;
+
+      expect(host?.disabled).toBe(true);
+      expect(
+        host?.getAttribute(TEXTAREA_A11Y_CONTRACT.DISABLED_ATTRIBUTES.asChild)
+      ).toBe('true');
     } finally {
       unmount(container);
     }
+  });
+
+  it('matches the documented textarea accessibility contract', () => {
+    expect(TEXTAREA_A11Y_CONTRACT.HOST_ELEMENT).toBe('textarea');
+    expect(TEXTAREA_A11Y_CONTRACT.DISABLED_ATTRIBUTES).toEqual({
+      native: 'disabled',
+      asChild: 'disabled',
+    });
+    expect(TEXTAREA_A11Y_CONTRACT.DATA_ATTRIBUTES).toEqual({
+      disabled: 'data-disabled',
+    });
+    expect(TEXTAREA_A11Y_CONTRACT.FOCUS_RULES).toEqual({
+      defaultTabIndex: 0,
+      disabledTabIndex: -1,
+    });
+    expect(TEXTAREA_A11Y_CONTRACT.LABELING).toEqual({
+      supportsLabelElement: true,
+      supportsAriaLabel: true,
+      supportsAriaLabelledBy: true,
+    });
   });
 });

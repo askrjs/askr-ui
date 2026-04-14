@@ -4,25 +4,25 @@ import {
   AlertDialogContent,
   AlertDialogPortal,
   AlertDialogTrigger,
-} from '../../src/components/alert-dialog';
+} from '../../src/components';
 import {
   Dialog,
   DialogContent,
   DialogPortal,
   DialogTrigger,
-} from '../../src/components/dialog';
+} from '../../src/components';
 import {
   Popover,
   PopoverContent,
   PopoverPortal,
   PopoverTrigger,
-} from '../../src/components/popover';
+} from '../../src/components';
 import {
   Tooltip,
   TooltipContent,
   TooltipPortal,
   TooltipTrigger,
-} from '../../src/components/tooltip';
+} from '../../src/components';
 
 describe('Overlay benches', () => {
   bench('create Dialog tree', () => {

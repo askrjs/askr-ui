@@ -3,7 +3,7 @@ import {
   Toggle,
   type ToggleAsChildProps,
   type ToggleButtonProps,
-} from '../../src/components/toggle';
+} from '../../src/components';
 
 describe('Toggle benches', () => {
   bench('create native <button>', () => {

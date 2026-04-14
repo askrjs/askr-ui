@@ -5,72 +5,298 @@ import {
   RadioGroupItem,
 } from '../../../src/components/primitives/radio-group/radio-group';
 
-function mount(element: JSX.Element): HTMLElement {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-  createIsland({
-    root: container,
-    component: () => element,
-  });
-  return container;
-}
+function getRadioByText(container: HTMLElement, text: string): HTMLElement {
+  const radio = Array.from(
+    container.querySelectorAll('[data-slot="radio-group-item"]')
+  ).find((element) => element.textContent?.trim() === text);
 
-function unmount(container: HTMLElement) {
-  if (container.parentNode) {
-    container.parentNode.removeChild(container);
+  if (!(radio instanceof HTMLElement)) {
+    throw new Error(`Unable to find radio item with text "${text}"`);
   }
+
+  return radio;
 }
 
-describe('RadioGroup — Behavior', () => {
-  let container: HTMLElement;
+describe('RadioGroup - Behavior', () => {
+  let container: HTMLElement | undefined;
 
   afterEach(() => {
-    if (container) {
-      unmount(container);
-    }
+    unmount(container);
+    container = undefined;
   });
 
-  it('renders radiogroup semantics in uncontrolled mode', () => {
+  it('renders the radiogroup container and checked hooks in uncontrolled mode', () => {
     container = mount(
-      <RadioGroup defaultValue="b">
-        <RadioGroupItem value="a">A</RadioGroupItem>
-        <RadioGroupItem value="b">B</RadioGroupItem>
+      <RadioGroup defaultValue="medium" orientation="horizontal">
+        <RadioGroupItem value="small">Small</RadioGroupItem>
+        <RadioGroupItem value="medium">Medium</RadioGroupItem>
+      </RadioGroup>
+    );
+    const group = container.querySelector('[data-slot="radio-group"]');
+    const small = getRadioByText(container, 'Small');
+    const medium = getRadioByText(container, 'Medium');
+
+    expect(group?.getAttribute('role')).toBe(
+      RADIO_GROUP_A11Y_CONTRACT.GROUP_ROLE
+    );
+    expect(group?.getAttribute('data-orientation')).toBe('horizontal');
+    expect(group?.getAttribute('aria-orientation')).toBe('horizontal');
+    expect(small.getAttribute('role')).toBe(
+      RADIO_GROUP_A11Y_CONTRACT.ITEM_ROLE
+    );
+    expect(small.getAttribute('aria-checked')).toBe('false');
+    expect(small.getAttribute('data-state')).toBe('unchecked');
+    expect(medium.getAttribute('aria-checked')).toBe('true');
+    expect(medium.getAttribute('data-state')).toBe('checked');
+  });
+
+  it('updates uncontrolled selection and hidden input value', async () => {
+    container = mount(
+      <RadioGroup name="size" defaultValue="small">
+        <RadioGroupItem value="small">Small</RadioGroupItem>
+        <RadioGroupItem value="medium">Medium</RadioGroupItem>
       </RadioGroup>
     );
 
-    const group = container.querySelector('[role="radiogroup"]');
-    const items = container.querySelectorAll('button');
+    getRadioByText(container, 'Medium').click();
+    await flushUpdates();
 
-    expect(group).toBeTruthy();
-    expect(items[0]?.getAttribute('aria-checked')).toBe('false');
-    expect(items[1]?.getAttribute('aria-checked')).toBe('true');
+    expect(
+      getRadioByText(container, 'Small').getAttribute('aria-checked')
+    ).toBe('false');
+    expect(
+      getRadioByText(container, 'Medium').getAttribute('aria-checked')
+    ).toBe('true');
+    expect(
+      container.querySelector('input[type="hidden"]')?.getAttribute('value')
+    ).toBe('medium');
   });
 
-  it('calls onValueChange when a different item is selected', () => {
+  it('supports nested radio items without relying on direct child cloning', async () => {
+    container = mount(
+      <RadioGroup name="size" defaultValue="small">
+        <div>
+          <RadioGroupItem value="small">Small</RadioGroupItem>
+        </div>
+        <div>
+          <RadioGroupItem value="medium">Medium</RadioGroupItem>
+        </div>
+      </RadioGroup>
+    );
+
+    getRadioByText(container, 'Medium').click();
+    await flushUpdates();
+
+    expect(
+      getRadioByText(container, 'Small').getAttribute('aria-checked')
+    ).toBe('false');
+    expect(
+      getRadioByText(container, 'Medium').getAttribute('aria-checked')
+    ).toBe('true');
+    expect(
+      container.querySelector('input[type="hidden"]')?.getAttribute('value')
+    ).toBe('medium');
+  });
+
+  it('treats value as controlled state when provided', async () => {
     const onValueChange = vi.fn();
+
     container = mount(
-      <RadioGroup value="a" onValueChange={onValueChange}>
-        <RadioGroupItem value="a">A</RadioGroupItem>
-        <RadioGroupItem value="b">B</RadioGroupItem>
+      <RadioGroup value="small" onValueChange={onValueChange}>
+        <RadioGroupItem value="small">Small</RadioGroupItem>
+        <RadioGroupItem value="medium">Medium</RadioGroupItem>
       </RadioGroup>
     );
 
-    const items = container.querySelectorAll('button');
-    items[1]?.click();
+    getRadioByText(container, 'Medium').click();
+    await flushUpdates();
 
-    expect(onValueChange).toHaveBeenCalledWith('b');
+    expect(onValueChange).toHaveBeenCalledWith('medium');
+    expect(
+      getRadioByText(container, 'Small').getAttribute('aria-checked')
+    ).toBe('true');
+    expect(
+      getRadioByText(container, 'Medium').getAttribute('aria-checked')
+    ).toBe('false');
   });
 
-  it('renders a hidden input when name is provided', () => {
+  it('blocks interaction when the group or item is disabled', async () => {
+    const onGroupValueChange = vi.fn();
+    const onItemValueChange = vi.fn();
+
     container = mount(
-      <RadioGroup name="size" defaultValue="m">
-        <RadioGroupItem value="s">S</RadioGroupItem>
-        <RadioGroupItem value="m">M</RadioGroupItem>
+      <div>
+        <RadioGroup
+          disabled
+          defaultValue="small"
+          onValueChange={onGroupValueChange}
+        >
+          <RadioGroupItem value="small">Group small</RadioGroupItem>
+          <RadioGroupItem value="medium">Group medium</RadioGroupItem>
+        </RadioGroup>
+        <RadioGroup defaultValue="medium" onValueChange={onItemValueChange}>
+          <RadioGroupItem value="small" disabled>
+            Item small
+          </RadioGroupItem>
+          <RadioGroupItem value="medium">Item medium</RadioGroupItem>
+        </RadioGroup>
+      </div>
+    );
+    const groupMedium = getRadioByText(
+      container,
+      'Group medium'
+    ) as HTMLButtonElement;
+    const itemSmall = getRadioByText(
+      container,
+      'Item small'
+    ) as HTMLButtonElement;
+
+    expect(groupMedium.disabled).toBe(true);
+    expect(itemSmall.disabled).toBe(true);
+
+    groupMedium.click();
+    itemSmall.click();
+    await flushUpdates();
+
+    expect(onGroupValueChange).not.toHaveBeenCalled();
+    expect(onItemValueChange).not.toHaveBeenCalled();
+    expect(
+      getRadioByText(container, 'Item medium').getAttribute('aria-checked')
+    ).toBe('true');
+  });
+
+  it('supports asChild item composition and merges host props', () => {
+    container = mount(
+      <RadioGroup defaultValue="left">
+        <RadioGroupItem
+          asChild
+          value="left"
+          data-testid="radio-item"
+          data-from-radio="yes"
+        >
+          <span data-from-child="yes">Left</span>
+        </RadioGroupItem>
+      </RadioGroup>
+    );
+    const host = getRadioByText(container, 'Left');
+
+    expect(host.getAttribute('role')).toBe(RADIO_GROUP_A11Y_CONTRACT.ITEM_ROLE);
+    expect(host.getAttribute('data-testid')).toBe('radio-item');
+    expect(host.getAttribute('data-from-radio')).toBe('yes');
+    expect(host.getAttribute('data-from-child')).toBe('yes');
+    expect(host.getAttribute('aria-checked')).toBe('true');
+    expect(host.getAttribute('data-state')).toBe('checked');
+  });
+
+  it('forwards refs to the group container and item hosts', () => {
+    let groupRef: HTMLDivElement | null = null;
+    let nativeItemRef: HTMLButtonElement | null = null;
+    let childItemRef: HTMLElement | null = null;
+
+    container = mount(
+      <RadioGroup ref={(node) => (groupRef = node)} defaultValue="left">
+        <RadioGroupItem ref={(node) => (nativeItemRef = node)} value="left">
+          Left
+        </RadioGroupItem>
+      </RadioGroup>
+    );
+    const group = container.querySelector(
+      '[data-slot="radio-group"]'
+    ) as HTMLDivElement | null;
+    const nativeItem = getRadioByText(container, 'Left') as HTMLButtonElement;
+
+    expect(groupRef).toBe(group);
+    expect(nativeItemRef).toBe(nativeItem);
+
+    unmount(container);
+    container = mount(
+      <RadioGroup defaultValue="left">
+        <RadioGroupItem
+          asChild
+          ref={(node) => (childItemRef = node as HTMLElement | null)}
+          value="left"
+        >
+          <span>Left</span>
+        </RadioGroupItem>
+      </RadioGroup>
+    );
+    const childHost = getRadioByText(container, 'Left');
+
+    expect(childItemRef).toBe(childHost);
+  });
+
+  it('renders a hidden input only when name is provided', () => {
+    container = mount(
+      <div>
+        <RadioGroup defaultValue="small">
+          <RadioGroupItem value="small">Unnamed small</RadioGroupItem>
+        </RadioGroup>
+        <RadioGroup name="named-size" defaultValue="medium">
+          <RadioGroupItem value="medium">Named medium</RadioGroupItem>
+        </RadioGroup>
+      </div>
+    );
+    const inputs = Array.from(
+      container.querySelectorAll('input[type="hidden"]')
+    );
+
+    expect(inputs).toHaveLength(1);
+    expect(inputs[0]?.getAttribute('name')).toBe('named-size');
+    expect(inputs[0]?.getAttribute('value')).toBe('medium');
+  });
+
+  it('does not wrap selection at boundaries when loop is false', async () => {
+    container = mount(
+      <RadioGroup defaultValue="small" orientation="horizontal" loop={false}>
+        <RadioGroupItem value="small">Small</RadioGroupItem>
+        <RadioGroupItem value="medium">Medium</RadioGroupItem>
       </RadioGroup>
     );
 
-    const input = container.querySelector('input[type="hidden"]');
-    expect(input?.getAttribute('name')).toBe('size');
-    expect(input?.getAttribute('value')).toBe('m');
+    const small = getRadioByText(container, 'Small');
+    small.focus();
+    small.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true })
+    );
+    await flushUpdates();
+
+    expect(
+      getRadioByText(container, 'Small').getAttribute('aria-checked')
+    ).toBe('true');
+    expect(
+      getRadioByText(container, 'Medium').getAttribute('aria-checked')
+    ).toBe('false');
+  });
+
+  it('does not activate disabled items during keyboard navigation attempts', async () => {
+    container = mount(
+      <RadioGroup defaultValue="small" orientation="vertical">
+        <RadioGroupItem value="small">Small</RadioGroupItem>
+        <RadioGroupItem value="medium" disabled>
+          Medium
+        </RadioGroupItem>
+        <RadioGroupItem value="large">Large</RadioGroupItem>
+      </RadioGroup>
+    );
+
+    const small = getRadioByText(container, 'Small');
+    small.focus();
+    small.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
+    );
+    small.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })
+    );
+    await flushUpdates();
+
+    expect(
+      getRadioByText(container, 'Small').getAttribute('aria-checked')
+    ).toBe('true');
+    expect(
+      getRadioByText(container, 'Medium').getAttribute('aria-checked')
+    ).toBe('false');
+    expect(
+      getRadioByText(container, 'Large').getAttribute('aria-checked')
+    ).toBe('false');
   });
 });

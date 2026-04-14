@@ -6,7 +6,7 @@ export const TEXTAREA_A11Y_CONTRACT = {
   HOST_ELEMENT: 'textarea' as const,
   DISABLED_ATTRIBUTES: {
     native: 'disabled' as const,
-    asChild: 'aria-disabled' as const,
+    asChild: 'disabled' as const,
   },
   DATA_ATTRIBUTES: {
     disabled: 'data-disabled' as const,

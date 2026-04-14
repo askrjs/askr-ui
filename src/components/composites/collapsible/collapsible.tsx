@@ -1,3 +1,4 @@
+import { defineContext, readContext } from '@askrjs/askr';
 import {
   Slot,
   Presence,
@@ -16,12 +17,15 @@ import type {
   CollapsibleTriggerProps,
 } from './collapsible.types';
 
-type InjectedCollapsibleProps = {
-  __open?: boolean;
-  __setOpen?: (open: boolean) => void;
-  __disabled?: boolean;
-  __contentId?: string;
+type CollapsibleRootContextValue = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  disabled: boolean;
+  contentId: string;
 };
+
+const CollapsibleRootContext =
+  defineContext<CollapsibleRootContextValue | null>(null);
 
 let pendingFocusRestoreId: string | null = null;
 
@@ -110,39 +114,14 @@ function resolveCollapsibleContentId(props: CollapsibleProps): string {
   });
 }
 
-function cloneCollapsibleChild(
-  child: unknown,
-  injected: InjectedCollapsibleProps
-): unknown {
-  if (
-    !isJsxElement(child) ||
-    (child.type !== CollapsibleTrigger && child.type !== CollapsibleContent)
-  ) {
-    return child;
-  }
+function readCollapsibleRootContext(): CollapsibleRootContextValue {
+  const context = readContext(CollapsibleRootContext);
 
-  return {
-    ...child,
-    props: {
-      ...child.props,
-      ...injected,
-    },
-  };
-}
-
-function readInjectedState(
-  props: InjectedCollapsibleProps
-): Required<InjectedCollapsibleProps> {
-  if (!props.__setOpen || props.__open === undefined || !props.__contentId) {
+  if (!context) {
     throw new Error('Collapsible components must be used within <Collapsible>');
   }
 
-  return {
-    __open: props.__open,
-    __setOpen: props.__setOpen,
-    __disabled: props.__disabled ?? false,
-    __contentId: props.__contentId,
-  };
+  return context;
 }
 
 export function Collapsible(props: CollapsibleProps) {
@@ -168,16 +147,18 @@ export function Collapsible(props: CollapsibleProps) {
     onOpenChange,
     disabled,
   });
-  const enhancedChildren = toChildArray(children).map((child) =>
-    cloneCollapsibleChild(child, {
-      __open: openState(),
-      __setOpen: openState.set,
-      __disabled: disabled,
-      __contentId: contentId,
-    })
-  );
+  const rootContext: CollapsibleRootContextValue = {
+    open: openState(),
+    setOpen: openState.set,
+    disabled,
+    contentId,
+  };
 
-  return <>{enhancedChildren}</>;
+  return (
+    <CollapsibleRootContext.Scope value={rootContext}>
+      {children}
+    </CollapsibleRootContext.Scope>
+  );
 }
 
 export function CollapsibleTrigger(props: CollapsibleTriggerProps): JSX.Element;
@@ -185,28 +166,12 @@ export function CollapsibleTrigger(
   props: CollapsibleTriggerAsChildProps
 ): JSX.Element;
 export function CollapsibleTrigger(
-  props:
-    | (CollapsibleTriggerProps & InjectedCollapsibleProps)
-    | (CollapsibleTriggerAsChildProps & InjectedCollapsibleProps)
+  props: CollapsibleTriggerProps | CollapsibleTriggerAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    ref,
-    __open,
-    __setOpen,
-    __disabled,
-    __contentId,
-    ...rest
-  } = props;
-  const injected = readInjectedState({
-    __open,
-    __setOpen,
-    __disabled,
-    __contentId,
-  });
+  const { asChild, children, ref, ...rest } = props;
+  const root = readCollapsibleRootContext();
   const restoreFocusRef = (node: HTMLElement | null) => {
-    if (node && pendingFocusRestoreId === injected.__contentId) {
+    if (node && pendingFocusRestoreId === root.contentId) {
       pendingFocusRestoreId = null;
       node.focus();
     }
@@ -217,15 +182,15 @@ export function CollapsibleTrigger(
       'currentTarget' in event &&
       event.currentTarget === document.activeElement
     ) {
-      pendingFocusRestoreId = injected.__contentId;
+      pendingFocusRestoreId = root.contentId;
     }
-    injected.__setOpen(!injected.__open);
+    root.setOpen(!root.open);
     if (event && 'currentTarget' in event) {
       (event.currentTarget as HTMLElement | null)?.focus?.();
     }
   };
   const interactionProps = pressable({
-    disabled: injected.__disabled,
+    disabled: root.disabled,
     onPress: (event) => toggleOpen(event as Event),
     isNativeButton: !asChild,
   });
@@ -240,10 +205,10 @@ export function CollapsibleTrigger(
       restoreFocusRef
     ),
     'data-slot': 'collapsible-trigger',
-    'aria-expanded': injected.__open ? 'true' : 'false',
-    'aria-controls': injected.__contentId,
-    'data-state': injected.__open ? 'open' : 'closed',
-    'data-disabled': injected.__disabled ? 'true' : undefined,
+    'aria-expanded': root.open ? 'true' : 'false',
+    'aria-controls': root.contentId,
+    'data-state': root.open ? 'open' : 'closed',
+    'data-disabled': root.disabled ? 'true' : undefined,
     onKeyDown: !asChild
       ? (event: KeyboardEvent) => {
           if (event.key === ' ') {
@@ -281,36 +246,19 @@ export function CollapsibleContent(
   props: CollapsibleContentAsChildProps
 ): JSX.Element | null;
 export function CollapsibleContent(
-  props:
-    | (CollapsibleContentProps & InjectedCollapsibleProps)
-    | (CollapsibleContentAsChildProps & InjectedCollapsibleProps)
+  props: CollapsibleContentProps | CollapsibleContentAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    forceMount = false,
-    ref,
-    __open,
-    __setOpen,
-    __disabled,
-    __contentId,
-    ...rest
-  } = props;
-  const injected = readInjectedState({
-    __open,
-    __setOpen,
-    __disabled,
-    __contentId,
-  });
+  const { asChild, children, forceMount = false, ref, ...rest } = props;
+  const root = readCollapsibleRootContext();
   const finalProps = mergeProps(rest, {
     ref,
-    id: injected.__contentId,
+    id: root.contentId,
     'data-slot': 'collapsible-content',
-    'data-state': injected.__open ? 'open' : 'closed',
+    'data-state': root.open ? 'open' : 'closed',
   });
 
   return (
-    <Presence present={forceMount || injected.__open}>
+    <Presence present={forceMount || root.open}>
       {asChild ? (
         <Slot asChild {...finalProps} children={children} />
       ) : (

@@ -5,10 +5,6 @@ export type ContainerOwnProps = {
   maxWidth?: string;
   /** CSS padding-inline value or named spacing token. Inline style only applied for real CSS lengths. */
   padding?: string;
-  /** Centers the container by applying margin-inline: auto. */
-  centered?: boolean;
-  /** Stretches the container to 100% width. */
-  fluid?: boolean;
   /** Named size token (e.g. sm, md, lg, xl) – data attribute only, no inline style. */
   size?: string;
   children?: unknown;

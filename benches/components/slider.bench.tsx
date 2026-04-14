@@ -4,7 +4,7 @@ import {
   SliderRange,
   SliderThumb,
   SliderTrack,
-} from '../../src/components/slider';
+} from '../../src/components';
 
 describe('Slider benches', () => {
   bench('create slider', () => {

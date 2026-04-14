@@ -6,7 +6,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from '../../src/components/navigation-menu';
+} from '../../src/components';
 
 describe('NavigationMenu benches', () => {
   bench('create navigation menu', () => {

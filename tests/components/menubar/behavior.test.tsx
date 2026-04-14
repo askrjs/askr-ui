@@ -86,6 +86,7 @@ describe('Menubar - Behavior', () => {
     );
     await flushPortalUpdates();
 
+    expect(getButtonByText('File').getAttribute('aria-expanded')).toBe('true');
     expect(document.body.textContent).toContain('Email');
   });
 

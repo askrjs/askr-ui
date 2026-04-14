@@ -79,4 +79,102 @@ describe('Slider - Behavior', () => {
     const root = container.querySelector('[data-slot="slider"]') as HTMLElement;
     expect(root?.getAttribute('style')).toContain('--ak-slider-percentage:25%');
   });
+
+  it('should support Home/End/PageUp/PageDown keyboard boundaries', async () => {
+    container = mount(
+      <Slider defaultValue={50} min={0} max={100} step={5} name="volume">
+        <SliderTrack>
+          <SliderRange />
+          <SliderThumb />
+        </SliderTrack>
+      </Slider>
+    );
+
+    let thumb = container.querySelector('[role="slider"]') as HTMLDivElement;
+    const input = container.querySelector(
+      'input[type="hidden"]'
+    ) as HTMLInputElement;
+
+    thumb.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'PageUp', bubbles: true })
+    );
+    await flushUpdates();
+    expect(input.value).toBe('100');
+
+    thumb = container.querySelector('[role="slider"]') as HTMLDivElement;
+
+    thumb.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'End', bubbles: true })
+    );
+    await flushUpdates();
+    expect(input.value).toBe('100');
+
+    thumb = container.querySelector('[role="slider"]') as HTMLDivElement;
+
+    thumb.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true })
+    );
+    await flushUpdates();
+    expect(input.value).toBe('50');
+
+    thumb = container.querySelector('[role="slider"]') as HTMLDivElement;
+
+    thumb.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Home', bubbles: true })
+    );
+    await flushUpdates();
+    expect(input.value).toBe('0');
+  });
+
+  it('should ignore pointer and keyboard updates when disabled', async () => {
+    container = mount(
+      <Slider disabled defaultValue={30} name="volume">
+        <SliderTrack>
+          <SliderRange />
+          <SliderThumb />
+        </SliderTrack>
+      </Slider>
+    );
+
+    const track = container.querySelector(
+      '[data-slider-track="true"]'
+    ) as HTMLDivElement;
+
+    track.getBoundingClientRect = () =>
+      ({
+        left: 0,
+        top: 0,
+        width: 100,
+        height: 10,
+        right: 100,
+        bottom: 10,
+        x: 0,
+        y: 0,
+        toJSON: () => null,
+      }) as DOMRect;
+
+    track.dispatchEvent(
+      new PointerEvent('pointerdown', {
+        bubbles: true,
+        clientX: 90,
+        clientY: 5,
+      })
+    );
+    await flushUpdates();
+
+    const thumb = container.querySelector('[role="slider"]') as HTMLDivElement;
+    const input = container.querySelector(
+      'input[type="hidden"]'
+    ) as HTMLInputElement;
+
+    thumb.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })
+    );
+    await flushUpdates();
+
+    expect(input.value).toBe('30');
+    expect(thumb.getAttribute('aria-valuenow')).toBe('30');
+    expect(thumb.getAttribute('aria-disabled')).toBe('true');
+    expect(input.disabled).toBe(true);
+  });
 });

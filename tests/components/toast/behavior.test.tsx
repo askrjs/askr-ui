@@ -79,10 +79,34 @@ describe('Toast - Behavior', () => {
 
     expect(container.querySelector('[data-toast="true"]')).not.toBeNull();
 
-    await vi.advanceTimersByTimeAsync(60);
+    await vi.runAllTimersAsync();
+    await flushUpdates();
     await flushUpdates();
 
     expect(container.querySelector('[data-toast="true"]')).toBeNull();
+  });
+
+  it('dismisses multiple open toasts when timers expire at the same time', async () => {
+    vi.useFakeTimers();
+    container = mount(
+      <ToastProvider duration={40}>
+        <ToastViewport />
+        <Toast id="first" defaultOpen={true}>
+          <ToastTitle>First timed</ToastTitle>
+        </Toast>
+        <Toast id="second" defaultOpen={true}>
+          <ToastTitle>Second timed</ToastTitle>
+        </Toast>
+      </ToastProvider>
+    );
+    await flushUpdates();
+
+    expect(container.querySelectorAll('[data-toast="true"]').length).toBe(2);
+
+    await vi.advanceTimersByTimeAsync(60);
+    await flushUpdates();
+
+    expect(container.querySelectorAll('[data-toast="true"]').length).toBe(0);
   });
 
   it('restores focus after closing a controlled toast', async () => {

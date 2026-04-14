@@ -1,6 +1,7 @@
-export const INLINE_A11Y_CONTRACT = {
+export const FLEX_A11Y_CONTRACT = {
   DATA_ATTRIBUTES: {
     slot: 'data-slot' as const,
+    direction: 'data-direction' as const,
     gap: 'data-gap' as const,
     align: 'data-align' as const,
     justify: 'data-justify' as const,
@@ -12,4 +13,6 @@ export const INLINE_A11Y_CONTRACT = {
   },
 } as const;
 
-export type InlineA11yContract = typeof INLINE_A11Y_CONTRACT;
+export type FlexA11yContract = typeof FLEX_A11Y_CONTRACT;
+export const INLINE_A11Y_CONTRACT = FLEX_A11Y_CONTRACT;
+export type InlineA11yContract = FlexA11yContract;

@@ -26,7 +26,8 @@
  * - Visual disabled styling (consumer responsibility)
  *
  * ## Indeterminate State
- * - aria-checked='mixed' for visually indeterminate state
+ * - `asChild`: aria-checked='mixed'
+ * - native input: current host path omits aria-checked and keeps data-state='indeterminate'
  * - Typically used for "select all" checkboxes when partial selection
  */
 
@@ -43,14 +44,14 @@ export const CHECKBOX_A11Y_CONTRACT = {
    * Keyboard activation keys
    *
    * Both Enter and Space must activate checkbox.
-   * Foundation handles implementation.
+   * Native inputs get this from host semantics. The `asChild` path applies it.
    */
   KEYBOARD_ACTIVATION: ['Enter', 'Space'] as const,
 
   /**
    * Checked state attribute
    *
-   * MUST be set to 'true', 'false', or 'mixed' (never undefined).
+   * MUST be set to 'true', 'false', or 'mixed' for the active host semantics.
    * - 'true': checked
    * - 'false': unchecked
    * - 'mixed': indeterminate (visually ambiguous)
@@ -63,7 +64,8 @@ export const CHECKBOX_A11Y_CONTRACT = {
    * Indeterminate state
    *
    * When indeterminate=true:
-   * - aria-checked='mixed'
+   * - `asChild`: aria-checked='mixed'
+   * - native input: current host path omits aria-checked and keeps data-state='indeterminate'
    * - Visual indeterminate indicator (consumer responsibility)
    * - Does NOT affect checked state (orthogonal)
    */
@@ -107,3 +109,5 @@ export const CHECKBOX_A11Y_CONTRACT = {
     visualIndicator: 'required',
   },
 } as const;
+
+export type CheckboxA11yContract = typeof CHECKBOX_A11Y_CONTRACT;

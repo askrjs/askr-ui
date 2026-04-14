@@ -9,6 +9,13 @@ export function isJsxElement(value: unknown): value is JSXElement {
   );
 }
 
+export function hasJsxIntrinsicType(
+  value: unknown,
+  expectedType: string
+): value is JSXElement {
+  return isJsxElement(value) && value.type === expectedType;
+}
+
 export function toChildArray(children: unknown): unknown[] {
   if (Array.isArray(children)) {
     return children;

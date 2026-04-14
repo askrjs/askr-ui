@@ -15,29 +15,12 @@ import {
 } from '../../../src/components/composites/field/field';
 import { RadioGroupItem } from '../../../src/components/primitives/radio-group/radio-group';
 
-function mount(element: JSX.Element): HTMLElement {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-  createIsland({
-    root: container,
-    component: () => element,
-  });
-  return container;
-}
-
-function unmount(container: HTMLElement) {
-  if (container.parentNode) {
-    container.parentNode.removeChild(container);
-  }
-}
-
-describe('Field — Behavior', () => {
-  let container: HTMLElement;
+describe('Field - Behavior', () => {
+  let container: HTMLElement | undefined;
 
   afterEach(() => {
-    if (container) {
-      unmount(container);
-    }
+    unmount(container);
+    container = undefined;
   });
 
   it('wires field metadata onto its control', () => {

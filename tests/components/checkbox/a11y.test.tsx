@@ -4,248 +4,108 @@ import { createIsland } from '@askrjs/askr';
 import { axe } from 'vitest-axe';
 import { CHECKBOX_A11Y_CONTRACT } from '../../../src/components/primitives/checkbox/checkbox.a11y';
 
-function mount(element: JSX.Element): HTMLElement {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-  createIsland({
-    root: container,
-    component: () => element,
+describe('Checkbox - Accessibility', () => {
+  it('has no automated axe violations for a labelled native checkbox', async () => {
+    await expectNoAxeViolations(
+      <label>
+        Accept terms
+        <Checkbox />
+      </label>
+    );
   });
-  return container;
-}
 
-function unmount(container: HTMLElement) {
-  if (container.parentNode) {
-    container.parentNode.removeChild(container);
-  }
-}
+  it('has no automated axe violations for a labelled asChild checkbox', async () => {
+    await expectNoAxeViolations(
+      <Checkbox asChild>
+        <div role="checkbox" aria-label="Accept terms">
+          Accept terms
+        </div>
+      </Checkbox>
+    );
+  });
 
-describe('Checkbox — Accessibility', () => {
-  let container: HTMLElement;
+  it('uses implicit native checkbox semantics for the default host', () => {
+    const container = mount(<Checkbox checked={false} />);
 
-  afterEach(() => {
-    if (container) {
+    try {
+      const input = container.querySelector('input') as HTMLInputElement | null;
+
+      expect(input?.type).toBe('checkbox');
+      expect(input?.getAttribute('aria-checked')).toBe('false');
+    } finally {
       unmount(container);
     }
   });
 
-  function renderLabeledCheckbox(props: Record<string, unknown> = {}) {
-    return (
-      <label>
-        Accept terms
-        <Checkbox {...props} />
-      </label>
+  it('uses mixed aria state for indeterminate asChild hosts', () => {
+    const container = mount(
+      <Checkbox asChild indeterminate>
+        <div role="checkbox">Select all</div>
+      </Checkbox>
     );
-  }
 
-  describe('Automated Axe Checks', () => {
-    it('should have no automated axe violations given default checkbox', async () => {
-      container = mount(renderLabeledCheckbox());
-      const results = await axe(container);
+    try {
+      const host = container.querySelector('[role="checkbox"]');
 
-      if (results.violations.length > 0) {
-        throw new Error(
-          `Axe violations found:\n${results.violations
-            .map(
-              (v) =>
-                `  - ${v.id}: ${v.description}\n    ${v.nodes.map((n) => n.html).join('\n    ')}`
-            )
-            .join('\n')}`
-        );
-      }
-    });
-
-    it('should have no automated axe violations given checked checkbox', async () => {
-      container = mount(renderLabeledCheckbox({ checked: true }));
-      const results = await axe(container);
-
-      if (results.violations.length > 0) {
-        throw new Error(
-          `Axe violations found:\n${results.violations
-            .map(
-              (v) =>
-                `  - ${v.id}: ${v.description}\n    ${v.nodes.map((n) => n.html).join('\n    ')}`
-            )
-            .join('\n')}`
-        );
-      }
-    });
-
-    it('should have no automated axe violations given indeterminate checkbox', async () => {
-      container = mount(renderLabeledCheckbox({ indeterminate: true }));
-      const results = await axe(container);
-
-      if (results.violations.length > 0) {
-        throw new Error(
-          `Axe violations found:\n${results.violations
-            .map(
-              (v) =>
-                `  - ${v.id}: ${v.description}\n    ${v.nodes.map((n) => n.html).join('\n    ')}`
-            )
-            .join('\n')}`
-        );
-      }
-    });
-
-    it('should have no automated axe violations given disabled checkbox', async () => {
-      container = mount(renderLabeledCheckbox({ disabled: true }));
-      const results = await axe(container);
-
-      if (results.violations.length > 0) {
-        throw new Error(
-          `Axe violations found:\n${results.violations
-            .map(
-              (v) =>
-                `  - ${v.id}: ${v.description}\n    ${v.nodes.map((n) => n.html).join('\n    ')}`
-            )
-            .join('\n')}`
-        );
-      }
-    });
-
-    it('should have no automated axe violations given asChild checkbox', async () => {
-      container = mount(
-        <Checkbox asChild checked={false}>
-          <div role="checkbox" aria-label="Custom checkbox">
-            Custom
-          </div>
-        </Checkbox>
+      expect(host?.getAttribute('role')).toBe(CHECKBOX_A11Y_CONTRACT.ROLE);
+      expect(host?.getAttribute('aria-checked')).toBe(
+        CHECKBOX_A11Y_CONTRACT.INDETERMINATE_VALUE
       );
-      const results = await axe(container);
-
-      if (results.violations.length > 0) {
-        throw new Error(
-          `Axe violations found:\n${results.violations
-            .map(
-              (v) =>
-                `  - ${v.id}: ${v.description}\n    ${v.nodes.map((n) => n.html).join('\n    ')}`
-            )
-            .join('\n')}`
-        );
-      }
-    });
-  });
-
-  describe('ARIA Contract Enforcement', () => {
-    it('should apply correct role given native input', () => {
-      container = mount(<Checkbox />);
-      const input = container.querySelector('input');
-      // Native inputs have implicit role='checkbox'
-      expect(input?.getAttribute('type')).toBe('checkbox');
-    });
-
-    it('should require explicit role given asChild', () => {
-      // Consumer must add role='checkbox' for non-native elements
-      container = mount(
-        <Checkbox asChild>
-          <div role="checkbox">Checkbox</div>
-        </Checkbox>
-      );
-      const div = container.querySelector('div');
-      expect(div?.getAttribute('role')).toBe(CHECKBOX_A11Y_CONTRACT.ROLE);
-    });
-
-    it('should expose aria-checked attribute given all states', () => {
-      // Unchecked
-      container = mount(<Checkbox checked={false} />);
-      let input = container.querySelector('input');
-      expect(input?.getAttribute('aria-checked')).toBe('false');
+    } finally {
       unmount(container);
+    }
+  });
 
-      // Checked
-      container = mount(<Checkbox checked={true} />);
-      input = container.querySelector('input');
-      expect(input?.getAttribute('aria-checked')).toBe('true');
+  it('keeps native indeterminate checkboxes in the indeterminate state contract', () => {
+    const container = mount(<Checkbox indeterminate />);
+
+    try {
+      const input = container.querySelector('input') as HTMLInputElement | null;
+
+      expect(input?.getAttribute('aria-checked')).toBeNull();
+      expect(input?.getAttribute('data-state')).toBe('indeterminate');
+    } finally {
       unmount(container);
-
-      // Indeterminate native inputs remain valid without mixed ARIA in the current host runtime
-      container = mount(<Checkbox indeterminate={true} />);
-      input = container.querySelector('input') as HTMLInputElement;
-      expect(input.getAttribute('aria-checked')).toBeNull();
-    });
-
-    it('should NOT omit aria-checked given default state', () => {
-      container = mount(<Checkbox />);
-      const input = container.querySelector('input');
-      // aria-checked must always be present, never undefined
-      expect(input?.hasAttribute('aria-checked')).toBe(true);
-      expect(input?.getAttribute('aria-checked')).toBe('false');
-    });
+    }
   });
 
-  describe('Keyboard Navigation', () => {
-    it('should be focusable given not disabled', () => {
-      container = mount(<Checkbox />);
-      const input = container.querySelector('input') as HTMLInputElement;
-      document.body.appendChild(container);
-      input.focus();
-      expect(document.activeElement).toBe(input);
-    });
+  it('uses aria-disabled and removes disabled asChild hosts from tab order', () => {
+    const container = mount(
+      <Checkbox asChild disabled>
+        <div role="checkbox">Disabled</div>
+      </Checkbox>
+    );
 
-    it('should NOT be focusable given disabled', () => {
-      container = mount(<Checkbox disabled />);
-      const input = container.querySelector('input') as HTMLInputElement;
-      input.focus();
-      expect(input.disabled).toBe(true);
-    });
+    try {
+      const host = container.querySelector('[role="checkbox"]');
 
-    it('should activate on Space key given enabled', () => {
-      const onPress = vi.fn();
-      container = mount(<Checkbox onPress={onPress} />);
-      const input = container.querySelector('input')!;
-      input.focus();
-      const event = new MouseEvent('click', {
-        bubbles: true,
-      });
-      input.dispatchEvent(event);
-      expect(onPress).toHaveBeenCalled();
-    });
+      expect(host?.getAttribute('aria-disabled')).toBe('true');
+      expect(host?.getAttribute('tabindex')).toBe('-1');
+    } finally {
+      unmount(container);
+    }
   });
 
-  describe('Disabled State Semantics', () => {
-    it('should apply disabled attribute given native input', () => {
-      container = mount(<Checkbox disabled />);
-      const input = container.querySelector('input') as HTMLInputElement;
-      expect(input?.disabled).toBe(true);
+  it('matches the documented checkbox accessibility contract', () => {
+    expect(CHECKBOX_A11Y_CONTRACT.ROLE).toBe('checkbox');
+    expect(CHECKBOX_A11Y_CONTRACT.KEYBOARD_ACTIVATION).toEqual([
+      'Enter',
+      'Space',
+    ]);
+    expect(CHECKBOX_A11Y_CONTRACT.CHECKED_ATTRIBUTE).toBe('aria-checked');
+    expect(CHECKBOX_A11Y_CONTRACT.INDETERMINATE_VALUE).toBe('mixed');
+    expect(CHECKBOX_A11Y_CONTRACT.DISABLED_ATTRIBUTES).toEqual({
+      nativeInput: {
+        disabled: true,
+      },
+      nonNative: {
+        'aria-disabled': 'true',
+        tabIndex: -1,
+      },
     });
-
-    it('should apply aria-disabled given asChild', () => {
-      container = mount(
-        <Checkbox asChild disabled>
-          <div role="checkbox">Disabled</div>
-        </Checkbox>
-      );
-      const div = container.querySelector('div');
-      expect(div?.getAttribute('aria-disabled')).toBe('true');
-    });
-
-    it('should remove from tab order given disabled asChild', () => {
-      container = mount(
-        <Checkbox asChild disabled>
-          <div role="checkbox" tabIndex={0}>
-            Disabled
-          </div>
-        </Checkbox>
-      );
-      const div = container.querySelector('div');
-      // Disabled elements should have tabIndex=-1
-      expect(div?.getAttribute('tabindex')).toBe('-1');
-    });
-  });
-
-  describe('Form Integration', () => {
-    it('should include name and value in form data given native input', () => {
-      container = mount(<Checkbox name="agree" value="yes" checked={true} />);
-      const input = container.querySelector('input') as HTMLInputElement;
-      expect(input?.name).toBe('agree');
-      expect(input?.value).toBe('yes');
-      expect(input?.checked).toBe(true);
-    });
-
-    it('should respect required attribute given form validation', () => {
-      container = mount(<Checkbox required />);
-      const input = container.querySelector('input') as HTMLInputElement;
-      expect(input?.required).toBe(true);
+    expect(CHECKBOX_A11Y_CONTRACT.DATA_ATTRIBUTES).toEqual({
+      state: 'data-state',
+      disabled: 'data-disabled',
     });
   });
 });

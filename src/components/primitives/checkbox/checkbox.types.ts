@@ -16,7 +16,7 @@ export type PressEvent = {
  *
  * ## Type-level Invariants
  * - onClick is PROHIBITED — use onPress instead
- * - checked is controlled state (no onChange, consumer manages state)
+ * - checked supports controlled and uncontrolled ownership through checked/defaultChecked
  * - asChild discriminates between native input and polymorphic rendering
  * - indeterminate is visual-only and orthogonal to checked state
  *
@@ -32,6 +32,8 @@ export type CheckboxOwnProps = {
   children?: unknown;
   onPress?: (e: PressEvent) => void;
   checked?: boolean;
+  defaultChecked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
   indeterminate?: boolean;
   disabled?: boolean;
   required?: boolean;

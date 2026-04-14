@@ -5,7 +5,7 @@ import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';
 
 describe('Label - Accessibility', () => {
-  it('should have no automated axe violations given labelled form control', async () => {
+  it('has no automated axe violations given labelled form control', async () => {
     await expectNoAxeViolations(
       <div>
         <Label htmlFor="email">Email</Label>
@@ -25,5 +25,17 @@ describe('Label - Accessibility', () => {
     } finally {
       unmount(container);
     }
+  });
+
+  it('matches the documented label accessibility contract', () => {
+    expect(LABEL_A11Y_CONTRACT.ELEMENT).toBe('label');
+    expect(LABEL_A11Y_CONTRACT.ASSOCIATION_ATTRIBUTE).toBe('for');
+    expect(LABEL_A11Y_CONTRACT.DATA_ATTRIBUTES).toEqual({
+      slot: 'data-slot',
+    });
+    expect(LABEL_A11Y_CONTRACT.AS_CHILD).toEqual({
+      forwardsProps: true,
+      preservesChildElement: true,
+    });
   });
 });

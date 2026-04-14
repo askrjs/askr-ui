@@ -6,6 +6,8 @@ import * as patternDataTable from '../src/components/patterns/data-table';
 
 describe('Public API', () => {
   it('exposes the 1.0 public component surface from the root entrypoint', () => {
+    expect('createAskRComponent' in askrUi).toBe(false);
+    expect('AskRComponent' in askrUi).toBe(false);
     expect(askrUi.FocusRing).toBeDefined();
     expect(askrUi.FocusScope).toBeDefined();
     expect(askrUi.DismissableLayer).toBeDefined();
@@ -38,14 +40,10 @@ describe('Public API', () => {
     // Layout primitives
     expect(askrUi.Container).toBeDefined();
     expect(askrUi.CONTAINER_A11Y_CONTRACT).toBeDefined();
-    expect(askrUi.Stack).toBeDefined();
-    expect(askrUi.STACK_A11Y_CONTRACT).toBeDefined();
-    expect(askrUi.Inline).toBeDefined();
-    expect(askrUi.INLINE_A11Y_CONTRACT).toBeDefined();
+    expect(askrUi.Flex).toBeDefined();
+    expect(askrUi.FLEX_A11Y_CONTRACT).toBeDefined();
     expect(askrUi.Grid).toBeDefined();
     expect(askrUi.GRID_A11Y_CONTRACT).toBeDefined();
-    expect(askrUi.Center).toBeDefined();
-    expect(askrUi.CENTER_A11Y_CONTRACT).toBeDefined();
     expect(askrUi.Spacer).toBeDefined();
     expect(askrUi.SPACER_A11Y_CONTRACT).toBeDefined();
     expect(askrUi.SidebarLayout).toBeDefined();

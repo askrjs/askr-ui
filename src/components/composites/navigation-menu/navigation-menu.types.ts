@@ -41,8 +41,14 @@ export type NavigationMenuContentProps = BoxProps<'div', HTMLDivElement> &
 export type NavigationMenuContentAsChildProps = BoxAsChildProps &
   NavigationMenuContentOwnProps;
 
-export type NavigationMenuLinkProps = BoxProps<'a', HTMLAnchorElement>;
-export type NavigationMenuLinkAsChildProps = BoxAsChildProps;
+export type NavigationMenuLinkOwnProps = {
+  disabled?: boolean;
+};
+
+export type NavigationMenuLinkProps = BoxProps<'a', HTMLAnchorElement> &
+  NavigationMenuLinkOwnProps;
+export type NavigationMenuLinkAsChildProps = BoxAsChildProps &
+  NavigationMenuLinkOwnProps;
 
 export type NavigationMenuViewportProps = BoxProps<'div', HTMLDivElement>;
 export type NavigationMenuViewportAsChildProps = BoxAsChildProps;
