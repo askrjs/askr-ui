@@ -1,21 +1,22 @@
 import type { JSXElement, Ref } from '@askrjs/askr/foundations';
+import type {
+  BoxLayoutOwnProps,
+  LayoutResponsive,
+} from '../box/box.types';
 
-export type FlexOwnProps = {
-  /** Flex direction. Defaults to 'row'. */
-  direction?: 'row' | 'column';
-  /** CSS gap value or named spacing token. Inline style only applied for real CSS lengths. */
-  gap?: string;
-  /** CSS align-items value. */
-  align?: string;
-  /** CSS justify-content value. */
-  justify?: string;
-  /** CSS flex-wrap value. */
-  wrap?: 'wrap' | 'nowrap' | 'wrap-reverse';
+export type FlexOwnProps = BoxLayoutOwnProps & {
+  direction?: LayoutResponsive<'row' | 'column' | 'row-reverse' | 'column-reverse'>;
+  gap?: LayoutResponsive<string | number>;
+  gapX?: LayoutResponsive<string | number>;
+  gapY?: LayoutResponsive<string | number>;
+  align?: LayoutResponsive<string>;
+  justify?: LayoutResponsive<string>;
+  wrap?: LayoutResponsive<'wrap' | 'nowrap' | 'wrap-reverse'>;
   /**
-   * Named breakpoint below which a row layout collapses to a column.
-   * Official themes recognize `sm`, `md`, `lg`, and `xl`.
+   * Compatibility breakpoint helper. Prefer responsive `direction` instead.
    */
   collapseBelow?: string;
+  as?: 'div' | 'span';
   children?: unknown;
 };
 
@@ -24,20 +25,32 @@ export type FlexDivProps = Omit<
   'children' | 'ref'
 > &
   FlexOwnProps & {
+    as?: 'div';
     asChild?: false;
     ref?: Ref<HTMLDivElement>;
   };
 
-export type FlexAsChildProps = FlexOwnProps & {
+export type FlexSpanProps = Omit<
+  JSX.IntrinsicElements['span'],
+  'children' | 'ref'
+> &
+  FlexOwnProps & {
+    as: 'span';
+    asChild?: false;
+    ref?: Ref<HTMLSpanElement>;
+  };
+
+export type FlexAsChildProps = Omit<FlexOwnProps, 'as'> & {
   asChild: true;
   children: JSXElement;
   ref?: Ref<unknown>;
   style?: JSX.IntrinsicElements['div']['style'];
 };
 
-export type FlexProps = FlexDivProps | FlexAsChildProps;
+export type FlexProps = FlexDivProps | FlexSpanProps | FlexAsChildProps;
 
 export type InlineOwnProps = FlexOwnProps;
 export type InlineDivProps = FlexDivProps;
+export type InlineSpanProps = FlexSpanProps;
 export type InlineAsChildProps = FlexAsChildProps;
 export type InlineProps = FlexProps;

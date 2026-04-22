@@ -1,71 +1,113 @@
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
-import { isCssLength, mergeLayoutStyles } from '../../_internal/layout';
-import type { GridAsChildProps, GridDivProps } from './grid.types';
+import {
+  applyBoxLayoutStyles,
+  extractBoxDataAttributes,
+  splitBoxLayoutProps,
+  withBoxLayoutStyle,
+} from '../../_internal/box-layout';
+import {
+  resolveAlignValue,
+  resolveGridTrackValue,
+  resolveJustifyValue,
+  resolveSpaceValue,
+  serializeResponsiveValue,
+  setResponsiveStyleVar,
+} from '../../_internal/layout';
+import type { GridAsChildProps, GridDivProps, GridSpanProps } from './grid.types';
 
-function resolveGridTemplateColumns(
-  columns: number | string | undefined,
+function resolveCompatibilityGridTemplate(
   minItemWidth: string | undefined,
   autoFit: boolean | undefined
 ): string | undefined {
-  if (typeof columns === 'number') {
-    return `repeat(${columns}, minmax(0, 1fr))`;
-  }
-  if (typeof columns === 'string') {
-    const trimmed = columns.trim();
-    if (/^\d+$/.test(trimmed)) return `repeat(${trimmed}, minmax(0, 1fr))`;
-    return isCssLength(trimmed) ? trimmed : undefined;
-  }
-  if (isCssLength(minItemWidth)) {
-    const fitKeyword = autoFit === false ? 'auto-fill' : 'auto-fit';
-    return `repeat(${fitKeyword}, minmax(${minItemWidth!}, 1fr))`;
-  }
-  return undefined;
+  if (!minItemWidth) return undefined;
+  const fitKeyword = autoFit === false ? 'auto-fill' : 'auto-fit';
+  return `repeat(${fitKeyword}, minmax(${minItemWidth}, 1fr))`;
 }
 
 export function Grid(props: GridDivProps): JSX.Element;
+export function Grid(props: GridSpanProps): JSX.Element;
 export function Grid(props: GridAsChildProps): JSX.Element;
-export function Grid(props: GridDivProps | GridAsChildProps) {
+export function Grid(props: GridDivProps | GridSpanProps | GridAsChildProps) {
+  const as = 'as' in props ? props.as : 'div';
   const {
     asChild,
     children,
+    areas,
     columns,
-    minItemWidth,
+    rows,
+    flow,
     gap,
-    autoFit,
+    gapX,
+    gapY,
     align,
     justify,
+    minItemWidth,
+    autoFit,
     ref,
     style: userStyle,
     ...rest
   } = props;
 
-  const gridTemplateColumns = resolveGridTemplateColumns(
-    columns,
-    minItemWidth,
-    autoFit
+  const { boxProps, rest: passthroughProps } = splitBoxLayoutProps(rest);
+  const layoutStyle: Record<string, string | number> = {};
+  applyBoxLayoutStyles(layoutStyle, boxProps);
+
+  setResponsiveStyleVar(
+    layoutStyle,
+    'display',
+    boxProps.display ?? 'grid',
+    (value) => value
+  );
+  setResponsiveStyleVar(layoutStyle, 'grid-template-areas', areas, (value) => value);
+  setResponsiveStyleVar(
+    layoutStyle,
+    'grid-template-columns',
+    columns ?? resolveCompatibilityGridTemplate(minItemWidth, autoFit),
+    resolveGridTrackValue
+  );
+  setResponsiveStyleVar(
+    layoutStyle,
+    'grid-template-rows',
+    rows,
+    resolveGridTrackValue
+  );
+  setResponsiveStyleVar(layoutStyle, 'grid-auto-flow', flow, (value) => value);
+  setResponsiveStyleVar(layoutStyle, 'gap', gap, resolveSpaceValue);
+  setResponsiveStyleVar(layoutStyle, 'column-gap', gapX, resolveSpaceValue);
+  setResponsiveStyleVar(layoutStyle, 'row-gap', gapY, resolveSpaceValue);
+  setResponsiveStyleVar(layoutStyle, 'align-items', align, resolveAlignValue);
+  setResponsiveStyleVar(
+    layoutStyle,
+    'justify-content',
+    justify,
+    resolveJustifyValue
   );
 
-  const layoutStyle: Record<string, string | number> = { display: 'grid' };
-  if (gridTemplateColumns)
-    layoutStyle.gridTemplateColumns = gridTemplateColumns;
-  if (isCssLength(gap)) layoutStyle.gap = gap!;
-  if (align) layoutStyle.alignItems = align;
-  if (justify) layoutStyle.justifyItems = justify;
-
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeProps(passthroughProps, {
     ref,
     'data-slot': 'grid',
-    'data-columns': columns !== undefined ? String(columns) : undefined,
+    'data-ak-layout': 'true',
+    'data-areas': serializeResponsiveValue(areas),
+    'data-columns': serializeResponsiveValue(columns),
+    'data-rows': serializeResponsiveValue(rows),
+    'data-flow': serializeResponsiveValue(flow),
+    'data-gap': serializeResponsiveValue(gap),
+    'data-gap-x': serializeResponsiveValue(gapX),
+    'data-gap-y': serializeResponsiveValue(gapY),
+    'data-align': serializeResponsiveValue(align),
+    'data-justify': serializeResponsiveValue(justify),
     'data-min-item-width': minItemWidth,
-    'data-gap': gap,
     'data-auto-fit': autoFit !== undefined ? String(autoFit) : undefined,
-    'data-align': align,
-    'data-justify': justify,
-    style: mergeLayoutStyles(layoutStyle, userStyle),
+    ...extractBoxDataAttributes(boxProps),
+    style: withBoxLayoutStyle(layoutStyle, userStyle),
   });
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;
+  }
+
+  if (as === 'span') {
+    return <span {...finalProps}>{children}</span>;
   }
 
   return <div {...finalProps}>{children}</div>;

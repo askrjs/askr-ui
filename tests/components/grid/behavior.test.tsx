@@ -29,22 +29,26 @@ describe('Grid - Behavior', () => {
   it('should apply repeat columns style given a numeric columns prop', () => {
     container = mount(<Grid columns={3} />);
     const el = container.querySelector('[data-slot="grid"]') as HTMLElement;
-    expect(el.style.gridTemplateColumns).toBe('repeat(3, minmax(0, 1fr))');
+    expect(el.style.getPropertyValue('--ak-grid-template-columns-initial')).toBe(
+      'repeat(3, minmax(0, 1fr))'
+    );
   });
 
   it('should apply repeat columns style given a numeric string columns prop', () => {
     container = mount(<Grid columns="3" />);
     const el = container.querySelector('[data-slot="grid"]') as HTMLElement;
-    const style = el.getAttribute('style') ?? '';
-    expect(style).toContain('repeat(3, minmax(0, 1fr))');
+    expect(el.style.getPropertyValue('--ak-grid-template-columns-initial')).toBe(
+      'repeat(3, minmax(0, 1fr))'
+    );
   });
 
   it('should apply raw CSS string given a CSS length columns prop', () => {
     container = mount(<Grid columns="1fr 2fr 1fr" />);
-    // CSS grid string is not a plain CSS length, should not set inline style
     const el = container.querySelector('[data-slot="grid"]') as HTMLElement;
-    // data-columns attribute should still be set
     expect(el.getAttribute(GRID_A11Y_CONTRACT.DATA_ATTRIBUTES.columns)).toBe(
+      'initial:1fr 2fr 1fr'
+    );
+    expect(el.style.getPropertyValue('--ak-grid-template-columns-initial')).toBe(
       '1fr 2fr 1fr'
     );
   });
@@ -53,7 +57,7 @@ describe('Grid - Behavior', () => {
     container = mount(<Grid columns={2} />);
     const el = container.querySelector('[data-slot="grid"]');
     expect(el?.getAttribute(GRID_A11Y_CONTRACT.DATA_ATTRIBUTES.columns)).toBe(
-      '2'
+      'initial:2'
     );
   });
 
@@ -69,7 +73,7 @@ describe('Grid - Behavior', () => {
     container = mount(<Grid gap="1rem" />);
     const el = container.querySelector('[data-slot="grid"]');
     expect(el?.getAttribute(GRID_A11Y_CONTRACT.DATA_ATTRIBUTES.gap)).toBe(
-      '1rem'
+      'initial:1rem'
     );
   });
 

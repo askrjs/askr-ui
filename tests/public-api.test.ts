@@ -38,6 +38,8 @@ describe('Public API', () => {
     expect(askrUi.Menubar).toBeDefined();
     expect(askrUi.NavigationMenu).toBeDefined();
     // Layout primitives
+    expect(askrUi.Box).toBeDefined();
+    expect(askrUi.BOX_A11Y_CONTRACT).toBeDefined();
     expect(askrUi.Container).toBeDefined();
     expect(askrUi.CONTAINER_A11Y_CONTRACT).toBeDefined();
     expect(askrUi.Flex).toBeDefined();
@@ -47,6 +49,8 @@ describe('Public API', () => {
     expect(askrUi.INLINE_A11Y_CONTRACT).toBeDefined();
     expect(askrUi.Grid).toBeDefined();
     expect(askrUi.GRID_A11Y_CONTRACT).toBeDefined();
+    expect(askrUi.Section).toBeDefined();
+    expect(askrUi.SECTION_A11Y_CONTRACT).toBeDefined();
     expect(askrUi.Spacer).toBeDefined();
     expect(askrUi.SPACER_A11Y_CONTRACT).toBeDefined();
     expect(askrUi.SidebarLayout).toBeDefined();
