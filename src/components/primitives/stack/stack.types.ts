@@ -1,14 +1,7 @@
 import type { JSXElement, Ref } from '@askrjs/askr/foundations';
+import type { FlexOwnProps } from '../inline/inline.types';
 
-export type StackOwnProps = {
-  /** CSS gap value or named spacing token. Inline style only applied for real CSS lengths. */
-  gap?: string;
-  /** CSS align-items value. */
-  align?: string;
-  /** CSS justify-content value. */
-  justify?: string;
-  /** CSS flex-wrap value. */
-  wrap?: 'wrap' | 'nowrap' | 'wrap-reverse';
+export type StackOwnProps = Omit<FlexOwnProps, 'direction' | 'as'> & {
   children?: unknown;
 };
 

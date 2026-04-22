@@ -30,7 +30,7 @@ describe('Stack - Behavior', () => {
     container = mount(<Stack gap="1rem" />);
     const el = container.querySelector('[data-slot="stack"]');
     expect(el?.getAttribute(STACK_A11Y_CONTRACT.DATA_ATTRIBUTES.gap)).toBe(
-      '1rem'
+      'initial:1rem'
     );
   });
 
@@ -38,7 +38,7 @@ describe('Stack - Behavior', () => {
     container = mount(<Stack align="center" />);
     const el = container.querySelector('[data-slot="stack"]');
     expect(el?.getAttribute(STACK_A11Y_CONTRACT.DATA_ATTRIBUTES.align)).toBe(
-      'center'
+      'initial:center'
     );
   });
 
@@ -46,7 +46,7 @@ describe('Stack - Behavior', () => {
     container = mount(<Stack justify="space-between" />);
     const el = container.querySelector('[data-slot="stack"]');
     expect(el?.getAttribute(STACK_A11Y_CONTRACT.DATA_ATTRIBUTES.justify)).toBe(
-      'space-between'
+      'initial:space-between'
     );
   });
 
@@ -54,7 +54,15 @@ describe('Stack - Behavior', () => {
     container = mount(<Stack wrap="wrap" />);
     const el = container.querySelector('[data-slot="stack"]');
     expect(el?.getAttribute(STACK_A11Y_CONTRACT.DATA_ATTRIBUTES.wrap)).toBe(
-      'wrap'
+      'initial:wrap'
+    );
+  });
+
+  it('should serialize a column flex direction through the compatibility wrapper', () => {
+    container = mount(<Stack />);
+    const el = container.querySelector('[data-slot="stack"]') as HTMLElement;
+    expect(el.style.getPropertyValue('--ak-flex-direction-initial')).toBe(
+      'column'
     );
   });
 

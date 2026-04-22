@@ -4,5 +4,6 @@ export type {
   GridProps,
   GridOwnProps,
   GridDivProps,
+  GridSpanProps,
   GridAsChildProps,
 } from './grid.types';

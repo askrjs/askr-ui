@@ -9,9 +9,11 @@ export type {
   FlexProps,
   FlexOwnProps,
   FlexDivProps,
+  FlexSpanProps,
   FlexAsChildProps,
   FlexProps as InlineProps,
   FlexOwnProps as InlineOwnProps,
   FlexDivProps as InlineDivProps,
+  FlexSpanProps as InlineSpanProps,
   FlexAsChildProps as InlineAsChildProps,
 } from './inline.types';
