@@ -62,11 +62,8 @@
     "access": "public"
   },
   "scripts": {
-    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
-    "build:js": "vp build",
-    "build:types": "tsc -p tsconfig.build.json",
-    "build": "npm run clean && npm run build:js && npm run build:types",
-    "dev": "vp build --watch",
+    "build": "vp pack",
+    "dev": "vp pack --watch",
     "verify:foundations": "node scripts/check-foundations-contract.js",
     "test": "npm run verify:foundations && vp test run",
     "test:types": "tsc -p tsconfig.type-tests.json --noEmit",
@@ -89,7 +86,7 @@
     "vitest-axe": "^0.1.0"
   },
   "peerDependencies": {
-    "@askrjs/askr": "0.0.1"
+    "@askrjs/askr": "file:../askr"
   },
   "peerDependenciesMeta": {
     "@askrjs/askr": {
