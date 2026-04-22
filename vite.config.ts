@@ -17,6 +17,29 @@ export default defineConfig({
     jsx: 'automatic',
     jsxImportSource: '@askrjs/askr',
   },
+  resolve: {
+    preserveSymlinks: true,
+  },
+  pack: {
+    entry: {
+      index: resolve(srcRoot, 'index.ts'),
+      'components/composites/field/field': resolve(
+        srcRoot,
+        'components/composites/field/field.tsx'
+      ),
+    },
+    format: ['esm', 'cjs'],
+    outDir: 'dist',
+    platform: 'neutral',
+    tsconfig: 'tsconfig.pack.json',
+    dts: true,
+    sourcemap: true,
+    unbundle: true,
+    treeshake: false,
+    deps: {
+      neverBundle: [/^@askrjs\/askr(?:\/.*)?$/],
+    },
+  },
   build: {
     minify: false,
     sourcemap: true,
