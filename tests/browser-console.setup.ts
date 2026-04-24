@@ -1,5 +1,9 @@
 import { afterEach, beforeEach } from 'vite-plus/test';
-import { allowConsole, beginConsoleCapture, endConsoleCapture } from './browser-console';
+import {
+  allowConsole,
+  beginConsoleCapture,
+  endConsoleCapture,
+} from './browser-console';
 
 beforeEach(() => {
   beginConsoleCapture();

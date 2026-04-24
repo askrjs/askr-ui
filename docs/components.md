@@ -208,7 +208,7 @@ import {
 ## Layout components
 
 ```ts
-import { Container, Grid, Flex, Spacer } from '@askrjs/askr-ui';
+import { Box, Container, Grid, Flex, Section, Spacer } from '@askrjs/askr-ui';
 ```
 
 ## Pattern components

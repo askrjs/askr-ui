@@ -71,6 +71,8 @@
     "quality": "npm run build && npm test && npm run bench",
     "test:types": "tsc -p tsconfig.type-tests.json --noEmit",
     "bench": "cross-env NODE_ENV=production vp test bench --run --reporter=default --config vitest.bench.config.ts",
+    "inventory": "node scripts/generate-inventory.js",
+    "inventory:verify": "node scripts/generate-inventory.js --verify",
     "fmt": "vp fmt .",
     "lint": "vp fmt --check .",
     "generate": "node scripts/generate.js",
