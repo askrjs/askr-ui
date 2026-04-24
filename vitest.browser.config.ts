@@ -6,6 +6,10 @@ export default defineConfig({
   ...sharedVitestConfig,
   test: {
     ...sharedVitestConfig.test,
+    setupFiles: [
+      ...(sharedVitestConfig.test?.setupFiles ?? []),
+      './tests/browser-console.setup.ts',
+    ],
     browser: {
       enabled: true,
       headless: true,

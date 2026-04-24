@@ -285,7 +285,11 @@ Test ownership is split by environment:
 - **Jsdom**: `tests/components/icon/**`, `tests/components/consistency-reset/**`, and `tests/components/data-table/state.test.tsx`
 - **Browser**: public component `behavior`, `a11y`, and `determinism` suites, plus browser coverage for `data-table`
 
-Use `tests/warnings.ts` when a browser-mode flow should be warning-free. Keep it targeted to real contract or user-facing defects, not generic framework noise.
+Browser suites run with a shared zero-noise console policy. Valid public flows must not emit unexpected `console.warn`, `console.error`, `console.log`, `console.info`, or `console.debug`.
+
+If a browser test intentionally asserts console output, use the local escape hatch in `tests/browser-console.ts` and keep the allowance scoped to that one test. Do not wrap browser suites in ad hoc warning spies.
+
+Use `tests/warnings.ts` only for targeted node/jsdom warning assertions that are not part of the browser public-flow gate.
 
 Behavior, accessibility, and determinism tests for public components should live in browser mode unless a suite is explicitly about DOM-only internal contracts.
 

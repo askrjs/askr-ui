@@ -1,4 +1,4 @@
-import { For, state } from '@askrjs/askr';
+import { state } from '@askrjs/askr';
 import {
   Presence,
   Slot,
@@ -7,7 +7,6 @@ import {
 } from '@askrjs/askr/foundations';
 import { resource } from '@askrjs/askr/resources';
 import { resolveCompoundId } from '../../_internal/id';
-import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import type {
   AvatarAsChildProps,
   AvatarFallbackAsChildProps,
@@ -45,13 +44,6 @@ function AvatarView(props: {
   asChild: boolean;
   finalProps: Record<string, unknown>;
 }) {
-  const keyedChildren = For<unknown>(
-    () => toChildArray(props.children),
-    (child, index) =>
-      isJsxElement(child) && child.key != null ? child.key : index,
-    (child) => child as never
-  );
-
   return props.asChild ? (
     <Slot
       asChild
@@ -59,7 +51,7 @@ function AvatarView(props: {
       children={props.children as JSX.Element}
     />
   ) : (
-    <span {...props.finalProps}>{keyedChildren}</span>
+    <span {...props.finalProps}>{props.children}</span>
   );
 }
 

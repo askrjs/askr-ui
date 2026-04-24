@@ -176,7 +176,13 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={keyedChildren as unknown as JSX.Element} />;
+    return (
+      <Slot
+        asChild
+        {...finalProps}
+        children={keyedChildren as unknown as JSX.Element}
+      />
+    );
   }
 
   return <div {...finalProps}>{keyedChildren}</div>;

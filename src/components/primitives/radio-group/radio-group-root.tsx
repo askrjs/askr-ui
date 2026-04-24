@@ -69,9 +69,12 @@ function RadioGroupRootView(props: {
       }
     },
   });
-  const finalProps = mergeProps({}, {
-    ...nav.container,
-  });
+  const finalProps = mergeProps(
+    {},
+    {
+      ...nav.container,
+    }
+  );
   const keyedChildren = toChildArray(props.children).map((child, index) => {
     if (!isJsxElement(child) || child.key != null) {
       return child;
@@ -102,11 +105,7 @@ function RadioGroupRootView(props: {
     (child) => child as JSX.Element
   );
 
-  return (
-    <div {...finalProps}>
-      {renderedList}
-    </div>
-  );
+  return <div {...finalProps}>{renderedList}</div>;
 }
 
 export function RadioGroup(props: RadioGroupProps) {
