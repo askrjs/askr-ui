@@ -1,5 +1,5 @@
 import { state } from '@askrjs/askr';
-import { controllableState, mergeProps } from '@askrjs/askr/foundations';
+import { mergeProps } from '@askrjs/askr/foundations';
 import { resource } from '@askrjs/askr/resources';
 import {
   getCompositeCollection,
@@ -62,12 +62,34 @@ export function Tabs(props: TabsProps) {
     value: String(item.value ?? ''),
     disabled: item.disabled,
   }));
-  const valueState = controllableState({
-    value,
-    defaultValue: defaultValue ?? '',
-    onChange: onValueChange,
-  });
-  const initialValueApplied = state(false);
+  const internalValueState = state(defaultValue ?? '');
+  const isControlled = value !== undefined;
+  const valueState = (() => {
+    const read = () => (isControlled ? (value as string) : internalValueState());
+    read.set = (nextOrUpdater: string | ((prev: string) => string)) => {
+      const prev = read();
+      const next =
+        typeof nextOrUpdater === 'function'
+          ? (nextOrUpdater as (prev: string) => string)(prev)
+          : nextOrUpdater;
+
+      if (Object.is(prev, next)) {
+        return;
+      }
+
+      if (isControlled) {
+        onValueChange?.(next);
+        return;
+      }
+
+      internalValueState.set(nextOrUpdater as never);
+      onValueChange?.(next);
+    };
+
+    return read as typeof read & {
+      set(nextOrUpdater: string | ((prev: string) => string)): void;
+    };
+  })();
   let itemsSyncQueued = false;
   const notifyItemsChanged = () => {
     itemsVersion.set((currentVersion) => currentVersion + 1);
@@ -125,7 +147,7 @@ export function Tabs(props: TabsProps) {
         return null;
       }
 
-      if (initialValueApplied()) {
+      if (valueState() !== '') {
         return null;
       }
 
@@ -136,7 +158,6 @@ export function Tabs(props: TabsProps) {
         return null;
       }
 
-      initialValueApplied.set(true);
       valueState.set(firstEnabledItem.value);
       return null;
     },
