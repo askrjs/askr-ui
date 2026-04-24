@@ -21,7 +21,6 @@ import {
 } from '../../_internal/overlay';
 import { resolvePartId } from '../../_internal/id';
 import { pathIsOpen } from '../../_internal/hierarchical-menu';
-import { stripInternalProps } from '../../_internal/props';
 import {
   NavigationMenuContentContext,
   type NavigationMenuContentContextValue,

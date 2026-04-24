@@ -73,9 +73,9 @@ import {
   type AlertDialogProps,
   type AlertDialogTriggerAsChildProps,
   type AlertDialogTriggerProps,
-  type ButtonAsChildProps,
-  type ButtonButtonProps,
-  type ButtonProps,
+   type ButtonAsChildProps,
+   type ButtonNativeProps,
+   type ButtonProps,
   type CheckboxAsChildProps,
   type CheckboxInputProps,
   type CheckboxProps,
@@ -141,8 +141,6 @@ import {
   Container,
   Flex,
   Grid,
-  Stack,
-  Center,
   Spacer,
   SidebarLayout,
   TopbarLayout,
@@ -172,22 +170,10 @@ import { Switch as SwitchSubpath } from '@askrjs/askr-ui/primitives/switch';
 import { Toggle as ToggleSubpath } from '@askrjs/askr-ui/primitives/toggle';
 import { Tooltip as TooltipSubpath } from '@askrjs/askr-ui/composites/tooltip';
 import { Container as ContainerSubpath } from '@askrjs/askr-ui/primitives/container';
-import { Stack as StackSubpath } from '@askrjs/askr-ui/primitives/stack';
 import {
   Flex as FlexSubpath,
-  type InlineProps,
-  type InlineAsChildProps,
-} from '@askrjs/askr-ui/primitives/inline';
+} from '@askrjs/askr-ui/primitives/flex';
 import { Grid as GridSubpath } from '@askrjs/askr-ui/primitives/grid';
-import {
-  Center as CenterSubpath,
-  type CenterProps,
-  type CenterAsChildProps,
-} from '@askrjs/askr-ui/primitives/center';
-import {
-  type StackProps,
-  type StackAsChildProps,
-} from '@askrjs/askr-ui/primitives/stack';
 import { Spacer as SpacerSubpath } from '@askrjs/askr-ui/primitives/spacer';
 import { SidebarLayout as SidebarLayoutSubpath } from '@askrjs/askr-ui/patterns/sidebar-layout';
 import { TopbarLayout as TopbarLayoutSubpath } from '@askrjs/askr-ui/patterns/topbar-layout';
@@ -226,23 +212,13 @@ const containerAsChildProps: ContainerAsChildProps = {
   asChild: true,
   children: slotChild,
 };
-const stackProps: StackProps = { gap: '1rem' };
-const stackAsChildProps: StackAsChildProps = {
-  asChild: true,
-  children: slotChild,
-};
-const inlineProps: InlineProps = { gap: '0.5rem' };
-const inlineAsChildProps: InlineAsChildProps = {
+const flexProps: FlexProps = { gap: '0.5rem' };
+const flexAsChildProps: FlexAsChildProps = {
   asChild: true,
   children: slotChild,
 };
 const gridProps: GridProps = { columns: 3 };
 const gridAsChildProps: GridAsChildProps = {
-  asChild: true,
-  children: slotChild,
-};
-const centerProps: CenterProps = { axis: 'both' };
-const centerAsChildProps: CenterAsChildProps = {
   asChild: true,
   children: slotChild,
 };
@@ -282,7 +258,7 @@ const dismissableLayerAsChildProps: DismissableLayerAsChildProps = {
 };
 
 const buttonProps: ButtonProps = { children: 'Save' };
-const buttonButtonProps: ButtonButtonProps = {
+const buttonNativeProps: ButtonNativeProps = {
   type: 'submit',
   children: 'Submit',
 };
@@ -608,7 +584,7 @@ void [
   dismissableLayerProps,
   dismissableLayerAsChildProps,
   buttonProps,
-  buttonButtonProps,
+  buttonNativeProps,
   buttonAsChildProps,
   checkboxControlledProps,
   checkboxUncontrolledProps,
@@ -676,10 +652,6 @@ void [
   selectItemProps,
   selectItemAsChildProps,
   fieldProps,
-  stackProps,
-  stackAsChildProps,
-  centerProps,
-  centerAsChildProps,
   containerFromSubpath,
   flexFromSubpath,
   gridFromSubpath,
@@ -689,19 +661,18 @@ void [
   Container,
   Flex,
   Grid,
-  Stack,
-  Center,
   Spacer,
   SidebarLayout,
   TopbarLayout,
   containerProps,
   containerAsChildProps,
-  inlineProps,
-  inlineAsChildProps,
+  flexProps,
+  flexAsChildProps,
   gridProps,
   gridAsChildProps,
   spacerProps,
   spacerAsChildProps,
   sidebarLayoutProps,
   topbarLayoutProps,
+  buttonNativeProps,
 ];

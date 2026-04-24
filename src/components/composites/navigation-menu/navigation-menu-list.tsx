@@ -4,7 +4,6 @@ import {
   getCompositeCollectionItems,
 } from '../../_internal/composite';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
-import { stripInternalProps } from '../../_internal/props';
 import { readNavigationMenuRootContext } from './navigation-menu.shared';
 import type {
   NavigationMenuListProps,
@@ -39,7 +38,7 @@ export function NavigationMenuList(
     },
   });
 
-  const finalProps = mergeProps(stripInternalProps(rest), {
+  const finalProps = mergeProps(rest, {
     ...nav.container,
     ref,
     'data-slot': 'navigation-menu-list',

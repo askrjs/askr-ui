@@ -126,14 +126,12 @@ import {
   Container,
   Flex,
   Grid,
-  Center,
   Spacer,
   SidebarLayout,
   TopbarLayout,
   type ContainerProps,
   type FlexProps,
   type GridProps,
-  type CenterProps,
   type SpacerProps,
   type SidebarLayoutProps,
   type TopbarLayoutProps,
@@ -155,10 +153,8 @@ import { Tabs as TabsSubpath } from '@askrjs/askr-ui/composites/tabs';
 import { ToastProvider as ToastSubpath } from '@askrjs/askr-ui/composites/toast';
 import { ToggleGroup as ToggleGroupSubpath } from '@askrjs/askr-ui/primitives/toggle-group';
 import { Container as ContainerSubpath } from '@askrjs/askr-ui/primitives/container';
-import { Stack as StackSubpath } from '@askrjs/askr-ui/primitives/stack';
-import { Flex as FlexSubpath } from '@askrjs/askr-ui/primitives/inline';
+import { Flex as FlexSubpath } from '@askrjs/askr-ui/primitives/flex';
 import { Grid as GridSubpath } from '@askrjs/askr-ui/primitives/grid';
-import { Center as CenterSubpath } from '@askrjs/askr-ui/primitives/center';
 import { Spacer as SpacerSubpath } from '@askrjs/askr-ui/primitives/spacer';
 import { SidebarLayout as SidebarLayoutSubpath } from '@askrjs/askr-ui/patterns/sidebar-layout';
 import { TopbarLayout as TopbarLayoutSubpath } from '@askrjs/askr-ui/patterns/topbar-layout';
@@ -186,7 +182,6 @@ const navigationMenuFromRoot: typeof NavigationMenu = askrUi.NavigationMenu;
 const containerFromSubpath: typeof Container = ContainerSubpath;
 const flexFromSubpath: typeof Flex = FlexSubpath;
 const gridFromSubpath: typeof Grid = GridSubpath;
-const centerFromSubpath: typeof Center = CenterSubpath;
 const spacerFromSubpath: typeof Spacer = SpacerSubpath;
 const sidebarLayoutFromSubpath: typeof SidebarLayout = SidebarLayoutSubpath;
 const topbarLayoutFromSubpath: typeof TopbarLayout = TopbarLayoutSubpath;
@@ -194,10 +189,6 @@ const topbarLayoutFromSubpath: typeof TopbarLayout = TopbarLayoutSubpath;
 const containerLayoutProps: ContainerProps = { maxWidth: '64rem' };
 const flexLayoutProps: FlexProps = { gap: '1rem', align: 'center' };
 const gridLayoutProps: GridProps = { columns: 3, gap: '1rem' };
-const centerLayoutProps: CenterProps = {
-  axis: 'horizontal',
-  minHeight: '100vh',
-};
 const spacerLayoutProps: SpacerProps = { grow: 1 };
 const sidebarLayoutLayoutProps: SidebarLayoutProps = {
   sidebarWidth: '20rem',
@@ -538,21 +529,18 @@ void [
   containerFromSubpath,
   flexFromSubpath,
   gridFromSubpath,
-  centerFromSubpath,
   spacerFromSubpath,
   sidebarLayoutFromSubpath,
   topbarLayoutFromSubpath,
   Container,
   Flex,
   Grid,
-  Center,
   Spacer,
   SidebarLayout,
   TopbarLayout,
   containerLayoutProps,
   flexLayoutProps,
   gridLayoutProps,
-  centerLayoutProps,
   spacerLayoutProps,
   sidebarLayoutLayoutProps,
   topbarLayoutLayoutProps,

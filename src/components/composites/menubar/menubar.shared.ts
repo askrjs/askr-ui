@@ -2,24 +2,20 @@ import { defineContext, readContext } from '@askrjs/askr';
 import {
   disabledIndexes,
   firstEnabledCompositeIndex,
+  getCompositeCollection,
+  getCompositeCollectionItems,
 } from '../../_internal/composite';
 
 export type MenubarTriggerMetadata = {
   index: number;
   disabled: boolean;
-  menuKey: string;
-  triggerId: string;
-  contentId: string;
-  portalId: string;
+  menuKey?: string;
 };
 
 export type MenubarSurfaceMetadata = {
   index: number;
   disabled: boolean;
 };
-
-const menubarTriggerMetadata = new Map<string, MenubarTriggerMetadata[]>();
-const menubarSurfaceMetadata = new Map<string, MenubarSurfaceMetadata[]>();
 
 export type MenubarRootContextValue = {
   menubarId: string;
@@ -92,41 +88,6 @@ export const MenubarContentRenderContext =
 export const MenubarSubContext = defineContext<MenubarSubContextValue | null>(
   null
 );
-export const MenubarDeclarationContext = defineContext<boolean>(false);
-
-export function beginMenubarTriggerDeclaration(menubarId: string) {
-  menubarTriggerMetadata.set(menubarId, []);
-}
-
-export function declareMenubarTriggerMetadata(
-  menubarId: string,
-  metadata: MenubarTriggerMetadata
-) {
-  const items = menubarTriggerMetadata.get(menubarId) ?? [];
-  items[metadata.index] = metadata;
-  menubarTriggerMetadata.set(menubarId, items);
-}
-
-export function getMenubarTriggerMetadata(menubarId: string) {
-  return (menubarTriggerMetadata.get(menubarId) ?? []).filter(Boolean);
-}
-
-export function beginMenubarSurfaceDeclaration(contentId: string) {
-  menubarSurfaceMetadata.set(contentId, []);
-}
-
-export function declareMenubarSurfaceMetadata(
-  contentId: string,
-  metadata: MenubarSurfaceMetadata
-) {
-  const items = menubarSurfaceMetadata.get(contentId) ?? [];
-  items[metadata.index] = metadata;
-  menubarSurfaceMetadata.set(contentId, items);
-}
-
-export function getMenubarSurfaceMetadata(contentId: string) {
-  return (menubarSurfaceMetadata.get(contentId) ?? []).filter(Boolean);
-}
 
 export function readMenubarRootContext(): MenubarRootContextValue {
   const context = readContext(MenubarRootContext);
@@ -194,10 +155,6 @@ export function readMenubarSubContext(): MenubarSubContextValue {
   return context;
 }
 
-export function readMenubarDeclarationContext(): boolean {
-  return Boolean(readContext(MenubarDeclarationContext));
-}
-
 export function createMenubarRootRenderContext(): MenubarRootRenderContextValue {
   let nextMenuIndex = 0;
 
@@ -225,7 +182,13 @@ export function createMenubarContentRenderContext(): MenubarContentRenderContext
 export function resolveMenubarRootState(
   root: MenubarRootContextValue
 ): MenubarRootResolvedState {
-  const items = getMenubarTriggerMetadata(root.menubarId);
+  const items = getCompositeCollectionItems(getCompositeCollection(root.menubarId)).map(
+    (item) => ({
+      index: item.index,
+      disabled: item.disabled,
+      menuKey: item.value,
+    })
+  );
   const fallbackIndex = firstEnabledCompositeIndex(items);
   const candidateIndex = root.currentTriggerIndexCandidate;
   const currentTriggerIndex =
@@ -243,7 +206,12 @@ export function resolveMenubarRootState(
 export function resolveMenubarContentState(
   content: MenubarContentContextValue
 ): MenubarContentResolvedState {
-  const items = getMenubarSurfaceMetadata(content.contentId);
+  const items = getCompositeCollectionItems(
+    getCompositeCollection(content.contentId)
+  ).map((item) => ({
+    index: item.index,
+    disabled: item.disabled,
+  }));
   const fallbackIndex = firstEnabledCompositeIndex(items);
   const candidateIndex = content.currentIndexCandidate;
   const currentIndex =

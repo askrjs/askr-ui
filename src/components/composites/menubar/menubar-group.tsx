@@ -1,5 +1,4 @@
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
-import { readMenubarDeclarationContext } from './menubar.shared';
 import type {
   MenubarGroupAsChildProps,
   MenubarGroupProps,
@@ -13,10 +12,6 @@ export function MenubarGroup(
   props: MenubarGroupProps | MenubarGroupAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
-
-  if (readMenubarDeclarationContext()) {
-    return <>{children}</>;
-  }
 
   const finalProps = mergeProps(rest, {
     ref,
@@ -34,10 +29,6 @@ export function MenubarGroup(
 export function MenubarLabel(
   props: MenubarLabelProps | MenubarLabelAsChildProps
 ) {
-  if (readMenubarDeclarationContext()) {
-    return null;
-  }
-
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
@@ -55,10 +46,6 @@ export function MenubarLabel(
 export function MenubarSeparator(
   props: MenubarSeparatorProps | MenubarSeparatorAsChildProps
 ) {
-  if (readMenubarDeclarationContext()) {
-    return null;
-  }
-
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,

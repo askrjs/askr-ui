@@ -16,9 +16,11 @@ import {
 } from '../../_internal/overlay';
 import {
   getSelectDisabledIndexes,
-  readSelectDeclarationContext,
+  readSelectRenderContext,
   readSelectRootContext,
   resolveSelectState,
+  SelectRenderContext,
+  SelectRootContext,
 } from './select.shared';
 import type {
   SelectContentAsChildProps,
@@ -43,11 +45,8 @@ export function SelectContent(
     ...rest
   } = props;
 
-  if (readSelectDeclarationContext()) {
-    return <>{children}</>;
-  }
-
   const root = readSelectRootContext();
+  const renderContext = readSelectRenderContext();
   const { items, currentIndex } = resolveSelectState(root);
   const overlayNodes = getOverlayNodes(root.selectId);
   const collection = getMenuCollection(root.selectId);
@@ -102,6 +101,13 @@ export function SelectContent(
   ) : (
     <div {...finalProps}>{children}</div>
   );
+  const scopedContentNode = (
+    <SelectRootContext.Scope value={root}>
+      <SelectRenderContext.Scope value={renderContext}>
+        {contentNode}
+      </SelectRenderContext.Scope>
+    </SelectRootContext.Scope>
+  );
 
   return (
     <Presence present={forceMount || root.open}>
@@ -111,7 +117,7 @@ export function SelectContent(
             root.setOpen(false);
           }}
         >
-          {contentNode}
+          {scopedContentNode}
         </DismissableLayer>
       </FocusScope>
     </Presence>

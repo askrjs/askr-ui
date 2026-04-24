@@ -1,91 +1,55 @@
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 import * as askrUi from '../src';
-import * as primitiveButton from '../src/components/primitives/button';
-import * as compositeField from '../src/components/composites/field';
-import * as patternDataTable from '../src/components/patterns/data-table';
+import {
+  componentSurface,
+  publicValueExports,
+  removedPublicExports,
+} from './fixtures/public-surface';
+
+function isPublicValueExport(name: string) {
+  return name !== 'default' && !name.startsWith('__');
+}
 
 describe('Public API', () => {
-  it('exposes the 1.0 public component surface from the root entrypoint', () => {
+  it('matches the manifest-driven surface from the root entrypoint', () => {
     expect('createAskRComponent' in askrUi).toBe(false);
     expect('AskRComponent' in askrUi).toBe(false);
-    expect(askrUi.FocusRing).toBeDefined();
-    expect(askrUi.FocusScope).toBeDefined();
-    expect(askrUi.DismissableLayer).toBeDefined();
-    expect(askrUi.Dialog).toBeDefined();
-    expect(askrUi.AlertDialog).toBeDefined();
-    expect(askrUi.Popover).toBeDefined();
-    expect(askrUi.Tooltip).toBeDefined();
-    expect(askrUi.Menu).toBeDefined();
-    expect(askrUi.DropdownMenu).toBeDefined();
-    expect(askrUi.Select).toBeDefined();
-    expect(askrUi.Collapsible).toBeDefined();
-    expect(askrUi.CollapsibleTrigger).toBeDefined();
-    expect(askrUi.CollapsibleContent).toBeDefined();
-    expect(askrUi.COLLAPSIBLE_A11Y_CONTRACT).toBeDefined();
-    expect(askrUi.Badge).toBeDefined();
-    expect(askrUi.Avatar).toBeDefined();
-    expect(askrUi.Skeleton).toBeDefined();
-    expect(askrUi.Progress).toBeDefined();
-    expect(askrUi.ProgressCircle).toBeDefined();
-    expect(askrUi.Spinner).toBeDefined();
-    expect(askrUi.Breadcrumb).toBeDefined();
-    expect(askrUi.Pagination).toBeDefined();
-    expect(askrUi.Accordion).toBeDefined();
-    expect(askrUi.Tabs).toBeDefined();
-    expect(askrUi.ToggleGroup).toBeDefined();
-    expect(askrUi.ToastProvider).toBeDefined();
-    expect(askrUi.Slider).toBeDefined();
-    expect(askrUi.Menubar).toBeDefined();
-    expect(askrUi.NavigationMenu).toBeDefined();
-    // Layout primitives
-    expect(askrUi.Container).toBeDefined();
-    expect(askrUi.CONTAINER_A11Y_CONTRACT).toBeDefined();
-    expect(askrUi.Flex).toBeDefined();
-    expect(askrUi.Inline).toBeDefined();
-    expect(askrUi.Inline).toBe(askrUi.Flex);
-    expect(askrUi.FLEX_A11Y_CONTRACT).toBeDefined();
-    expect(askrUi.INLINE_A11Y_CONTRACT).toBeDefined();
-    expect(askrUi.Grid).toBeDefined();
-    expect(askrUi.GRID_A11Y_CONTRACT).toBeDefined();
-    expect(askrUi.Spacer).toBeDefined();
-    expect(askrUi.SPACER_A11Y_CONTRACT).toBeDefined();
-    expect(askrUi.SidebarLayout).toBeDefined();
-    expect(askrUi.SIDEBAR_LAYOUT_A11Y_CONTRACT).toBeDefined();
-    expect(askrUi.TopbarLayout).toBeDefined();
-    expect(askrUi.TOPBAR_LAYOUT_A11Y_CONTRACT).toBeDefined();
-    // DataTable
-    expect(askrUi.createDataTable).toBeDefined();
-    expect(askrUi.column).toBeDefined();
-    expect(askrUi.DataTableRoot).toBeDefined();
-    expect(askrUi.DataTableContent).toBeDefined();
-    expect(askrUi.DataTableTableView).toBeDefined();
-    expect(askrUi.DataTableTableHeader).toBeDefined();
-    expect(askrUi.DataTableTableBody).toBeDefined();
-    expect(askrUi.DataTableHeaderRow).toBeDefined();
-    expect(askrUi.DataTableHead).toBeDefined();
-    expect(askrUi.DataTableRow).toBeDefined();
-    expect(askrUi.DataTableCell).toBeDefined();
-    expect(askrUi.DataTableExpandedRow).toBeDefined();
-    expect(askrUi.DataTableListView).toBeDefined();
-    expect(askrUi.DataTableListItem).toBeDefined();
-    expect(askrUi.DataTableListMain).toBeDefined();
-    expect(askrUi.DataTableListMeta).toBeDefined();
-    expect(askrUi.DataTableListActions).toBeDefined();
-    expect(askrUi.DataTableListExpanded).toBeDefined();
-    expect(askrUi.DataTableToolbar).toBeDefined();
-    expect(askrUi.DataTableSearch).toBeDefined();
-    expect(askrUi.DataTablePagination).toBeDefined();
-    expect(askrUi.DataTableEmpty).toBeDefined();
-    expect(askrUi.DataTableLoading).toBeDefined();
-    expect(askrUi.DataTableError).toBeDefined();
-    expect(askrUi.DATA_TABLE_A11Y_CONTRACT).toBeDefined();
+
+    const sourceExportNames = Array.from(
+      new Set(
+        componentSurface.flatMap((entry) =>
+          Object.keys(entry.module).filter(isPublicValueExport)
+        )
+      )
+    ).sort();
+
+    expect(publicValueExports).toEqual(sourceExportNames);
+
+    for (const entry of componentSurface) {
+      for (const exportName of Object.keys(entry.module).filter(
+        isPublicValueExport
+      )) {
+        expect(exportName in askrUi).toBe(true);
+        expect(
+          (askrUi as Record<string, unknown>)[exportName]
+        ).toBe((entry.module as Record<string, unknown>)[exportName]);
+      }
+    }
+
+    for (const removedExport of removedPublicExports) {
+      expect(removedExport in askrUi).toBe(false);
+    }
   });
 
-  it('exposes bucketed component entrypoints from the source layout', () => {
-    expect(primitiveButton.Button).toBeDefined();
-    expect(compositeField.Field).toBeDefined();
-    expect(compositeField.FieldInput).toBeDefined();
-    expect(patternDataTable.DataTableRoot).toBeDefined();
-    expect(patternDataTable.createDataTable).toBeDefined();
+  it('removes the old layout alias folders from the source tree', () => {
+    for (const alias of removedPublicExports) {
+      expect(
+        existsSync(
+          join(process.cwd(), 'src/components/primitives', alias.toLowerCase())
+        )
+      ).toBe(false);
+    }
   });
 });

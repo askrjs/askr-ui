@@ -30,6 +30,7 @@ import {
   ToastRootContext,
   readToastProviderContext,
   readToastRootContext,
+  type ToastRegistration,
   type ToastProviderContextValue,
   type ToastRootContextValue,
 } from './toast.shared';
@@ -94,6 +95,8 @@ function getToastProviderContext(providerId: string): ToastProviderContextValue 
     providerId,
     duration: 0,
     toasts: [],
+    registerToast: () => {},
+    unregisterToast: () => {},
   };
   toastProviderContexts.set(providerId, created);
   return created;
@@ -132,11 +135,10 @@ function ToastProviderView(props: {
 
 function ToastRegistrationView(props: {
   key?: string;
-  toast: JSX.Element;
+  registration: ToastRegistration;
   provider: ToastProviderContextValue;
-  index: number;
 }) {
-  const toastProps = props.toast.props as ToastProps;
+  const toastProps = props.registration.props;
   const {
     children,
     open,
@@ -145,16 +147,9 @@ function ToastRegistrationView(props: {
     duration,
     variant,
     ref,
-    id,
     ...rest
   } = toastProps;
-  const toastId = resolveCompoundId(
-    'toast',
-    typeof id === 'string'
-      ? id
-      : `${props.provider.providerId}-${props.index}`,
-    children
-  );
+  const toastId = props.registration.toastId;
   const openState = controllableState({
     value: open,
     defaultValue: defaultOpen,
@@ -304,14 +299,28 @@ function ToastRegistrationView(props: {
 export function ToastProvider(props: ToastProviderProps) {
   const { children, duration = 5000, id, ref, ...rest } = props;
   const providerId = resolveCompoundId('toast-provider', id, children);
-  const toastElements = collectJsxElements(
-    children,
-    (element) => element.type === Toast
-  );
+  const toastRegistrationsState = state<ToastRegistration[]>([]);
   const providerContext = getToastProviderContext(providerId);
+  const registerToast = (registration: ToastRegistration) => {
+    const nextRegistrations = toastRegistrationsState().filter(
+      (entry) => entry.toastId !== registration.toastId
+    );
+    nextRegistrations.push(registration);
+    toastRegistrationsState.set(nextRegistrations);
+    providerContext.toasts = nextRegistrations;
+  };
+  const unregisterToast = (toastId: string) => {
+    const nextRegistrations = toastRegistrationsState().filter(
+      (entry) => entry.toastId !== toastId
+    );
+    toastRegistrationsState.set(nextRegistrations);
+    providerContext.toasts = nextRegistrations;
+  };
   providerContext.providerId = providerId;
   providerContext.duration = duration;
-  providerContext.toasts = toastElements;
+  providerContext.toasts = toastRegistrationsState();
+  providerContext.registerToast = registerToast;
+  providerContext.unregisterToast = unregisterToast;
   const finalProps = mergeProps(rest, {
     ref,
     'data-slot': 'toast-provider',
@@ -347,17 +356,11 @@ export function ToastViewport(props: ToastViewportProps | ToastViewportAsChildPr
   const provider = readToastProviderContext();
   const content = (
     <>
-      {provider.toasts.map((toast, index) => (
+      {provider.toasts.map((registration) => (
         <ToastRegistrationView
-          key={resolveCompoundId(
-            'toast',
-            (toast.props?.id as string | undefined) ??
-              `${provider.providerId}-${index}`,
-            toast.props?.children
-          )}
-          toast={toast}
+          key={registration.toastId}
+          registration={registration}
           provider={provider}
-          index={index}
         />
       ))}
       {children}
@@ -380,7 +383,29 @@ export function ToastViewport(props: ToastViewportProps | ToastViewportAsChildPr
 }
 
 export function Toast(props: ToastProps): JSX.Element | null {
-  readToastProviderContext();
+  const provider = readToastProviderContext();
+  const toastId = resolveCompoundId('toast', props.id, props.children);
+
+  resource(
+    ({ signal }) => {
+      provider.registerToast({
+        toastId,
+        props,
+      });
+
+      signal.addEventListener(
+        'abort',
+        () => {
+          provider.unregisterToast(toastId);
+        },
+        { once: true }
+      );
+
+      return null;
+    },
+    [provider.providerId, toastId]
+  );
+
   return null;
 }
 

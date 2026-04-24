@@ -14,11 +14,9 @@ import {
   registerCompositeNode,
 } from '../../_internal/composite';
 import {
-  declareMenubarSurfaceMetadata,
   MenubarSubContext,
   readMenubarContentContext,
   readMenubarContentRenderContext,
-  readMenubarDeclarationContext,
   readMenubarRootContext,
   readOptionalMenubarRootContext,
   readMenubarSubContext,
@@ -58,14 +56,6 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
   const content = readMenubarContentContext();
   const renderContext = readMenubarContentRenderContext();
   const surfaceIndex = renderContext.claimSurfaceIndex();
-
-  if (readMenubarDeclarationContext()) {
-    declareMenubarSurfaceMetadata(content.contentId, {
-      index: surfaceIndex,
-      disabled,
-    });
-    return null;
-  }
 
   const root = readOptionalMenubarRootContext();
 
@@ -173,14 +163,6 @@ export function MenubarSubTrigger(
   } = props;
   const content = readMenubarContentContext();
   const sub = readMenubarSubContext();
-
-  if (readMenubarDeclarationContext()) {
-    declareMenubarSurfaceMetadata(content.contentId, {
-      index: sub.surfaceIndex,
-      disabled,
-    });
-    return null;
-  }
 
   const root = readOptionalMenubarRootContext();
 

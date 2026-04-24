@@ -1,10 +1,10 @@
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
 import { isCssLength, mergeLayoutStyles } from '../../_internal/layout';
-import type { FlexAsChildProps, FlexDivProps } from './inline.types';
+import type { FlexAsChildProps, FlexNativeProps } from './flex.types';
 
-export function Flex(props: FlexDivProps): JSX.Element;
+export function Flex(props: FlexNativeProps): JSX.Element;
 export function Flex(props: FlexAsChildProps): JSX.Element;
-export function Flex(props: FlexDivProps | FlexAsChildProps) {
+export function Flex(props: FlexNativeProps | FlexAsChildProps) {
   const {
     asChild,
     children,
@@ -30,7 +30,7 @@ export function Flex(props: FlexDivProps | FlexAsChildProps) {
 
   const finalProps = mergeProps(rest, {
     ref,
-    'data-slot': 'inline',
+    'data-slot': 'flex',
     'data-direction': direction,
     'data-gap': gap,
     'data-align': align,
@@ -46,5 +46,3 @@ export function Flex(props: FlexDivProps | FlexAsChildProps) {
 
   return <div {...finalProps}>{children}</div>;
 }
-
-export { Flex as Inline };

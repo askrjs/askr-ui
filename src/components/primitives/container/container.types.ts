@@ -10,7 +10,7 @@ export type ContainerOwnProps = {
   children?: unknown;
 };
 
-export type ContainerDivProps = Omit<
+export type ContainerNativeProps = Omit<
   JSX.IntrinsicElements['div'],
   'children' | 'ref'
 > &
@@ -26,4 +26,4 @@ export type ContainerAsChildProps = ContainerOwnProps & {
   style?: JSX.IntrinsicElements['div']['style'];
 };
 
-export type ContainerProps = ContainerDivProps | ContainerAsChildProps;
+export type ContainerProps = ContainerNativeProps | ContainerAsChildProps;

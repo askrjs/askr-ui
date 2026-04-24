@@ -1,12 +1,12 @@
 import { bench, describe } from 'vite-plus/test';
 import {
   Spacer,
-  type SpacerDivProps,
+  type SpacerNativeProps,
 } from '../../src/components/primitives/spacer';
 
 describe('Spacer benches', () => {
   bench('create default flex spacer', () => {
-    Spacer({} as unknown as SpacerDivProps);
+    Spacer({} as unknown as SpacerNativeProps);
   });
 
   bench('create configured flex spacer', () => {
@@ -14,7 +14,7 @@ describe('Spacer benches', () => {
       grow: 2,
       shrink: 0,
       basis: '24px',
-    } as unknown as SpacerDivProps);
+    } as unknown as SpacerNativeProps);
   });
 
   bench('create block spacer', () => {
@@ -22,6 +22,6 @@ describe('Spacer benches', () => {
       axis: 'block',
       basis: '32px',
       shrink: 0,
-    } as unknown as SpacerDivProps);
+    } as unknown as SpacerNativeProps);
   });
 });

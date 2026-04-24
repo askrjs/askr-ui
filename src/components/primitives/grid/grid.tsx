@@ -1,6 +1,6 @@
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
 import { isCssLength, mergeLayoutStyles } from '../../_internal/layout';
-import type { GridAsChildProps, GridDivProps } from './grid.types';
+import type { GridAsChildProps, GridNativeProps } from './grid.types';
 
 function resolveGridTemplateColumns(
   columns: number | string | undefined,
@@ -22,9 +22,9 @@ function resolveGridTemplateColumns(
   return undefined;
 }
 
-export function Grid(props: GridDivProps): JSX.Element;
+export function Grid(props: GridNativeProps): JSX.Element;
 export function Grid(props: GridAsChildProps): JSX.Element;
-export function Grid(props: GridDivProps | GridAsChildProps) {
+export function Grid(props: GridNativeProps | GridAsChildProps) {
   const {
     asChild,
     children,

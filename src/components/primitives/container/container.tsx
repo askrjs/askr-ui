@@ -2,12 +2,12 @@ import { Slot, mergeProps } from '@askrjs/askr/foundations';
 import { isCssLength, mergeLayoutStyles } from '../../_internal/layout';
 import type {
   ContainerAsChildProps,
-  ContainerDivProps,
+  ContainerNativeProps,
 } from './container.types';
 
-export function Container(props: ContainerDivProps): JSX.Element;
+export function Container(props: ContainerNativeProps): JSX.Element;
 export function Container(props: ContainerAsChildProps): JSX.Element;
-export function Container(props: ContainerDivProps | ContainerAsChildProps) {
+export function Container(props: ContainerNativeProps | ContainerAsChildProps) {
   const {
     asChild,
     children,

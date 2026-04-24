@@ -13,6 +13,7 @@ import {
   disabledIndexes,
   firstEnabledCompositeIndex,
   getCompositeCollection,
+  getCompositeCollectionItems,
   registerCompositeNode,
 } from '../../_internal/composite';
 import {
@@ -20,7 +21,6 @@ import {
   toggleDisclosureValue,
 } from '../../_internal/disclosure';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
-import { collectJsxElements } from '../../_internal/jsx';
 import type {
   AccordionContentAsChildProps,
   AccordionContentProps,
@@ -88,24 +88,24 @@ export function Accordion(props: AccordionProps) {
     ...rest
   } = props;
   const accordionId = resolveCompoundId('accordion', id, children);
-  const items = collectJsxElements(
-    children,
-    (element) => element.type === AccordionItem
-  ).map((element) => ({
-    value: element.props?.value as string,
-    disabled: Boolean(element.props?.disabled),
-  }));
   const valueState = createAccordionValueState(props);
+  const collection = getCompositeCollection(accordionId);
+  const items = getCompositeCollectionItems(collection).filter(
+    (item): item is typeof item & { value: string } =>
+      typeof item.value === 'string'
+  );
   const currentOpenIndex = items.findIndex((item) =>
     isDisclosureValueOpen(type, valueState(), item.value)
   );
-  const currentIndexState = state(
-    currentOpenIndex >= 0 ? currentOpenIndex : firstEnabledCompositeIndex(items)
-  );
-  const currentIndex = items[currentIndexState()]
-    ? currentIndexState()
-    : firstEnabledCompositeIndex(items);
-  const collection = getCompositeCollection(accordionId);
+  const currentIndexState = state(0);
+  const fallbackIndex = firstEnabledCompositeIndex(items);
+  const candidateIndex = currentIndexState();
+  const currentIndex =
+    currentOpenIndex >= 0 && !items[currentOpenIndex]?.disabled
+      ? currentOpenIndex
+      : items[candidateIndex] && !items[candidateIndex]?.disabled
+        ? candidateIndex
+        : fallbackIndex;
   const disabledIndexList = disabledIndexes(items);
   const setValue: AccordionRootContextValue['setValue'] = (nextValue) => {
     if (type === 'multiple') {

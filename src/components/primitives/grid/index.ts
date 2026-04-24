@@ -3,6 +3,6 @@ export { GRID_A11Y_CONTRACT, type GridA11yContract } from './grid.a11y';
 export type {
   GridProps,
   GridOwnProps,
-  GridDivProps,
+  GridNativeProps,
   GridAsChildProps,
 } from './grid.types';

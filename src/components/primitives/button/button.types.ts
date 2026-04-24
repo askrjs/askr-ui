@@ -37,7 +37,7 @@ export type ButtonOwnProps = {
 /**
  * Props when rendering as native <button>
  */
-export type ButtonButtonProps = Omit<
+export type ButtonNativeProps = Omit<
   JSX.IntrinsicElements['button'],
   'children' | 'onClick' | 'disabled' | 'type' | 'ref'
 > &
@@ -60,4 +60,4 @@ export type ButtonAsChildProps = ButtonOwnProps & {
 /**
  * Union of all Button prop variants
  */
-export type ButtonProps = ButtonButtonProps | ButtonAsChildProps;
+export type ButtonProps = ButtonNativeProps | ButtonAsChildProps;

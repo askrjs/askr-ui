@@ -1,5 +1,9 @@
 import { defineContext, readContext } from '@askrjs/askr';
-import { firstEnabledIndex, getMenuItemMetadata } from '../../_internal/menu';
+import {
+  firstEnabledIndex,
+  getMenuCollection,
+  getMenuCollectionItems,
+} from '../../_internal/menu';
 import type { OverlayPortal } from '../../_internal/overlay';
 
 export type SelectItemMetadata = {
@@ -19,6 +23,7 @@ export type SelectRootContextValue = {
   currentIndexCandidate: number;
   setCurrentIndex: (index: number) => void;
   disabled: boolean;
+  declaredItems: SelectItemMetadata[];
 };
 
 export type SelectRenderContextValue = {
@@ -29,8 +34,6 @@ export type SelectRenderContextValue = {
 export type SelectGroupContextValue = {
   groupId: string;
   labelId: string;
-  addLabel: () => void;
-  removeLabel: () => void;
 };
 
 export type SelectResolvedState = {
@@ -47,7 +50,6 @@ export const SelectRenderContext =
 export const SelectGroupContext = defineContext<SelectGroupContextValue | null>(
   null
 );
-export const SelectDeclarationContext = defineContext<boolean>(false);
 
 export function readSelectRootContext(): SelectRootContextValue {
   const context = readContext(SelectRootContext);
@@ -71,10 +73,6 @@ export function readSelectRenderContext(): SelectRenderContextValue {
 
 export function readSelectGroupContext(): SelectGroupContextValue | null {
   return readContext(SelectGroupContext);
-}
-
-export function readSelectDeclarationContext(): boolean {
-  return Boolean(readContext(SelectDeclarationContext));
 }
 
 export function createSelectRenderContext(): SelectRenderContextValue {
@@ -107,11 +105,15 @@ export function getSelectDisabledIndexes(
 export function resolveSelectState(
   root: SelectRootContextValue
 ): SelectResolvedState {
-  const items = getMenuItemMetadata(root.selectId).map((item) => ({
-    disabled: item.disabled,
-    value: item.value,
-    text: item.text,
-  }));
+  const registeredItems = getMenuCollectionItems(getMenuCollection(root.selectId)).map(
+    (item) => ({
+      disabled: item.disabled,
+      value: item.value,
+      text: item.text,
+    })
+  );
+  const items =
+    registeredItems.length > 0 ? registeredItems : root.declaredItems;
   const effectiveItems = items.map((item) => ({
     disabled: root.disabled || item.disabled,
   }));

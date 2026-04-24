@@ -7,14 +7,12 @@ import {
 } from '@askrjs/askr/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import {
-  declareMenuItemMetadata,
   getMenuCollection,
   registerCollectionNode,
   resolveMenuItemText,
 } from '../../_internal/menu';
 import { resolvePartId } from '../../_internal/id';
 import {
-  readMenuDeclarationContext,
   readMenuRenderContext,
   readMenuRootContext,
   resolveMenuState,
@@ -36,17 +34,8 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
   const root = readMenuRootContext();
   const renderContext = readMenuRenderContext();
   const itemIndex = renderContext.claimItemIndex();
-
-  if (readMenuDeclarationContext()) {
-    declareMenuItemMetadata(root.menuId, {
-      index: itemIndex,
-      disabled,
-      text: resolveMenuItemText(children),
-    });
-    return null;
-  }
-
   const itemId = resolvePartId(root.menuId, `item-${itemIndex}`);
+  const itemText = resolveMenuItemText(children);
   const { items, currentIndex, disabledIndexes } = resolveMenuState(root);
   const collection = getMenuCollection(root.menuId);
   const nav = rovingFocus({
@@ -83,7 +72,7 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
         registerCollectionNode(itemId, collection, node, {
           index: itemIndex,
           disabled,
-          text: resolveMenuItemText(children),
+          text: itemText,
         });
       }
     ),

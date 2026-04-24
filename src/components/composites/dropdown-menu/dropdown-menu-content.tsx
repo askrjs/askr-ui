@@ -15,7 +15,6 @@ import {
   syncOverlayPosition,
 } from '../../_internal/overlay';
 import {
-  readDropdownMenuDeclarationContext,
   readDropdownMenuRootContext,
   resolveDropdownMenuState,
 } from './dropdown-menu.shared';
@@ -43,11 +42,6 @@ export function DropdownMenuContent(
     sideOffset = 0,
     ...rest
   } = props;
-
-  if (readDropdownMenuDeclarationContext()) {
-    return <>{children}</>;
-  }
-
   const root = readDropdownMenuRootContext();
   const { items, currentIndex, disabledIndexes } =
     resolveDropdownMenuState(root);

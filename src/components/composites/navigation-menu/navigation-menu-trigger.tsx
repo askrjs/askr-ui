@@ -13,7 +13,6 @@ import {
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import { getOverlayNodes } from '../../_internal/overlay';
 import { samePath } from '../../_internal/hierarchical-menu';
-import { stripInternalProps } from '../../_internal/props';
 import {
   readNavigationMenuRootContext,
   readNavigationMenuItemContext,
@@ -77,7 +76,7 @@ export function NavigationMenuTrigger(
     isNativeButton: !asChild,
   });
 
-  const finalProps = mergeProps(stripInternalProps(rest), {
+  const finalProps = mergeProps(rest, {
     ...interactionProps,
     ...nav.item(item.itemIndex),
     ref: composeRefs(ref as any, (node: HTMLElement | null) => {

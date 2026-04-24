@@ -11,23 +11,43 @@ Reference for all `@askrjs/askr-ui` components.
 import {
   Button,
   Checkbox,
+  DebouncedInput,
   Field,
+  FieldCheckbox,
+  FieldDescription,
+  FieldError,
+  FieldLegend,
+  FieldRow,
+  FieldRadioGroup,
+  FieldSelectTrigger,
+  FieldSwitch,
+  FieldTextarea,
+  FieldInput,
+  Fieldset,
   Input,
   Label,
   RadioGroup,
   RadioGroupItem,
   Select,
+  SelectGroup,
   SelectContent,
   SelectItem,
+  SelectItemText,
+  SelectLabel,
   SelectPortal,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
   Separator,
   Slider,
+  SliderTrack,
+  SliderRange,
+  SliderThumb,
   Switch,
   Textarea,
   Toggle,
   ToggleGroup,
+  ToggleGroupItem,
   VisuallyHidden,
 } from '@askrjs/askr-ui';
 ```
@@ -55,6 +75,10 @@ import {
   AlertDialog,
   AlertDialogTrigger,
   AlertDialogContent,
+  AlertDialogOverlay,
+  AlertDialogPortal,
+  AlertDialogTitle,
+  AlertDialogDescription,
   AlertDialogAction,
   AlertDialogCancel,
 } from '@askrjs/askr-ui';
@@ -63,15 +87,27 @@ import {
   PopoverTrigger,
   PopoverContent,
   PopoverPortal,
+  PopoverClose,
 } from '@askrjs/askr-ui';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@askrjs/askr-ui';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipPortal } from '@askrjs/askr-ui';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
+  DropdownMenuPortal,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
 } from '@askrjs/askr-ui';
-import { Menu, MenuContent, MenuItem } from '@askrjs/askr-ui';
+import {
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuGroup,
+  MenuLabel,
+  MenuSeparator,
+} from '@askrjs/askr-ui';
 ```
 
 ## Disclosure components
@@ -80,6 +116,7 @@ import { Menu, MenuContent, MenuItem } from '@askrjs/askr-ui';
 import {
   Accordion,
   AccordionItem,
+  AccordionHeader,
   AccordionTrigger,
   AccordionContent,
 } from '@askrjs/askr-ui';
@@ -97,33 +134,69 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@askrjs/askr-ui';
 import { Badge } from '@askrjs/askr-ui';
 import { Spinner } from '@askrjs/askr-ui';
 import { Skeleton } from '@askrjs/askr-ui';
-import { Progress } from '@askrjs/askr-ui';
-import { ProgressCircle } from '@askrjs/askr-ui';
-import { Toast, ToastProvider } from '@askrjs/askr-ui';
+import { Progress, ProgressIndicator } from '@askrjs/askr-ui';
+import { ProgressCircle, ProgressCircleIndicator } from '@askrjs/askr-ui';
+import {
+  Toast,
+  ToastProvider,
+  ToastViewport,
+  ToastTitle,
+  ToastDescription,
+  ToastAction,
+  ToastClose,
+} from '@askrjs/askr-ui';
 ```
 
 ## Identity components
 
 ```ts
-import { Avatar } from '@askrjs/askr-ui';
+import { Avatar, AvatarFallback, AvatarImage } from '@askrjs/askr-ui';
 ```
 
 ## Navigation components
 
 ```ts
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@askrjs/askr-ui';
+import {
+  Breadcrumb,
+  BreadcrumbCurrent,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from '@askrjs/askr-ui';
 import {
   Pagination,
-  PaginationItem,
-  PaginationPrev,
+  PaginationPrevious,
   PaginationNext,
+  PaginationPage,
+  PaginationEllipsis,
 } from '@askrjs/askr-ui';
-import { Menubar, MenubarMenu, MenubarTrigger } from '@askrjs/askr-ui';
+import {
+  Menubar,
+  MenubarMenu,
+  MenubarTrigger,
+  MenubarPortal,
+  MenubarContent,
+  MenubarItem,
+  MenubarGroup,
+  MenubarLabel,
+  MenubarSeparator,
+  MenubarSub,
+  MenubarSubTrigger,
+  MenubarSubContent,
+} from '@askrjs/askr-ui';
 import {
   NavigationMenu,
   NavigationMenuList,
   NavigationMenuItem,
   NavigationMenuTrigger,
+  NavigationMenuContent,
+  NavigationMenuLink,
+  NavigationMenuViewport,
+  NavigationMenuIndicator,
+  NavigationMenuSub,
+  NavigationMenuSubTrigger,
+  NavigationMenuSubContent,
 } from '@askrjs/askr-ui';
 ```
 
@@ -131,14 +204,42 @@ import {
 
 ```ts
 import {
-  Center,
   Container,
-  DataTable,
   Grid,
   Flex,
-  SidebarLayout,
   Spacer,
-  Stack,
+} from '@askrjs/askr-ui';
+```
+
+## Pattern components
+
+```ts
+import {
+  createDataTable,
+  column,
+  DataTableRoot,
+  DataTableContent,
+  DataTableTableView,
+  DataTableTableHeader,
+  DataTableTableBody,
+  DataTableHeaderRow,
+  DataTableHead,
+  DataTableRow,
+  DataTableCell,
+  DataTableExpandedRow,
+  DataTableListView,
+  DataTableListItem,
+  DataTableListMain,
+  DataTableListMeta,
+  DataTableListActions,
+  DataTableListExpanded,
+  DataTableToolbar,
+  DataTableSearch,
+  DataTablePagination,
+  DataTableEmpty,
+  DataTableLoading,
+  DataTableError,
+  SidebarLayout,
   TopbarLayout,
 } from '@askrjs/askr-ui';
 ```

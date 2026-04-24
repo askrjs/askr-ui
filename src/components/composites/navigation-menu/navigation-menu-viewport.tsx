@@ -1,5 +1,4 @@
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
-import { stripInternalProps } from '../../_internal/props';
 import { readNavigationMenuRootContext } from './navigation-menu.shared';
 import type {
   NavigationMenuViewportProps,

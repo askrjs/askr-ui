@@ -6,6 +6,6 @@ export {
 export type {
   ContainerProps,
   ContainerOwnProps,
-  ContainerDivProps,
+  ContainerNativeProps,
   ContainerAsChildProps,
 } from './container.types';

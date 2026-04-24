@@ -1,66 +1,18 @@
 import { state } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
-import { beginMenuItemDeclaration } from '../../_internal/menu';
+import { collectJsxElements } from '../../_internal/jsx';
 import { getPersistentPortal } from '../../_internal/overlay';
+import { resolveMenuItemText } from '../../_internal/menu';
+import { SelectItem } from './select-item';
 import {
   createSelectRenderContext,
   readSelectRootContext,
-  SelectDeclarationContext,
   SelectRenderContext,
   SelectRootContext,
   type SelectRootContextValue,
 } from './select.shared';
 import type { SelectProps } from './select.types';
-
-function SelectDeclarationPassView(props: {
-  children?: unknown;
-  selectId: string;
-}) {
-  beginMenuItemDeclaration(props.selectId);
-  return <>{props.children}</>;
-}
-
-function SelectDeclarationContextView(props: {
-  children?: unknown;
-  selectId: string;
-  renderContext: ReturnType<typeof createSelectRenderContext>;
-}) {
-  return (
-    <SelectRenderContext.Scope value={props.renderContext}>
-      <SelectDeclarationPassView selectId={props.selectId}>
-        {props.children}
-      </SelectDeclarationPassView>
-    </SelectRenderContext.Scope>
-  );
-}
-
-function SelectScopeView(props: {
-  children?: unknown;
-  name?: string;
-  disabled: boolean;
-  selectId: string;
-  declarationRenderContext: ReturnType<typeof createSelectRenderContext>;
-  runtimeRenderContext: ReturnType<typeof createSelectRenderContext>;
-}) {
-  return (
-    <>
-      <SelectDeclarationContext.Scope value={true}>
-        <SelectDeclarationContextView
-          selectId={props.selectId}
-          renderContext={props.declarationRenderContext}
-        >
-          {props.children}
-        </SelectDeclarationContextView>
-      </SelectDeclarationContext.Scope>
-      <SelectRenderContext.Scope value={props.runtimeRenderContext}>
-        <SelectRootView name={props.name} disabled={props.disabled}>
-          {props.children}
-        </SelectRootView>
-      </SelectRenderContext.Scope>
-    </>
-  );
-}
 
 function SelectRootView(props: {
   children?: unknown;
@@ -69,6 +21,7 @@ function SelectRootView(props: {
 }) {
   const root = readSelectRootContext();
   const PortalHost = root.portal;
+  root.portal.render({ children: null });
 
   return (
     <>
@@ -111,6 +64,18 @@ export function Select(props: SelectProps) {
     onChange: onOpenChange,
   });
   const currentIndexState = state(0);
+  const declaredItems = collectJsxElements(
+    children,
+    (element) => element.type === SelectItem
+  ).map((element, index) => ({
+    disabled: Boolean(element.props?.disabled),
+    value:
+      typeof element.props?.value === 'string' ? element.props.value : undefined,
+    text: resolveMenuItemText(
+      element.props?.children,
+      element.props?.textValue as string | undefined
+    ),
+  }));
   const rootContext: SelectRootContextValue = {
     selectId,
     open: openState(),
@@ -122,20 +87,17 @@ export function Select(props: SelectProps) {
     currentIndexCandidate: currentIndexState(),
     setCurrentIndex: currentIndexState.set,
     disabled,
+    declaredItems,
   };
-  const declarationRenderContext = createSelectRenderContext();
   const runtimeRenderContext = createSelectRenderContext();
 
   return (
     <SelectRootContext.Scope value={rootContext}>
-      <SelectScopeView
-        children={children}
-        name={name}
-        disabled={disabled}
-        selectId={selectId}
-        declarationRenderContext={declarationRenderContext}
-        runtimeRenderContext={runtimeRenderContext}
-      />
+      <SelectRenderContext.Scope value={runtimeRenderContext}>
+        <SelectRootView name={name} disabled={disabled}>
+          {children}
+        </SelectRootView>
+      </SelectRenderContext.Scope>
     </SelectRootContext.Scope>
   );
 }

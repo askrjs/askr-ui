@@ -17,11 +17,9 @@ import {
   syncOverlayPosition,
 } from '../../_internal/overlay';
 import {
-  beginMenubarSurfaceDeclaration,
   createMenubarContentRenderContext,
   MenubarContentContext,
   MenubarContentRenderContext,
-  readMenubarDeclarationContext,
   readOptionalMenubarRootContext,
   readMenubarSubContext,
   resolveMenubarContentOwner,
@@ -34,47 +32,6 @@ import type {
   MenubarSubContentAsChildProps,
   MenubarSubContentProps,
 } from './menubar.types';
-
-function MenubarContentDeclarationPassView(props: {
-  children?: unknown;
-  contentId: string;
-}) {
-  beginMenubarSurfaceDeclaration(props.contentId);
-  return <>{props.children}</>;
-}
-
-function MenubarContentDeclarationRenderScopeView(props: {
-  children?: unknown;
-  contentContext: MenubarContentContextValue;
-  renderContext: ReturnType<typeof createMenubarContentRenderContext>;
-}) {
-  return (
-    <MenubarContentRenderContext.Scope value={props.renderContext}>
-      <MenubarContentDeclarationPassView
-        contentId={props.contentContext.contentId}
-      >
-        {props.children}
-      </MenubarContentDeclarationPassView>
-    </MenubarContentRenderContext.Scope>
-  );
-}
-
-function MenubarContentDeclarationScopeView(props: {
-  children?: unknown;
-  contentContext: MenubarContentContextValue;
-  renderContext: ReturnType<typeof createMenubarContentRenderContext>;
-}) {
-  return (
-    <MenubarContentContext.Scope value={props.contentContext}>
-      <MenubarContentDeclarationRenderScopeView
-        contentContext={props.contentContext}
-        renderContext={props.renderContext}
-      >
-        {props.children}
-      </MenubarContentDeclarationRenderScopeView>
-    </MenubarContentContext.Scope>
-  );
-}
 
 function MenubarContentRuntimeNodeView(props: { node: JSX.Element }) {
   return props.node;
@@ -138,19 +95,7 @@ function renderMenubarSurfaceContent(
     currentIndexCandidate: currentIndexState(),
     setCurrentIndex: currentIndexState.set,
   };
-  const declarationRenderContext = createMenubarContentRenderContext();
   const runtimeRenderContext = createMenubarContentRenderContext();
-
-  if (readMenubarDeclarationContext()) {
-    return (
-      <MenubarContentDeclarationScopeView
-        contentContext={contentContext}
-        renderContext={declarationRenderContext}
-      >
-        {children}
-      </MenubarContentDeclarationScopeView>
-    );
-  }
 
   const root = readOptionalMenubarRootContext();
 

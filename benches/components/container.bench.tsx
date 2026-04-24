@@ -1,12 +1,13 @@
 import { bench, describe } from 'vite-plus/test';
 import {
   Container,
-  type ContainerDivProps,
+  type ContainerAsChildProps,
+  type ContainerNativeProps,
 } from '../../src/components/primitives/container';
 
 describe('Container benches', () => {
   bench('create default container', () => {
-    Container({ children: 'bench' } as unknown as ContainerDivProps);
+    Container({ children: 'bench' } as unknown as ContainerNativeProps);
   });
 
   bench('create configured container layout', () => {
@@ -15,7 +16,7 @@ describe('Container benches', () => {
       padding: '24px',
       size: 'lg',
       children: <div>content</div>,
-    } as unknown as ContainerDivProps);
+    } as unknown as ContainerNativeProps);
   });
 
   bench('create asChild container with prop merging', () => {
@@ -25,6 +26,6 @@ describe('Container benches', () => {
       children: child,
       padding: '16px',
       'data-bench': 'container',
-    } as unknown as ContainerDivProps);
+    } as unknown as ContainerAsChildProps);
   });
 });

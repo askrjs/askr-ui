@@ -1,5 +1,4 @@
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
-import { readDropdownMenuDeclarationContext } from './dropdown-menu.shared';
 import type {
   DropdownMenuGroupAsChildProps,
   DropdownMenuGroupProps,
@@ -13,11 +12,6 @@ export function DropdownMenuGroup(
   props: DropdownMenuGroupProps | DropdownMenuGroupAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
-
-  if (readDropdownMenuDeclarationContext()) {
-    return <>{children}</>;
-  }
-
   const finalProps = mergeProps(rest, {
     ref,
     role: 'group',
@@ -34,10 +28,6 @@ export function DropdownMenuGroup(
 export function DropdownMenuLabel(
   props: DropdownMenuLabelProps | DropdownMenuLabelAsChildProps
 ) {
-  if (readDropdownMenuDeclarationContext()) {
-    return null;
-  }
-
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
@@ -55,10 +45,6 @@ export function DropdownMenuLabel(
 export function DropdownMenuSeparator(
   props: DropdownMenuSeparatorProps | DropdownMenuSeparatorAsChildProps
 ) {
-  if (readDropdownMenuDeclarationContext()) {
-    return null;
-  }
-
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,

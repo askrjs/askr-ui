@@ -1,13 +1,13 @@
 import { state } from '@askrjs/askr';
 import { mergeProps, rovingFocus } from '@askrjs/askr/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
-import { resolveCompoundId } from '../../_internal/id';
+import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import { getCompositeCollection } from '../../_internal/composite';
+import { collectJsxElements } from '../../_internal/jsx';
 import { getPersistentPortal } from '../../_internal/overlay';
+import { MenubarMenu } from './menubar-menu';
 import {
-  beginMenubarTriggerDeclaration,
   createMenubarRootRenderContext,
-  MenubarDeclarationContext,
   MenubarRootContext,
   MenubarRootRenderContext,
   readMenubarRootContext,
@@ -15,28 +15,6 @@ import {
   type MenubarRootContextValue,
 } from './menubar.shared';
 import type { MenubarProps } from './menubar.types';
-
-function MenubarDeclarationPassView(props: {
-  children?: unknown;
-  menubarId: string;
-}) {
-  beginMenubarTriggerDeclaration(props.menubarId);
-  return <>{props.children}</>;
-}
-
-function MenubarDeclarationContextView(props: {
-  children?: unknown;
-  menubarId: string;
-  renderContext: ReturnType<typeof createMenubarRootRenderContext>;
-}) {
-  return (
-    <MenubarRootRenderContext.Scope value={props.renderContext}>
-      <MenubarDeclarationPassView menubarId={props.menubarId}>
-        {props.children}
-      </MenubarDeclarationPassView>
-    </MenubarRootRenderContext.Scope>
-  );
-}
 
 function MenubarRuntimeView(props: {
   children?: unknown;
@@ -46,9 +24,13 @@ function MenubarRuntimeView(props: {
   const root = readMenubarRootContext();
   const { items, currentTriggerIndex, disabledTriggerIndexes } =
     resolveMenubarRootState(root);
+  const portalIds = collectJsxElements(
+    props.children,
+    (element) => element.type === MenubarMenu
+  ).map((_element, index) => resolvePartId(root.menubarId, `portal-${index}`));
 
-  items.forEach((item) => {
-    getPersistentPortal(item.portalId).render({ children: null });
+  portalIds.forEach((portalId) => {
+    getPersistentPortal(portalId).render({ children: null });
   });
 
   const collection = getCompositeCollection(root.menubarId);
@@ -74,38 +56,11 @@ function MenubarRuntimeView(props: {
   return (
     <>
       <div {...finalProps}>{props.children}</div>
-      {items.map((item) => {
-        const PortalHost = getPersistentPortal(item.portalId);
+      {portalIds.map((portalId) => {
+        const PortalHost = getPersistentPortal(portalId);
 
-        return <PortalHost key={item.portalId} />;
+        return <PortalHost key={portalId} />;
       })}
-    </>
-  );
-}
-
-function MenubarScopeView(props: {
-  children?: unknown;
-  menubarId: string;
-  ref: MenubarProps['ref'];
-  rest: Omit<MenubarProps, 'children' | 'id' | 'loop'>;
-  declarationRenderContext: ReturnType<typeof createMenubarRootRenderContext>;
-  runtimeRenderContext: ReturnType<typeof createMenubarRootRenderContext>;
-}) {
-  return (
-    <>
-      <MenubarDeclarationContext.Scope value={true}>
-        <MenubarDeclarationContextView
-          menubarId={props.menubarId}
-          renderContext={props.declarationRenderContext}
-        >
-          {props.children}
-        </MenubarDeclarationContextView>
-      </MenubarDeclarationContext.Scope>
-      <MenubarRootRenderContext.Scope value={props.runtimeRenderContext}>
-        <MenubarRuntimeView ref={props.ref} rest={props.rest}>
-          {props.children}
-        </MenubarRuntimeView>
-      </MenubarRootRenderContext.Scope>
     </>
   );
 }
@@ -128,19 +83,15 @@ export function Menubar(props: MenubarProps) {
     currentTriggerIndexCandidate: currentTriggerIndexState(),
     setCurrentTriggerIndex: currentTriggerIndexState.set,
   };
-  const declarationRenderContext = createMenubarRootRenderContext();
   const runtimeRenderContext = createMenubarRootRenderContext();
 
   return (
     <MenubarRootContext.Scope value={rootContext}>
-      <MenubarScopeView
-        children={children}
-        menubarId={menubarId}
-        ref={ref}
-        rest={rest}
-        declarationRenderContext={declarationRenderContext}
-        runtimeRenderContext={runtimeRenderContext}
-      />
+      <MenubarRootRenderContext.Scope value={runtimeRenderContext}>
+        <MenubarRuntimeView ref={ref} rest={rest}>
+          {children}
+        </MenubarRuntimeView>
+      </MenubarRootRenderContext.Scope>
     </MenubarRootContext.Scope>
   );
 }

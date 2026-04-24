@@ -1,9 +1,13 @@
 import { bench, describe } from 'vite-plus/test';
-import { Flex, type FlexDivProps } from '../../src/components/primitives/flex';
+import {
+  Flex,
+  type FlexAsChildProps,
+  type FlexNativeProps,
+} from '../../src/components/primitives/flex';
 
 describe('Flex benches', () => {
   bench('create default flex', () => {
-    Flex({ children: 'bench' } as unknown as FlexDivProps);
+    Flex({ children: 'bench' } as unknown as FlexNativeProps);
   });
 
   bench('create configured flex layout', () => {
@@ -14,7 +18,7 @@ describe('Flex benches', () => {
       justify: 'space-between',
       wrap: 'wrap',
       children: [<span>A</span>, <span>B</span>, <span>C</span>],
-    } as unknown as FlexDivProps);
+    } as unknown as FlexNativeProps);
   });
 
   bench('create asChild flex with prop merging', () => {
@@ -24,6 +28,6 @@ describe('Flex benches', () => {
       children: child,
       gap: '8px',
       'data-bench': 'flex',
-    } as unknown as FlexDivProps);
+    } as unknown as FlexAsChildProps);
   });
 });

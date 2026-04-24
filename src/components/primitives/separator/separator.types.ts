@@ -6,7 +6,7 @@ export type SeparatorOwnProps = {
   children?: unknown;
 };
 
-export type SeparatorDivProps = Omit<
+export type SeparatorNativeProps = Omit<
   JSX.IntrinsicElements['div'],
   'children' | 'ref'
 > &
@@ -21,4 +21,4 @@ export type SeparatorAsChildProps = SeparatorOwnProps & {
   ref?: Ref<unknown>;
 };
 
-export type SeparatorProps = SeparatorDivProps | SeparatorAsChildProps;
+export type SeparatorProps = SeparatorNativeProps | SeparatorAsChildProps;

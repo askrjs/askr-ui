@@ -7,14 +7,12 @@ import {
 } from '@askrjs/askr/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import {
-  declareMenuItemMetadata,
   getMenuCollection,
   registerCollectionNode,
   resolveMenuItemText,
 } from '../../_internal/menu';
 import { resolvePartId } from '../../_internal/id';
 import {
-  readDropdownMenuDeclarationContext,
   readDropdownMenuRenderContext,
   readDropdownMenuRootContext,
   resolveDropdownMenuState,
@@ -45,17 +43,8 @@ export function DropdownMenuItem(
   const root = readDropdownMenuRootContext();
   const renderContext = readDropdownMenuRenderContext();
   const itemIndex = renderContext.claimItemIndex();
-
-  if (readDropdownMenuDeclarationContext()) {
-    declareMenuItemMetadata(root.dropdownMenuId, {
-      index: itemIndex,
-      disabled,
-      text: resolveMenuItemText(children),
-    });
-    return null;
-  }
-
   const itemId = resolvePartId(root.dropdownMenuId, `item-${itemIndex}`);
+  const itemText = resolveMenuItemText(children);
   const { items, currentIndex, disabledIndexes } =
     resolveDropdownMenuState(root);
   const hasEnabledItems = items.some(
@@ -102,7 +91,7 @@ export function DropdownMenuItem(
         registerCollectionNode(itemId, collection, node, {
           index: itemIndex,
           disabled,
-          text: resolveMenuItemText(children),
+          text: itemText,
         });
       }
     ),
