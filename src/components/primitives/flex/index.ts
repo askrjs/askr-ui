@@ -4,5 +4,7 @@ export type {
   FlexProps,
   FlexOwnProps,
   FlexNativeProps,
+  FlexDivProps,
+  FlexSpanProps,
   FlexAsChildProps,
 } from './flex.types';

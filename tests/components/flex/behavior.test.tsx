@@ -30,7 +30,7 @@ describe('Flex - Behavior', () => {
     container = mount(<Flex gap="0.5rem" />);
     const el = container.querySelector('[data-slot="flex"]');
     expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.gap)).toBe(
-      '0.5rem'
+      'initial:0.5rem'
     );
   });
 
@@ -38,7 +38,7 @@ describe('Flex - Behavior', () => {
     container = mount(<Flex align="center" />);
     const el = container.querySelector('[data-slot="flex"]');
     expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.align)).toBe(
-      'center'
+      'initial:center'
     );
   });
 
@@ -46,7 +46,7 @@ describe('Flex - Behavior', () => {
     container = mount(<Flex wrap="wrap" />);
     const el = container.querySelector('[data-slot="flex"]');
     expect(el?.getAttribute(FLEX_A11Y_CONTRACT.DATA_ATTRIBUTES.wrap)).toBe(
-      'wrap'
+      'initial:wrap'
     );
   });
 
