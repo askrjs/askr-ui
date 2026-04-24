@@ -29,17 +29,17 @@ describe('Grid - Behavior', () => {
   it('should apply repeat columns style given a numeric columns prop', () => {
     container = mount(<Grid columns={3} />);
     const el = container.querySelector('[data-slot="grid"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--ak-grid-template-columns-initial')).toBe(
-      'repeat(3, minmax(0, 1fr))'
-    );
+    expect(
+      el.style.getPropertyValue('--ak-grid-template-columns-initial')
+    ).toBe('repeat(3, minmax(0, 1fr))');
   });
 
   it('should apply repeat columns style given a numeric string columns prop', () => {
     container = mount(<Grid columns="3" />);
     const el = container.querySelector('[data-slot="grid"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--ak-grid-template-columns-initial')).toBe(
-      'repeat(3, minmax(0, 1fr))'
-    );
+    expect(
+      el.style.getPropertyValue('--ak-grid-template-columns-initial')
+    ).toBe('repeat(3, minmax(0, 1fr))');
   });
 
   it('should apply raw CSS string given a CSS length columns prop', () => {
@@ -48,9 +48,9 @@ describe('Grid - Behavior', () => {
     expect(el.getAttribute(GRID_A11Y_CONTRACT.DATA_ATTRIBUTES.columns)).toBe(
       'initial:1fr 2fr 1fr'
     );
-    expect(el.style.getPropertyValue('--ak-grid-template-columns-initial')).toBe(
-      '1fr 2fr 1fr'
-    );
+    expect(
+      el.style.getPropertyValue('--ak-grid-template-columns-initial')
+    ).toBe('1fr 2fr 1fr');
   });
 
   it('should emit data-columns attribute', () => {

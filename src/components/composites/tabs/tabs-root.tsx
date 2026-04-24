@@ -8,6 +8,7 @@ import {
   firstEnabledCompositeIndex,
 } from '../../_internal/composite';
 import { resolveCompoundId } from '../../_internal/id';
+import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import {
   createTabsRenderContext,
   TabsRenderContext,
@@ -34,7 +35,18 @@ function TabsRootView(props: {
   children?: unknown;
   finalProps: Record<string, unknown>;
 }) {
-  return <div {...props.finalProps}>{props.children}</div>;
+  const keyedChildren = toChildArray(props.children).map((child, index) => {
+    if (!isJsxElement(child) || child.key != null) {
+      return child;
+    }
+
+    return {
+      ...child,
+      key: `tabs-root-${index}`,
+    };
+  });
+
+  return <div {...props.finalProps}>{keyedChildren}</div>;
 }
 
 export function Tabs(props: TabsProps) {
@@ -65,7 +77,8 @@ export function Tabs(props: TabsProps) {
   const internalValueState = state(defaultValue ?? '');
   const isControlled = value !== undefined;
   const valueState = (() => {
-    const read = () => (isControlled ? (value as string) : internalValueState());
+    const read = () =>
+      isControlled ? (value as string) : internalValueState();
     read.set = (nextOrUpdater: string | ((prev: string) => string)) => {
       const prev = read();
       const next =
@@ -141,28 +154,25 @@ export function Tabs(props: TabsProps) {
     'data-orientation': orientation,
   });
 
-  resource(
-    () => {
-      if (value !== undefined || defaultValue !== undefined) {
-        return null;
-      }
-
-      if (valueState() !== '') {
-        return null;
-      }
-
-      const firstEnabledIndex = firstEnabledCompositeIndex(items);
-      const firstEnabledItem = items[firstEnabledIndex];
-
-      if (!firstEnabledItem) {
-        return null;
-      }
-
-      valueState.set(firstEnabledItem.value);
+  resource(() => {
+    if (value !== undefined || defaultValue !== undefined) {
       return null;
-    },
-    [tabsId, value, defaultValue, itemsRevision]
-  );
+    }
+
+    if (valueState() !== '') {
+      return null;
+    }
+
+    const firstEnabledIndex = firstEnabledCompositeIndex(items);
+    const firstEnabledItem = items[firstEnabledIndex];
+
+    if (!firstEnabledItem) {
+      return null;
+    }
+
+    valueState.set(firstEnabledItem.value);
+    return null;
+  }, [tabsId, value, defaultValue, itemsRevision]);
 
   return (
     <TabsRootContext.Scope value={rootContext}>

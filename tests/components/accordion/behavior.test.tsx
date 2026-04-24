@@ -34,7 +34,7 @@ describe('Accordion - Behavior', () => {
   it('should support single and multiple open state', async () => {
     container = mount(
       <div>
-        <Accordion defaultValue="one" collapsible>
+        <Accordion key="single" defaultValue="one" collapsible>
           <AccordionItem value="one">
             <AccordionHeader>
               <AccordionTrigger>One</AccordionTrigger>
@@ -48,7 +48,7 @@ describe('Accordion - Behavior', () => {
             <AccordionContent>Second</AccordionContent>
           </AccordionItem>
         </Accordion>
-        <Accordion type="multiple" defaultValue={['one']}>
+        <Accordion key="multiple" type="multiple" defaultValue={['one']}>
           <AccordionItem value="one">
             <AccordionHeader>
               <AccordionTrigger>One multiple</AccordionTrigger>

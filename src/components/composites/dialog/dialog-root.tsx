@@ -1,5 +1,6 @@
-import { state } from '@askrjs/askr';
+import { For, state } from '@askrjs/askr';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
+import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import {
   clearOverlayPosition,
   getOverlayNodes,
@@ -24,11 +25,17 @@ function scheduleDialogPortalSync(callback: () => void) {
 function DialogRootView(props: { children?: unknown }) {
   const root = readDialogRootContext();
   const PortalHost = root.portal;
+  const keyedChildren = For<unknown>(
+    () => toChildArray(props.children),
+    (child, index) =>
+      isJsxElement(child) && child.key != null ? child.key : index,
+    (child) => child as never
+  );
 
   return (
     <>
-      {props.children}
-      {PortalHost ? <PortalHost /> : null}
+      {keyedChildren}
+      {PortalHost ? <PortalHost key="dialog-root-portal" /> : null}
     </>
   );
 }

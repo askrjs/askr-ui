@@ -7,6 +7,7 @@ import {
 } from '@askrjs/askr/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import { resolvePartId } from '../../_internal/id';
+import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import { pathIsOpen } from '../../_internal/hierarchical-menu';
 import { getOverlayNodes } from '../../_internal/overlay';
 import {
@@ -32,7 +33,18 @@ import type {
 } from './menubar.types';
 
 function MenubarSubScopeView(props: { children?: unknown }) {
-  return <>{props.children}</>;
+  const keyedChildren = toChildArray(props.children).map((child, index) => {
+    if (!isJsxElement(child) || child.key != null) {
+      return child;
+    }
+
+    return {
+      ...child,
+      key: `menubar-sub-${index}`,
+    };
+  });
+
+  return <>{keyedChildren}</>;
 }
 
 function scheduleMenubarPortalSync(root: { syncPortals: () => void }) {

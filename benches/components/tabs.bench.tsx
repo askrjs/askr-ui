@@ -1,10 +1,5 @@
 import { bench, describe } from 'vite-plus/test';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '../../src/components/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../src/components';
 
 describe('Tabs benches', () => {
   bench('create tabs', () => {

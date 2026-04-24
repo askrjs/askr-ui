@@ -3,7 +3,11 @@ import { mergeProps, rovingFocus } from '@askrjs/askr/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import { getCompositeCollection } from '../../_internal/composite';
-import { collectJsxElements } from '../../_internal/jsx';
+import {
+  collectJsxElements,
+  isJsxElement,
+  toChildArray,
+} from '../../_internal/jsx';
 import { getPersistentPortal } from '../../_internal/overlay';
 import { MenubarMenu } from './menubar-menu';
 import {
@@ -55,7 +59,18 @@ function MenubarRuntimeView(props: {
 
   return (
     <>
-      <div {...finalProps}>{props.children}</div>
+      <div {...finalProps}>
+        {toChildArray(props.children).map((child, index) => {
+          if (!isJsxElement(child) || child.key != null) {
+            return child;
+          }
+
+          return {
+            ...child,
+            key: `menubar-root-${index}`,
+          };
+        })}
+      </div>
       {portalIds.map((portalId) => {
         const PortalHost = getPersistentPortal(portalId);
 

@@ -1,5 +1,7 @@
+import { For } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
+import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import {
   clearOverlayPosition,
   getOverlayNodes,
@@ -22,11 +24,17 @@ function scheduleTooltipPortalSync(callback: () => void) {
 function TooltipRootView(props: { children?: unknown }) {
   const root = readTooltipRootContext();
   const PortalHost = root.portal;
+  const keyedChildren = For<unknown>(
+    () => toChildArray(props.children),
+    (child, index) =>
+      isJsxElement(child) && child.key != null ? child.key : index,
+    (child) => child as never
+  );
 
   return (
     <>
-      {props.children}
-      {PortalHost ? <PortalHost /> : null}
+      {keyedChildren}
+      {PortalHost ? <PortalHost key="tooltip-root-portal" /> : null}
     </>
   );
 }

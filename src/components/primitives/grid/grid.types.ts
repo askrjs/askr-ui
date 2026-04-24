@@ -1,8 +1,5 @@
 import type { JSXElement, Ref } from '@askrjs/askr/foundations';
-import type {
-  BoxLayoutOwnProps,
-  LayoutResponsive,
-} from '../box/box.types';
+import type { BoxLayoutOwnProps, LayoutResponsive } from '../box/box.types';
 
 export type GridOwnProps = BoxLayoutOwnProps & {
   areas?: LayoutResponsive<string>;

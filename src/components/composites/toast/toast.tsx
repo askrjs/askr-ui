@@ -84,7 +84,9 @@ function restoreToastFocus(entry: ToastLifecycleEntry) {
   }
 }
 
-function getToastProviderContext(providerId: string): ToastProviderContextValue {
+function getToastProviderContext(
+  providerId: string
+): ToastProviderContextValue {
   const existing = toastProviderContexts.get(providerId);
 
   if (existing) {
@@ -351,7 +353,9 @@ export function ToastProvider(props: ToastProviderProps) {
 
 export function ToastViewport(props: ToastViewportProps): JSX.Element;
 export function ToastViewport(props: ToastViewportAsChildProps): JSX.Element;
-export function ToastViewport(props: ToastViewportProps | ToastViewportAsChildProps) {
+export function ToastViewport(
+  props: ToastViewportProps | ToastViewportAsChildProps
+) {
   const { asChild, children, ref, ...rest } = props;
   const provider = readToastProviderContext();
   const content = (
@@ -471,11 +475,16 @@ export function ToastDescription(
 
 export function ToastAction(props: ToastActionProps): JSX.Element;
 export function ToastAction(props: ToastActionAsChildProps): JSX.Element;
-export function ToastAction(
-  props: ToastActionProps | ToastActionAsChildProps
-) {
-  const { asChild, children, disabled = false, onPress, ref, type: typeProp, ...rest } =
-    props;
+export function ToastAction(props: ToastActionProps | ToastActionAsChildProps) {
+  const {
+    asChild,
+    children,
+    disabled = false,
+    onPress,
+    ref,
+    type: typeProp,
+    ...rest
+  } = props;
   const root = readToastRootContext();
   const interactionProps = pressable({
     disabled,
@@ -509,11 +518,16 @@ export function ToastAction(
 
 export function ToastClose(props: ToastCloseProps): JSX.Element;
 export function ToastClose(props: ToastCloseAsChildProps): JSX.Element;
-export function ToastClose(
-  props: ToastCloseProps | ToastCloseAsChildProps
-) {
-  const { asChild, children, disabled = false, onPress, ref, type: typeProp, ...rest } =
-    props;
+export function ToastClose(props: ToastCloseProps | ToastCloseAsChildProps) {
+  const {
+    asChild,
+    children,
+    disabled = false,
+    onPress,
+    ref,
+    type: typeProp,
+    ...rest
+  } = props;
   const root = readToastRootContext();
   const interactionProps = pressable({
     disabled,

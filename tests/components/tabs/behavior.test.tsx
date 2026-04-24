@@ -34,7 +34,7 @@ describe('Tabs - Behavior', () => {
   it('should support automatic and manual activation', async () => {
     container = mount(
       <div>
-        <Tabs defaultValue="overview">
+        <Tabs key="automatic" defaultValue="overview">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -42,7 +42,7 @@ describe('Tabs - Behavior', () => {
           <TabsContent value="overview">Overview panel</TabsContent>
           <TabsContent value="settings">Settings panel</TabsContent>
         </Tabs>
-        <Tabs defaultValue="overview" activationMode="manual">
+        <Tabs key="manual" defaultValue="overview" activationMode="manual">
           <TabsList>
             <TabsTrigger value="overview">Overview manual</TabsTrigger>
             <TabsTrigger value="settings">Settings manual</TabsTrigger>

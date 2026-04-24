@@ -14,6 +14,7 @@ import {
 } from '../../../src/components/composites/navigation-menu';
 import { NAVIGATION_MENU_A11Y_CONTRACT } from '../../../src/components/composites/navigation-menu/navigation-menu.a11y';
 import { flushUpdates, mount, unmount } from '../../test-utils';
+import { expectNoUnexpectedWarnings } from '../../warnings';
 
 function getButtonByText(text: string): HTMLButtonElement {
   const button = Array.from(document.body.querySelectorAll('button')).find(
@@ -41,55 +42,59 @@ describe('NavigationMenu - Behavior', () => {
   });
 
   it('updates viewport and indicator state with nested flyouts', async () => {
-    container = mount(
-      <NavigationMenu>
-        <NavigationMenuList>
-          <NavigationMenuItem value="products">
-            <NavigationMenuTrigger>Products</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <NavigationMenuLink href="/products/core">
-                Core
-              </NavigationMenuLink>
-              <NavigationMenuSub value="more">
-                <NavigationMenuSubTrigger>More</NavigationMenuSubTrigger>
-                <NavigationMenuSubContent>
-                  <NavigationMenuLink href="/products/pro">
-                    Pro
+    await expectNoUnexpectedWarnings(
+      async () => {
+        container = mount(
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem value="products">
+                <NavigationMenuTrigger>Products</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <NavigationMenuLink href="/products/core">
+                    Core
                   </NavigationMenuLink>
-                </NavigationMenuSubContent>
-              </NavigationMenuSub>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-        <NavigationMenuViewport />
-        <NavigationMenuIndicator />
-      </NavigationMenu>
+                  <NavigationMenuSub value="more">
+                    <NavigationMenuSubTrigger>More</NavigationMenuSubTrigger>
+                    <NavigationMenuSubContent>
+                      <NavigationMenuLink href="/products/pro">
+                        Pro
+                      </NavigationMenuLink>
+                    </NavigationMenuSubContent>
+                  </NavigationMenuSub>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+            <NavigationMenuViewport />
+            <NavigationMenuIndicator />
+          </NavigationMenu>
+        );
+
+        getButtonByText('Products').click();
+        await flushPortalUpdates();
+
+        expect(
+          container
+            .querySelector(
+              `[${NAVIGATION_MENU_A11Y_CONTRACT.VIEWPORT_MARKER}="true"]`
+            )
+            ?.getAttribute('data-state')
+        ).toBe('open');
+        expect(
+          container
+            .querySelector(
+              `[${NAVIGATION_MENU_A11Y_CONTRACT.INDICATOR_MARKER}="true"]`
+            )
+            ?.getAttribute('data-active-item')
+        ).toBe('products');
+
+        getButtonByText('More').dispatchEvent(
+          new PointerEvent('pointerenter', { bubbles: true })
+        );
+        await flushPortalUpdates();
+
+        expect(document.body.textContent).toContain('Pro');
+      },
     );
-
-    getButtonByText('Products').click();
-    await flushPortalUpdates();
-
-    expect(
-      container
-        .querySelector(
-          `[${NAVIGATION_MENU_A11Y_CONTRACT.VIEWPORT_MARKER}="true"]`
-        )
-        ?.getAttribute('data-state')
-    ).toBe('open');
-    expect(
-      container
-        .querySelector(
-          `[${NAVIGATION_MENU_A11Y_CONTRACT.INDICATOR_MARKER}="true"]`
-        )
-        ?.getAttribute('data-active-item')
-    ).toBe('products');
-
-    getButtonByText('More').dispatchEvent(
-      new PointerEvent('pointerenter', { bubbles: true })
-    );
-    await flushPortalUpdates();
-
-    expect(document.body.textContent).toContain('Pro');
   });
 
   it('supports trigger open and escape dismissal', async () => {

@@ -157,6 +157,14 @@ export function readMyComponentContext() {
 
 Do **not** skip testing. Tests are part of the component.
 
+**Test layers**
+
+- **Node**: `tests/public-api.test.ts`, `tests/docs-contract.test.ts`, and `tests/types/**`
+- **Jsdom**: DOM-backed helpers and internal contract checks like `tests/components/icon/**`, `tests/components/consistency-reset/**`, and `tests/components/data-table/state.test.tsx`
+- **Browser**: public component `behavior`, `a11y`, and `determinism` suites, plus browser coverage for `data-table`
+
+Use `tests/warnings.ts` for browser flows that should stay warning-free. Keep it targeted to real contract or user-visible defects, not generic framework noise.
+
 **Behavior tests** (`tests/components/my-component/behavior.test.tsx`):
 
 - Mount and verify core state transitions
@@ -212,11 +220,13 @@ After every change, run:
 ```bash
 npm run fmt
 npm run lint
+npm run test:unit
+npm run test:component
 npm test
 npm run bench
 ```
 
-**All four must pass.** If `bench` fails, stabilize the benchmark entry or investigate regressions.
+For release gating, run `npm run quality` so build, tests, and benchmarks are exercised together. If `bench` fails, stabilize the benchmark entry or investigate regressions.
 
 ### Step 7: Add Benchmark Entry
 

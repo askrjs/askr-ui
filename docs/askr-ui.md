@@ -19,7 +19,7 @@ visual styling. Pair it with `askr-themes` for visual defaults, or supply your o
 | Identity   | Avatar                                                                                                                              | `@askrjs/askr-ui` |
 | Navigation | Breadcrumb, Pagination, Menubar, NavigationMenu                                                                                     | `@askrjs/askr-ui` |
 | Layout     | Container, Flex, Grid, Spacer                                                                                                       | `@askrjs/askr-ui` |
-| Patterns   | DataTable, SidebarLayout, TopbarLayout                                                                                               | `@askrjs/askr-ui` |
+| Patterns   | DataTable, SidebarLayout, TopbarLayout                                                                                              | `@askrjs/askr-ui` |
 
 ## Import style
 

@@ -6,7 +6,7 @@ import {
 } from '../../../src/components/composites/collapsible/collapsible';
 import { COLLAPSIBLE_A11Y_CONTRACT } from '../../../src/components/composites/collapsible/collapsible.a11y';
 import { createIsland } from '@askrjs/askr';
-import { axe } from 'vitest-axe';
+import { expectNoAxeViolations } from '../../accessibility';
 
 function mount(element: JSX.Element): HTMLElement {
   const container = document.createElement('div');
@@ -41,18 +41,7 @@ describe('Collapsible — Accessibility', () => {
           <CollapsibleContent>Hidden content</CollapsibleContent>
         </Collapsible>
       );
-      const results = await axe(container);
-
-      if (results.violations.length > 0) {
-        throw new Error(
-          `Axe violations found:\n${results.violations
-            .map(
-              (v) =>
-                `  - ${v.id}: ${v.description}\n    ${v.nodes.map((n) => n.html).join('\n    ')}`
-            )
-            .join('\n')}`
-        );
-      }
+      await expectNoAxeViolations(container);
     });
 
     it('should have no automated axe violations given open collapsible', async () => {
@@ -62,18 +51,7 @@ describe('Collapsible — Accessibility', () => {
           <CollapsibleContent>Visible content</CollapsibleContent>
         </Collapsible>
       );
-      const results = await axe(container);
-
-      if (results.violations.length > 0) {
-        throw new Error(
-          `Axe violations found:\n${results.violations
-            .map(
-              (v) =>
-                `  - ${v.id}: ${v.description}\n    ${v.nodes.map((n) => n.html).join('\n    ')}`
-            )
-            .join('\n')}`
-        );
-      }
+      await expectNoAxeViolations(container);
     });
 
     it('should have no automated axe violations given disabled collapsible', async () => {
@@ -83,18 +61,7 @@ describe('Collapsible — Accessibility', () => {
           <CollapsibleContent>Content</CollapsibleContent>
         </Collapsible>
       );
-      const results = await axe(container);
-
-      if (results.violations.length > 0) {
-        throw new Error(
-          `Axe violations found:\n${results.violations
-            .map(
-              (v) =>
-                `  - ${v.id}: ${v.description}\n    ${v.nodes.map((n) => n.html).join('\n    ')}`
-            )
-            .join('\n')}`
-        );
-      }
+      await expectNoAxeViolations(container);
     });
   });
 

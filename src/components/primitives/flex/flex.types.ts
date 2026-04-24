@@ -1,11 +1,10 @@
 import type { JSXElement, Ref } from '@askrjs/askr/foundations';
-import type {
-  BoxLayoutOwnProps,
-  LayoutResponsive,
-} from '../box/box.types';
+import type { BoxLayoutOwnProps, LayoutResponsive } from '../box/box.types';
 
 export type FlexOwnProps = BoxLayoutOwnProps & {
-  direction?: LayoutResponsive<'row' | 'column' | 'row-reverse' | 'column-reverse'>;
+  direction?: LayoutResponsive<
+    'row' | 'column' | 'row-reverse' | 'column-reverse'
+  >;
   gap?: LayoutResponsive<string | number>;
   gapX?: LayoutResponsive<string | number>;
   gapY?: LayoutResponsive<string | number>;

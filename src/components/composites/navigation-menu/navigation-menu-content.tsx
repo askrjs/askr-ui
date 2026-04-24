@@ -13,6 +13,7 @@ import {
   getCompositeCollectionItems,
 } from '../../_internal/composite';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
+import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import {
   getOverlayNodes,
   getPersistentPortal,
@@ -78,10 +79,11 @@ export function NavigationMenuContent(
   const firstEnabledIndex =
     orderedSurfaceItems.find((entry) => !entry.disabled)?.index ?? 0;
   const currentIndexState = state(firstEnabledIndex);
+  const currentIndexCandidate = currentIndexState();
   const currentIndex = orderedSurfaceItems.some(
-    (entry) => entry.index === currentIndexState() && !entry.disabled
+    (entry) => entry.index === currentIndexCandidate && !entry.disabled
   )
-    ? currentIndexState()
+    ? currentIndexCandidate
     : firstEnabledIndex;
 
   const surfaceIndexMap = new Map<string, number>();
@@ -158,9 +160,33 @@ export function NavigationMenuContent(
   });
 
   const contentNode = asChild ? (
-    <Slot asChild {...finalProps} children={children} />
+    <Slot
+      asChild
+      {...finalProps}
+      children={toChildArray(children).map((child, index) => {
+        if (!isJsxElement(child) || child.key != null) {
+          return child;
+        }
+
+        return {
+          ...child,
+          key: `navigation-menu-content-${index}`,
+        };
+      }) as unknown as JSX.Element}
+    />
   ) : (
-    <div {...finalProps}>{children}</div>
+    <div {...finalProps}>
+      {toChildArray(children).map((child, index) => {
+        if (!isJsxElement(child) || child.key != null) {
+          return child;
+        }
+
+        return {
+          ...child,
+          key: `navigation-menu-content-${index}`,
+        };
+      })}
+    </div>
   );
 
   const rendered = (
@@ -181,13 +207,7 @@ export function NavigationMenuContent(
   );
 
   const PortalHost = portal;
+  portal.render({ children: rendered });
 
-  return (
-    <>
-      {portal.render({
-        children: rendered,
-      })}
-      {PortalHost ? <PortalHost /> : null}
-    </>
-  );
+  return <PortalHost />;
 }

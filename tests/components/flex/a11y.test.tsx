@@ -6,8 +6,8 @@ describe('Flex - Accessibility', () => {
   it('should have no automated axe violations given flex with children', async () => {
     await expectNoAxeViolations(
       <Flex>
-        <span>Item one</span>
-        <span>Item two</span>
+        <span key="one">Item one</span>
+        <span key="two">Item two</span>
       </Flex>
     );
   });

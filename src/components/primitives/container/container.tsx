@@ -54,7 +54,12 @@ export function Container(props: ContainerNativeProps | ContainerAsChildProps) {
     );
   }
 
-  if (padding !== undefined && boxProps.px === undefined && boxProps.pl === undefined && boxProps.pr === undefined) {
+  if (
+    padding !== undefined &&
+    boxProps.px === undefined &&
+    boxProps.pl === undefined &&
+    boxProps.pr === undefined
+  ) {
     setResponsiveStyleVar(layoutStyle, 'px', padding, resolveSpaceValue);
   }
 
@@ -62,10 +67,15 @@ export function Container(props: ContainerNativeProps | ContainerAsChildProps) {
     side: 'marginLeft' | 'marginRight',
     value: typeof align
   ) => {
-    setResponsiveStyleVar(layoutStyle, side === 'marginLeft' ? 'ml' : 'mr', value, (input) => {
-      const margins = resolveInlineAlignValue(input);
-      return side === 'marginLeft' ? margins.marginLeft : margins.marginRight;
-    });
+    setResponsiveStyleVar(
+      layoutStyle,
+      side === 'marginLeft' ? 'ml' : 'mr',
+      value,
+      (input) => {
+        const margins = resolveInlineAlignValue(input);
+        return side === 'marginLeft' ? margins.marginLeft : margins.marginRight;
+      }
+    );
   };
 
   if (boxProps.ml === undefined && boxProps.mr === undefined) {

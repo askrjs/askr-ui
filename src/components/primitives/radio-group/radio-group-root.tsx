@@ -1,4 +1,5 @@
 import { state } from '@askrjs/askr';
+import { For } from '@askrjs/askr/for';
 import {
   controllableState,
   mergeProps,
@@ -12,6 +13,7 @@ import {
   getCompositeCollectionItems,
 } from '../../_internal/composite';
 import { resolveCompoundId } from '../../_internal/id';
+import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import {
   createRadioGroupRenderContext,
   readRadioGroupRootContext,
@@ -46,6 +48,7 @@ function RadioGroupRootView(props: {
   disabled: boolean;
   value: string;
 }) {
+  const { children, name, disabled, value } = props;
   const root = readRadioGroupRootContext();
   const collection = getCompositeCollection(root.groupId);
   const disabledItemIndexes = disabledIndexes(root.items);
@@ -66,22 +69,43 @@ function RadioGroupRootView(props: {
       }
     },
   });
-  const finalProps = mergeProps(props as {}, {
+  const finalProps = mergeProps({}, {
     ...nav.container,
   });
+  const keyedChildren = toChildArray(props.children).map((child, index) => {
+    if (!isJsxElement(child) || child.key != null) {
+      return child;
+    }
+
+    return {
+      ...child,
+      key: `radio-group-root-${index}`,
+    };
+  });
+  const renderedChildren = [...keyedChildren];
+
+  if (name) {
+    renderedChildren.push(
+      <input
+        key="radio-group-hidden-input"
+        type="hidden"
+        name={name}
+        value={value}
+        disabled={disabled}
+      />
+    );
+  }
+  const renderedList = For(
+    () => renderedChildren,
+    (child, index) =>
+      isJsxElement(child) && child.key != null ? String(child.key) : index,
+    (child) => child as JSX.Element
+  );
 
   return (
-    <>
-      <div {...finalProps}>{props.children}</div>
-      {props.name ? (
-        <input
-          type="hidden"
-          name={props.name}
-          value={props.value}
-          disabled={props.disabled}
-        />
-      ) : null}
-    </>
+    <div {...finalProps}>
+      {renderedList}
+    </div>
   );
 }
 
@@ -167,6 +191,16 @@ export function RadioGroup(props: RadioGroupProps) {
     'data-orientation': orientation,
     'aria-orientation': orientation === 'both' ? undefined : orientation,
   });
+  const keyedChildren = toChildArray(children).map((child, index) => {
+    if (!isJsxElement(child) || child.key != null) {
+      return child;
+    }
+
+    return {
+      ...child,
+      key: `radio-group-${index}`,
+    };
+  });
 
   return (
     <RadioGroupRootContext.Scope value={rootContext}>
@@ -176,7 +210,7 @@ export function RadioGroup(props: RadioGroupProps) {
         disabled={disabled}
         value={valueState()}
       >
-        <div {...finalProps}>{children}</div>
+        <div {...finalProps}>{keyedChildren}</div>
       </RadioGroupScopeView>
     </RadioGroupRootContext.Scope>
   );

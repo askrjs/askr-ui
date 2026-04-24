@@ -35,15 +35,22 @@ export function TopbarLayout(props: TopbarLayoutProps): JSX.Element {
       data-gap={gap}
       style={mergeLayoutStyles(wrapperStyle, userStyle)}
     >
-      <header
-        data-slot="navbar"
-        style={mergeLayoutStyles(navbarStyle, undefined)}
-      >
-        {topbar}
-      </header>
-      <main data-slot="main" style={mergeLayoutStyles(mainStyle, undefined)}>
-        {children}
-      </main>
+      {[
+        <header
+          key="topbar-layout-navbar"
+          data-slot="navbar"
+          style={mergeLayoutStyles(navbarStyle, undefined)}
+        >
+          {topbar}
+        </header>,
+        <main
+          key="topbar-layout-main"
+          data-slot="main"
+          style={mergeLayoutStyles(mainStyle, undefined)}
+        >
+          {children}
+        </main>,
+      ]}
     </div>
   );
 }

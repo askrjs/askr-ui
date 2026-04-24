@@ -1,4 +1,6 @@
+import { For } from '@askrjs/askr';
 import { resolvePartId } from '../../_internal/id';
+import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import {
   NavigationMenuItemContext,
   type NavigationMenuItemContextValue,
@@ -7,7 +9,14 @@ import {
 import type { NavigationMenuItemProps } from './navigation-menu.types';
 
 function NavigationMenuItemScopeView(props: { children?: unknown }) {
-  return <>{props.children}</>;
+  const keyedChildren = For<unknown>(
+    () => toChildArray(props.children),
+    (child, index) =>
+      isJsxElement(child) && child.key != null ? child.key : index,
+    (child) => child as never
+  );
+
+  return <>{keyedChildren}</>;
 }
 
 export function NavigationMenuItem(props: NavigationMenuItemProps) {

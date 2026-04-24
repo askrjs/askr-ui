@@ -21,6 +21,7 @@ import {
   toggleDisclosureValue,
 } from '../../_internal/disclosure';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
+import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import type {
   AccordionContentAsChildProps,
   AccordionContentProps,
@@ -66,14 +67,36 @@ function AccordionRootView(props: {
   children?: unknown;
   finalProps: Record<string, unknown>;
 }) {
-  return <div {...props.finalProps}>{props.children}</div>;
+  const keyedChildren = toChildArray(props.children).map((child, index) => {
+    if (!isJsxElement(child) || child.key != null) {
+      return child;
+    }
+
+    return {
+      ...child,
+      key: `accordion-root-${index}`,
+    };
+  });
+
+  return <div {...props.finalProps}>{keyedChildren}</div>;
 }
 
 function AccordionItemView(props: {
   children?: unknown;
   finalProps: Record<string, unknown>;
 }) {
-  return <div {...props.finalProps}>{props.children}</div>;
+  const keyedChildren = toChildArray(props.children).map((child, index) => {
+    if (!isJsxElement(child) || child.key != null) {
+      return child;
+    }
+
+    return {
+      ...child,
+      key: `accordion-item-${index}`,
+    };
+  });
+
+  return <div {...props.finalProps}>{keyedChildren}</div>;
 }
 
 export function Accordion(props: AccordionProps) {
@@ -144,7 +167,9 @@ export function Accordion(props: AccordionProps) {
   return (
     <AccordionRootContext.Scope value={rootContext}>
       <AccordionRenderContext.Scope value={renderContext}>
-        <AccordionRootView finalProps={finalProps}>{children}</AccordionRootView>
+        <AccordionRootView finalProps={finalProps}>
+          {children}
+        </AccordionRootView>
       </AccordionRenderContext.Scope>
     </AccordionRootContext.Scope>
   );

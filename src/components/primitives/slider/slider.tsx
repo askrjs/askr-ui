@@ -216,9 +216,7 @@ export function Slider(props: SliderProps) {
 
 export function SliderTrack(props: SliderTrackProps): JSX.Element;
 export function SliderTrack(props: SliderTrackAsChildProps): JSX.Element;
-export function SliderTrack(
-  props: SliderTrackProps | SliderTrackAsChildProps
-) {
+export function SliderTrack(props: SliderTrackProps | SliderTrackAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const root = readSliderRootContext();
   const entry = getSliderEntry(root.sliderId);
@@ -258,9 +256,7 @@ export function SliderTrack(
 
 export function SliderRange(props: SliderRangeProps): JSX.Element;
 export function SliderRange(props: SliderRangeAsChildProps): JSX.Element;
-export function SliderRange(
-  props: SliderRangeProps | SliderRangeAsChildProps
-) {
+export function SliderRange(props: SliderRangeProps | SliderRangeAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const root = readSliderRootContext();
   const percentage = rangePercentage(root.value, root.min, root.max);
@@ -281,9 +277,7 @@ export function SliderRange(
 
 export function SliderThumb(props: SliderThumbProps): JSX.Element;
 export function SliderThumb(props: SliderThumbAsChildProps): JSX.Element;
-export function SliderThumb(
-  props: SliderThumbProps | SliderThumbAsChildProps
-) {
+export function SliderThumb(props: SliderThumbProps | SliderThumbAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const root = readSliderRootContext();
   const entry = getSliderEntry(root.sliderId);

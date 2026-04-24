@@ -1,5 +1,5 @@
 import { bench, describe } from 'vite-plus/test';
-import { Pagination } from '../../src/components/pagination';
+import { Pagination } from '../../src/components';
 
 describe('Pagination benches', () => {
   bench('create pagination', () => {

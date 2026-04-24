@@ -30,9 +30,9 @@ describe('Public API', () => {
         isPublicValueExport
       )) {
         expect(exportName in askrUi).toBe(true);
-        expect(
-          (askrUi as Record<string, unknown>)[exportName]
-        ).toBe((entry.module as Record<string, unknown>)[exportName]);
+        expect((askrUi as Record<string, unknown>)[exportName]).toBe(
+          (entry.module as Record<string, unknown>)[exportName]
+        );
       }
     }
 

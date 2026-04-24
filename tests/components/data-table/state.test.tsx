@@ -80,12 +80,20 @@ function createTableInContext(
   let tableRef: DataTableInstance<User> = undefined!;
 
   function TestComponent() {
-    tableRef = createDataTable<User>({
+    const table = createDataTable<User>({
       data: () => users,
       getRowId: (row) => row.id,
       columns: baseColumns,
       ...overrides,
     });
+
+    table.getSorting();
+    table.getFilters();
+    table.getSelection();
+    table.getExpanded();
+    table.getPagination();
+    table.getColumnVisibility();
+    tableRef = table;
 
     return <div />;
   }

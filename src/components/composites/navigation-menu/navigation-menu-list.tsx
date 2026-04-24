@@ -4,6 +4,7 @@ import {
   getCompositeCollectionItems,
 } from '../../_internal/composite';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
+import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import { readNavigationMenuRootContext } from './navigation-menu.shared';
 import type {
   NavigationMenuListProps,
@@ -48,6 +49,17 @@ export function NavigationMenuList(
   return asChild ? (
     <Slot asChild {...finalProps} children={children} />
   ) : (
-    <div {...finalProps}>{children}</div>
+    <div {...finalProps}>
+      {toChildArray(children).map((child, index) => {
+        if (!isJsxElement(child) || child.key != null) {
+          return child;
+        }
+
+        return {
+          ...child,
+          key: `navigation-menu-list-${index}`,
+        };
+      })}
+    </div>
   );
 }

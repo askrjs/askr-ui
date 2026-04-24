@@ -1,25 +1,16 @@
 import { defineConfig } from 'vite-plus';
-import { askr } from '@askrjs/askr-vite';
+import { sharedVitestConfig } from './vitest.base.config';
 
 export default defineConfig({
-  plugins: [askr()],
   test: {
+    ...sharedVitestConfig.test,
     environment: 'jsdom',
-    globals: true,
     include: ['benches/**/*.bench.ts', 'benches/**/*.bench.tsx'],
     benchmark: {
       include: ['benches/**/*.bench.ts', 'benches/**/*.bench.tsx'],
     },
   },
-  oxc: {
-    jsx: {
-      runtime: 'automatic',
-      importSource: '@askrjs/askr',
-    },
-    jsxInject:
-      "import { jsx, jsxs, Fragment } from '@askrjs/askr/jsx-runtime';",
-  },
-  resolve: {
-    alias: {},
-  },
+  plugins: sharedVitestConfig.plugins,
+  oxc: sharedVitestConfig.oxc,
+  resolve: sharedVitestConfig.resolve,
 });

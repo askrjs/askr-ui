@@ -38,6 +38,7 @@ export function DataTablePagination(props: DataTablePaginationProps) {
   return (
     <nav {...finalProps}>
       <button
+        key="previous"
         type="button"
         aria-label="Previous page"
         data-slot="data-table-pagination-previous"
@@ -46,10 +47,11 @@ export function DataTablePagination(props: DataTablePaginationProps) {
       >
         Previous
       </button>
-      <span data-slot="data-table-pagination-info">
+      <span key="info" data-slot="data-table-pagination-info">
         Page {pagination.page} of {pageCount}
       </span>
       <button
+        key="next"
         type="button"
         aria-label="Next page"
         data-slot="data-table-pagination-next"

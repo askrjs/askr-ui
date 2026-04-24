@@ -1,7 +1,11 @@
-import { state } from '@askrjs/askr';
+import { For, state } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
-import { collectJsxElements } from '../../_internal/jsx';
+import {
+  collectJsxElements,
+  isJsxElement,
+  toChildArray,
+} from '../../_internal/jsx';
 import { getPersistentPortal } from '../../_internal/overlay';
 import { resolveMenuItemText } from '../../_internal/menu';
 import { SelectItem } from './select-item';
@@ -21,12 +25,18 @@ function SelectRootView(props: {
 }) {
   const root = readSelectRootContext();
   const PortalHost = root.portal;
+  const keyedChildren = For<unknown>(
+    () => toChildArray(props.children),
+    (child, index) =>
+      isJsxElement(child) && child.key != null ? child.key : index,
+    (child) => child as never
+  );
   root.portal.render({ children: null });
 
   return (
     <>
-      {props.children}
-      {PortalHost ? <PortalHost /> : null}
+      {keyedChildren}
+      {PortalHost ? <PortalHost key="select-root-portal" /> : null}
       {props.name ? (
         <input
           type="hidden"
@@ -70,7 +80,9 @@ export function Select(props: SelectProps) {
   ).map((element, index) => ({
     disabled: Boolean(element.props?.disabled),
     value:
-      typeof element.props?.value === 'string' ? element.props.value : undefined,
+      typeof element.props?.value === 'string'
+        ? element.props.value
+        : undefined,
     text: resolveMenuItemText(
       element.props?.children,
       element.props?.textValue as string | undefined

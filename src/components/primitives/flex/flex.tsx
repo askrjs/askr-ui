@@ -25,9 +25,7 @@ const SLOTS = {
 export function Flex(props: FlexDivProps): JSX.Element;
 export function Flex(props: FlexSpanProps): JSX.Element;
 export function Flex(props: FlexAsChildProps): JSX.Element;
-export function Flex(
-  props: FlexDivProps | FlexSpanProps | FlexAsChildProps
-) {
+export function Flex(props: FlexDivProps | FlexSpanProps | FlexAsChildProps) {
   const as = 'as' in props ? props.as : 'div';
   const {
     asChild,
@@ -47,7 +45,8 @@ export function Flex(
 
   const { boxProps, rest: passthroughProps } = splitBoxLayoutProps(rest);
   const rootSlot =
-    typeof (passthroughProps as Record<string, unknown>)['data-slot'] === 'string'
+    typeof (passthroughProps as Record<string, unknown>)['data-slot'] ===
+    'string'
       ? String((passthroughProps as Record<string, unknown>)['data-slot'])
       : SLOTS.root;
   const layoutStyle: Record<string, string | number> = {};
@@ -59,7 +58,12 @@ export function Flex(
     boxProps.display ?? 'flex',
     (value) => value
   );
-  setResponsiveStyleVar(layoutStyle, 'flex-direction', direction, (value) => value);
+  setResponsiveStyleVar(
+    layoutStyle,
+    'flex-direction',
+    direction,
+    (value) => value
+  );
   setResponsiveStyleVar(layoutStyle, 'gap', gap, resolveSpaceValue);
   setResponsiveStyleVar(layoutStyle, 'column-gap', gapX, resolveSpaceValue);
   setResponsiveStyleVar(layoutStyle, 'row-gap', gapY, resolveSpaceValue);
@@ -89,7 +93,7 @@ export function Flex(
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return <Slot asChild {...finalProps} children={children as JSX.Element} />;
   }
 
   if (as === 'span') {
