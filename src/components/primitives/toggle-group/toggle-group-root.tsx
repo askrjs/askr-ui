@@ -13,6 +13,7 @@ import {
 } from '../../_internal/composite';
 import { isDisclosureValueOpen } from '../../_internal/disclosure';
 import { resolveCompoundId } from '../../_internal/id';
+import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import {
   createToggleGroupRenderContext,
   readToggleGroupRootContext,
@@ -80,8 +81,18 @@ function ToggleGroupRootView(props: {
   const mergedProps = mergeProps(props.finalProps, {
     ...nav.container,
   });
+  const keyedChildren = toChildArray(props.children).map((child, index) => {
+    if (!isJsxElement(child) || child.key != null) {
+      return child;
+    }
 
-  return <div {...mergedProps}>{props.children}</div>;
+    return {
+      ...child,
+      key: `toggle-group-root-${index}`,
+    };
+  });
+
+  return <div {...mergedProps}>{keyedChildren}</div>;
 }
 
 export function ToggleGroup(props: ToggleGroupProps) {

@@ -15,8 +15,14 @@ import type { SectionAsChildProps, SectionElementProps } from './section.types';
 export function Section(props: SectionElementProps): JSX.Element;
 export function Section(props: SectionAsChildProps): JSX.Element;
 export function Section(props: SectionElementProps | SectionAsChildProps) {
-  const { asChild, children, size = '3', ref, style: userStyle, ...rest } =
-    props;
+  const {
+    asChild,
+    children,
+    size = '3',
+    ref,
+    style: userStyle,
+    ...rest
+  } = props;
 
   const { boxProps, rest: passthroughProps } = splitBoxLayoutProps(rest);
   const layoutStyle: Record<string, string | number> = {};

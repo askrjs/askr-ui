@@ -73,9 +73,9 @@ import {
   type AlertDialogProps,
   type AlertDialogTriggerAsChildProps,
   type AlertDialogTriggerProps,
-   type ButtonAsChildProps,
-   type ButtonNativeProps,
-   type ButtonProps,
+  type ButtonAsChildProps,
+  type ButtonNativeProps,
+  type ButtonProps,
   type CheckboxAsChildProps,
   type CheckboxInputProps,
   type CheckboxProps,
@@ -170,9 +170,7 @@ import { Switch as SwitchSubpath } from '@askrjs/askr-ui/primitives/switch';
 import { Toggle as ToggleSubpath } from '@askrjs/askr-ui/primitives/toggle';
 import { Tooltip as TooltipSubpath } from '@askrjs/askr-ui/composites/tooltip';
 import { Container as ContainerSubpath } from '@askrjs/askr-ui/primitives/container';
-import {
-  Flex as FlexSubpath,
-} from '@askrjs/askr-ui/primitives/flex';
+import { Flex as FlexSubpath } from '@askrjs/askr-ui/primitives/flex';
 import { Grid as GridSubpath } from '@askrjs/askr-ui/primitives/grid';
 import { Spacer as SpacerSubpath } from '@askrjs/askr-ui/primitives/spacer';
 import { SidebarLayout as SidebarLayoutSubpath } from '@askrjs/askr-ui/patterns/sidebar-layout';

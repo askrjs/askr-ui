@@ -6,9 +6,9 @@ describe('Spacer - Accessibility', () => {
   it('should have no automated axe violations given default flex spacer', async () => {
     await expectNoAxeViolations(
       <div style={{ display: 'flex' }}>
-        <span>Left</span>
+        <span key="left">Left</span>
         <Spacer />
-        <span>Right</span>
+        <span key="right">Right</span>
       </div>
     );
   });

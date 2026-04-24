@@ -1,5 +1,6 @@
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
 import { isCssLength, mergeLayoutStyles } from '../../_internal/layout';
+import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import type { SpacerAsChildProps, SpacerNativeProps } from './spacer.types';
 
 export function Spacer(props: SpacerNativeProps): JSX.Element;
@@ -42,10 +43,20 @@ export function Spacer(props: SpacerNativeProps | SpacerAsChildProps) {
     'data-basis': basis,
     style: mergeLayoutStyles(layoutStyle, userStyle),
   });
+  const keyedChildren = toChildArray(children).map((child, index) => {
+    if (!isJsxElement(child) || child.key != null) {
+      return child;
+    }
+
+    return {
+      ...child,
+      key: `spacer-${index}`,
+    };
+  });
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return <div {...finalProps}>{children}</div>;
+  return <div {...finalProps}>{keyedChildren}</div>;
 }

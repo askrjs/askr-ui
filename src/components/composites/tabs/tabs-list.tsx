@@ -4,6 +4,7 @@ import {
   disabledIndexes,
   getCompositeCollection,
 } from '../../_internal/composite';
+import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import { readTabsRootContext } from './tabs.shared';
 import type { TabsListAsChildProps, TabsListProps } from './tabs.types';
 
@@ -13,6 +14,16 @@ export function TabsList(props: TabsListProps | TabsListAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const root = readTabsRootContext();
   const collection = getCompositeCollection(root.tabsId);
+  const keyedChildren = toChildArray(children).map((child, index) => {
+    if (!isJsxElement(child) || child.key != null) {
+      return child;
+    }
+
+    return {
+      ...child,
+      key: `tabs-list-${index}`,
+    };
+  });
   const disabledItemIndexes = disabledIndexes(root.items);
   const nav = rovingFocus({
     currentIndex: root.currentIndex,
@@ -36,8 +47,14 @@ export function TabsList(props: TabsListProps | TabsListAsChildProps) {
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot
+        asChild
+        {...finalProps}
+        children={keyedChildren as unknown as JSX.Element}
+      />
+    );
   }
 
-  return <div {...finalProps}>{children}</div>;
+  return <div {...finalProps}>{keyedChildren}</div>;
 }

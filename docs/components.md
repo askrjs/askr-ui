@@ -89,7 +89,12 @@ import {
   PopoverPortal,
   PopoverClose,
 } from '@askrjs/askr-ui';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipPortal } from '@askrjs/askr-ui';
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipPortal,
+} from '@askrjs/askr-ui';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -203,12 +208,7 @@ import {
 ## Layout components
 
 ```ts
-import {
-  Container,
-  Grid,
-  Flex,
-  Spacer,
-} from '@askrjs/askr-ui';
+import { Container, Grid, Flex, Spacer } from '@askrjs/askr-ui';
 ```
 
 ## Pattern components

@@ -1,3 +1,4 @@
+import { For } from '@askrjs/askr';
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
 import {
   applyBoxLayoutStyles,
@@ -5,6 +6,7 @@ import {
   splitBoxLayoutProps,
   withBoxLayoutStyle,
 } from '../../_internal/box-layout';
+import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import {
   resolveAlignValue,
   resolveGridTrackValue,
@@ -13,7 +15,11 @@ import {
   serializeResponsiveValue,
   setResponsiveStyleVar,
 } from '../../_internal/layout';
-import type { GridAsChildProps, GridDivProps, GridSpanProps } from './grid.types';
+import type {
+  GridAsChildProps,
+  GridDivProps,
+  GridSpanProps,
+} from './grid.types';
 
 function resolveCompatibilityGridTemplate(
   minItemWidth: string | undefined,
@@ -58,7 +64,12 @@ export function Grid(props: GridDivProps | GridSpanProps | GridAsChildProps) {
     boxProps.display ?? 'grid',
     (value) => value
   );
-  setResponsiveStyleVar(layoutStyle, 'grid-template-areas', areas, (value) => value);
+  setResponsiveStyleVar(
+    layoutStyle,
+    'grid-template-areas',
+    areas,
+    (value) => value
+  );
   setResponsiveStyleVar(
     layoutStyle,
     'grid-template-columns',
@@ -101,14 +112,20 @@ export function Grid(props: GridDivProps | GridSpanProps | GridAsChildProps) {
     ...extractBoxDataAttributes(boxProps),
     style: withBoxLayoutStyle(layoutStyle, userStyle),
   });
+  const keyedChildren = For<unknown>(
+    () => toChildArray(children),
+    (child, index) =>
+      isJsxElement(child) && child.key != null ? child.key : index,
+    (child) => child as never
+  );
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return <Slot asChild {...finalProps} children={children as JSX.Element} />;
   }
 
   if (as === 'span') {
-    return <span {...finalProps}>{children}</span>;
+    return <span {...finalProps}>{keyedChildren}</span>;
   }
 
-  return <div {...finalProps}>{children}</div>;
+  return <div {...finalProps}>{keyedChildren}</div>;
 }

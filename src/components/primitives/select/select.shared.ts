@@ -105,13 +105,13 @@ export function getSelectDisabledIndexes(
 export function resolveSelectState(
   root: SelectRootContextValue
 ): SelectResolvedState {
-  const registeredItems = getMenuCollectionItems(getMenuCollection(root.selectId)).map(
-    (item) => ({
-      disabled: item.disabled,
-      value: item.value,
-      text: item.text,
-    })
-  );
+  const registeredItems = getMenuCollectionItems(
+    getMenuCollection(root.selectId)
+  ).map((item) => ({
+    disabled: item.disabled,
+    value: item.value,
+    text: item.text,
+  }));
   const items =
     registeredItems.length > 0 ? registeredItems : root.declaredItems;
   const effectiveItems = items.map((item) => ({

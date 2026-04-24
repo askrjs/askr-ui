@@ -182,13 +182,13 @@ export function createMenubarContentRenderContext(): MenubarContentRenderContext
 export function resolveMenubarRootState(
   root: MenubarRootContextValue
 ): MenubarRootResolvedState {
-  const items = getCompositeCollectionItems(getCompositeCollection(root.menubarId)).map(
-    (item) => ({
-      index: item.index,
-      disabled: item.disabled,
-      menuKey: item.value,
-    })
-  );
+  const items = getCompositeCollectionItems(
+    getCompositeCollection(root.menubarId)
+  ).map((item) => ({
+    index: item.index,
+    disabled: item.disabled,
+    menuKey: item.value,
+  }));
   const fallbackIndex = firstEnabledCompositeIndex(items);
   const candidateIndex = root.currentTriggerIndexCandidate;
   const currentTriggerIndex =

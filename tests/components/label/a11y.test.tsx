@@ -8,8 +8,10 @@ describe('Label - Accessibility', () => {
   it('has no automated axe violations given labelled form control', async () => {
     await expectNoAxeViolations(
       <div>
-        <Label htmlFor="email">Email</Label>
-        <input id="email" />
+        <Label key="label" htmlFor="email">
+          Email
+        </Label>
+        <input key="email" id="email" />
       </div>
     );
   });

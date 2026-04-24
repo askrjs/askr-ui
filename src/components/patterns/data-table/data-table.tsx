@@ -1,5 +1,6 @@
 import { mergeProps } from '@askrjs/askr/foundations';
 import { DATA_TABLE_A11Y_CONTRACT } from './data-table.a11y';
+import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import {
   DataTableRootContext,
   readDataTableRootContext,
@@ -22,14 +23,36 @@ function DataTableRootView(props: {
   children?: unknown;
   finalProps: Record<string, unknown>;
 }) {
-  return <div {...props.finalProps}>{props.children}</div>;
+  const keyedChildren = toChildArray(props.children).map((child, index) => {
+    if (!isJsxElement(child) || child.key != null) {
+      return child;
+    }
+
+    return {
+      ...child,
+      key: `data-table-root-${index}`,
+    };
+  });
+
+  return <div {...props.finalProps}>{keyedChildren}</div>;
 }
 
 function DataTableContentView(props: {
   children?: unknown;
   finalProps: Record<string, unknown>;
 }) {
-  return <div {...props.finalProps}>{props.children}</div>;
+  const keyedChildren = toChildArray(props.children).map((child, index) => {
+    if (!isJsxElement(child) || child.key != null) {
+      return child;
+    }
+
+    return {
+      ...child,
+      key: `data-table-content-${index}`,
+    };
+  });
+
+  return <div {...props.finalProps}>{keyedChildren}</div>;
 }
 
 export function DataTableRoot<T>(props: DataTableRootProps<T>) {

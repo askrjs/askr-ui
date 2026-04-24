@@ -1,12 +1,16 @@
 import { bench, describe } from 'vite-plus/test';
-import { Field, FieldControl } from '../../src/components/field';
-import { Input } from '../../src/components/input';
-import { Label } from '../../src/components/label';
-import { RadioGroup, RadioGroupItem } from '../../src/components/radio-group';
-import { Separator } from '../../src/components/separator';
-import { Switch } from '../../src/components/switch';
-import { Textarea } from '../../src/components/textarea';
-import { VisuallyHidden } from '../../src/components/visually-hidden';
+import {
+  Field,
+  FieldControl,
+  Input,
+  Label,
+  RadioGroup,
+  RadioGroupItem,
+  Separator,
+  Switch,
+  Textarea,
+  VisuallyHidden,
+} from '../../src/components';
 
 describe('Form benches', () => {
   bench('create field primitives', () => {

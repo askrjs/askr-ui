@@ -12,13 +12,7 @@ export function Box(props: BoxSpanProps): JSX.Element;
 export function Box(props: BoxAsChildProps): JSX.Element;
 export function Box(props: BoxDivProps | BoxSpanProps | BoxAsChildProps) {
   const as = 'as' in props ? props.as : 'div';
-  const {
-    asChild,
-    children,
-    ref,
-    style: userStyle,
-    ...rest
-  } = props;
+  const { asChild, children, ref, style: userStyle, ...rest } = props;
 
   const { boxProps, rest: passthroughProps } = splitBoxLayoutProps(rest);
   const layoutStyle: Record<string, string | number> = {};

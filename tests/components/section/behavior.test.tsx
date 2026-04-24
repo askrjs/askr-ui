@@ -11,7 +11,9 @@ describe('Section - Behavior', () => {
 
   it('should render the section data-slot', () => {
     container = mount(<Section />);
-    expect(container.querySelector('section[data-slot="section"]')).not.toBeNull();
+    expect(
+      container.querySelector('section[data-slot="section"]')
+    ).not.toBeNull();
   });
 
   it('should serialize themed section spacing via the shared layout contract', () => {

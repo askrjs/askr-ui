@@ -6,9 +6,7 @@ import type {
 
 export function Separator(props: SeparatorNativeProps): JSX.Element;
 export function Separator(props: SeparatorAsChildProps): JSX.Element;
-export function Separator(
-  props: SeparatorNativeProps | SeparatorAsChildProps
-) {
+export function Separator(props: SeparatorNativeProps | SeparatorAsChildProps) {
   const {
     asChild,
     children,

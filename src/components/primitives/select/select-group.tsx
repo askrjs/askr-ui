@@ -43,10 +43,9 @@ export function SelectGroup(props: SelectGroupProps | SelectGroupAsChildProps) {
   const groupIndex = renderContext.claimGroupIndex();
   const groupId = resolvePartId(root.selectId, `group-${groupIndex}`);
   const labelId = `${groupId}-label`;
-  const containsLabel = collectJsxElements(
-    children,
-    (element) => element.type === SelectLabel
-  ).length > 0;
+  const containsLabel =
+    collectJsxElements(children, (element) => element.type === SelectLabel)
+      .length > 0;
   const finalProps = mergeProps(rest, {
     ref,
     id: groupId,

@@ -1,5 +1,8 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test';
-import { Inline, INLINE_A11Y_CONTRACT } from '../../../src/components/primitives/inline';
+import {
+  Inline,
+  INLINE_A11Y_CONTRACT,
+} from '../../../src/components/primitives/inline';
 import { mount, unmount } from '../../test-utils';
 
 describe('Inline - Behavior', () => {

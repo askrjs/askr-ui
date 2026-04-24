@@ -7,7 +7,6 @@ import {
   MenubarPortal,
   MenubarTrigger,
 } from '../../../src/components/composites/menubar';
-import { axe } from 'vitest-axe';
 import { expectNoAxeViolations } from '../../accessibility';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
@@ -41,8 +40,6 @@ describe('Menubar - Accessibility', () => {
     await flushUpdates();
     await flushUpdates();
 
-    const results = await axe(container);
-
-    expect(results.violations).toEqual([]);
+    await expectNoAxeViolations(container);
   });
 });

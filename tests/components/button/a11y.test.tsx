@@ -1,5 +1,4 @@
 import { describe, it, expect, afterEach } from 'vite-plus/test';
-import { axe } from 'vitest-axe';
 import { Button } from '../../../src/components/primitives/button/button';
 import { createIsland } from '@askrjs/askr';
 import { expectNoAxeViolations } from '../../accessibility';
@@ -71,8 +70,12 @@ describe('Button - Accessibility', () => {
   it('preserves accessible naming props from the host', () => {
     const container = mount(
       <div>
-        <span id="button-label">Submit form</span>
-        <Button aria-labelledby="button-label">Submit</Button>
+        <span key="button-label" id="button-label">
+          Submit form
+        </span>
+        <Button key="button" aria-labelledby="button-label">
+          Submit
+        </Button>
       </div>
     );
 

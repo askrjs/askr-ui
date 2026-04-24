@@ -1,7 +1,5 @@
 import { bench, describe } from 'vite-plus/test';
-import { DismissableLayer } from '../../src/components/dismissable-layer';
-import { FocusRing } from '../../src/components/focus-ring';
-import { FocusScope } from '../../src/components/focus-scope';
+import { DismissableLayer, FocusRing, FocusScope } from '../../src/components';
 
 describe('Focus foundation benches', () => {
   bench('create FocusRing', () => {

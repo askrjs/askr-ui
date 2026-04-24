@@ -71,7 +71,14 @@ export const docsCategories = [
   },
   {
     label: 'Overlay',
-    names: ['dialog', 'alert-dialog', 'popover', 'tooltip', 'dropdown-menu', 'menu'],
+    names: [
+      'dialog',
+      'alert-dialog',
+      'popover',
+      'tooltip',
+      'dropdown-menu',
+      'menu',
+    ],
   },
   {
     label: 'Disclosure',
@@ -79,7 +86,14 @@ export const docsCategories = [
   },
   {
     label: 'Status',
-    names: ['badge', 'progress', 'progress-circle', 'toast', 'skeleton', 'spinner'],
+    names: [
+      'badge',
+      'progress',
+      'progress-circle',
+      'toast',
+      'skeleton',
+      'spinner',
+    ],
   },
   {
     label: 'Identity',

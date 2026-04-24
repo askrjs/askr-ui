@@ -112,7 +112,8 @@ export function setResponsiveStyleVar<T>(
     const breakpointValue = normalized[breakpoint];
     if (breakpointValue === undefined) continue;
     const resolved = resolve(breakpointValue);
-    if (resolved === undefined || resolved === null || resolved === '') continue;
+    if (resolved === undefined || resolved === null || resolved === '')
+      continue;
     styles[`--ak-${variable}-${breakpoint}`] = resolved;
   }
 }
@@ -161,9 +162,10 @@ export function resolveAlignValue(value: string): string {
   return trimmed;
 }
 
-export function resolveInlineAlignValue(
-  value: 'left' | 'center' | 'right'
-): { marginLeft?: string; marginRight?: string } {
+export function resolveInlineAlignValue(value: 'left' | 'center' | 'right'): {
+  marginLeft?: string;
+  marginRight?: string;
+} {
   if (value === 'left') return { marginLeft: '0', marginRight: 'auto' };
   if (value === 'right') return { marginLeft: 'auto', marginRight: '0' };
   return { marginLeft: 'auto', marginRight: 'auto' };

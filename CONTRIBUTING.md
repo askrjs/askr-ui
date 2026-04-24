@@ -56,7 +56,7 @@ Study a component in your family before proposing changes.
 1. **Write a test that reproduces the bug** (should fail before your fix)
 2. **Fix the bug** (minimal change)
 3. **Verify the test passes** and no other tests regress
-4. **Run the quality gate**: `npm run fmt && npm run lint && npm test && npm run bench`
+4. **Run the quality gate**: `npm run quality`
 
 **Example:**
 
@@ -147,7 +147,10 @@ npm run fmt && npm run lint && npm test && npm run bench
 - `npm run build` — Build library for distribution
 - `npm run build:types` — Generate TypeScript declarations
 - `npm run dev` — Watch mode (for development)
-- `npm test` — Run all tests (includes foundations contract check)
+- `npm run test:unit` — Run node + jsdom coverage
+- `npm run test:component` — Run browser-mode component coverage
+- `npm test` — Run foundations, unit, and browser coverage
+- `npm run quality` — Run build, tests, and benchmarks for release gating
 - `npm run test:types` — Check type definitions
 - `npm run bench` — Run benchmarks
 - `npm run fmt` — Format code (prettier)
@@ -166,11 +169,17 @@ src/
   index.ts            # Public exports
 
 tests/
+  public-api.test.ts         # Node: public surface
+  docs-contract.test.ts      # Node: docs contract
+  types/                     # Node: type tests
   components/
+    icon/                     # Jsdom: internal component contracts
+    consistency-reset/        # Jsdom: portal / prop forwarding checks
+    data-table/state.test.tsx # Jsdom: factory and internal state checks
     my-component/
-      behavior.test.tsx         # State transitions, user interaction
-      a11y.test.tsx             # Accessibility (axe)
-      determinism.test.tsx      # ID stability, rerender consistency
+      behavior.test.tsx       # Browser: state transitions, user interaction
+      a11y.test.tsx           # Browser: accessibility (axe)
+      determinism.test.tsx    # Browser: ID stability, rerender consistency
 
 benches/
   components/
@@ -270,30 +279,15 @@ it('has no automated axe violations', async () => {
 
 ### Testing
 
-**Behavior tests**: State transitions, prop handling, event firing
+Test ownership is split by environment:
 
-```tsx
-it('opens when trigger is clicked', () => {
-  // mount, interact, assert
-});
-```
+- **Node**: `tests/public-api.test.ts`, `tests/docs-contract.test.ts`, and `tests/types/**`
+- **Jsdom**: `tests/components/icon/**`, `tests/components/consistency-reset/**`, and `tests/components/data-table/state.test.tsx`
+- **Browser**: public component `behavior`, `a11y`, and `determinism` suites, plus browser coverage for `data-table`
 
-**Accessibility tests**: ARIA, keyboard nav, roles
+Use `tests/warnings.ts` when a browser-mode flow should be warning-free. Keep it targeted to real contract or user-facing defects, not generic framework noise.
 
-```tsx
-it('has no automated axe violations', async () => {
-  // axe check
-});
-```
-
-**Determinism tests**: ID stability, rerender consistency
-
-```tsx
-it('has deterministic markup', () => {
-  vi.useFakeTimers();
-  // mount, measure HTML, verify stable
-});
-```
+Behavior, accessibility, and determinism tests for public components should live in browser mode unless a suite is explicitly about DOM-only internal contracts.
 
 ---
 
@@ -304,10 +298,10 @@ it('has deterministic markup', () => {
 1. **Run the full quality gate:**
 
    ```bash
-   npm run fmt && npm run lint && npm test && npm run bench
+   npm run quality
    ```
 
-   All four must pass.
+   The gate runs build, tests, and benchmarks.
 
 2. **Verify no regressions:**
 
@@ -344,6 +338,7 @@ What does this PR accomplish? Why is it needed?
 - [ ] `npm run fmt` passes
 - [ ] `npm run lint` passes
 - [ ] `npm test` passes
+- [ ] `npm run quality` passes before release
 - [ ] `npm run bench` shows no regressions
 - [ ] Types are complete (`npm run test:types`)
 - [ ] Component follows RULES.md and SPEC.md

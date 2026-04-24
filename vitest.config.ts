@@ -1,23 +1,11 @@
 import { defineConfig } from 'vite-plus';
-import { askr } from '@askrjs/askr-vite';
 
 export default defineConfig({
-  plugins: [askr()],
   test: {
-    environment: 'jsdom',
-    globals: true,
-    include: ['tests/**/*.test.{ts,tsx}'],
-    setupFiles: ['./tests/setup.ts'],
-  },
-  oxc: {
-    jsx: {
-      runtime: 'automatic',
-      importSource: '@askrjs/askr',
-    },
-    jsxInject:
-      "import { jsx, jsxs, Fragment } from '@askrjs/askr/jsx-runtime';",
-  },
-  resolve: {
-    alias: {},
+    projects: [
+      './vitest.node.config.ts',
+      './vitest.jsdom.config.ts',
+      './vitest.browser.config.ts',
+    ],
   },
 });
