@@ -1,28 +1,24 @@
 import type { JSXElement, Ref } from '@askrjs/askr/foundations';
+import type {
+  BoxLayoutOwnProps,
+  LayoutResponsive,
+} from '../box/box.types';
 
-export type GridOwnProps = {
-  /**
-   * Number of equal columns (generates `repeat(n, minmax(0, 1fr))`); or a raw
-   * CSS string (applied as inline style only when it is a real CSS length).
-   */
-  columns?: number | string;
-  /**
-   * Minimum item width for an auto-fit/fill grid.
-   * Applied as inline style only when it is a real CSS length.
-   */
+export type GridOwnProps = BoxLayoutOwnProps & {
+  areas?: LayoutResponsive<string>;
+  columns?: LayoutResponsive<number | string>;
+  rows?: LayoutResponsive<number | string>;
+  flow?: LayoutResponsive<string>;
+  gap?: LayoutResponsive<string | number>;
+  gapX?: LayoutResponsive<string | number>;
+  gapY?: LayoutResponsive<string | number>;
+  align?: LayoutResponsive<string>;
+  justify?: LayoutResponsive<string>;
+  /** Compatibility helper for auto-fit grids. */
   minItemWidth?: string;
-  /** CSS gap value or named spacing token. Inline style only applied for real CSS lengths. */
-  gap?: string;
-  /**
-   * When true (default), uses `auto-fit` for the implicit repeat; when false,
-   * uses `auto-fill`. Only relevant when `columns` is absent and `minItemWidth`
-   * is a real CSS length.
-   */
+  /** Compatibility helper for auto-fit grids. */
   autoFit?: boolean;
-  /** CSS align-items value. */
-  align?: string;
-  /** CSS justify-items value. */
-  justify?: string;
+  as?: 'div' | 'span';
   children?: unknown;
 };
 
@@ -31,15 +27,28 @@ export type GridNativeProps = Omit<
   'children' | 'ref'
 > &
   GridOwnProps & {
+    as?: 'div';
     asChild?: false;
     ref?: Ref<HTMLDivElement>;
   };
 
-export type GridAsChildProps = GridOwnProps & {
+export type GridSpanProps = Omit<
+  JSX.IntrinsicElements['span'],
+  'children' | 'ref'
+> &
+  GridOwnProps & {
+    as: 'span';
+    asChild?: false;
+    ref?: Ref<HTMLSpanElement>;
+  };
+
+export type GridAsChildProps = Omit<GridOwnProps, 'as'> & {
   asChild: true;
   children: JSXElement;
   ref?: Ref<unknown>;
   style?: JSX.IntrinsicElements['div']['style'];
 };
 
-export type GridProps = GridNativeProps | GridAsChildProps;
+export type GridDivProps = GridNativeProps;
+
+export type GridProps = GridDivProps | GridSpanProps | GridAsChildProps;

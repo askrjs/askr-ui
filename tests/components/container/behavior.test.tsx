@@ -22,7 +22,7 @@ describe('Container - Behavior', () => {
     ) as HTMLElement;
     expect(el.style.boxSizing).toBe('border-box');
     expect(el.style.width).toBe('100%');
-    expect(el.style.marginInline).toBe('auto');
+    expect(el.getAttribute('data-ak-layout')).toBe('true');
   });
 
   it('should pass through className', () => {
@@ -44,22 +44,22 @@ describe('Container - Behavior', () => {
     const el = container.querySelector('[data-slot="container"]');
     expect(
       el?.getAttribute(CONTAINER_A11Y_CONTRACT.DATA_ATTRIBUTES.maxWidth)
-    ).toBe('80rem');
+    ).toBe('initial:80rem');
   });
 
-  it('should set maxWidth inline style for valid CSS lengths', () => {
+  it('should serialize maxWidth into layout custom properties', () => {
     container = mount(<Container maxWidth="80rem" />);
     const el = container.querySelector(
       '[data-slot="container"]'
     ) as HTMLElement;
-    expect(el.style.maxWidth).toBe('80rem');
+    expect(el.style.getPropertyValue('--ak-max-width-initial')).toBe('80rem');
   });
 
   it('should emit data-size attribute for named tokens', () => {
-    container = mount(<Container size="lg" />);
+    container = mount(<Container size="3" />);
     const el = container.querySelector('[data-slot="container"]');
     expect(el?.getAttribute(CONTAINER_A11Y_CONTRACT.DATA_ATTRIBUTES.size)).toBe(
-      'lg'
+      'initial:3'
     );
   });
 

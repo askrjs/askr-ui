@@ -2,6 +2,7 @@
 
 export * from './primitives/avatar';
 export * from './primitives/badge';
+export * from './primitives/box';
 export * from './primitives/button';
 export * from './primitives/checkbox';
 export * from './primitives/container';
@@ -14,6 +15,7 @@ export * from './primitives/progress-circle';
 export * from './primitives/radio-group';
 export * from './primitives/select';
 export * from './primitives/separator';
+export * from './primitives/section';
 export * from './primitives/skeleton';
 export * from './primitives/slider';
 export * from './primitives/spacer';

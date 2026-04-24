@@ -1,12 +1,18 @@
 import type { JSXElement, Ref } from '@askrjs/askr/foundations';
+import type {
+  BoxLayoutOwnProps,
+  LayoutResponsive,
+} from '../box/box.types';
 
-export type ContainerOwnProps = {
-  /** CSS max-width value or named size token. Inline style only applied for real CSS lengths. */
-  maxWidth?: string;
-  /** CSS padding-inline value or named spacing token. Inline style only applied for real CSS lengths. */
-  padding?: string;
-  /** Named size token (e.g. sm, md, lg, xl) – data attribute only, no inline style. */
-  size?: string;
+export type ContainerOwnProps = BoxLayoutOwnProps & {
+  /** Radix-style container size token. */
+  size?: LayoutResponsive<'1' | '2' | '3' | '4' | 'sm' | 'md' | 'lg' | 'xl'>;
+  /** Horizontal alignment of the constrained container. */
+  align?: LayoutResponsive<'left' | 'center' | 'right'>;
+  /** Compatibility max-width override. */
+  maxWidth?: LayoutResponsive<string>;
+  /** Compatibility horizontal padding override. */
+  padding?: LayoutResponsive<string | number>;
   children?: unknown;
 };
 

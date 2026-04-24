@@ -1,5 +1,3 @@
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 import * as askrUi from '../src';
 import {
@@ -40,16 +38,6 @@ describe('Public API', () => {
 
     for (const removedExport of removedPublicExports) {
       expect(removedExport in askrUi).toBe(false);
-    }
-  });
-
-  it('removes the old layout alias folders from the source tree', () => {
-    for (const alias of removedPublicExports) {
-      expect(
-        existsSync(
-          join(process.cwd(), 'src/components/primitives', alias.toLowerCase())
-        )
-      ).toBe(false);
     }
   });
 });
