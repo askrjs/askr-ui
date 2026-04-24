@@ -1,7 +1,8 @@
 import { defineContext, readContext } from '@askrjs/askr';
 import {
   firstEnabledIndex,
-  getMenuItemMetadata,
+  getMenuCollection,
+  getMenuCollectionItems,
   type MenuItemMetadata,
 } from '../../_internal/menu';
 import type { MenuOwnProps } from './menu.types';
@@ -28,7 +29,6 @@ export const MenuRootContext = defineContext<MenuRootContextValue | null>(null);
 export const MenuRenderContext = defineContext<MenuRenderContextValue | null>(
   null
 );
-export const MenuDeclarationContext = defineContext<boolean>(false);
 
 export function readMenuRootContext(): MenuRootContextValue {
   const context = readContext(MenuRootContext);
@@ -50,10 +50,6 @@ export function readMenuRenderContext(): MenuRenderContextValue {
   return context;
 }
 
-export function readMenuDeclarationContext(): boolean {
-  return Boolean(readContext(MenuDeclarationContext));
-}
-
 export function createMenuRenderContext(): MenuRenderContextValue {
   let nextItemIndex = 0;
 
@@ -69,7 +65,7 @@ export function createMenuRenderContext(): MenuRenderContextValue {
 export function resolveMenuState(
   root: MenuRootContextValue
 ): MenuResolvedState {
-  const items = getMenuItemMetadata(root.menuId);
+  const items = getMenuCollectionItems(getMenuCollection(root.menuId));
   const fallbackIndex = firstEnabledIndex(items);
   const candidateIndex = root.currentIndexCandidate;
   const currentIndex =

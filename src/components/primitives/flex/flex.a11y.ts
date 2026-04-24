@@ -9,10 +9,8 @@ export const FLEX_A11Y_CONTRACT = {
     collapseBelow: 'data-collapse-below' as const,
   },
   SLOT_VALUES: {
-    root: 'inline' as const,
+    root: 'flex' as const,
   },
 } as const;
 
 export type FlexA11yContract = typeof FLEX_A11Y_CONTRACT;
-export const INLINE_A11Y_CONTRACT = FLEX_A11Y_CONTRACT;
-export type InlineA11yContract = FlexA11yContract;

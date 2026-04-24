@@ -5,10 +5,7 @@ import {
   pressable,
 } from '@askrjs/askr/foundations';
 import { getOverlayNodes } from '../../_internal/overlay';
-import {
-  readDropdownMenuDeclarationContext,
-  readDropdownMenuRootContext,
-} from './dropdown-menu.shared';
+import { readDropdownMenuRootContext } from './dropdown-menu.shared';
 import type {
   DropdownMenuPortalProps,
   DropdownMenuTriggerAsChildProps,
@@ -24,10 +21,6 @@ export function DropdownMenuTrigger(
 export function DropdownMenuTrigger(
   props: DropdownMenuTriggerProps | DropdownMenuTriggerAsChildProps
 ) {
-  if (readDropdownMenuDeclarationContext()) {
-    return null;
-  }
-
   const {
     asChild,
     children,
@@ -83,10 +76,6 @@ export function DropdownMenuTrigger(
 export function DropdownMenuPortal(
   props: DropdownMenuPortalProps
 ): JSX.Element | null {
-  if (readDropdownMenuDeclarationContext()) {
-    return <>{props.children}</>;
-  }
-
   const root = readDropdownMenuRootContext();
 
   return root.portal.render({

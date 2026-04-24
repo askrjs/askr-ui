@@ -14,8 +14,6 @@ import {
   registerCompositeNode,
 } from '../../_internal/composite';
 import {
-  declareMenubarTriggerMetadata,
-  readMenubarDeclarationContext,
   readMenubarMenuContext,
   readMenubarRootContext,
   readMenubarRootRenderContext,
@@ -107,18 +105,6 @@ export function MenubarTrigger(
   const root = readMenubarRootContext();
   const menu = readMenubarMenuContext();
 
-  if (readMenubarDeclarationContext()) {
-    declareMenubarTriggerMetadata(root.menubarId, {
-      index: menu.menuIndex,
-      disabled,
-      menuKey: menu.menuKey,
-      triggerId: menu.triggerId,
-      contentId: menu.contentId,
-      portalId: menu.portalId,
-    });
-    return null;
-  }
-
   const { items, currentTriggerIndex, disabledTriggerIndexes } =
     resolveMenubarRootState(root);
   const collection = getCompositeCollection(root.menubarId);
@@ -203,10 +189,6 @@ export function MenubarTrigger(
 }
 
 export function MenubarPortal(props: MenubarPortalProps): JSX.Element | null {
-  if (readMenubarDeclarationContext()) {
-    return <>{props.children}</>;
-  }
-
   const root = readMenubarRootContext();
   const menu = readMenubarMenuContext();
   const portal = getPersistentPortal(menu.portalId);

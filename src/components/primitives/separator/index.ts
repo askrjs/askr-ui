@@ -6,6 +6,6 @@ export {
 export type {
   SeparatorProps,
   SeparatorOwnProps,
-  SeparatorDivProps,
+  SeparatorNativeProps,
   SeparatorAsChildProps,
 } from './separator.types';

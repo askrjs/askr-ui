@@ -1,7 +1,7 @@
 export { Button } from './button';
 export type {
   ButtonOwnProps,
-  ButtonButtonProps,
+  ButtonNativeProps,
   ButtonAsChildProps,
   ButtonProps,
 } from './button.types';

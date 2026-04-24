@@ -5,11 +5,7 @@ import {
   pressable,
 } from '@askrjs/askr/foundations';
 import { getOverlayNodes } from '../../_internal/overlay';
-import {
-  readSelectDeclarationContext,
-  readSelectRootContext,
-  resolveSelectState,
-} from './select.shared';
+import { readSelectRootContext, resolveSelectState } from './select.shared';
 import type {
   SelectPortalProps,
   SelectTriggerAsChildProps,
@@ -25,10 +21,6 @@ export function SelectTrigger(
 export function SelectTrigger(
   props: SelectTriggerProps | SelectTriggerAsChildProps
 ) {
-  if (readSelectDeclarationContext()) {
-    return null;
-  }
-
   const {
     asChild,
     children,
@@ -85,10 +77,6 @@ export function SelectTrigger(
 export function SelectValue(props: SelectValueProps): JSX.Element | null;
 export function SelectValue(props: SelectValueAsChildProps): JSX.Element | null;
 export function SelectValue(props: SelectValueProps | SelectValueAsChildProps) {
-  if (readSelectDeclarationContext()) {
-    return null;
-  }
-
   const { asChild, children, placeholder, ref, ...rest } = props;
   const root = readSelectRootContext();
   const { selectedText } = resolveSelectState(root);
@@ -107,10 +95,6 @@ export function SelectValue(props: SelectValueProps | SelectValueAsChildProps) {
 }
 
 export function SelectPortal(props: SelectPortalProps): JSX.Element | null {
-  if (readSelectDeclarationContext()) {
-    return <>{props.children}</>;
-  }
-
   const root = readSelectRootContext();
 
   return root.portal.render({

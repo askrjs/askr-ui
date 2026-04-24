@@ -1,9 +1,12 @@
 import { bench, describe } from 'vite-plus/test';
-import { Grid, type GridDivProps } from '../../src/components/primitives/grid';
+import {
+  Grid,
+  type GridNativeProps,
+} from '../../src/components/primitives/grid';
 
 describe('Grid benches', () => {
   bench('create default grid', () => {
-    Grid({ children: 'bench' } as unknown as GridDivProps);
+    Grid({ children: 'bench' } as unknown as GridNativeProps);
   });
 
   bench('create configured grid layout', () => {
@@ -13,7 +16,7 @@ describe('Grid benches', () => {
       align: 'stretch',
       justify: 'center',
       children: [<div>A</div>, <div>B</div>, <div>C</div>],
-    } as unknown as GridDivProps);
+    } as unknown as GridNativeProps);
   });
 
   bench('create auto-fit grid layout', () => {
@@ -22,6 +25,6 @@ describe('Grid benches', () => {
       autoFit: true,
       gap: '12px',
       children: [<div>A</div>, <div>B</div>, <div>C</div>, <div>D</div>],
-    } as unknown as GridDivProps);
+    } as unknown as GridNativeProps);
   });
 });

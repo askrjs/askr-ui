@@ -7,7 +7,6 @@ import {
 } from '@askrjs/askr/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import {
-  declareMenuItemMetadata,
   getMenuCollection,
   registerCollectionNode,
   resolveMenuItemText,
@@ -15,7 +14,6 @@ import {
 import { resolvePartId } from '../../_internal/id';
 import {
   getSelectDisabledIndexes,
-  readSelectDeclarationContext,
   readSelectRenderContext,
   readSelectRootContext,
   resolveSelectState,
@@ -45,16 +43,6 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
   const itemIndex = renderContext.claimItemIndex();
   const itemText = resolveMenuItemText(children, textValue);
   const isDisabled = root.disabled || disabled;
-
-  if (readSelectDeclarationContext()) {
-    declareMenuItemMetadata(root.selectId, {
-      index: itemIndex,
-      disabled: isDisabled,
-      value,
-      text: itemText,
-    });
-    return null;
-  }
 
   const itemId = resolvePartId(root.selectId, `item-${itemIndex}`);
   const { items, currentIndex } = resolveSelectState(root);

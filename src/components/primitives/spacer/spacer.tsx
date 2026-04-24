@@ -1,10 +1,10 @@
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
 import { isCssLength, mergeLayoutStyles } from '../../_internal/layout';
-import type { SpacerAsChildProps, SpacerDivProps } from './spacer.types';
+import type { SpacerAsChildProps, SpacerNativeProps } from './spacer.types';
 
-export function Spacer(props: SpacerDivProps): JSX.Element;
+export function Spacer(props: SpacerNativeProps): JSX.Element;
 export function Spacer(props: SpacerAsChildProps): JSX.Element;
-export function Spacer(props: SpacerDivProps | SpacerAsChildProps) {
+export function Spacer(props: SpacerNativeProps | SpacerAsChildProps) {
   const {
     asChild,
     children,

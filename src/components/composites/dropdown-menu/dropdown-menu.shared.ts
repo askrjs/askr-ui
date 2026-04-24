@@ -1,7 +1,8 @@
 import { defineContext, readContext } from '@askrjs/askr';
 import {
   firstEnabledIndex,
-  getMenuItemMetadata,
+  getMenuCollection,
+  getMenuCollectionItems,
   type MenuItemMetadata,
 } from '../../_internal/menu';
 import type { OverlayPortal } from '../../_internal/overlay';
@@ -30,7 +31,6 @@ export const DropdownMenuRootContext =
   defineContext<DropdownMenuRootContextValue | null>(null);
 export const DropdownMenuRenderContext =
   defineContext<DropdownMenuRenderContextValue | null>(null);
-export const DropdownMenuDeclarationContext = defineContext<boolean>(false);
 
 export function readDropdownMenuRootContext(): DropdownMenuRootContextValue {
   const context = readContext(DropdownMenuRootContext);
@@ -54,10 +54,6 @@ export function readDropdownMenuRenderContext(): DropdownMenuRenderContextValue 
   return context;
 }
 
-export function readDropdownMenuDeclarationContext(): boolean {
-  return Boolean(readContext(DropdownMenuDeclarationContext));
-}
-
 export function createDropdownMenuRenderContext(): DropdownMenuRenderContextValue {
   let nextItemIndex = 0;
 
@@ -73,7 +69,7 @@ export function createDropdownMenuRenderContext(): DropdownMenuRenderContextValu
 export function resolveDropdownMenuState(
   root: DropdownMenuRootContextValue
 ): DropdownMenuResolvedState {
-  const items = getMenuItemMetadata(root.dropdownMenuId);
+  const items = getMenuCollectionItems(getMenuCollection(root.dropdownMenuId));
   const fallbackIndex = firstEnabledIndex(items);
   const candidateIndex = root.currentIndexCandidate;
   const currentIndex =

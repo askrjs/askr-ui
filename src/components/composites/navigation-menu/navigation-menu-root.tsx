@@ -2,7 +2,6 @@ import { state } from '@askrjs/askr';
 import { mergeProps } from '@askrjs/askr/foundations';
 import { resolveCompoundId } from '../../_internal/id';
 import { getPersistentPortal } from '../../_internal/overlay';
-import { stripInternalProps } from '../../_internal/props';
 import {
   NavigationMenuRootContext,
   type NavigationMenuRootContextValue,
@@ -22,13 +21,6 @@ function NavigationMenuRootView(props: {
       {PortalHost ? <PortalHost /> : null}
     </nav>
   );
-}
-
-function scheduleNavigationMenuPortalSync(_navigationMenuId: string) {
-  queueMicrotask(() => {
-    // Force re-evaluation of navigation menu portals on next tick
-    // Individual portal sync will happen via ref callbacks if content is present
-  });
 }
 
 export function NavigationMenu(props: NavigationMenuProps) {
@@ -59,7 +51,6 @@ export function NavigationMenu(props: NavigationMenuProps) {
 
   const wrappedSetOpenPath = (nextPath: string[]) => {
     openPathState.set(nextPath);
-    scheduleNavigationMenuPortalSync(navigationMenuId);
   };
 
   const rootContext: NavigationMenuRootContextValue = {
@@ -73,7 +64,7 @@ export function NavigationMenu(props: NavigationMenuProps) {
     portal,
   };
 
-  const finalProps = mergeProps(stripInternalProps(rest), {
+  const finalProps = mergeProps(rest, {
     ref,
     'data-slot': 'navigation-menu',
     'data-navigation-menu': 'true',

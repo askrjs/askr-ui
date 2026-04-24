@@ -1,4 +1,4 @@
-import * as foundations from '@askrjs/askr/foundations';
+import { readFile } from 'node:fs/promises';
 
 let runtimeExports;
 try {
@@ -101,5 +101,5 @@ for (const [marker, source] of typeMarkers) {
 }
 
 console.log(
-  `Foundations contract verified: ${runtimeRequiredExports.length} runtime exports present.`
+  `Foundations contract verified: ${runtimeKeys.length} runtime exports present.`
 );

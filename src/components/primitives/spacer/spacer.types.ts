@@ -14,7 +14,7 @@ export type SpacerOwnProps = {
   children?: unknown;
 };
 
-export type SpacerDivProps = Omit<
+export type SpacerNativeProps = Omit<
   JSX.IntrinsicElements['div'],
   'children' | 'ref'
 > &
@@ -30,4 +30,4 @@ export type SpacerAsChildProps = SpacerOwnProps & {
   style?: JSX.IntrinsicElements['div']['style'];
 };
 
-export type SpacerProps = SpacerDivProps | SpacerAsChildProps;
+export type SpacerProps = SpacerNativeProps | SpacerAsChildProps;

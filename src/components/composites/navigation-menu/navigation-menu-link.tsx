@@ -11,7 +11,6 @@ import {
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import { getOverlayNodes } from '../../_internal/overlay';
 import { resolvePartId } from '../../_internal/id';
-import { stripInternalProps } from '../../_internal/props';
 import {
   readNavigationMenuRootContext,
   readNavigationMenuItemContext,
@@ -53,7 +52,7 @@ export function NavigationMenuLink(
 
   const surfaceId = resolvePartId(content.contentId, `item-${surfaceIndex}`);
 
-  const finalProps = mergeProps(stripInternalProps(rest), {
+  const finalProps = mergeProps(rest, {
     ...nav.item(surfaceIndex),
     ref: composeRefs(ref as any, (node: HTMLElement | null) => {
       registerCompositeNode(surfaceId, collection, node, {

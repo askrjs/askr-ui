@@ -1,11 +1,17 @@
 import { defineContext, readContext } from '@askrjs/askr';
-import type { JSXElement } from '@askrjs/askr/foundations';
-import type { ToastVariant } from './toast.types';
+import type { ToastVariant, ToastProps } from './toast.types';
+
+export type ToastRegistration = {
+  toastId: string;
+  props: ToastProps;
+};
 
 export type ToastProviderContextValue = {
   providerId: string;
   duration: number;
-  toasts: JSXElement[];
+  toasts: ToastRegistration[];
+  registerToast: (registration: ToastRegistration) => void;
+  unregisterToast: (toastId: string) => void;
 };
 
 export type ToastRootContextValue = {

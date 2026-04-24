@@ -1,55 +1,19 @@
-import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-const COMPONENT_REGISTRY = [
-  { name: 'avatar', bucket: 'primitives' },
-  { name: 'badge', bucket: 'primitives' },
-  { name: 'button', bucket: 'primitives' },
-  { name: 'center', bucket: 'primitives' },
-  { name: 'checkbox', bucket: 'primitives' },
-  { name: 'container', bucket: 'primitives' },
-  { name: 'grid', bucket: 'primitives' },
-  { name: 'inline', bucket: 'primitives' },
-  { name: 'input', bucket: 'primitives' },
-  { name: 'label', bucket: 'primitives' },
-  { name: 'progress', bucket: 'primitives' },
-  { name: 'progress-circle', bucket: 'primitives' },
-  { name: 'radio-group', bucket: 'primitives' },
-  { name: 'select', bucket: 'primitives' },
-  { name: 'separator', bucket: 'primitives' },
-  { name: 'skeleton', bucket: 'primitives' },
-  { name: 'slider', bucket: 'primitives' },
-  { name: 'spacer', bucket: 'primitives' },
-  { name: 'spinner', bucket: 'primitives' },
-  { name: 'stack', bucket: 'primitives' },
-  { name: 'switch', bucket: 'primitives' },
-  { name: 'textarea', bucket: 'primitives' },
-  { name: 'toggle', bucket: 'primitives' },
-  { name: 'toggle-group', bucket: 'primitives' },
-  { name: 'visually-hidden', bucket: 'primitives' },
-  { name: 'accordion', bucket: 'composites' },
-  { name: 'alert-dialog', bucket: 'composites' },
-  { name: 'breadcrumb', bucket: 'composites' },
-  { name: 'collapsible', bucket: 'composites' },
-  { name: 'dialog', bucket: 'composites' },
-  { name: 'dismissable-layer', bucket: 'composites' },
-  { name: 'dropdown-menu', bucket: 'composites' },
-  { name: 'field', bucket: 'composites' },
-  { name: 'focus-ring', bucket: 'composites' },
-  { name: 'focus-scope', bucket: 'composites' },
-  { name: 'menu', bucket: 'composites' },
-  { name: 'menubar', bucket: 'composites' },
-  { name: 'navigation-menu', bucket: 'composites' },
-  { name: 'pagination', bucket: 'composites' },
-  { name: 'popover', bucket: 'composites' },
-  { name: 'tabs', bucket: 'composites' },
-  { name: 'toast', bucket: 'composites' },
-  { name: 'tooltip', bucket: 'composites' },
-  { name: 'data-table', bucket: 'patterns' },
-  { name: 'sidebar-layout', bucket: 'patterns' },
-  { name: 'topbar-layout', bucket: 'patterns' },
-];
+import {
+  componentFamilies,
+  docsCategories,
+  removedPublicExports,
+  toExportName,
+  toSourceImportPath,
+} from './component-manifest.js';
 
 const EXPORT_PATTERNS = [
   {
@@ -74,7 +38,7 @@ function validateRegistry() {
   const __dirname = dirname(fileURLToPath(import.meta.url));
   const componentsDir = join(__dirname, '../src/components');
 
-  for (const component of COMPONENT_REGISTRY) {
+  for (const component of componentFamilies) {
     const componentIndexPath = join(
       componentsDir,
       component.bucket,
@@ -104,12 +68,59 @@ function generateComponentsIndex() {
     '',
   ];
 
-  for (const component of COMPONENT_REGISTRY) {
+  for (const component of componentFamilies) {
     lines.push(`export * from './${component.bucket}/${component.name}';`);
   }
 
   lines.push('');
   writeFileSync(indexPath, `${lines.join('\n')}`, 'utf8');
+}
+
+function generatePublicSurfaceFixture() {
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  const fixturePath = join(__dirname, '../tests/fixtures/public-surface.ts');
+  const fixtureDir = dirname(fixturePath);
+  mkdirSync(fixtureDir, { recursive: true });
+
+  const lines = [
+    '// Generated - do not edit. Run `npm run generate` to update.',
+    '',
+  ];
+
+  for (const component of componentFamilies) {
+    const moduleAlias = `${toExportName(component.name)}Module`;
+    lines.push(
+      `import * as ${moduleAlias} from '${toSourceImportPath(component.bucket, component.name)}';`
+    );
+  }
+
+  lines.push('');
+  lines.push('export const componentSurface = [');
+
+  for (const component of componentFamilies) {
+    const moduleAlias = `${toExportName(component.name)}Module`;
+    lines.push(
+      `  { bucket: '${component.bucket}', name: '${component.name}', module: ${moduleAlias} },`
+    );
+  }
+
+  lines.push('] as const;');
+  lines.push('');
+  lines.push(
+    `export const publicValueExports = Array.from(new Set(componentSurface.flatMap((entry) => Object.keys(entry.module).filter((name) => name !== 'default' && !name.startsWith('__'))))).sort();`
+  );
+  lines.push('');
+  lines.push(
+    `export const removedPublicExports = ${JSON.stringify(
+      removedPublicExports.map((name) => toExportName(name))
+    )} as const;`
+  );
+  lines.push('');
+  lines.push(
+    `export const docsCategories = ${JSON.stringify(docsCategories, null, 2)} as const;`
+  );
+  lines.push('');
+  writeFileSync(fixturePath, `${lines.join('\n')}`, 'utf8');
 }
 
 function removeCategoriesDirectory() {
@@ -148,7 +159,8 @@ export function generate() {
   removeCategoriesDirectory();
   generateComponentsIndex();
   generatePackageJson();
-  return COMPONENT_REGISTRY.length;
+  generatePublicSurfaceFixture();
+  return componentFamilies.length;
 }
 
 if (process.argv[1]) {

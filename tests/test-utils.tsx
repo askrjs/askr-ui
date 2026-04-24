@@ -1,4 +1,4 @@
-import { createIsland } from '@askrjs/askr';
+import { cleanupApp, createIsland } from '@askrjs/askr';
 import { DefaultPortal } from '@askrjs/askr/foundations';
 
 export function resetTestState() {
@@ -24,6 +24,10 @@ export async function flushUpdates() {
 }
 
 export function unmount(container: HTMLElement | undefined) {
+  if (container) {
+    cleanupApp(container);
+  }
+
   if (container?.parentNode) {
     container.parentNode.removeChild(container);
   }

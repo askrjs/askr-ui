@@ -26,7 +26,7 @@ export type GridOwnProps = {
   children?: unknown;
 };
 
-export type GridDivProps = Omit<
+export type GridNativeProps = Omit<
   JSX.IntrinsicElements['div'],
   'children' | 'ref'
 > &
@@ -42,4 +42,4 @@ export type GridAsChildProps = GridOwnProps & {
   style?: JSX.IntrinsicElements['div']['style'];
 };
 
-export type GridProps = GridDivProps | GridAsChildProps;
+export type GridProps = GridNativeProps | GridAsChildProps;

@@ -1,12 +1,14 @@
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
 import type {
   SeparatorAsChildProps,
-  SeparatorDivProps,
+  SeparatorNativeProps,
 } from './separator.types';
 
-export function Separator(props: SeparatorDivProps): JSX.Element;
+export function Separator(props: SeparatorNativeProps): JSX.Element;
 export function Separator(props: SeparatorAsChildProps): JSX.Element;
-export function Separator(props: SeparatorDivProps | SeparatorAsChildProps) {
+export function Separator(
+  props: SeparatorNativeProps | SeparatorAsChildProps
+) {
   const {
     asChild,
     children,

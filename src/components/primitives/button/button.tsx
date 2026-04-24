@@ -1,5 +1,5 @@
 import { Slot, pressable, mergeProps } from '@askrjs/askr/foundations';
-import type { ButtonButtonProps, ButtonAsChildProps } from './button.types';
+import type { ButtonNativeProps, ButtonAsChildProps } from './button.types';
 
 /**
  * Headless Button component
@@ -38,9 +38,9 @@ import type { ButtonButtonProps, ButtonAsChildProps } from './button.types';
  * </Button>
  * ```
  */
-export function Button(props: ButtonButtonProps): JSX.Element;
+export function Button(props: ButtonNativeProps): JSX.Element;
 export function Button(props: ButtonAsChildProps): JSX.Element;
-export function Button(props: ButtonButtonProps | ButtonAsChildProps) {
+export function Button(props: ButtonNativeProps | ButtonAsChildProps) {
   const {
     asChild,
     children,

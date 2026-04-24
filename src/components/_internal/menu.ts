@@ -1,5 +1,5 @@
 import { createCollection } from '@askrjs/askr/foundations';
-import { collectJsxElements, extractTextContent } from './jsx';
+import { extractTextContent } from './jsx';
 
 export type MenuItemMetadata = {
   index: number;
@@ -20,7 +20,6 @@ const menuCollections = new Map<
   ReturnType<typeof createCollection<HTMLElement, MenuCollectionMetadata>>
 >();
 const menuCollectionUnregisters = new Map<string, () => void>();
-const menuItemMetadata = new Map<string, Array<MenuItemMetadata | undefined>>();
 
 export function getMenuCollection(id: string) {
   const existing = menuCollections.get(id);
@@ -34,24 +33,20 @@ export function getMenuCollection(id: string) {
   return created;
 }
 
-export function beginMenuItemDeclaration(id: string) {
-  menuItemMetadata.set(id, []);
-}
-
-export function declareMenuItemMetadata(
-  id: string,
-  metadata: MenuItemMetadata
-) {
-  const items = menuItemMetadata.get(id) ?? [];
-
-  items[metadata.index] = metadata;
-  menuItemMetadata.set(id, items);
-}
-
-export function getMenuItemMetadata(id: string): MenuItemMetadata[] {
-  return (menuItemMetadata.get(id) ?? []).filter(
-    (item): item is MenuItemMetadata => item !== undefined
-  );
+export function getMenuCollectionItems(
+  collection: ReturnType<
+    typeof createCollection<HTMLElement, MenuCollectionMetadata>
+  >
+): MenuItemMetadata[] {
+  return collection
+    .items()
+    .map((item) => ({
+      index: item.metadata.index,
+      disabled: item.metadata.disabled,
+      value: item.metadata.value,
+      text: item.metadata.text ?? '',
+    }))
+    .sort((left, right) => left.index - right.index);
 }
 
 export function resolveMenuItemText(
@@ -61,26 +56,6 @@ export function resolveMenuItemText(
   return typeof textValue === 'string'
     ? textValue
     : extractTextContent(children).trim();
-}
-
-export function collectItemMetadata(
-  children: unknown,
-  itemType: unknown
-): Array<{ disabled: boolean; value?: string; text: string }> {
-  return collectJsxElements(
-    children,
-    (element) => element.type === itemType
-  ).map((element) => ({
-    disabled: Boolean(element.props?.disabled),
-    value:
-      typeof element.props?.value === 'string'
-        ? element.props.value
-        : undefined,
-    text: resolveMenuItemText(
-      element.props?.children,
-      element.props?.textValue as string | undefined
-    ),
-  }));
 }
 
 export function firstEnabledIndex(items: Array<{ disabled: boolean }>): number {

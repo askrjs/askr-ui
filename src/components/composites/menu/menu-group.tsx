@@ -1,5 +1,4 @@
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
-import { readMenuDeclarationContext } from './menu.shared';
 import type {
   MenuGroupAsChildProps,
   MenuGroupProps,
@@ -13,11 +12,6 @@ export function MenuGroup(props: MenuGroupProps): JSX.Element;
 export function MenuGroup(props: MenuGroupAsChildProps): JSX.Element;
 export function MenuGroup(props: MenuGroupProps | MenuGroupAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
-
-  if (readMenuDeclarationContext()) {
-    return <>{children}</>;
-  }
-
   const finalProps = mergeProps(rest, {
     ref,
     'data-slot': 'menu-group',
@@ -34,10 +28,6 @@ export function MenuGroup(props: MenuGroupProps | MenuGroupAsChildProps) {
 export function MenuLabel(props: MenuLabelProps): JSX.Element | null;
 export function MenuLabel(props: MenuLabelAsChildProps): JSX.Element | null;
 export function MenuLabel(props: MenuLabelProps | MenuLabelAsChildProps) {
-  if (readMenuDeclarationContext()) {
-    return null;
-  }
-
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
@@ -58,10 +48,6 @@ export function MenuSeparator(
 export function MenuSeparator(
   props: MenuSeparatorProps | MenuSeparatorAsChildProps
 ) {
-  if (readMenuDeclarationContext()) {
-    return null;
-  }
-
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,

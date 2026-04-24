@@ -19,7 +19,7 @@ export type FlexOwnProps = {
   children?: unknown;
 };
 
-export type FlexDivProps = Omit<
+export type FlexNativeProps = Omit<
   JSX.IntrinsicElements['div'],
   'children' | 'ref'
 > &
@@ -35,9 +35,4 @@ export type FlexAsChildProps = FlexOwnProps & {
   style?: JSX.IntrinsicElements['div']['style'];
 };
 
-export type FlexProps = FlexDivProps | FlexAsChildProps;
-
-export type InlineOwnProps = FlexOwnProps;
-export type InlineDivProps = FlexDivProps;
-export type InlineAsChildProps = FlexAsChildProps;
-export type InlineProps = FlexProps;
+export type FlexProps = FlexNativeProps | FlexAsChildProps;

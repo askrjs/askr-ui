@@ -12,7 +12,6 @@ import {
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import { getOverlayNodes } from '../../_internal/overlay';
 import { pathIsOpen } from '../../_internal/hierarchical-menu';
-import { stripInternalProps } from '../../_internal/props';
 import {
   readNavigationMenuRootContext,
   readNavigationMenuItemContext,
