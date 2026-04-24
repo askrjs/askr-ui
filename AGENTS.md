@@ -163,7 +163,11 @@ Do **not** skip testing. Tests are part of the component.
 - **Jsdom**: DOM-backed helpers and internal contract checks like `tests/components/icon/**`, `tests/components/consistency-reset/**`, and `tests/components/data-table/state.test.tsx`
 - **Browser**: public component `behavior`, `a11y`, and `determinism` suites, plus browser coverage for `data-table`
 
-Use `tests/warnings.ts` for browser flows that should stay warning-free. Keep it targeted to real contract or user-visible defects, not generic framework noise.
+Browser suites run with a shared zero-noise console policy. Public flows must stay silent across `warn`, `error`, `log`, `info`, and `debug`.
+
+If a browser test intentionally expects console output, use the local allowance helper in `tests/browser-console.ts` and keep the exception scoped to that test. Do not add ad hoc console spies around browser suites.
+
+Use `tests/warnings.ts` only for targeted node/jsdom warning assertions that are outside the browser public-flow gate.
 
 **Behavior tests** (`tests/components/my-component/behavior.test.tsx`):
 

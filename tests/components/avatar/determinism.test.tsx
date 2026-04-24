@@ -10,8 +10,8 @@ describe('Avatar - Determinism', () => {
   it('should render deterministic avatar markup', () => {
     expectDeterministicRender(() => (
       <Avatar>
-        <AvatarImage src="/avatar.png" alt="Jane Doe" />
-        <AvatarFallback>JD</AvatarFallback>
+        <AvatarImage key="image" src="/avatar.png" alt="Jane Doe" />
+        <AvatarFallback key="fallback">JD</AvatarFallback>
       </Avatar>
     ));
   });

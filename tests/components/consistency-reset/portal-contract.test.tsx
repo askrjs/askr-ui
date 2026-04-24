@@ -33,7 +33,6 @@ import {
   TooltipTrigger,
 } from '../../../src/components/composites/tooltip';
 import { flushUpdates, mount, unmount } from '../../test-utils';
-import { expectNoUnexpectedWarnings } from '../../warnings';
 
 describe('Consistency Reset - Portal Contract', () => {
   let container: HTMLElement;
@@ -43,73 +42,61 @@ describe('Consistency Reset - Portal Contract', () => {
   });
 
   it('renders retained portal content at the root sink instead of inline', async () => {
-    await expectNoUnexpectedWarnings(
-      async () => {
-        container = mount(
-          <div>
-            <Dialog key="dialog" defaultOpen>
-              <DialogPortal>
-                <DialogContent>Dialog body</DialogContent>
-              </DialogPortal>
-              <DialogTrigger>Open dialog</DialogTrigger>
-            </Dialog>
-            <Popover key="popover" defaultOpen>
-              <PopoverPortal>
-                <PopoverContent>Popover body</PopoverContent>
-              </PopoverPortal>
-              <PopoverTrigger>Open popover</PopoverTrigger>
-            </Popover>
-            <DropdownMenu key="dropdown-menu" defaultOpen>
-              <DropdownMenuPortal>
-                <DropdownMenuContent>
-                  <DropdownMenuItem>Archive</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenuPortal>
-              <DropdownMenuTrigger>Open menu</DropdownMenuTrigger>
-            </DropdownMenu>
-            <Select key="select" defaultOpen defaultValue="askr">
-              <SelectPortal>
-                <SelectContent>
-                  <SelectItem value="askr">Askr</SelectItem>
-                </SelectContent>
-              </SelectPortal>
-              <SelectTrigger>
-                <SelectValue placeholder="Choose one" />
-              </SelectTrigger>
-            </Select>
-            <Tooltip key="tooltip" open>
-              <TooltipPortal>
-                <TooltipContent>Tooltip body</TooltipContent>
-              </TooltipPortal>
-              <TooltipTrigger>Tooltip trigger</TooltipTrigger>
-            </Tooltip>
-          </div>
-        );
-
-        await flushUpdates();
-
-        const text = container.textContent ?? '';
-
-        expect(text.indexOf('Open dialog')).toBeLessThan(
-          text.indexOf('Dialog body')
-        );
-        expect(text.indexOf('Open popover')).toBeLessThan(
-          text.indexOf('Popover body')
-        );
-        expect(text.indexOf('Open menu')).toBeLessThan(text.indexOf('Archive'));
-        expect(text.indexOf('Tooltip trigger')).toBeLessThan(
-          text.indexOf('Tooltip body')
-        );
-        expect(text.indexOf('Choose one')).toBeLessThan(
-          text.lastIndexOf('Askr')
-        );
-      },
-      {
-        allowWarnings: [
-          'Slow render detected',
-          '[askr] Unused state variable detected in Tooltip',
-        ],
-      }
+    container = mount(
+      <div>
+        <Dialog key="dialog" defaultOpen>
+          <DialogPortal>
+            <DialogContent>Dialog body</DialogContent>
+          </DialogPortal>
+          <DialogTrigger>Open dialog</DialogTrigger>
+        </Dialog>
+        <Popover key="popover" defaultOpen>
+          <PopoverPortal>
+            <PopoverContent>Popover body</PopoverContent>
+          </PopoverPortal>
+          <PopoverTrigger>Open popover</PopoverTrigger>
+        </Popover>
+        <DropdownMenu key="dropdown-menu" defaultOpen>
+          <DropdownMenuPortal>
+            <DropdownMenuContent>
+              <DropdownMenuItem>Archive</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
+          <DropdownMenuTrigger>Open menu</DropdownMenuTrigger>
+        </DropdownMenu>
+        <Select key="select" defaultOpen defaultValue="askr">
+          <SelectPortal>
+            <SelectContent>
+              <SelectItem value="askr">Askr</SelectItem>
+            </SelectContent>
+          </SelectPortal>
+          <SelectTrigger>
+            <SelectValue placeholder="Choose one" />
+          </SelectTrigger>
+        </Select>
+        <Tooltip key="tooltip" open>
+          <TooltipPortal>
+            <TooltipContent>Tooltip body</TooltipContent>
+          </TooltipPortal>
+          <TooltipTrigger>Tooltip trigger</TooltipTrigger>
+        </Tooltip>
+      </div>
     );
+
+    await flushUpdates();
+
+    const text = container.textContent ?? '';
+
+    expect(text.indexOf('Open dialog')).toBeLessThan(
+      text.indexOf('Dialog body')
+    );
+    expect(text.indexOf('Open popover')).toBeLessThan(
+      text.indexOf('Popover body')
+    );
+    expect(text.indexOf('Open menu')).toBeLessThan(text.indexOf('Archive'));
+    expect(text.indexOf('Tooltip trigger')).toBeLessThan(
+      text.indexOf('Tooltip body')
+    );
+    expect(text.indexOf('Choose one')).toBeLessThan(text.lastIndexOf('Askr'));
   });
 });

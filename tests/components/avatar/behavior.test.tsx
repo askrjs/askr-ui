@@ -11,8 +11,8 @@ describe('Avatar - Behavior', () => {
   it('should keep fallback visible until image load event', async () => {
     const container = mount(
       <Avatar>
-        <AvatarImage src="/avatar.png" alt="Jane Doe" />
-        <AvatarFallback>JD</AvatarFallback>
+        <AvatarImage key="image" src="/avatar.png" alt="Jane Doe" />
+        <AvatarFallback key="fallback">JD</AvatarFallback>
       </Avatar>
     );
 

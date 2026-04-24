@@ -163,16 +163,18 @@ export function NavigationMenuContent(
     <Slot
       asChild
       {...finalProps}
-      children={toChildArray(children).map((child, index) => {
-        if (!isJsxElement(child) || child.key != null) {
-          return child;
-        }
+      children={
+        toChildArray(children).map((child, index) => {
+          if (!isJsxElement(child) || child.key != null) {
+            return child;
+          }
 
-        return {
-          ...child,
-          key: `navigation-menu-content-${index}`,
-        };
-      }) as unknown as JSX.Element}
+          return {
+            ...child,
+            key: `navigation-menu-content-${index}`,
+          };
+        }) as unknown as JSX.Element
+      }
     />
   ) : (
     <div {...finalProps}>

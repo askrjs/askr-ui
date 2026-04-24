@@ -1,5 +1,9 @@
 import { vi } from 'vite-plus/test';
 
+// Prefer the browser-only global console policy in tests/browser-console.ts for
+// public component browser suites. Keep this helper for targeted node/jsdom
+// coverage that still needs an explicit warning or error assertion.
+
 type LogMatcher = RegExp | string;
 
 interface WarningOptions {
