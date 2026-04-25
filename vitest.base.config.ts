@@ -1,5 +1,10 @@
 import { askr } from '@askrjs/askr-vite';
 import { defineConfig } from 'vite-plus';
+import { fileURLToPath } from 'node:url';
+
+const foundationsAlias = fileURLToPath(
+  new URL('./src/foundations/index.ts', import.meta.url)
+);
 
 export const sharedVitestConfig = defineConfig({
   plugins: [askr()],
@@ -18,7 +23,7 @@ export const sharedVitestConfig = defineConfig({
   resolve: {
     alias: {
       '@askrjs/askr/for': '@askrjs/askr/control',
-      '@askrjs/askr-ui/foundations': './src/foundations/index.ts',
+      '@askrjs/askr-ui/foundations': foundationsAlias,
     },
     preserveSymlinks: true,
   },
