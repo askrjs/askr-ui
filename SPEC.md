@@ -58,8 +58,11 @@ The public surface has two tiers. **Core** is what the library cannot remove wit
 
 ## Runtime Contract
 
-askr-ui depends on `@askrjs/askr/foundations` exposing the verified contract used in CI:
+askr-ui depends on `@askrjs/askr-ui/foundations` exposing the verified behavior-helper
+contract used in CI:
 
+- `createCollection`
+- `createLayer`
 - `Presence`
 - `pressable`
 - `focusable`
@@ -70,6 +73,12 @@ askr-ui depends on `@askrjs/askr/foundations` exposing the verified contract use
 - `Ref`
 - `Orientation`
 - `controllableState`
+
+askr-ui also consumes structural primitives from `@askrjs/askr/foundations`:
+
+- `Slot`
+- `Presence`
+- `JSXElement`
 
 Dependency drift is guarded by a dedicated verification script.
 

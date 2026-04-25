@@ -1,5 +1,5 @@
 import { For, state } from '@askrjs/askr';
-import { controllableState } from '@askrjs/askr/foundations';
+import { controllableState } from '@askrjs/askr-ui/foundations';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import { getPersistentPortal } from '../../_internal/overlay';
@@ -15,11 +15,15 @@ import type { DropdownMenuProps } from './dropdown-menu.types';
 function DropdownMenuRootView(props: { children?: unknown }) {
   const root = readDropdownMenuRootContext();
   const PortalHost = root.portal;
-  const keyedChildren = For<unknown>(
-    () => toChildArray(props.children),
-    (child, index) =>
-      isJsxElement(child) && child.key != null ? child.key : index,
-    (child) => child as never
+  const keyedChildren = (
+    <For
+      each={() => toChildArray(props.children)}
+      by={(child, index) =>
+        isJsxElement(child) && child.key != null ? child.key : index
+      }
+    >
+      {(child) => child as never}
+    </For>
   );
 
   return (

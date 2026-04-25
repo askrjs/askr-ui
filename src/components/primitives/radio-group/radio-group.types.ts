@@ -1,4 +1,4 @@
-import type { JSXElement, Orientation, Ref } from '@askrjs/askr/foundations';
+import type { JSXElement, Orientation, Ref } from '@askrjs/askr-ui/foundations';
 
 export type RadioGroupOwnProps = {
   value?: string;

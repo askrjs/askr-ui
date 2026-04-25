@@ -3,7 +3,7 @@ import {
   composeRefs,
   mergeProps,
   pressable,
-} from '@askrjs/askr/foundations';
+} from '@askrjs/askr-ui/foundations';
 import { getOverlayNodes } from '../../_internal/overlay';
 import { readDropdownMenuRootContext } from './dropdown-menu.shared';
 import type {

@@ -1,4 +1,4 @@
-import { controllableState } from '@askrjs/askr/foundations';
+import { controllableState } from '@askrjs/askr-ui/foundations';
 import { resolveCompoundId } from '../../_internal/id';
 import {
   applyFilters,

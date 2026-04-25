@@ -5,7 +5,7 @@ import {
   composeRefs,
   mergeProps,
   rovingFocus,
-} from '@askrjs/askr/foundations';
+} from '@askrjs/askr-ui/foundations';
 import { DismissableLayer } from '../../composites/dismissable-layer';
 import { FocusScope } from '../../composites/focus-scope';
 import { focusSelectedCollectionItem } from '../../_internal/focus';

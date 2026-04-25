@@ -1,4 +1,4 @@
-import { Presence, Slot, mergeProps } from '@askrjs/askr/foundations';
+import { Presence, Slot, mergeProps } from '@askrjs/askr-ui/foundations';
 import {
   getTabsContentId,
   getTabsTriggerId,

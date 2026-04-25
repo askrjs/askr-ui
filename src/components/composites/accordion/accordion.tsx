@@ -7,7 +7,7 @@ import {
   mergeProps,
   pressable,
   rovingFocus,
-} from '@askrjs/askr/foundations';
+} from '@askrjs/askr-ui/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import {
   disabledIndexes,

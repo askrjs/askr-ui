@@ -1,5 +1,5 @@
 import { For, state } from '@askrjs/askr';
-import { mergeProps } from '@askrjs/askr/foundations';
+import { mergeProps } from '@askrjs/askr-ui/foundations';
 import { resolveCompoundId } from '../../_internal/id';
 import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import { getPersistentPortal } from '../../_internal/overlay';
@@ -15,11 +15,15 @@ function NavigationMenuRootView(props: {
   portalHost: (() => JSX.Element | null) | null;
 }) {
   const PortalHost = props.portalHost;
-  const keyedChildren = For<unknown>(
-    () => toChildArray(props.children),
-    (child, index) =>
-      isJsxElement(child) && child.key != null ? child.key : index,
-    (child) => child as never
+  const keyedChildren = (
+    <For
+      each={() => toChildArray(props.children)}
+      by={(child, index) =>
+        isJsxElement(child) && child.key != null ? child.key : index
+      }
+    >
+      {(child) => child as never}
+    </For>
   );
 
   return (

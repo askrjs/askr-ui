@@ -1,5 +1,5 @@
 import { For } from '@askrjs/askr';
-import { Slot, mergeProps } from '@askrjs/askr/foundations';
+import { Slot, mergeProps } from '@askrjs/askr-ui/foundations';
 import {
   applyBoxLayoutStyles,
   extractBoxDataAttributes,
@@ -112,11 +112,15 @@ export function Grid(props: GridDivProps | GridSpanProps | GridAsChildProps) {
     ...extractBoxDataAttributes(boxProps),
     style: withBoxLayoutStyle(layoutStyle, userStyle),
   });
-  const keyedChildren = For<unknown>(
-    () => toChildArray(children),
-    (child, index) =>
-      isJsxElement(child) && child.key != null ? child.key : index,
-    (child) => child as never
+  const keyedChildren = (
+    <For
+      each={() => toChildArray(children)}
+      by={(child, index) =>
+        isJsxElement(child) && child.key != null ? child.key : index
+      }
+    >
+      {(child) => child as never}
+    </For>
   );
 
   if (asChild) {

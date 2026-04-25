@@ -1,4 +1,4 @@
-import { formatId } from '@askrjs/askr/foundations';
+import { formatId } from '@askrjs/askr-ui/foundations';
 import { serializeForId } from './jsx';
 
 export function hashString(value: string): string {

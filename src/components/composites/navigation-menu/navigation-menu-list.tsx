@@ -1,4 +1,4 @@
-import { Slot, mergeProps, rovingFocus } from '@askrjs/askr/foundations';
+import { Slot, mergeProps, rovingFocus } from '@askrjs/askr-ui/foundations';
 import {
   getCompositeCollection,
   getCompositeCollectionItems,

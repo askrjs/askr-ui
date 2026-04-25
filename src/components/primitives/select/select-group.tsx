@@ -1,4 +1,4 @@
-import { Slot, mergeProps } from '@askrjs/askr/foundations';
+import { Slot, mergeProps } from '@askrjs/askr-ui/foundations';
 import { resolvePartId } from '../../_internal/id';
 import { collectJsxElements } from '../../_internal/jsx';
 import {

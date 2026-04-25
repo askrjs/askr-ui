@@ -3,7 +3,7 @@ import {
   composeRefs,
   hoverable,
   mergeProps,
-} from '@askrjs/askr/foundations';
+} from '@askrjs/askr-ui/foundations';
 import { readTooltipRootContext } from './tooltip.shared';
 import type {
   TooltipTriggerAsChildProps,

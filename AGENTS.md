@@ -104,7 +104,8 @@ Start from the standard template. Every component must follow this structure:
 
 ```tsx
 // src/components/composites/my-component/my-component.tsx
-import { Slot, mergeProps } from '@askrjs/askr/foundations';
+import { Slot } from '@askrjs/askr/foundations';
+import { mergeProps } from '@askrjs/askr-ui/foundations';
 import type { MyComponentProps } from './my-component.types';
 
 export function MyComponent(props: MyComponentProps): JSX.Element {

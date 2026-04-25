@@ -3,7 +3,7 @@ import {
   controllableState,
   mergeProps,
   pressable,
-} from '@askrjs/askr/foundations';
+} from '@askrjs/askr-ui/foundations';
 import type {
   CheckboxInputProps,
   CheckboxAsChildProps,

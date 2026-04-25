@@ -3,7 +3,7 @@ import {
   composeRefs,
   mergeProps,
   rovingFocus,
-} from '@askrjs/askr/foundations';
+} from '@askrjs/askr-ui/foundations';
 import {
   registerCompositeNode,
   getCompositeCollection,

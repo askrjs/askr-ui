@@ -1,4 +1,4 @@
-import { mergeProps } from '@askrjs/askr/foundations';
+import { mergeProps } from '@askrjs/askr-ui/foundations';
 import { DATA_TABLE_A11Y_CONTRACT } from './data-table.a11y';
 import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import {

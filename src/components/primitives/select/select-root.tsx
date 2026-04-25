@@ -1,5 +1,5 @@
 import { For, state } from '@askrjs/askr';
-import { controllableState } from '@askrjs/askr/foundations';
+import { controllableState } from '@askrjs/askr-ui/foundations';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import {
   collectJsxElements,
@@ -25,11 +25,15 @@ function SelectRootView(props: {
 }) {
   const root = readSelectRootContext();
   const PortalHost = root.portal;
-  const keyedChildren = For<unknown>(
-    () => toChildArray(props.children),
-    (child, index) =>
-      isJsxElement(child) && child.key != null ? child.key : index,
-    (child) => child as never
+  const keyedChildren = (
+    <For
+      each={() => toChildArray(props.children)}
+      by={(child, index) =>
+        isJsxElement(child) && child.key != null ? child.key : index
+      }
+    >
+      {(child) => child as never}
+    </For>
   );
   root.portal.render({ children: null });
 

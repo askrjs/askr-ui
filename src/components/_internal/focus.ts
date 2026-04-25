@@ -1,4 +1,4 @@
-import type { Collection } from '@askrjs/askr/foundations';
+import type { Collection } from '@askrjs/askr-ui/foundations';
 
 const FOCUSABLE_SELECTOR = [
   'a[href]',

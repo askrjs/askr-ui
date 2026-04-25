@@ -7,8 +7,8 @@ import {
   formatId,
   mergeProps,
   pressable,
-} from '@askrjs/askr/foundations';
-import type { JSXElement } from '@askrjs/askr/foundations';
+} from '@askrjs/askr-ui/foundations';
+import type { JSXElement } from '@askrjs/askr-ui/foundations';
 import type {
   CollapsibleContentAsChildProps,
   CollapsibleContentProps,
