@@ -1,24 +1,15 @@
 // Generated - do not edit. Run `npm run generate` to update.
 
 export * from './primitives/avatar';
-export * from './primitives/badge';
-export * from './primitives/box';
 export * from './primitives/button';
 export * from './primitives/checkbox';
-export * from './primitives/container';
-export * from './primitives/flex';
-export * from './primitives/grid';
 export * from './primitives/input';
 export * from './primitives/label';
 export * from './primitives/progress';
 export * from './primitives/progress-circle';
 export * from './primitives/radio-group';
 export * from './primitives/select';
-export * from './primitives/separator';
-export * from './primitives/section';
-export * from './primitives/skeleton';
 export * from './primitives/slider';
-export * from './primitives/spacer';
 export * from './primitives/spinner';
 export * from './primitives/switch';
 export * from './primitives/textarea';
@@ -44,5 +35,3 @@ export * from './composites/tabs';
 export * from './composites/toast';
 export * from './composites/tooltip';
 export * from './patterns/data-table';
-export * from './patterns/sidebar-layout';
-export * from './patterns/topbar-layout';

@@ -2,6 +2,9 @@
 
 Headless Askr UI components.
 
+`askr-ui` owns behavior and accessibility. Visual-only composition and display
+components live in `@askrjs/askr-themes`.
+
 ## Contents
 
 - [Overview](./askr-ui.md) — What askr-ui is and component categories

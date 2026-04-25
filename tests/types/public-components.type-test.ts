@@ -9,7 +9,6 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-  Badge,
   Breadcrumb,
   BreadcrumbCurrent,
   BreadcrumbItem,
@@ -42,7 +41,6 @@ import {
   ProgressCircle,
   ProgressCircleIndicator,
   ProgressIndicator,
-  Skeleton,
   Slider,
   SliderRange,
   SliderThumb,
@@ -71,8 +69,6 @@ import {
   type AvatarFallbackProps,
   type AvatarImageProps,
   type AvatarProps,
-  type BadgeAsChildProps,
-  type BadgeProps,
   type BreadcrumbCurrentAsChildProps,
   type BreadcrumbCurrentProps,
   type BreadcrumbLinkAsChildProps,
@@ -104,8 +100,6 @@ import {
   type PaginationProps,
   type ProgressCircleProps,
   type ProgressProps,
-  type SkeletonAsChildProps,
-  type SkeletonProps,
   type SliderProps,
   type SpinnerProps,
   type TabsContentAsChildProps,
@@ -123,22 +117,9 @@ import {
   type ToggleGroupItemProps,
   type ToggleGroupMultipleProps,
   type ToggleGroupSingleProps,
-  Container,
-  Flex,
-  Grid,
-  Spacer,
-  SidebarLayout,
-  TopbarLayout,
-  type ContainerProps,
-  type FlexProps,
-  type GridProps,
-  type SpacerProps,
-  type SidebarLayoutProps,
-  type TopbarLayoutProps,
 } from '@askrjs/askr-ui';
 import { Accordion as AccordionSubpath } from '@askrjs/askr-ui/composites/accordion';
 import { Avatar as AvatarSubpath } from '@askrjs/askr-ui/primitives/avatar';
-import { Badge as BadgeSubpath } from '@askrjs/askr-ui/primitives/badge';
 import { Breadcrumb as BreadcrumbSubpath } from '@askrjs/askr-ui/composites/breadcrumb';
 import { Collapsible as CollapsibleSubpath } from '@askrjs/askr-ui/composites/collapsible';
 import { Menubar as MenubarSubpath } from '@askrjs/askr-ui/composites/menubar';
@@ -146,24 +127,16 @@ import { NavigationMenu as NavigationMenuSubpath } from '@askrjs/askr-ui/composi
 import { Pagination as PaginationSubpath } from '@askrjs/askr-ui/composites/pagination';
 import { Progress as ProgressSubpath } from '@askrjs/askr-ui/primitives/progress';
 import { ProgressCircle as ProgressCircleSubpath } from '@askrjs/askr-ui/primitives/progress-circle';
-import { Skeleton as SkeletonSubpath } from '@askrjs/askr-ui/primitives/skeleton';
 import { Slider as SliderSubpath } from '@askrjs/askr-ui/primitives/slider';
 import { Spinner as SpinnerSubpath } from '@askrjs/askr-ui/primitives/spinner';
 import { Tabs as TabsSubpath } from '@askrjs/askr-ui/composites/tabs';
 import { ToastProvider as ToastSubpath } from '@askrjs/askr-ui/composites/toast';
 import { ToggleGroup as ToggleGroupSubpath } from '@askrjs/askr-ui/primitives/toggle-group';
-import { Container as ContainerSubpath } from '@askrjs/askr-ui/primitives/container';
-import { Flex as FlexSubpath } from '@askrjs/askr-ui/primitives/flex';
-import { Grid as GridSubpath } from '@askrjs/askr-ui/primitives/grid';
-import { Spacer as SpacerSubpath } from '@askrjs/askr-ui/primitives/spacer';
-import { SidebarLayout as SidebarLayoutSubpath } from '@askrjs/askr-ui/patterns/sidebar-layout';
-import { TopbarLayout as TopbarLayoutSubpath } from '@askrjs/askr-ui/patterns/topbar-layout';
 
 const slotChild = {} as JSXElement;
 
 const accordionFromSubpath: typeof Accordion = AccordionSubpath;
 const avatarFromSubpath: typeof Avatar = AvatarSubpath;
-const badgeFromSubpath: typeof Badge = BadgeSubpath;
 const breadcrumbFromSubpath: typeof Breadcrumb = BreadcrumbSubpath;
 const collapsibleFromSubpath: typeof Collapsible = CollapsibleSubpath;
 const menubarFromSubpath: typeof Menubar = MenubarSubpath;
@@ -171,7 +144,6 @@ const navigationMenuFromSubpath: typeof NavigationMenu = NavigationMenuSubpath;
 const paginationFromSubpath: typeof Pagination = PaginationSubpath;
 const progressFromSubpath: typeof Progress = ProgressSubpath;
 const progressCircleFromSubpath: typeof ProgressCircle = ProgressCircleSubpath;
-const skeletonFromSubpath: typeof Skeleton = SkeletonSubpath;
 const sliderFromSubpath: typeof Slider = SliderSubpath;
 const spinnerFromSubpath: typeof Spinner = SpinnerSubpath;
 const tabsFromSubpath: typeof Tabs = TabsSubpath;
@@ -179,33 +151,7 @@ const toastFromSubpath: typeof ToastProvider = ToastSubpath;
 const toggleGroupFromSubpath: typeof ToggleGroup = ToggleGroupSubpath;
 const menubarFromRoot: typeof Menubar = askrUi.Menubar;
 const navigationMenuFromRoot: typeof NavigationMenu = askrUi.NavigationMenu;
-const containerFromSubpath: typeof Container = ContainerSubpath;
-const flexFromSubpath: typeof Flex = FlexSubpath;
-const gridFromSubpath: typeof Grid = GridSubpath;
-const spacerFromSubpath: typeof Spacer = SpacerSubpath;
-const sidebarLayoutFromSubpath: typeof SidebarLayout = SidebarLayoutSubpath;
-const topbarLayoutFromSubpath: typeof TopbarLayout = TopbarLayoutSubpath;
 
-const containerLayoutProps: ContainerProps = { maxWidth: '64rem' };
-const flexLayoutProps: FlexProps = { gap: '1rem', align: 'center' };
-const gridLayoutProps: GridProps = { columns: 3, gap: '1rem' };
-const spacerLayoutProps: SpacerProps = { grow: 1 };
-const sidebarLayoutLayoutProps: SidebarLayoutProps = {
-  sidebarWidth: '20rem',
-  gap: '1rem',
-};
-const topbarLayoutLayoutProps: TopbarLayoutProps = { topbarHeight: '3rem' };
-
-const badgeProps: BadgeProps = { children: 'Beta' };
-const badgeAsChildProps: BadgeAsChildProps = {
-  asChild: true,
-  children: slotChild,
-};
-const skeletonProps: SkeletonProps = { children: 'loading' };
-const skeletonAsChildProps: SkeletonAsChildProps = {
-  asChild: true,
-  children: slotChild,
-};
 const avatarProps: AvatarProps = { children: 'avatar' };
 const avatarImageProps: AvatarImageProps = { src: '/avatar.png', alt: 'User' };
 const avatarFallbackProps: AvatarFallbackProps = { children: 'JD' };
@@ -398,7 +344,6 @@ const _invalidNavigationTrigger: NavigationMenuTriggerAsChildProps = {
 void [
   accordionFromSubpath,
   avatarFromSubpath,
-  badgeFromSubpath,
   breadcrumbFromSubpath,
   collapsibleFromSubpath,
   menubarFromSubpath,
@@ -406,7 +351,6 @@ void [
   paginationFromSubpath,
   progressFromSubpath,
   progressCircleFromSubpath,
-  skeletonFromSubpath,
   sliderFromSubpath,
   spinnerFromSubpath,
   tabsFromSubpath,
@@ -414,7 +358,6 @@ void [
   toggleGroupFromSubpath,
   menubarFromRoot,
   navigationMenuFromRoot,
-  Badge,
   Avatar,
   AvatarImage,
   AvatarFallback,
@@ -464,10 +407,6 @@ void [
   SliderTrack,
   SliderRange,
   SliderThumb,
-  badgeProps,
-  badgeAsChildProps,
-  skeletonProps,
-  skeletonAsChildProps,
   avatarProps,
   avatarImageProps,
   avatarFallbackProps,
@@ -526,22 +465,4 @@ void [
   toastCloseProps,
   toastCloseAsChildProps,
   sliderProps,
-  containerFromSubpath,
-  flexFromSubpath,
-  gridFromSubpath,
-  spacerFromSubpath,
-  sidebarLayoutFromSubpath,
-  topbarLayoutFromSubpath,
-  Container,
-  Flex,
-  Grid,
-  Spacer,
-  SidebarLayout,
-  TopbarLayout,
-  containerLayoutProps,
-  flexLayoutProps,
-  gridLayoutProps,
-  spacerLayoutProps,
-  sidebarLayoutLayoutProps,
-  topbarLayoutLayoutProps,
 ];

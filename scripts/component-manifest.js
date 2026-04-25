@@ -1,21 +1,14 @@
 export const componentFamilies = [
   { bucket: 'primitives', name: 'avatar' },
-  { bucket: 'primitives', name: 'badge' },
   { bucket: 'primitives', name: 'button' },
   { bucket: 'primitives', name: 'checkbox' },
-  { bucket: 'primitives', name: 'container' },
-  { bucket: 'primitives', name: 'flex' },
-  { bucket: 'primitives', name: 'grid' },
   { bucket: 'primitives', name: 'input' },
   { bucket: 'primitives', name: 'label' },
   { bucket: 'primitives', name: 'progress' },
   { bucket: 'primitives', name: 'progress-circle' },
   { bucket: 'primitives', name: 'radio-group' },
   { bucket: 'primitives', name: 'select' },
-  { bucket: 'primitives', name: 'separator' },
-  { bucket: 'primitives', name: 'skeleton' },
   { bucket: 'primitives', name: 'slider' },
-  { bucket: 'primitives', name: 'spacer' },
   { bucket: 'primitives', name: 'spinner' },
   { bucket: 'primitives', name: 'switch' },
   { bucket: 'primitives', name: 'textarea' },
@@ -41,8 +34,6 @@ export const componentFamilies = [
   { bucket: 'composites', name: 'toast' },
   { bucket: 'composites', name: 'tooltip' },
   { bucket: 'patterns', name: 'data-table' },
-  { bucket: 'patterns', name: 'sidebar-layout' },
-  { bucket: 'patterns', name: 'topbar-layout' },
 ];
 
 export const docsCategories = [
@@ -53,7 +44,6 @@ export const docsCategories = [
       'toggle',
       'checkbox',
       'visually-hidden',
-      'separator',
       'label',
       'input',
       'textarea',
@@ -86,14 +76,7 @@ export const docsCategories = [
   },
   {
     label: 'Status',
-    names: [
-      'badge',
-      'progress',
-      'progress-circle',
-      'toast',
-      'skeleton',
-      'spinner',
-    ],
+    names: ['progress', 'progress-circle', 'toast', 'spinner'],
   },
   {
     label: 'Identity',
@@ -104,16 +87,27 @@ export const docsCategories = [
     names: ['breadcrumb', 'pagination', 'menubar', 'navigation-menu'],
   },
   {
-    label: 'Layout',
-    names: ['container', 'flex', 'grid', 'spacer'],
-  },
-  {
     label: 'Patterns',
-    names: ['data-table', 'sidebar-layout', 'topbar-layout'],
+    names: ['data-table'],
   },
 ];
 
-export const removedPublicExports = ['center', 'inline', 'stack'];
+export const removedPublicExports = [
+  'badge',
+  'box',
+  'center',
+  'container',
+  'flex',
+  'grid',
+  'inline',
+  'section',
+  'separator',
+  'skeleton',
+  'spacer',
+  'stack',
+  'sidebar-layout',
+  'topbar-layout',
+];
 
 export function toExportName(name) {
   return name

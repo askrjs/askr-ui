@@ -11,15 +11,18 @@ visual styling. Pair it with `askr-themes` for visual defaults, or supply your o
 
 | Category   | Components                                                                                                                          | Import path       |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| Foundation | Button, Toggle, Checkbox, VisuallyHidden, Separator, Label, Input, Textarea, Field, RadioGroup, Switch, Select, Slider, ToggleGroup | `@askrjs/askr-ui` |
+| Foundation | Button, Toggle, Checkbox, VisuallyHidden, Label, Input, Textarea, Field, RadioGroup, Switch, Select, Slider, ToggleGroup            | `@askrjs/askr-ui` |
 | Focus      | FocusRing, FocusScope, DismissableLayer                                                                                             | `@askrjs/askr-ui` |
 | Overlay    | Dialog, AlertDialog, Popover, Tooltip, DropdownMenu, Menu                                                                           | `@askrjs/askr-ui` |
 | Disclosure | Accordion, Collapsible, Tabs                                                                                                        | `@askrjs/askr-ui` |
-| Status     | Badge, Progress, ProgressCircle, Toast, Skeleton, Spinner                                                                           | `@askrjs/askr-ui` |
+| Status     | Progress, ProgressCircle, Toast, Spinner                                                                                            | `@askrjs/askr-ui` |
 | Identity   | Avatar                                                                                                                              | `@askrjs/askr-ui` |
 | Navigation | Breadcrumb, Pagination, Menubar, NavigationMenu                                                                                     | `@askrjs/askr-ui` |
-| Layout     | Box, Container, Flex, Grid, Section, Spacer                                                                                         | `@askrjs/askr-ui` |
-| Patterns   | DataTable, SidebarLayout, TopbarLayout                                                                                              | `@askrjs/askr-ui` |
+| Patterns   | DataTable                                                                                                                           | `@askrjs/askr-ui` |
+
+Visual-only composition and display components such as Box, Stack, Inline,
+Grid, Container, Section, Spacer, Separator/Divider, Badge, Skeleton,
+SidebarLayout, and TopbarLayout live in `@askrjs/askr-themes`.
 
 ## Import style
 

@@ -38,7 +38,6 @@ import {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-  Separator,
   Slider,
   SliderTrack,
   SliderRange,
@@ -136,9 +135,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@askrjs/askr-ui';
 ## Status components
 
 ```ts
-import { Badge } from '@askrjs/askr-ui';
 import { Spinner } from '@askrjs/askr-ui';
-import { Skeleton } from '@askrjs/askr-ui';
 import { Progress, ProgressIndicator } from '@askrjs/askr-ui';
 import { ProgressCircle, ProgressCircleIndicator } from '@askrjs/askr-ui';
 import {
@@ -205,12 +202,6 @@ import {
 } from '@askrjs/askr-ui';
 ```
 
-## Layout components
-
-```ts
-import { Box, Container, Grid, Flex, Section, Spacer } from '@askrjs/askr-ui';
-```
-
 ## Pattern components
 
 ```ts
@@ -239,10 +230,11 @@ import {
   DataTableEmpty,
   DataTableLoading,
   DataTableError,
-  SidebarLayout,
-  TopbarLayout,
 } from '@askrjs/askr-ui';
 ```
+
+Visual-only layout and display components are exported by
+`@askrjs/askr-themes/default/*`, not `@askrjs/askr-ui`.
 
 ## See also
 

@@ -6,7 +6,6 @@ import {
   Label,
   RadioGroup,
   RadioGroupItem,
-  Separator,
   Switch,
   Textarea,
   VisuallyHidden,
@@ -25,7 +24,6 @@ describe('Form benches', () => {
       ],
     });
     Textarea({ value: 'Notes' });
-    Separator({});
     VisuallyHidden({ children: 'Hidden label' });
   });
 
