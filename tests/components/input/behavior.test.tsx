@@ -1,4 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { state } from '@askrjs/askr';
+import { Button } from '../../../src/components/primitives/button';
 import {
   DebouncedInput,
   Input,
@@ -72,6 +74,55 @@ describe('Input - Behavior', () => {
     const input = container.querySelector('input') as HTMLInputElement | null;
 
     expect(input?.type).toBe('search');
+  });
+
+  it('preserves input identity and value through sibling rerenders', async () => {
+    const InputFixture = () => {
+      const value = state('');
+      const version = state(0);
+
+      return (
+        <div>
+          <Input
+            aria-label="Search"
+            value={value()}
+            onInput={(event) => {
+              value.set(event.target.value);
+            }}
+          />
+          <Button onPress={() => version.set(version() + 1)}>
+            Rerender {version()}
+          </Button>
+          <output data-testid="mirror">{value()}</output>
+        </div>
+      );
+    };
+
+    container = mount(<InputFixture />);
+
+    const input = container.querySelector('input') as HTMLInputElement;
+    input.focus();
+    input.value = 'northwind';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    await flushUpdates();
+
+    const updatedInput = container.querySelector('input') as HTMLInputElement;
+
+    expect(updatedInput).toBe(input);
+    expect(updatedInput.value).toBe('northwind');
+    expect(document.activeElement).toBe(updatedInput);
+
+    const button = container.querySelector('button') as HTMLButtonElement;
+    button.click();
+    await flushUpdates();
+
+    const rerenderedInput = container.querySelector('input') as HTMLInputElement;
+
+    expect(rerenderedInput).toBe(input);
+    expect(rerenderedInput.value).toBe('northwind');
+    expect(container.querySelector('[data-testid="mirror"]')?.textContent).toBe(
+      'northwind'
+    );
   });
 
   it('forwards onInput and debounces committed value', async () => {
