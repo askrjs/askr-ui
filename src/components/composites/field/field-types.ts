@@ -1,4 +1,4 @@
-import type { JSXElement, Ref } from '@askrjs/askr/foundations';
+import type { JSXElement, Ref } from '@askrjs/askr-ui/foundations';
 import type { CheckboxInputProps } from '../../primitives/checkbox';
 import type { InputInputProps } from '../../primitives/input';
 import type { RadioGroupProps } from '../../primitives/radio-group';

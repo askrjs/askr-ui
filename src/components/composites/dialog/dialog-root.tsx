@@ -7,7 +7,7 @@ import {
   getPersistentPortal,
   syncOverlayPosition,
 } from '../../_internal/overlay';
-import { controllableState } from '@askrjs/askr/foundations';
+import { controllableState } from '@askrjs/askr-ui/foundations';
 import { DialogDescription } from './dialog-description';
 import {
   DialogRootContext,
@@ -25,11 +25,15 @@ function scheduleDialogPortalSync(callback: () => void) {
 function DialogRootView(props: { children?: unknown }) {
   const root = readDialogRootContext();
   const PortalHost = root.portal;
-  const keyedChildren = For<unknown>(
-    () => toChildArray(props.children),
-    (child, index) =>
-      isJsxElement(child) && child.key != null ? child.key : index,
-    (child) => child as never
+  const keyedChildren = (
+    <For
+      each={() => toChildArray(props.children)}
+      by={(child, index) =>
+        isJsxElement(child) && child.key != null ? child.key : index
+      }
+    >
+      {(child) => child as never}
+    </For>
   );
 
   return (

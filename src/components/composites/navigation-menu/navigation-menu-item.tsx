@@ -9,11 +9,15 @@ import {
 import type { NavigationMenuItemProps } from './navigation-menu.types';
 
 function NavigationMenuItemScopeView(props: { children?: unknown }) {
-  const keyedChildren = For<unknown>(
-    () => toChildArray(props.children),
-    (child, index) =>
-      isJsxElement(child) && child.key != null ? child.key : index,
-    (child) => child as never
+  const keyedChildren = (
+    <For
+      each={() => toChildArray(props.children)}
+      by={(child, index) =>
+        isJsxElement(child) && child.key != null ? child.key : index
+      }
+    >
+      {(child) => child as never}
+    </For>
   );
 
   return <>{keyedChildren}</>;

@@ -20,11 +20,15 @@ askr-ui components   (Button, Dialog, Select, ...)
     ↑ built on
 foundations          (applyInteractionPolicy, focusScope, ...)
     ↑ from
-@askrjs/askr/foundations
+@askrjs/askr-ui/foundations
 ```
 
 Your application code should compose `askr-ui` components. You only need to use foundations
 directly when building a new primitive that `askr-ui` does not provide.
+
+Structural primitives like `Slot` and `Presence` still come from
+`@askrjs/askr/foundations`. The `askr-ui` foundations entry owns the behavior helpers layered
+on top of those structural primitives.
 
 ## See also
 

@@ -3,7 +3,7 @@ import {
   composeRefs,
   mergeProps,
   pressable,
-} from '@askrjs/askr/foundations';
+} from '@askrjs/askr-ui/foundations';
 import { readDialogRootContext } from './dialog.shared';
 import type {
   DialogTriggerAsChildProps,

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "module": "ESNext",
     "declaration": true,
     "declarationMap": true,
@@ -8,8 +9,16 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "types": ["node"],
+    "ignoreDeprecations": "6.0",
     "forceConsistentCasingInFileNames": true,
     "composite": true,
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "paths": {
+      "@askrjs/askr": ["../askr/dist/index.d.ts"],
+      "@askrjs/askr/foundations": ["../askr/dist/foundations/index.d.ts"],
+      "@askrjs/askr/fx": ["../askr/dist/fx/index.d.ts"],
+      "@askrjs/askr/resources": ["../askr/dist/resources/index.d.ts"],
+      "@askrjs/askr-ui/foundations": ["./src/foundations/index.ts"]
+    }
   }
 }

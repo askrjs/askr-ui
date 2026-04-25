@@ -1,4 +1,4 @@
-import type { JSXElement, Ref } from '@askrjs/askr/foundations';
+import type { JSXElement, Ref } from '@askrjs/askr-ui/foundations';
 import type { FlexOwnProps } from '../flex/flex.types';
 
 export type StackOwnProps = Omit<FlexOwnProps, 'direction' | 'as'> & {

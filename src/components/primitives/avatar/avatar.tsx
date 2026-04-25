@@ -4,7 +4,7 @@ import {
   Slot,
   composeRefs,
   mergeProps,
-} from '@askrjs/askr/foundations';
+} from '@askrjs/askr-ui/foundations';
 import { resource } from '@askrjs/askr/resources';
 import { resolveCompoundId } from '../../_internal/id';
 import type {

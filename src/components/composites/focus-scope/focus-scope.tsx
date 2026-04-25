@@ -1,4 +1,4 @@
-import { Slot, composeRefs, mergeProps } from '@askrjs/askr/foundations';
+import { Slot, composeRefs, mergeProps } from '@askrjs/askr-ui/foundations';
 import {
   focusFirstDescendant,
   getFocusableElements,

@@ -1,10 +1,9 @@
-import { state } from '@askrjs/askr';
-import { For } from '@askrjs/askr/for';
+import { For, state } from '@askrjs/askr';
 import {
   controllableState,
   mergeProps,
   rovingFocus,
-} from '@askrjs/askr/foundations';
+} from '@askrjs/askr-ui/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import {
   disabledIndexes,
@@ -98,11 +97,15 @@ function RadioGroupRootView(props: {
       />
     );
   }
-  const renderedList = For(
-    () => renderedChildren,
-    (child, index) =>
-      isJsxElement(child) && child.key != null ? String(child.key) : index,
-    (child) => child as JSX.Element
+  const renderedList = (
+    <For
+      each={() => renderedChildren}
+      by={(child, index) =>
+        isJsxElement(child) && child.key != null ? String(child.key) : index
+      }
+    >
+      {(child) => child as JSX.Element}
+    </For>
   );
 
   return <div {...finalProps}>{renderedList}</div>;

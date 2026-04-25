@@ -36,6 +36,11 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
+    "./foundations": {
+      "types": "./dist/foundations/index.d.ts",
+      "import": "./dist/foundations/index.js",
+      "require": "./dist/foundations/index.cjs"
+    },
     "./primitives/*": {
       "types": "./dist/components/primitives/*/*.d.ts",
       "import": "./dist/components/primitives/*/*.js",

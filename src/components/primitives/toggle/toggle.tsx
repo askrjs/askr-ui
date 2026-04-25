@@ -1,4 +1,4 @@
-import { Slot, pressable, mergeProps } from '@askrjs/askr/foundations';
+import { Slot, pressable, mergeProps } from '@askrjs/askr-ui/foundations';
 import type { ToggleButtonProps, ToggleAsChildProps } from './toggle.types';
 
 /**

@@ -1,4 +1,4 @@
-import type { Orientation } from '@askrjs/askr/foundations';
+import type { Orientation } from '@askrjs/askr-ui/foundations';
 import type {
   BoxAsChildProps,
   BoxProps,

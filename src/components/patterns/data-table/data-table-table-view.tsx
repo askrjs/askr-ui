@@ -1,4 +1,4 @@
-import { mergeProps, pressable } from '@askrjs/askr/foundations';
+import { mergeProps, pressable } from '@askrjs/askr-ui/foundations';
 import { DATA_TABLE_A11Y_CONTRACT } from './data-table.a11y';
 import { readDataTableRootContext } from './data-table.shared';
 import type {

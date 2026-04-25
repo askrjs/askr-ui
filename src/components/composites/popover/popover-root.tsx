@@ -1,5 +1,5 @@
 import { For } from '@askrjs/askr';
-import { controllableState } from '@askrjs/askr/foundations';
+import { controllableState } from '@askrjs/askr-ui/foundations';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import {
@@ -24,11 +24,15 @@ function schedulePopoverPortalSync(callback: () => void) {
 function PopoverRootView(props: { children?: unknown }) {
   const root = readPopoverRootContext();
   const PortalHost = root.portal;
-  const keyedChildren = For<unknown>(
-    () => toChildArray(props.children),
-    (child, index) =>
-      isJsxElement(child) && child.key != null ? child.key : index,
-    (child) => child as never
+  const keyedChildren = (
+    <For
+      each={() => toChildArray(props.children)}
+      by={(child, index) =>
+        isJsxElement(child) && child.key != null ? child.key : index
+      }
+    >
+      {(child) => child as never}
+    </For>
   );
 
   return (

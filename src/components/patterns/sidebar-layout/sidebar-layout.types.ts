@@ -1,4 +1,4 @@
-import type { Ref } from '@askrjs/askr/foundations';
+import type { Ref } from '@askrjs/askr-ui/foundations';
 
 export type SidebarPosition = 'start' | 'end';
 
