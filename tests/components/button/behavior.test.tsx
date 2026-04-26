@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { state } from '@askrjs/askr';
 import { Button } from '../../../src/components/primitives/button';
-import { mount, unmount } from '../../test-utils';
+import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Button - Behavior', () => {
   let container: HTMLElement | undefined;
@@ -86,5 +87,57 @@ describe('Button - Behavior', () => {
     link?.click();
 
     expect(onPress).not.toHaveBeenCalled();
+  });
+
+  it('replaces stateful icon children instead of accumulating them', async () => {
+    const onPress = vi.fn();
+
+    const ThemeLikeButton = () => {
+      const dark = state(false);
+
+      return (
+        <Button
+          onPress={() => {
+            onPress();
+            dark.set(!dark());
+          }}
+          aria-label="Toggle icon"
+        >
+          {dark() ? (
+            <svg aria-hidden="true" data-icon="moon" viewBox="0 0 16 16" />
+          ) : (
+            <svg aria-hidden="true" data-icon="sun" viewBox="0 0 16 16" />
+          )}
+        </Button>
+      );
+    };
+
+    container = mount(<ThemeLikeButton />);
+
+    let button = container.querySelector('button') as HTMLButtonElement | null;
+    const initialButton = button;
+
+    expect(button?.querySelectorAll('svg')).toHaveLength(1);
+    expect(button?.querySelector('svg')?.getAttribute('data-icon')).toBe('sun');
+
+    button?.click();
+    await flushUpdates();
+
+    button = container.querySelector('button') as HTMLButtonElement | null;
+
+    expect(onPress).toHaveBeenCalledTimes(1);
+    expect(button).toBe(initialButton);
+    expect(button?.querySelectorAll('svg')).toHaveLength(1);
+    expect(button?.querySelector('svg')?.getAttribute('data-icon')).toBe('moon');
+
+    button?.click();
+    await flushUpdates();
+
+    button = container.querySelector('button') as HTMLButtonElement | null;
+
+    expect(onPress).toHaveBeenCalledTimes(2);
+    expect(button).toBe(initialButton);
+    expect(button?.querySelectorAll('svg')).toHaveLength(1);
+    expect(button?.querySelector('svg')?.getAttribute('data-icon')).toBe('sun');
   });
 });

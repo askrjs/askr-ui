@@ -1,6 +1,4 @@
-import { For } from '@askrjs/askr';
 import { Slot, pressable, mergeProps } from '@askrjs/askr-ui/foundations';
-import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import type { ButtonNativeProps, ButtonAsChildProps } from './button.types';
 
 /**
@@ -71,16 +69,6 @@ export function Button(props: ButtonNativeProps | ButtonAsChildProps) {
     'data-size': size && size !== 'md' ? size : undefined,
     ref,
   });
-  const keyedChildren = (
-    <For
-      each={() => toChildArray(children)}
-      by={(child, index) =>
-        isJsxElement(child) && child.key != null ? child.key : index
-      }
-    >
-      {(child) => child as never}
-    </For>
-  );
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children as JSX.Element} />;
@@ -90,7 +78,7 @@ export function Button(props: ButtonNativeProps | ButtonAsChildProps) {
   const type = typeProp ?? 'button';
   return (
     <button type={type} {...finalProps}>
-      {keyedChildren}
+      {children}
     </button>
   );
 }
