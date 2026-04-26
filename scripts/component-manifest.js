@@ -28,6 +28,7 @@ export const componentFamilies = [
   { bucket: 'composites', name: 'menu' },
   { bucket: 'composites', name: 'menubar' },
   { bucket: 'composites', name: 'navigation-menu' },
+  { bucket: 'composites', name: 'nav-link' },
   { bucket: 'composites', name: 'pagination' },
   { bucket: 'composites', name: 'popover' },
   { bucket: 'composites', name: 'tabs' },
@@ -84,7 +85,13 @@ export const docsCategories = [
   },
   {
     label: 'Navigation',
-    names: ['breadcrumb', 'pagination', 'menubar', 'navigation-menu'],
+    names: [
+      'breadcrumb',
+      'nav-link',
+      'pagination',
+      'menubar',
+      'navigation-menu',
+    ],
   },
   {
     label: 'Patterns',

@@ -11,6 +11,7 @@ export default defineConfig({
       'tests/components/icon/**/*.test.tsx',
       'tests/components/consistency-reset/**/*.test.tsx',
       'tests/components/data-table/state.test.tsx',
+      'tests/components/nav-link/behavior.test.tsx',
     ],
   },
 });

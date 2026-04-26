@@ -157,6 +157,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@askrjs/askr-ui';
 
 ## Navigation components
 
+`NavLink` is the route-aware anchor for navbar-style links. It marks the
+current route with `aria-current="page"` and `data-state="active"`.
+
 ```ts
 import {
   Breadcrumb,
@@ -165,6 +168,7 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
+  NavLink,
 } from '@askrjs/askr-ui';
 import {
   Pagination,

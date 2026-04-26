@@ -29,6 +29,7 @@ export * from './composites/focus-scope';
 export * from './composites/menu';
 export * from './composites/menubar';
 export * from './composites/navigation-menu';
+export * from './composites/nav-link';
 export * from './composites/pagination';
 export * from './composites/popover';
 export * from './composites/tabs';

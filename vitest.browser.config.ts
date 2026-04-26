@@ -21,6 +21,9 @@ export default defineConfig({
       'tests/components/*/a11y.test.tsx',
       'tests/components/*/determinism.test.tsx',
     ],
-    exclude: ['tests/components/icon/**'],
+    exclude: [
+      'tests/components/icon/**',
+      'tests/components/nav-link/behavior.test.tsx',
+    ],
   },
 });
