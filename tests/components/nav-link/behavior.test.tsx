@@ -92,4 +92,27 @@ describe('NavLink - Behavior', () => {
     expect(link?.getAttribute('data-state')).toBe('active');
     expect(link?.getAttribute('aria-current')).toBe('page');
   });
+
+  it('should intercept normal left-click navigation', () => {
+    window.history.pushState({}, '', '/');
+
+    container = mount(
+      <nav>
+        <NavLink href="/docs">Docs</NavLink>
+      </nav>
+    );
+
+    const link = container.querySelector('a') as HTMLAnchorElement | null;
+    expect(link).not.toBeNull();
+
+    const clickEvent = new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true,
+      button: 0,
+    });
+
+    link!.dispatchEvent(clickEvent);
+
+    expect(clickEvent.defaultPrevented).toBe(true);
+  });
 });

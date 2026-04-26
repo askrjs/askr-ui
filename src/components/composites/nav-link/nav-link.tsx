@@ -1,5 +1,5 @@
-import { currentRoute } from '@askrjs/askr/router';
-import { Slot, mergeProps } from '@askrjs/askr-ui/foundations';
+import { Link, currentRoute } from '@askrjs/askr/router';
+import { Slot, mergeProps, type JSXElement } from '@askrjs/askr-ui/foundations';
 import type { NavLinkAsChildProps, NavLinkProps } from './nav-link.types';
 
 type RouteSnapshot = ReturnType<typeof currentRoute>;
@@ -79,8 +79,8 @@ function isCurrentRoute(snapshot: RouteSnapshot, href: string): boolean {
  * It mirrors the current route with `aria-current="page"` and route state
  * attributes so themes can style active links consistently.
  */
-export function NavLink(props: NavLinkProps): JSX.Element;
-export function NavLink(props: NavLinkAsChildProps): JSX.Element;
+export function NavLink(props: NavLinkProps): JSXElement;
+export function NavLink(props: NavLinkAsChildProps): JSXElement;
 export function NavLink(props: NavLinkProps | NavLinkAsChildProps) {
   const {
     asChild,
@@ -96,27 +96,28 @@ export function NavLink(props: NavLinkProps | NavLinkAsChildProps) {
 
   const snapshot = currentRoute();
   const isCurrent = isCurrentRoute(snapshot, href);
+  const ariaCurrent = isCurrent ? ('page' as const) : undefined;
 
   const hostProps = mergeProps(rest, {
     href,
-    class: className,
-    rel,
-    target,
+    class: className as string | undefined,
+    rel: rel as string | undefined,
+    target: target as string | undefined,
     ref,
-    'aria-label': ariaLabel,
+    'aria-label': ariaLabel as string | undefined,
   });
 
   const finalProps = {
     ...hostProps,
-    'aria-current': isCurrent ? 'page' : undefined,
+    'aria-current': ariaCurrent,
     'data-slot': 'nav-link',
     'data-nav-link': 'true',
     'data-state': isCurrent ? 'active' : 'inactive',
   };
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return <a {...finalProps}>{children}</a>;
+  return <Link {...finalProps}>{children}</Link>;
 }
