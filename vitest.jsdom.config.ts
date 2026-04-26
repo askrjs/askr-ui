@@ -7,6 +7,7 @@ export default defineConfig({
     ...sharedVitestConfig.test,
     environment: 'jsdom',
     include: [
+      'tests/components/button/**/*.test.tsx',
       'tests/components/icon/**/*.test.tsx',
       'tests/components/consistency-reset/**/*.test.tsx',
       'tests/components/data-table/state.test.tsx',
