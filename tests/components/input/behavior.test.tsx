@@ -116,7 +116,9 @@ describe('Input - Behavior', () => {
     button.click();
     await flushUpdates();
 
-    const rerenderedInput = container.querySelector('input') as HTMLInputElement;
+    const rerenderedInput = container.querySelector(
+      'input'
+    ) as HTMLInputElement;
 
     expect(rerenderedInput).toBe(input);
     expect(rerenderedInput.value).toBe('northwind');

@@ -54,7 +54,9 @@ describe('Button - jsdom regression', () => {
 
     expect(onPress).toHaveBeenCalledTimes(1);
     expect(button?.querySelectorAll('svg')).toHaveLength(1);
-    expect(button?.querySelector('svg')?.getAttribute('data-icon')).toBe('moon');
+    expect(button?.querySelector('svg')?.getAttribute('data-icon')).toBe(
+      'moon'
+    );
 
     button?.click();
     await flushUpdates();
