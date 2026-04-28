@@ -1,11 +1,7 @@
 import { For, state } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr-ui/foundations';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
-import {
-  collectJsxElements,
-  isJsxElement,
-  toChildArray,
-} from '../../_internal/jsx';
+import { collectJsxElements, toChildArray } from '../../_internal/jsx';
 import { getPersistentPortal } from '../../_internal/overlay';
 import { resolveMenuItemText } from '../../_internal/menu';
 import { SelectItem } from './select-item';
@@ -28,9 +24,7 @@ function SelectRootView(props: {
   const keyedChildren = (
     <For
       each={() => toChildArray(props.children)}
-      by={(child, index) =>
-        isJsxElement(child) && child.key != null ? child.key : index
-      }
+      by={(_child, index) => index}
     >
       {(child) => child as never}
     </For>

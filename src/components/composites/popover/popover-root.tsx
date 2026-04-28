@@ -1,7 +1,7 @@
 import { For } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr-ui/foundations';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
-import { isJsxElement, toChildArray } from '../../_internal/jsx';
+import { toChildArray } from '../../_internal/jsx';
 import {
   clearOverlayPosition,
   getOverlayNodes,
@@ -27,9 +27,7 @@ function PopoverRootView(props: { children?: unknown }) {
   const keyedChildren = (
     <For
       each={() => toChildArray(props.children)}
-      by={(child, index) =>
-        isJsxElement(child) && child.key != null ? child.key : index
-      }
+      by={(_child, index) => index}
     >
       {(child) => child as never}
     </For>

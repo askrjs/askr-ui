@@ -23,6 +23,12 @@ import {
 } from '../../../src/components/composites/navigation-menu';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
+async function flushPortalUpdates() {
+  await flushUpdates();
+  await flushUpdates();
+  await flushUpdates();
+}
+
 function collectInternalAttributes(root: ParentNode) {
   return Array.from(root.querySelectorAll('*')).flatMap((element) =>
     element
@@ -66,16 +72,14 @@ describe('Consistency Reset - Internal Props', () => {
         (element) => element.textContent?.trim() === 'File'
       ) as HTMLButtonElement
     ).click();
-    await flushUpdates();
-    await flushUpdates();
+    await flushPortalUpdates();
 
     (
       Array.from(document.body.querySelectorAll('button')).find(
         (element) => element.textContent?.trim() === 'Share'
       ) as HTMLButtonElement
     ).dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
-    await flushUpdates();
-    await flushUpdates();
+    await flushPortalUpdates();
 
     expect(collectInternalAttributes(document.body)).toEqual([]);
   });
@@ -106,16 +110,14 @@ describe('Consistency Reset - Internal Props', () => {
         (element) => element.textContent?.trim() === 'Products'
       ) as HTMLButtonElement
     ).click();
-    await flushUpdates();
-    await flushUpdates();
+    await flushPortalUpdates();
 
     (
       Array.from(document.body.querySelectorAll('button')).find(
         (element) => element.textContent?.trim() === 'More'
       ) as HTMLButtonElement
     ).dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
-    await flushUpdates();
-    await flushUpdates();
+    await flushPortalUpdates();
 
     expect(collectInternalAttributes(document.body)).toEqual([]);
   });

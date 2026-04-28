@@ -26,16 +26,13 @@ function MenubarRuntimeView(props: {
   rest: Omit<MenubarProps, 'children' | 'id' | 'loop'>;
 }) {
   const root = readMenubarRootContext();
+  const portalEpoch = root.portalEpoch;
   const { items, currentTriggerIndex, disabledTriggerIndexes } =
     resolveMenubarRootState(root);
   const portalIds = collectJsxElements(
     props.children,
     (element) => element.type === MenubarMenu
   ).map((_element, index) => resolvePartId(root.menubarId, `portal-${index}`));
-
-  portalIds.forEach((portalId) => {
-    getPersistentPortal(portalId).render({ children: null });
-  });
 
   const collection = getCompositeCollection(root.menubarId);
   const nav = rovingFocus({
@@ -74,7 +71,7 @@ function MenubarRuntimeView(props: {
       {portalIds.map((portalId) => {
         const PortalHost = getPersistentPortal(portalId);
 
-        return <PortalHost key={portalId} />;
+        return <PortalHost key={`${portalId}-${portalEpoch}`} />;
       })}
     </>
   );
@@ -86,17 +83,24 @@ export function Menubar(props: MenubarProps) {
   const openPathState = state<string[]>([]);
   const portalEpochState = state(0);
   const currentTriggerIndexState = state(0);
+  const setOpenPath = (path: string[]) => {
+    openPathState.set(path);
+  };
+  const setCurrentTriggerIndex = (index: number) => {
+    currentTriggerIndexState.set(index);
+  };
   const rootContext: MenubarRootContextValue = {
     menubarId,
     openPath: openPathState(),
-    setOpenPath: openPathState.set,
+    getOpenPath: openPathState,
+    setOpenPath,
     loop,
     portalEpoch: portalEpochState(),
     syncPortals: () => {
       portalEpochState.set(portalEpochState() + 1);
     },
     currentTriggerIndexCandidate: currentTriggerIndexState(),
-    setCurrentTriggerIndex: currentTriggerIndexState.set,
+    setCurrentTriggerIndex,
   };
   const runtimeRenderContext = createMenubarRootRenderContext();
 

@@ -43,11 +43,23 @@ export function AlertDialog(props: AlertDialogProps) {
 export function AlertDialogTrigger(
   props: AlertDialogTriggerProps | AlertDialogTriggerAsChildProps
 ) {
+  const root = readDialogRootContext();
+  const handlePress = (event: {
+    defaultPrevented?: boolean;
+    preventDefault?: () => void;
+  }) => {
+    props.onPress?.(event as never);
+
+    if (!event.defaultPrevented && root.open) {
+      event.preventDefault?.();
+    }
+  };
+
   if (props.asChild) {
-    return <DialogTrigger {...props} />;
+    return <DialogTrigger {...props} onPress={handlePress} />;
   }
 
-  return <DialogTrigger {...props} />;
+  return <DialogTrigger {...props} onPress={handlePress} />;
 }
 
 export function AlertDialogPortal(

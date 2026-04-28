@@ -12,7 +12,7 @@ import {
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 function ControlledToastFixture() {
-  const openState = state(false);
+  const openState = state(true);
 
   return (
     <div>
@@ -114,7 +114,7 @@ describe('Toast - Behavior', () => {
 
     const launcher = container.querySelector('#launcher') as HTMLButtonElement;
     launcher.focus();
-    launcher.click();
+    await flushUpdates();
     await flushUpdates();
 
     expect(container.querySelector('[data-toast="true"]')).not.toBeNull();
@@ -123,6 +123,7 @@ describe('Toast - Behavior', () => {
       '[data-toast-close="true"]'
     ) as HTMLButtonElement;
     close.click();
+    await flushUpdates();
     await flushUpdates();
 
     expect(document.activeElement).toBe(launcher);

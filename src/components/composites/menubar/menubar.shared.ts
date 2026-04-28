@@ -20,6 +20,7 @@ export type MenubarSurfaceMetadata = {
 export type MenubarRootContextValue = {
   menubarId: string;
   openPath: string[];
+  getOpenPath: () => string[];
   setOpenPath: (path: string[]) => void;
   loop: boolean;
   portalEpoch: number;

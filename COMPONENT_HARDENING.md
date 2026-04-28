@@ -53,7 +53,7 @@ Do not add scorecard rows for removed or non-exported components.
 - The public API surface must remain minimal and free from implementation-driven parts or props.
 - API naming and prop patterns must be consistent across sibling component families.
 - Pattern components (`DataTable`, `SidebarLayout`, `TopbarLayout`) must not drive complexity into core primitives.
-- Any proposed addition to the public surface must be justified against the irreducible core definition in ORIGINAL_DESIGN_PLAN.md before it ships.
+- Any proposed addition to the public surface must be justified against the core/pattern split and API-minimality rules in SPEC.md and RULES.md before it ships.
 
 ## Global Phase Gates
 

@@ -1,6 +1,6 @@
 import { For, state } from '@askrjs/askr';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
-import { isJsxElement, toChildArray } from '../../_internal/jsx';
+import { toChildArray } from '../../_internal/jsx';
 import {
   clearOverlayPosition,
   getOverlayNodes,
@@ -28,9 +28,7 @@ function DialogRootView(props: { children?: unknown }) {
   const keyedChildren = (
     <For
       each={() => toChildArray(props.children)}
-      by={(child, index) =>
-        isJsxElement(child) && child.key != null ? child.key : index
-      }
+      by={(_child, index) => index}
     >
       {(child) => child as never}
     </For>

@@ -24,8 +24,8 @@ describe('IconBase', () => {
 
     const svg = container.querySelector('svg')!;
     expect(svg.getAttribute('data-size')).toBe('sm');
-    expect(svg.getAttribute('style')).toContain(
-      '--ak-icon-size:var(--ak-icon-size-sm'
+    expect(svg.style.getPropertyValue('--ak-icon-size').trim()).toContain(
+      'var(--ak-icon-size-sm'
     );
   });
 
@@ -34,7 +34,7 @@ describe('IconBase', () => {
 
     const svg = container.querySelector('svg')!;
     expect(svg.getAttribute('data-size')).toBeNull();
-    expect(svg.getAttribute('style')).toContain('--ak-icon-size:1.5rem');
+    expect(svg.style.getPropertyValue('--ak-icon-size').trim()).toBe('1.5rem');
   });
 
   it('marks unlabeled icons as decorative', () => {
@@ -57,9 +57,9 @@ describe('IconBase', () => {
   it('preserves explicit stroke width overrides', () => {
     container = mount(IconBase({ strokeWidth: 1.5 }));
 
-    const style = container.querySelector('svg')?.getAttribute('style') ?? '';
-    expect(style).toContain(
-      '--ak-icon-stroke-width:var(--ak-icon-stroke-width-md, 1.5)'
+    const svg = container.querySelector('svg')!;
+    expect(svg.style.getPropertyValue('--ak-icon-stroke-width').trim()).toBe(
+      'var(--ak-icon-stroke-width-md, 1.5)'
     );
   });
 
@@ -67,11 +67,10 @@ describe('IconBase', () => {
     container = mount(IconBase({ size: 15 }));
 
     const svg = container.querySelector('svg')!;
-    const style = svg.getAttribute('style') ?? '';
     expect(svg.getAttribute('width')).toBe('24');
     expect(svg.getAttribute('height')).toBe('24');
-    expect(style).toContain('--ak-icon-size:15px');
-    expect(style).toContain('display:inline-block');
-    expect(style).toContain('flex-shrink:0');
+    expect(svg.style.getPropertyValue('--ak-icon-size').trim()).toBe('15px');
+    expect(svg.style.display).toBe('inline-block');
+    expect(svg.style.flexShrink).toBe('0');
   });
 });
