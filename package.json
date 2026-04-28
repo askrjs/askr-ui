@@ -1,6 +1,6 @@
 {
   "name": "@askrjs/askr-ui",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Headless askr components",
   "keywords": [
     "accessible",
@@ -68,6 +68,7 @@
   },
   "scripts": {
     "build": "vp pack",
+    "pack": "npm run build",
     "dev": "vp pack --watch",
     "verify:foundations": "node scripts/check-foundations-contract.js",
     "test:unit": "npm run test:types && vp test run --config vitest.node.config.ts && vp test run --config vitest.jsdom.config.ts",
@@ -81,7 +82,7 @@
     "fmt": "vp fmt .",
     "lint": "vp fmt --check .",
     "generate": "node scripts/generate.js",
-    "prepublishOnly": "npm run quality"
+    "prepublishOnly": "npm run pack"
   },
   "devDependencies": {
     "@askrjs/askr": "file:../askr",
@@ -98,7 +99,7 @@
     "vitest-axe": "^0.1.0"
   },
   "peerDependencies": {
-    "@askrjs/askr": "file:../askr"
+    "@askrjs/askr": "0.1.0"
   },
   "peerDependenciesMeta": {
     "@askrjs/askr": {
