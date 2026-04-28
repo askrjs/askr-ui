@@ -39,8 +39,8 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Build
-        run: npm run build
+      - name: Pack
+        run: npm run pack
 
       - name: Publish to npm
         run: npm publish --provenance
