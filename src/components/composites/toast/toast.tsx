@@ -407,7 +407,16 @@ export function Toast(props: ToastProps): JSX.Element | null {
 
       return null;
     },
-    [provider.providerId, toastId]
+    [
+      provider.providerId,
+      toastId,
+      props.children,
+      props.defaultOpen,
+      props.duration,
+      props.onOpenChange,
+      props.open,
+      props.variant,
+    ]
   );
 
   return null;

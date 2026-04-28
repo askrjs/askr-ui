@@ -1,6 +1,6 @@
 import { For } from '@askrjs/askr';
 import { resolvePartId } from '../../_internal/id';
-import { isJsxElement, toChildArray } from '../../_internal/jsx';
+import { toChildArray } from '../../_internal/jsx';
 import {
   NavigationMenuItemContext,
   type NavigationMenuItemContextValue,
@@ -13,9 +13,7 @@ function NavigationMenuSubScopeView(props: { children?: unknown }) {
   const keyedChildren = (
     <For
       each={() => toChildArray(props.children)}
-      by={(child, index) =>
-        isJsxElement(child) && child.key != null ? child.key : index
-      }
+      by={(_child, index) => index}
     >
       {(child) => child as never}
     </For>

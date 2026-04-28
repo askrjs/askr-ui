@@ -20,7 +20,7 @@ describe('VisuallyHidden - Accessibility', () => {
     try {
       const strong = container.querySelector('strong');
       expect(strong?.getAttribute('data-askr-visually-hidden')).toBe('true');
-      expect(strong?.getAttribute('style')).toContain('position:absolute');
+      expect((strong as HTMLElement | null)?.style.position).toBe('absolute');
     } finally {
       unmount(container);
     }

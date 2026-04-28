@@ -77,7 +77,9 @@ describe('Slider - Behavior', () => {
     );
 
     const root = container.querySelector('[data-slot="slider"]') as HTMLElement;
-    expect(root?.getAttribute('style')).toContain('--ak-slider-percentage:25%');
+    expect(root.style.getPropertyValue('--ak-slider-percentage').trim()).toBe(
+      '25%'
+    );
   });
 
   it('should support Home/End/PageUp/PageDown keyboard boundaries', async () => {

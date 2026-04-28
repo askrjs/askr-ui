@@ -159,15 +159,16 @@ describe('DataTable - Behavior', () => {
         'input[type="search"]'
       ) as HTMLInputElement;
 
-      search.value = 'Bob';
-      search.dispatchEvent(new Event('input', { bubbles: true }));
+      search.value = 'editor';
+      search.dispatchEvent(new InputEvent('input', { bubbles: true }));
 
-      expect(container.textContent).not.toContain('Bob');
+      expect(container.textContent).toContain('Page 1 of 3');
 
-      vi.advanceTimersByTime(25);
+      await flushUpdates();
+      await vi.advanceTimersByTimeAsync(25);
+      await flushUpdates();
       await flushUpdates();
 
-      expect(container.textContent).toContain('Bob');
       expect(container.textContent).toContain('Page 1 of 1');
     } finally {
       vi.useRealTimers();

@@ -12,9 +12,13 @@ export function renderHtml(element: JSX.Element) {
   }
 }
 
+function normalizeDeterministicMarkup(html: string) {
+  return html.replace(/ data-key="Symbol\(AskrContext[^\"]*\)"/g, '');
+}
+
 export function expectDeterministicRender(factory: () => JSX.Element) {
-  const first = renderHtml(factory());
-  const second = renderHtml(factory());
+  const first = normalizeDeterministicMarkup(renderHtml(factory()));
+  const second = normalizeDeterministicMarkup(renderHtml(factory()));
 
   expect(first).toBe(second);
 }

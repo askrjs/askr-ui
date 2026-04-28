@@ -39,9 +39,9 @@ describe('ProgressCircle - Behavior', () => {
       const root = container.querySelector(
         `[role="${PROGRESS_CIRCLE_A11Y_CONTRACT.ROLE}"]`
       ) as HTMLElement;
-      expect(root?.getAttribute('style')).toContain(
-        '--ak-progress-percentage:50%'
-      );
+      expect(
+        root.style.getPropertyValue('--ak-progress-percentage').trim()
+      ).toBe('50%');
     } finally {
       unmount(container);
     }

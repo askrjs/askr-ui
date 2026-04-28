@@ -174,7 +174,7 @@ export function MenubarTrigger(
       root.setCurrentTriggerIndex(menu.menuIndex);
     },
     onPointerEnter: () => {
-      if (!disabled && root.openPath.length > 0) {
+      if (!disabled && root.getOpenPath().length > 0) {
         root.setCurrentTriggerIndex(menu.menuIndex);
         root.setOpenPath(menu.path);
         scheduleMenubarPortalSync(root);

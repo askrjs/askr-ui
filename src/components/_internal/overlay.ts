@@ -1,3 +1,5 @@
+import { definePortal } from '@askrjs/askr/foundations';
+
 export type OverlaySide = 'top' | 'right' | 'bottom' | 'left';
 export type OverlayAlign = 'start' | 'center' | 'end';
 export type OverlayPortal = {
@@ -27,20 +29,7 @@ type OverlayPositionOptions = {
 };
 
 function createOverlayPortal(): OverlayPortal {
-  let value: unknown = null;
-
-  function OverlayPortalHost() {
-    return value as JSX.Element | null;
-  }
-
-  OverlayPortalHost.render = function OverlayPortalRender(props: {
-    children?: unknown;
-  }) {
-    value = props.children ?? null;
-    return null;
-  };
-
-  return OverlayPortalHost;
+  return definePortal<unknown>() as OverlayPortal;
 }
 
 export function getPersistentPortal(id: string) {
