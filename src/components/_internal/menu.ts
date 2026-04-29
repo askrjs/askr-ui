@@ -1,4 +1,4 @@
-import { createCollection } from '@askrjs/askr-ui/foundations';
+﻿import { createCollection } from '@askrjs/ui/foundations';
 import { extractTextContent } from './jsx';
 
 export type MenuItemMetadata = {
@@ -80,3 +80,4 @@ export function registerCollectionNode(
 
   menuCollectionUnregisters.set(key, collection.register(node, metadata));
 }
+

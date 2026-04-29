@@ -1,4 +1,4 @@
-import { controllableState } from '@askrjs/askr-ui/foundations';
+﻿import { controllableState } from '@askrjs/ui/foundations';
 import { resolveCompoundId } from '../../_internal/id';
 import {
   applyFilters,
@@ -270,7 +270,7 @@ export function createDataTable<T>(
     expansionState.set(next);
   };
 
-  // Data pipeline: rows → filtered → sorted → paginated
+  // Data pipeline: rows â†’ filtered â†’ sorted â†’ paginated
   const buildRowModels = (
     sourceRows: T[],
     startIndex: number
@@ -295,7 +295,7 @@ export function createDataTable<T>(
   const instance: DataTableInstance<T> = {
     tableId,
 
-    // ─── Columns ───
+    // â”€â”€â”€ Columns â”€â”€â”€
 
     getColumns(): ResolvedColumnDef<T>[] {
       return resolvedColumns;
@@ -305,7 +305,7 @@ export function createDataTable<T>(
       return computeVisibleColumns();
     },
 
-    // ─── Row models ───
+    // â”€â”€â”€ Row models â”€â”€â”€
 
     getRows(): DataTableRow<T>[] {
       return buildRowModels(options.data(), 0);
@@ -405,7 +405,7 @@ export function createDataTable<T>(
       );
     },
 
-    // ─── Sorting ───
+    // â”€â”€â”€ Sorting â”€â”€â”€
 
     getSorting(): SortingState {
       return sortingState();
@@ -436,7 +436,7 @@ export function createDataTable<T>(
       return descriptor.desc ? 'desc' : 'asc';
     },
 
-    // ─── Filtering ───
+    // â”€â”€â”€ Filtering â”€â”€â”€
 
     getFilters(): FilterState {
       return filterState();
@@ -481,7 +481,7 @@ export function createDataTable<T>(
       filterState.set({ global: '', columns: {} });
     },
 
-    // ─── Selection ───
+    // â”€â”€â”€ Selection â”€â”€â”€
 
     getSelection(): RowSelectionState {
       return selectionState();
@@ -554,7 +554,7 @@ export function createDataTable<T>(
       return selectedCount > 0 && !instance.isAllPageRowsSelected();
     },
 
-    // ─── Expansion ───
+    // â”€â”€â”€ Expansion â”€â”€â”€
 
     getExpanded(): RowExpansionState {
       return expansionState();
@@ -576,7 +576,7 @@ export function createDataTable<T>(
       return expansionState()[rowId] === true;
     },
 
-    // ─── Pagination ───
+    // â”€â”€â”€ Pagination â”€â”€â”€
 
     getPagination(): PaginationState {
       return paginationState();
@@ -653,7 +653,7 @@ export function createDataTable<T>(
       }
     },
 
-    // ─── Column Visibility ───
+    // â”€â”€â”€ Column Visibility â”€â”€â”€
 
     getColumnVisibility(): ColumnVisibilityState {
       return visibilityState();
@@ -688,7 +688,7 @@ export function createDataTable<T>(
       return col?.defaultVisible !== false;
     },
 
-    // ─── Responsive ───
+    // â”€â”€â”€ Responsive â”€â”€â”€
 
     getResponsiveMode(): 'table' | 'list' {
       const config = options.responsive;
@@ -713,7 +713,7 @@ export function createDataTable<T>(
       return 'table';
     },
 
-    // ─── Data State ───
+    // â”€â”€â”€ Data State â”€â”€â”€
 
     getDataState(): DataState {
       const loading = options.loading ?? false;
@@ -734,7 +734,7 @@ export function createDataTable<T>(
       return deriveDataState(loading, error, data.length, filtered);
     },
 
-    // ─── Manual Mode Flags ───
+    // â”€â”€â”€ Manual Mode Flags â”€â”€â”€
 
     isManualSorting(): boolean {
       return options.manualSorting ?? false;
@@ -751,3 +751,4 @@ export function createDataTable<T>(
 
   return instance;
 }
+

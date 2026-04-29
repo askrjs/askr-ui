@@ -1,4 +1,4 @@
-import { Slot, mergeProps, rovingFocus } from '@askrjs/askr-ui/foundations';
+﻿import { Slot, mergeProps, rovingFocus } from '@askrjs/ui/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import { getMenuCollection } from '../../_internal/menu';
 import { readMenuRootContext, resolveMenuState } from './menu.shared';
@@ -38,3 +38,4 @@ export function MenuContent(props: MenuContentProps | MenuContentAsChildProps) {
 
   return <div {...finalProps}>{children}</div>;
 }
+

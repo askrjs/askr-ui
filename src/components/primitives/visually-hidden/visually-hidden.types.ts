@@ -1,4 +1,4 @@
-import type { JSXElement, Ref } from '@askrjs/askr-ui/foundations';
+﻿import type { JSXElement, Ref } from '@askrjs/ui/foundations';
 
 export type VisuallyHiddenOwnProps = {
   children?: unknown;
@@ -22,3 +22,4 @@ export type VisuallyHiddenAsChildProps = VisuallyHiddenOwnProps & {
 export type VisuallyHiddenProps =
   | VisuallyHiddenSpanProps
   | VisuallyHiddenAsChildProps;
+

@@ -1,9 +1,9 @@
-import {
+﻿import {
   Slot,
   controllableState,
   mergeProps,
   pressable,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import type {
   CheckboxInputProps,
   CheckboxAsChildProps,
@@ -151,3 +151,4 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
     />
   );
 }
+

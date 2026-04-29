@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+﻿import { defineContext, readContext } from '@askrjs/askr';
 import {
   Slot,
   Presence,
@@ -7,8 +7,8 @@ import {
   formatId,
   mergeProps,
   pressable,
-} from '@askrjs/askr-ui/foundations';
-import type { JSXElement } from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
+import type { JSXElement } from '@askrjs/ui/foundations';
 import type {
   CollapsibleContentAsChildProps,
   CollapsibleContentProps,
@@ -267,3 +267,4 @@ export function CollapsibleContent(
     </Presence>
   );
 }
+

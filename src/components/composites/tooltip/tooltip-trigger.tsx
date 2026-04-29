@@ -1,9 +1,9 @@
-import {
+﻿import {
   Slot,
   composeRefs,
   hoverable,
   mergeProps,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { readTooltipRootContext } from './tooltip.shared';
 import type {
   TooltipTriggerAsChildProps,
@@ -67,3 +67,4 @@ export function TooltipTrigger(
     </button>
   );
 }
+

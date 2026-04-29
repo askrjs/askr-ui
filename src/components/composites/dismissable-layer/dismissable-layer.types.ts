@@ -1,4 +1,4 @@
-import type { JSXElement, Ref } from '@askrjs/askr-ui/foundations';
+﻿import type { JSXElement, Ref } from '@askrjs/ui/foundations';
 
 export type DismissableLayerOwnProps = {
   children?: unknown;
@@ -25,3 +25,4 @@ export type DismissableLayerAsChildProps = DismissableLayerOwnProps & {
   children: JSXElement;
   ref?: Ref<unknown>;
 };
+

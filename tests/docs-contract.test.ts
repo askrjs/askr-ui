@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+﻿import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 import * as askrUi from '../src';
@@ -55,9 +55,9 @@ describe('Docs contract', () => {
 
     for (const { importPath } of documentedImports) {
       const exportKey =
-        importPath === '@askrjs/askr-ui'
+        importPath === '@askrjs/ui'
           ? '.'
-          : `.${importPath.replace('@askrjs/askr-ui', '')}`;
+          : `.${importPath.replace('@askrjs/ui', '')}`;
       const supported = exportKeys.some((candidate) =>
         exportSupportsPath(candidate, exportKey)
       );
@@ -97,3 +97,4 @@ describe('Docs contract', () => {
     }
   });
 });
+

@@ -1,5 +1,5 @@
-import { state } from '@askrjs/askr';
-import { mergeProps } from '@askrjs/askr-ui/foundations';
+﻿import { state } from '@askrjs/askr';
+import { mergeProps } from '@askrjs/ui/foundations';
 import { resource } from '@askrjs/askr/resources';
 import {
   getCompositeCollection,
@@ -185,3 +185,4 @@ export function Tabs(props: TabsProps) {
     </TabsRootContext.Scope>
   );
 }
+

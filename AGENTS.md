@@ -1,4 +1,4 @@
-# Agent & Copilot Guidance for askr-ui
+﻿# Agent & Copilot Guidance for askr-ui
 
 This document guides AI agents and automated systems on working with askr-ui's codebase. It complements the human-facing [CONTRIBUTING.md](CONTRIBUTING.md) and the technical rules in [RULES.md](RULES.md), [SPEC.md](SPEC.md), and [COMPONENT_HARDENING.md](COMPONENT_HARDENING.md).
 
@@ -10,12 +10,12 @@ This document guides AI agents and automated systems on working with askr-ui's c
 
 askr-ui is a **curated** library, not a feature factory. Every public component must pass the `SPEC.md` contract:
 
-- ✅ runtime behavior tests (deterministic, no flake)
-- ✅ accessibility semantics coverage (axe, ARIA)
-- ✅ compile-time types (no `any`)
-- ✅ determinism checks (ID stability, rerender consistency)
-- ✅ benchmark entry (performance tracking)
-- ✅ documentation with examples
+- âœ… runtime behavior tests (deterministic, no flake)
+- âœ… accessibility semantics coverage (axe, ARIA)
+- âœ… compile-time types (no `any`)
+- âœ… determinism checks (ID stability, rerender consistency)
+- âœ… benchmark entry (performance tracking)
+- âœ… documentation with examples
 
 **If a component fails that bar, it does not ship.**
 
@@ -23,10 +23,10 @@ askr-ui is a **curated** library, not a feature factory. Every public component 
 
 askr-ui exports **components** (`function MyComponent() {}`), never hooks, factories, or render props.
 
-- ❌ Do not add `useMyComponent()` hooks
-- ❌ Do not add `createMyComponent()` factories
-- ❌ Do not suggest component-render-prop patterns
-- ✅ Build with context + subcomponents + composition
+- âŒ Do not add `useMyComponent()` hooks
+- âŒ Do not add `createMyComponent()` factories
+- âŒ Do not suggest component-render-prop patterns
+- âœ… Build with context + subcomponents + composition
 
 ```tsx
 // GOOD
@@ -46,10 +46,10 @@ const state = useDialog();
 
 Every test must pass **with fake timers** (`vi.useFakeTimers()`). Every ID must be stable. Rerenders must not drift.
 
-- 🚫 Never add `Math.random()` outside strict ID scope
-- 🚫 Never rely on `Date.now()` for logic (timer tests only)
-- ✅ Use the shared `useId()` from `src/components/_internal/id.ts`
-- ✅ Run all tests deterministically; leave determinism tests in place
+- ðŸš« Never add `Math.random()` outside strict ID scope
+- ðŸš« Never rely on `Date.now()` for logic (timer tests only)
+- âœ… Use the shared `useId()` from `src/components/_internal/id.ts`
+- âœ… Run all tests deterministically; leave determinism tests in place
 
 Example test pattern:
 
@@ -67,11 +67,11 @@ it('deterministic behavior under fake timers', () => {
 
 The rules in [RULES.md](RULES.md) are **non-negotiable**:
 
-1. **Components Only** — no hooks, factories, render props
-2. **Root Owns State** — one root component per family, state via context
-3. **Context Is Internal** — misuse throws immediately, no silent no-ops
-4. **Slot-Based Composition** — `asChild` mandatory on wrappers, no forced DOM
-5. **Side Effects Only When Justified** — every timer/layout-read/async must be commented and tested
+1. **Components Only** â€” no hooks, factories, render props
+2. **Root Owns State** â€” one root component per family, state via context
+3. **Context Is Internal** â€” misuse throws immediately, no silent no-ops
+4. **Slot-Based Composition** â€” `asChild` mandatory on wrappers, no forced DOM
+5. **Side Effects Only When Justified** â€” every timer/layout-read/async must be commented and tested
 
 When you encounter a use case that breaks these rules, **escalate**, do not work around.
 
@@ -105,7 +105,7 @@ Start from the standard template. Every component must follow this structure:
 ```tsx
 // src/components/composites/my-component/my-component.tsx
 import { Slot } from '@askrjs/askr/foundations';
-import { mergeProps } from '@askrjs/askr-ui/foundations';
+import { mergeProps } from '@askrjs/ui/foundations';
 import type { MyComponentProps } from './my-component.types';
 
 export function MyComponent(props: MyComponentProps): JSX.Element {
@@ -382,11 +382,11 @@ export function Collapsible(props: CollapsibleProps): JSX.Element {
 
 ## Reference Resources
 
-- [RULES.md](RULES.md) — Non-negotiable component rules
-- [SPEC.md](SPEC.md) — Public contract and design rules
-- [COMPONENT_HARDENING.md](COMPONENT_HARDENING.md) — Design review gates
-- [ROADMAP.md](ROADMAP.md) — Tier structure and release gates
-- [`src/components/_internal/`](src/components/_internal/) — Shared utilities
+- [RULES.md](RULES.md) â€” Non-negotiable component rules
+- [SPEC.md](SPEC.md) â€” Public contract and design rules
+- [COMPONENT_HARDENING.md](COMPONENT_HARDENING.md) â€” Design review gates
+- [ROADMAP.md](ROADMAP.md) â€” Tier structure and release gates
+- [`src/components/_internal/`](src/components/_internal/) â€” Shared utilities
 - Existing components for reference patterns (e.g., `Dialog`, `Collapsible`, `Select`)
 
 ---
@@ -394,3 +394,4 @@ export function Collapsible(props: CollapsibleProps): JSX.Element {
 ## Questions?
 
 If your task is unclear or conflicts with these guidelines, **ask for clarification** rather than proceeding with assumptions. askr-ui's quality bar depends on intentionality.
+

@@ -1,4 +1,4 @@
-import { Slot, focusable, mergeProps } from '@askrjs/askr-ui/foundations';
+﻿import { Slot, focusable, mergeProps } from '@askrjs/ui/foundations';
 import { hasJsxIntrinsicType } from '../../_internal/jsx';
 import type {
   TextareaAsChildProps,
@@ -33,3 +33,4 @@ export function Textarea(props: TextareaElementProps | TextareaAsChildProps) {
     </textarea>
   );
 }
+

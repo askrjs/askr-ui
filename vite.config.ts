@@ -1,4 +1,4 @@
-import { resolve } from 'node:path';
+﻿import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { defineConfig } from 'vite-plus';
@@ -19,7 +19,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@askrjs/askr-ui/foundations': resolve(srcRoot, 'foundations/index.ts'),
+      '@askrjs/ui/foundations': resolve(srcRoot, 'foundations/index.ts'),
     },
     preserveSymlinks: true,
   },
@@ -80,3 +80,4 @@ export default defineConfig({
     },
   },
 });
+

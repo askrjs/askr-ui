@@ -1,9 +1,9 @@
-import {
+﻿import {
   Slot,
   composeRefs,
   controllableState,
   mergeProps,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { mergeCssVar } from '../../_internal/style';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import {
@@ -347,3 +347,4 @@ export function SliderThumb(props: SliderThumbProps | SliderThumbAsChildProps) {
 
   return <div {...finalProps}>{children}</div>;
 }
+

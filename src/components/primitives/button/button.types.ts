@@ -1,4 +1,4 @@
-import type { JSXElement, Ref } from '@askrjs/askr-ui/foundations';
+﻿import type { JSXElement, Ref } from '@askrjs/ui/foundations';
 
 /**
  * Press event passed to onPress handler
@@ -61,3 +61,4 @@ export type ButtonAsChildProps = ButtonOwnProps & {
  * Union of all Button prop variants
  */
 export type ButtonProps = ButtonNativeProps | ButtonAsChildProps;
+

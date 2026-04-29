@@ -1,4 +1,4 @@
-import { Slot, composeRefs, mergeProps } from '@askrjs/askr-ui/foundations';
+﻿import { Slot, composeRefs, mergeProps } from '@askrjs/ui/foundations';
 import {
   focusFirstDescendant,
   getFocusableElements,
@@ -187,3 +187,4 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
 
   return <div {...finalProps}>{keyedChildren}</div>;
 }
+

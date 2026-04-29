@@ -1,4 +1,4 @@
-import type { JSXElement, Ref } from '@askrjs/askr-ui/foundations';
+﻿import type { JSXElement, Ref } from '@askrjs/ui/foundations';
 
 export type LabelOwnProps = {
   children?: unknown;
@@ -20,3 +20,4 @@ export type LabelAsChildProps = LabelOwnProps & {
 };
 
 export type LabelProps = LabelLabelProps | LabelAsChildProps;
+

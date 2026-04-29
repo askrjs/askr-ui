@@ -1,10 +1,10 @@
-import {
+﻿import {
   Slot,
   composeRefs,
   mergeProps,
   pressable,
   rovingFocus,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import {
   disabledIndexes,
@@ -101,3 +101,4 @@ export function RadioGroupItem(
     </button>
   );
 }
+

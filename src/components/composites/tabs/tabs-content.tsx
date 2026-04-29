@@ -1,4 +1,4 @@
-import { Presence, Slot, mergeProps } from '@askrjs/askr-ui/foundations';
+﻿import { Presence, Slot, mergeProps } from '@askrjs/ui/foundations';
 import {
   getTabsContentId,
   getTabsTriggerId,
@@ -33,3 +33,4 @@ export function TabsContent(props: TabsContentProps | TabsContentAsChildProps) {
     </Presence>
   );
 }
+

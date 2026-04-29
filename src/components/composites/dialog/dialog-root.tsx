@@ -1,4 +1,4 @@
-import { For, state } from '@askrjs/askr';
+﻿import { For, state } from '@askrjs/askr';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import { toChildArray } from '../../_internal/jsx';
 import {
@@ -7,7 +7,7 @@ import {
   getPersistentPortal,
   syncOverlayPosition,
 } from '../../_internal/overlay';
-import { controllableState } from '@askrjs/askr-ui/foundations';
+import { controllableState } from '@askrjs/ui/foundations';
 import { DialogDescription } from './dialog-description';
 import {
   DialogRootContext,
@@ -122,3 +122,4 @@ export function Dialog(props: DialogProps) {
     </DialogRootContext.Scope>
   );
 }
+

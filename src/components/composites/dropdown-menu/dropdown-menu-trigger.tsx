@@ -1,9 +1,9 @@
-import {
+﻿import {
   Slot,
   composeRefs,
   mergeProps,
   pressable,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { getOverlayNodes } from '../../_internal/overlay';
 import { readDropdownMenuRootContext } from './dropdown-menu.shared';
 import type {
@@ -82,3 +82,4 @@ export function DropdownMenuPortal(
     children: props.children,
   }) as JSX.Element | null;
 }
+

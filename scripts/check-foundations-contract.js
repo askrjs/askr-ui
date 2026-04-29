@@ -1,11 +1,11 @@
-import { readFile } from 'node:fs/promises';
+﻿import { readFile } from 'node:fs/promises';
 
 let runtimeExports;
 try {
-  runtimeExports = await import('@askrjs/askr-ui/foundations');
+  runtimeExports = await import('@askrjs/ui/foundations');
 } catch (err) {
   console.warn(
-    `Warning: Could not import @askrjs/askr-ui/foundations: ${err.message}`
+    `Warning: Could not import @askrjs/ui/foundations: ${err.message}`
   );
   runtimeExports = {};
 }
@@ -43,7 +43,7 @@ const indexTypePaths = [
   join(scriptDir, '../../askr-ui/dist/foundations/index.d.ts'),
   join(
     scriptDir,
-    '../node_modules/@askrjs/askr-ui/dist/foundations/index.d.ts'
+    '../node_modules/@askrjs/ui/dist/foundations/index.d.ts'
   ),
 ];
 
@@ -59,7 +59,7 @@ for (const path of indexTypePaths) {
 
 if (!indexTypes) {
   throw new Error(
-    `Could not find @askrjs/askr-ui foundations type definitions in any location: ${indexTypePaths.join(', ')}`
+    `Could not find @askrjs/ui foundations type definitions in any location: ${indexTypePaths.join(', ')}`
   );
 }
 
@@ -80,3 +80,4 @@ for (const marker of typeMarkers) {
 console.log(
   `Foundations contract verified: ${runtimeKeys.length} runtime exports present.`
 );
+

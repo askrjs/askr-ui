@@ -1,4 +1,4 @@
-import type { JSXElement, Ref } from '@askrjs/askr-ui/foundations';
+﻿import type { JSXElement, Ref } from '@askrjs/ui/foundations';
 
 /**
  * Press event passed to onPress handler
@@ -15,7 +15,7 @@ export type PressEvent = {
  * Checkbox component prop types
  *
  * ## Type-level Invariants
- * - onClick is PROHIBITED — use onPress instead
+ * - onClick is PROHIBITED â€” use onPress instead
  * - checked supports controlled and uncontrolled ownership through checked/defaultChecked
  * - asChild discriminates between native input and polymorphic rendering
  * - indeterminate is visual-only and orthogonal to checked state
@@ -74,3 +74,4 @@ export type CheckboxAsChildProps = CheckboxOwnProps & {
  * Discriminated union of Checkbox prop types
  */
 export type CheckboxProps = CheckboxInputProps | CheckboxAsChildProps;
+

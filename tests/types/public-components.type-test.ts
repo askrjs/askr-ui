@@ -1,5 +1,5 @@
-import type { JSXElement } from '@askrjs/askr/foundations';
-import * as askrUi from '@askrjs/askr-ui';
+﻿import type { JSXElement } from '@askrjs/askr/foundations';
+import * as askrUi from '@askrjs/ui';
 import {
   Accordion,
   AccordionContent,
@@ -117,21 +117,21 @@ import {
   type ToggleGroupItemProps,
   type ToggleGroupMultipleProps,
   type ToggleGroupSingleProps,
-} from '@askrjs/askr-ui';
-import { Accordion as AccordionSubpath } from '@askrjs/askr-ui/composites/accordion';
-import { Avatar as AvatarSubpath } from '@askrjs/askr-ui/primitives/avatar';
-import { Breadcrumb as BreadcrumbSubpath } from '@askrjs/askr-ui/composites/breadcrumb';
-import { Collapsible as CollapsibleSubpath } from '@askrjs/askr-ui/composites/collapsible';
-import { Menubar as MenubarSubpath } from '@askrjs/askr-ui/composites/menubar';
-import { NavigationMenu as NavigationMenuSubpath } from '@askrjs/askr-ui/composites/navigation-menu';
-import { Pagination as PaginationSubpath } from '@askrjs/askr-ui/composites/pagination';
-import { Progress as ProgressSubpath } from '@askrjs/askr-ui/primitives/progress';
-import { ProgressCircle as ProgressCircleSubpath } from '@askrjs/askr-ui/primitives/progress-circle';
-import { Slider as SliderSubpath } from '@askrjs/askr-ui/primitives/slider';
-import { Spinner as SpinnerSubpath } from '@askrjs/askr-ui/primitives/spinner';
-import { Tabs as TabsSubpath } from '@askrjs/askr-ui/composites/tabs';
-import { ToastProvider as ToastSubpath } from '@askrjs/askr-ui/composites/toast';
-import { ToggleGroup as ToggleGroupSubpath } from '@askrjs/askr-ui/primitives/toggle-group';
+} from '@askrjs/ui';
+import { Accordion as AccordionSubpath } from '@askrjs/ui/composites/accordion';
+import { Avatar as AvatarSubpath } from '@askrjs/ui/primitives/avatar';
+import { Breadcrumb as BreadcrumbSubpath } from '@askrjs/ui/composites/breadcrumb';
+import { Collapsible as CollapsibleSubpath } from '@askrjs/ui/composites/collapsible';
+import { Menubar as MenubarSubpath } from '@askrjs/ui/composites/menubar';
+import { NavigationMenu as NavigationMenuSubpath } from '@askrjs/ui/composites/navigation-menu';
+import { Pagination as PaginationSubpath } from '@askrjs/ui/composites/pagination';
+import { Progress as ProgressSubpath } from '@askrjs/ui/primitives/progress';
+import { ProgressCircle as ProgressCircleSubpath } from '@askrjs/ui/primitives/progress-circle';
+import { Slider as SliderSubpath } from '@askrjs/ui/primitives/slider';
+import { Spinner as SpinnerSubpath } from '@askrjs/ui/primitives/spinner';
+import { Tabs as TabsSubpath } from '@askrjs/ui/composites/tabs';
+import { ToastProvider as ToastSubpath } from '@askrjs/ui/composites/toast';
+import { ToggleGroup as ToggleGroupSubpath } from '@askrjs/ui/primitives/toggle-group';
 
 const slotChild = {} as JSXElement;
 
@@ -466,3 +466,4 @@ void [
   toastCloseAsChildProps,
   sliderProps,
 ];
+

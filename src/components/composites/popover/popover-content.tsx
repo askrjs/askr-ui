@@ -1,9 +1,9 @@
-import {
+﻿import {
   Presence,
   Slot,
   composeRefs,
   mergeProps,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { DismissableLayer } from '../../composites/dismissable-layer';
 import { FocusScope } from '../../composites/focus-scope';
 import {
@@ -100,3 +100,4 @@ export function PopoverContent(
     </Presence>
   );
 }
+

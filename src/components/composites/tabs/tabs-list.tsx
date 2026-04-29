@@ -1,4 +1,4 @@
-import { Slot, mergeProps, rovingFocus } from '@askrjs/askr-ui/foundations';
+﻿import { Slot, mergeProps, rovingFocus } from '@askrjs/ui/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import {
   disabledIndexes,
@@ -58,3 +58,4 @@ export function TabsList(props: TabsListProps | TabsListAsChildProps) {
 
   return <div {...finalProps}>{keyedChildren}</div>;
 }
+

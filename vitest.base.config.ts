@@ -1,4 +1,4 @@
-import { askr } from '@askrjs/askr-vite';
+﻿import { askr } from '@askrjs/vite';
 import { defineConfig } from 'vite-plus';
 import { fileURLToPath } from 'node:url';
 
@@ -23,8 +23,9 @@ export const sharedVitestConfig = defineConfig({
   resolve: {
     alias: {
       '@askrjs/askr/for': '@askrjs/askr/control',
-      '@askrjs/askr-ui/foundations': foundationsAlias,
+      '@askrjs/ui/foundations': foundationsAlias,
     },
     preserveSymlinks: true,
   },
 });
+

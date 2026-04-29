@@ -1,11 +1,11 @@
-import {
+﻿import {
   Presence,
   Slot,
   composeRefs,
   controllableState,
   mergeProps,
   pressable,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { state } from '@askrjs/askr';
 import { resource } from '@askrjs/askr/resources';
 import { DismissableLayer } from '../../composites/dismissable-layer';
@@ -567,3 +567,4 @@ export function ToastClose(props: ToastCloseProps | ToastCloseAsChildProps) {
     </button>
   );
 }
+

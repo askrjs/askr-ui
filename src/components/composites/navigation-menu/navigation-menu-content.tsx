@@ -1,11 +1,11 @@
-import { state } from '@askrjs/askr';
+﻿import { state } from '@askrjs/askr';
 import {
   Slot,
   composeRefs,
   mergeProps,
   rovingFocus,
   Presence,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { DismissableLayer } from '../../composites/dismissable-layer';
 import { FocusScope } from '../../composites/focus-scope';
 import {
@@ -213,3 +213,4 @@ export function NavigationMenuContent(
 
   return <PortalHost />;
 }
+

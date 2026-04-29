@@ -1,4 +1,4 @@
-import { Slot, mergeProps, rovingFocus } from '@askrjs/askr-ui/foundations';
+﻿import { Slot, mergeProps, rovingFocus } from '@askrjs/ui/foundations';
 import {
   getCompositeCollection,
   getCompositeCollectionItems,
@@ -63,3 +63,4 @@ export function NavigationMenuList(
     </div>
   );
 }
+

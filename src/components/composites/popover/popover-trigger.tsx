@@ -1,9 +1,9 @@
-import {
+﻿import {
   Slot,
   composeRefs,
   mergeProps,
   pressable,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { readPopoverRootContext } from './popover.shared';
 import type {
   PopoverTriggerAsChildProps,
@@ -67,3 +67,4 @@ export function PopoverTrigger(
     </button>
   );
 }
+

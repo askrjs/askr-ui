@@ -1,6 +1,6 @@
-# UI: askr-ui
+﻿# UI: askr-ui
 
-`@askrjs/askr-ui` provides headless UI primitives for Askr applications.
+`@askrjs/ui` provides headless UI primitives for Askr applications.
 
 ## What askr-ui is
 
@@ -11,18 +11,18 @@ visual styling. Pair it with `askr-themes` for visual defaults, or supply your o
 
 | Category   | Components                                                                                                               | Import path       |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------ | ----------------- |
-| Foundation | Button, Toggle, Checkbox, VisuallyHidden, Label, Input, Textarea, Field, RadioGroup, Switch, Select, Slider, ToggleGroup | `@askrjs/askr-ui` |
-| Focus      | FocusRing, FocusScope, DismissableLayer                                                                                  | `@askrjs/askr-ui` |
-| Overlay    | Dialog, AlertDialog, Popover, Tooltip, DropdownMenu, Menu                                                                | `@askrjs/askr-ui` |
-| Disclosure | Accordion, Collapsible, Tabs                                                                                             | `@askrjs/askr-ui` |
-| Status     | Progress, ProgressCircle, Toast, Spinner                                                                                 | `@askrjs/askr-ui` |
-| Identity   | Avatar                                                                                                                   | `@askrjs/askr-ui` |
-| Navigation | Breadcrumb, NavLink, Pagination, Menubar, NavigationMenu                                                                 | `@askrjs/askr-ui` |
-| Patterns   | DataTable                                                                                                                | `@askrjs/askr-ui` |
+| Foundation | Button, Toggle, Checkbox, VisuallyHidden, Label, Input, Textarea, Field, RadioGroup, Switch, Select, Slider, ToggleGroup | `@askrjs/ui` |
+| Focus      | FocusRing, FocusScope, DismissableLayer                                                                                  | `@askrjs/ui` |
+| Overlay    | Dialog, AlertDialog, Popover, Tooltip, DropdownMenu, Menu                                                                | `@askrjs/ui` |
+| Disclosure | Accordion, Collapsible, Tabs                                                                                             | `@askrjs/ui` |
+| Status     | Progress, ProgressCircle, Toast, Spinner                                                                                 | `@askrjs/ui` |
+| Identity   | Avatar                                                                                                                   | `@askrjs/ui` |
+| Navigation | Breadcrumb, NavLink, Pagination, Menubar, NavigationMenu                                                                 | `@askrjs/ui` |
+| Patterns   | DataTable                                                                                                                | `@askrjs/ui` |
 
 Visual-only composition and display components such as Box, Stack, Inline,
 Grid, Container, Section, Spacer, Separator/Divider, Badge, Skeleton,
-SidebarLayout, and TopbarLayout live in `@askrjs/askr-themes`.
+SidebarLayout, and TopbarLayout live in `@askrjs/themes`.
 
 NavLink is the route-aware anchor for navbar-style current-page highlighting.
 
@@ -31,17 +31,17 @@ NavLink is the route-aware anchor for navbar-style current-page highlighting.
 Components are importable per-subpath for tree-shaking:
 
 ```ts
-import { Button } from '@askrjs/askr-ui';
-import { Dialog, DialogTrigger, DialogContent } from '@askrjs/askr-ui';
-import { Button, Input, Field } from '@askrjs/askr-ui';
-import { Dialog, Menu } from '@askrjs/askr-ui';
-import { Menubar, NavigationMenu } from '@askrjs/askr-ui';
+import { Button } from '@askrjs/ui';
+import { Dialog, DialogTrigger, DialogContent } from '@askrjs/ui';
+import { Button, Input, Field } from '@askrjs/ui';
+import { Dialog, Menu } from '@askrjs/ui';
+import { Menubar, NavigationMenu } from '@askrjs/ui';
 import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
-} from '@askrjs/askr-ui';
+} from '@askrjs/ui';
 ```
 
 ## See also
@@ -50,3 +50,4 @@ import {
 - [Components](./components.md)
 - [Composition](./composition.md)
 - [Styling: askr-themes](../styling/askr-themes.md)
+

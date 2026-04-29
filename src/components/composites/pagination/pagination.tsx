@@ -1,10 +1,10 @@
-import { defineContext, readContext } from '@askrjs/askr';
+﻿import { defineContext, readContext } from '@askrjs/askr';
 import {
   Slot,
   controllableState,
   mergeProps,
   pressable,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import { buildPaginationModel, clampPage } from '../../_internal/pagination';
 import type {
@@ -287,3 +287,4 @@ export function PaginationEllipsis(
 
   return <span {...finalProps}>{children ?? '...'}</span>;
 }
+

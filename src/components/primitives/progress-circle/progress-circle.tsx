@@ -1,5 +1,5 @@
-import { defineContext, readContext } from '@askrjs/askr';
-import { Slot, mergeProps } from '@askrjs/askr-ui/foundations';
+﻿import { defineContext, readContext } from '@askrjs/askr';
+import { Slot, mergeProps } from '@askrjs/ui/foundations';
 import { mergeCssVar } from '../../_internal/style';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import {
@@ -135,3 +135,4 @@ export function Spinner(props: SpinnerProps) {
     />
   );
 }
+

@@ -1,4 +1,4 @@
-import type { Ref } from '@askrjs/askr-ui/foundations';
+﻿import type { Ref } from '@askrjs/ui/foundations';
 import type { BoxAsChildProps, BoxProps } from '../../_internal/types';
 
 export type AvatarLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';
@@ -33,3 +33,4 @@ export type AvatarFallbackProps = BoxProps<'span', HTMLSpanElement> &
   AvatarFallbackOwnProps;
 export type AvatarFallbackAsChildProps = BoxAsChildProps &
   AvatarFallbackOwnProps;
+

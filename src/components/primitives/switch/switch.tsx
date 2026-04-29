@@ -1,9 +1,9 @@
-import {
+﻿import {
   Slot,
   controllableState,
   mergeProps,
   pressable,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import type { SwitchAsChildProps, SwitchButtonProps } from './switch.types';
 
 export function Switch(props: SwitchButtonProps): JSX.Element;
@@ -78,3 +78,4 @@ export function Switch(props: SwitchButtonProps | SwitchAsChildProps) {
     </>
   );
 }
+
