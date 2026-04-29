@@ -68,7 +68,6 @@
   },
   "scripts": {
     "build": "vp pack",
-    "pack": "npm run build",
     "dev": "vp pack --watch",
     "verify:foundations": "node scripts/check-foundations-contract.js",
     "test:unit": "npm run test:types && vp test run --config vitest.node.config.ts && vp test run --config vitest.jsdom.config.ts",
@@ -82,7 +81,7 @@
     "fmt": "vp fmt .",
     "lint": "vp fmt --check .",
     "generate": "node scripts/generate.js",
-    "prepublishOnly": "npm run pack"
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "@askrjs/askr": "file:../askr",

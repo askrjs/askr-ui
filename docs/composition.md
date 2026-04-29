@@ -1,99 +1,33 @@
-﻿# UI: Composition
+# Composition
 
 Patterns for composing `askr-ui` primitives into application components.
 
 ## Principle
 
-Askr UI is composed, not configured.
+Askr UI is composed, not configured. Keep behavior in primitives and combine
+them in application code instead of expanding component props.
 
-Rather than `<Button icon="save" iconPosition="left">`, you compose:
+## Example
 
 ```tsx
-import { Button } from '@askrjs/ui';
+import { Button, Dialog, DialogContent, DialogOverlay, DialogPortal, DialogTrigger } from '@askrjs/ui';
 import { SaveIcon } from '@askrjs/lucide';
-
-<Button onPress={save}>
-  <SaveIcon size={14} aria-hidden="true" /> Save changes
-</Button>;
-```
-
-This keeps component APIs narrow. Behavior scales through composition, not prop proliferation.
-
-## Field + Label composition
-
-```tsx
-import { Field, FieldLabel, Input } from '@askrjs/ui';
-
-<Field id="email">
-  <FieldLabel fieldId="email">Email address</FieldLabel>
-  <Input type="email" value={email()} onInput={...} />
-</Field>
-```
-
-`Field` provides the accessibility binding. `FieldLabel` associates the label. `Input`
-provides the control. Each component does one thing.
-
-## Dialog composition
-
-```tsx
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-  DialogClose,
-  DialogPortal,
-  DialogOverlay,
-} from '@askrjs/ui';
-import { Button } from '@askrjs/ui';
 
 <Dialog>
   <DialogTrigger>
-    <Button>Open</Button>
+    <Button>
+      <SaveIcon size={14} aria-hidden="true" /> Save changes
+    </Button>
   </DialogTrigger>
   <DialogPortal>
     <DialogOverlay />
-    <DialogContent>
-      <DialogTitle>Confirm action</DialogTitle>
-      <DialogDescription>This cannot be undone.</DialogDescription>
-      <DialogClose>
-        <Button>Cancel</Button>
-      </DialogClose>
-      <Button onPress={confirm}>Confirm</Button>
-    </DialogContent>
+    <DialogContent>Confirm action</DialogContent>
   </DialogPortal>
 </Dialog>;
 ```
 
-## Select composition
-
-```tsx
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectPortal,
-  SelectContent,
-  SelectItem,
-} from '@askrjs/ui';
-
-<Select value={timezone()} onValueChange={setTimezone}>
-  <SelectTrigger aria-label="Timezone">
-    <SelectValue placeholder="Select timezone" />
-  </SelectTrigger>
-  <SelectPortal>
-    <SelectContent>
-      <SelectItem value="utc">UTC</SelectItem>
-      <SelectItem value="pst">Pacific Time</SelectItem>
-    </SelectContent>
-  </SelectPortal>
-</Select>;
-```
-
 ## See also
 
-- [Components](./components.md)
+- [askr-ui](./askr-ui.md)
 - [Foundations](./foundations.md)
-- [Forms guide](../guides/forms.md)
-
+- [Components](./components.md)
