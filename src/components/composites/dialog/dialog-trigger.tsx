@@ -1,9 +1,9 @@
-import {
+﻿import {
   Slot,
   composeRefs,
   mergeProps,
   pressable,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { readDialogRootContext } from './dialog.shared';
 import type {
   DialogTriggerAsChildProps,
@@ -66,3 +66,4 @@ export function DialogTrigger(
     </button>
   );
 }
+

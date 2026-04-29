@@ -1,4 +1,4 @@
-# askr-ui 1.0 Contract
+﻿# askr-ui 1.0 Contract
 
 ## Overview
 
@@ -25,7 +25,7 @@ If a component fails that bar, it does not ship as public API.
 - Disclosure and content: `Collapsible`, `Accordion`, `Tabs`
 - Status and identity: `Badge`, `Avatar`, `Skeleton`, `Progress`, `ProgressCircle`, `Spinner`, `Toast`
 - Basic navigation and utility: `Breadcrumb`, `Pagination`, `ToggleGroup`, `Slider`, `Menubar`, `NavigationMenu`
-- Layout primitives (structural/headless only — no colors, borders, or theme tokens): `Container`, `Flex`, `Grid`, `Spacer`
+- Layout primitives (structural/headless only â€” no colors, borders, or theme tokens): `Container`, `Flex`, `Grid`, `Spacer`
 - Patterns: `DataTable`, `SidebarLayout`, `TopbarLayout`
 
 Responsive theme contract:
@@ -58,7 +58,7 @@ The public surface has two tiers. **Core** is what the library cannot remove wit
 
 ## Runtime Contract
 
-askr-ui depends on `@askrjs/askr-ui/foundations` exposing the verified behavior-helper
+askr-ui depends on `@askrjs/ui/foundations` exposing the verified behavior-helper
 contract used in CI:
 
 - `createCollection`
@@ -97,3 +97,4 @@ Every public release must pass:
 - milestone-era docs and deferred API language are removed
 - `Menubar` and `NavigationMenu` join the supported root and subpath API
 - portal parts are documented against the supported portal-slot contract used by the runtime
+

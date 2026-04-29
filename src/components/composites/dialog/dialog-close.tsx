@@ -1,4 +1,4 @@
-import { Slot, mergeProps, pressable } from '@askrjs/askr-ui/foundations';
+﻿import { Slot, mergeProps, pressable } from '@askrjs/ui/foundations';
 import { readDialogRootContext } from './dialog.shared';
 import type { DialogCloseAsChildProps, DialogCloseProps } from './dialog.types';
 
@@ -44,3 +44,4 @@ export function DialogClose(props: DialogCloseProps | DialogCloseAsChildProps) {
     </button>
   );
 }
+

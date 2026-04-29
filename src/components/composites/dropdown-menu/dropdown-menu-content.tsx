@@ -1,10 +1,10 @@
-import {
+﻿import {
   Presence,
   Slot,
   composeRefs,
   mergeProps,
   rovingFocus,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { DismissableLayer } from '../../composites/dismissable-layer';
 import { FocusScope } from '../../composites/focus-scope';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
@@ -119,3 +119,4 @@ export function DropdownMenuContent(
     </Presence>
   );
 }
+

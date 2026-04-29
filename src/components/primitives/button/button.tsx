@@ -1,4 +1,4 @@
-import { Slot, pressable, mergeProps } from '@askrjs/askr-ui/foundations';
+﻿import { Slot, pressable, mergeProps } from '@askrjs/ui/foundations';
 import type { ButtonNativeProps, ButtonAsChildProps } from './button.types';
 
 /**
@@ -82,3 +82,4 @@ export function Button(props: ButtonNativeProps | ButtonAsChildProps) {
     </button>
   );
 }
+

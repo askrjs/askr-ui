@@ -1,4 +1,4 @@
-{
+﻿{
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
@@ -9,18 +9,18 @@
       "@askrjs/askr/foundations": ["../askr/dist/foundations/index.d.ts"],
       "@askrjs/askr/fx": ["../askr/dist/fx/index.d.ts"],
       "@askrjs/askr/resources": ["../askr/dist/resources/index.d.ts"],
-      "@askrjs/askr-ui": ["./src/index.ts"],
-      "@askrjs/askr-ui/foundations": ["./src/foundations/index.ts"],
-      "@askrjs/askr-ui/primitives/*": [
+      "@askrjs/ui": ["./src/index.ts"],
+      "@askrjs/ui/foundations": ["./src/foundations/index.ts"],
+      "@askrjs/ui/primitives/*": [
         "./src/components/primitives/*/index.ts"
       ],
-      "@askrjs/askr-ui/composites/field/*": [
+      "@askrjs/ui/composites/field/*": [
         "./src/components/composites/field/*.tsx"
       ],
-      "@askrjs/askr-ui/composites/*": [
+      "@askrjs/ui/composites/*": [
         "./src/components/composites/*/index.ts"
       ],
-      "@askrjs/askr-ui/patterns/*": ["./src/components/patterns/*/index.ts"]
+      "@askrjs/ui/patterns/*": ["./src/components/patterns/*/index.ts"]
     }
   },
   "include": [
@@ -30,3 +30,4 @@
     "types/**/*.d.ts"
   ]
 }
+

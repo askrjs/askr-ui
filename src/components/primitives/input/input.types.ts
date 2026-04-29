@@ -1,4 +1,4 @@
-import type { JSXElement, Ref } from '@askrjs/askr-ui/foundations';
+﻿import type { JSXElement, Ref } from '@askrjs/ui/foundations';
 
 export type InputEvent = Event & {
   currentTarget: HTMLInputElement;
@@ -34,3 +34,4 @@ export type DebouncedInputProps = Omit<InputInputProps, 'onInput' | 'type'> & {
 };
 
 export type InputProps = InputInputProps | InputAsChildProps;
+

@@ -1,4 +1,4 @@
-import { state } from '@askrjs/askr';
+﻿import { state } from '@askrjs/askr';
 import {
   Presence,
   Slot,
@@ -7,7 +7,7 @@ import {
   mergeProps,
   pressable,
   rovingFocus,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import {
   disabledIndexes,
@@ -350,3 +350,4 @@ export function AccordionContent(
     </Presence>
   );
 }
+

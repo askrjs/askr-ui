@@ -1,4 +1,4 @@
-import type { JSXElement, Ref } from '@askrjs/askr-ui/foundations';
+﻿import type { JSXElement, Ref } from '@askrjs/ui/foundations';
 
 export type SwitchOwnProps = {
   children?: unknown;
@@ -29,3 +29,4 @@ export type SwitchAsChildProps = SwitchOwnProps & {
 };
 
 export type SwitchProps = SwitchButtonProps | SwitchAsChildProps;
+

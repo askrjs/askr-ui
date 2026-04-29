@@ -1,4 +1,4 @@
-import type { JSXElement, Ref } from '@askrjs/askr-ui/foundations';
+﻿import type { JSXElement, Ref } from '@askrjs/ui/foundations';
 
 export type PressEvent = {
   preventDefault?: () => void;
@@ -50,3 +50,4 @@ export type BoxAsChildProps = BoxOwnProps & {
   children: JSXElement;
   ref?: Ref<unknown>;
 };
+

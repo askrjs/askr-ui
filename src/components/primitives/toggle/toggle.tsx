@@ -1,4 +1,4 @@
-import { Slot, pressable, mergeProps } from '@askrjs/askr-ui/foundations';
+﻿import { Slot, pressable, mergeProps } from '@askrjs/ui/foundations';
 import type { ToggleButtonProps, ToggleAsChildProps } from './toggle.types';
 
 /**
@@ -34,7 +34,7 @@ import type { ToggleButtonProps, ToggleAsChildProps } from './toggle.types';
  * @example Polymorphic rendering (asChild)
  * ```tsx
  * <Toggle asChild pressed={muted} onPress={toggleMute}>
- *   <span>🔇</span>
+ *   <span>ðŸ”‡</span>
  * </Toggle>
  * ```
  */
@@ -81,3 +81,4 @@ export function Toggle(props: ToggleButtonProps | ToggleAsChildProps) {
     </button>
   );
 }
+

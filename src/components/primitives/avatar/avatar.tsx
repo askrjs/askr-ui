@@ -1,10 +1,10 @@
-import { state } from '@askrjs/askr';
+﻿import { state } from '@askrjs/askr';
 import {
   Presence,
   Slot,
   composeRefs,
   mergeProps,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { resource } from '@askrjs/askr/resources';
 import { resolveCompoundId } from '../../_internal/id';
 import type {
@@ -173,3 +173,4 @@ export function AvatarFallback(
     </Presence>
   );
 }
+

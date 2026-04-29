@@ -1,4 +1,4 @@
-import type { JSXElement } from '@askrjs/askr-ui/foundations';
+﻿import type { JSXElement } from '@askrjs/ui/foundations';
 
 export function isJsxElement(value: unknown): value is JSXElement {
   return (
@@ -150,3 +150,4 @@ export function serializeForId(value: unknown): string {
 
   return typeof value;
 }
+

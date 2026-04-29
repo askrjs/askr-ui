@@ -1,9 +1,9 @@
-import {
+﻿import {
   Slot,
   composeRefs,
   mergeProps,
   pressable,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { getOverlayNodes } from '../../_internal/overlay';
 import { readSelectRootContext, resolveSelectState } from './select.shared';
 import type {
@@ -101,3 +101,4 @@ export function SelectPortal(props: SelectPortalProps): JSX.Element | null {
     children: props.children,
   }) as JSX.Element | null;
 }
+

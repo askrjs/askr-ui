@@ -1,4 +1,4 @@
-import { composeRefs, Slot, mergeProps } from '@askrjs/askr-ui/foundations';
+﻿import { composeRefs, Slot, mergeProps } from '@askrjs/ui/foundations';
 import { readDialogRootContext } from './dialog.shared';
 import type { DialogTitleAsChildProps, DialogTitleProps } from './dialog.types';
 
@@ -28,3 +28,4 @@ export function DialogTitle(props: DialogTitleProps | DialogTitleAsChildProps) {
 
   return <h2 {...finalProps}>{children}</h2>;
 }
+

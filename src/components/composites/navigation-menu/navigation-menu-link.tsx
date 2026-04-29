@@ -1,9 +1,9 @@
-import {
+﻿import {
   Slot,
   composeRefs,
   mergeProps,
   rovingFocus,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import {
   registerCompositeNode,
   getCompositeCollection,
@@ -74,3 +74,4 @@ export function NavigationMenuLink(
     <a {...finalProps}>{children}</a>
   );
 }
+

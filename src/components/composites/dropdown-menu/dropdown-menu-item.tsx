@@ -1,10 +1,10 @@
-import {
+﻿import {
   Slot,
   composeRefs,
   mergeProps,
   pressable,
   rovingFocus,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import {
   getMenuCollection,
@@ -112,3 +112,4 @@ export function DropdownMenuItem(
     </button>
   );
 }
+

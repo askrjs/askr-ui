@@ -1,10 +1,10 @@
-import {
+﻿import {
   Slot,
   composeRefs,
   createLayer,
   dismissable,
   mergeProps,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { resolveCompoundId } from '../../_internal/id';
 import type {
   DismissableLayerAsChildProps,
@@ -186,3 +186,4 @@ export function DismissableLayer(
 
   return <div {...finalProps}>{children}</div>;
 }
+

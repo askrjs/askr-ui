@@ -1,10 +1,10 @@
-import {
+﻿import {
   Slot,
   composeRefs,
   mergeProps,
   pressable,
   rovingFocus,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import {
   registerCompositeNode,
   getCompositeCollection,
@@ -111,3 +111,4 @@ export function NavigationMenuTrigger(
     </button>
   );
 }
+

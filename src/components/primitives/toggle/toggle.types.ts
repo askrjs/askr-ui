@@ -1,4 +1,4 @@
-import type { JSXElement, Ref } from '@askrjs/askr-ui/foundations';
+﻿import type { JSXElement, Ref } from '@askrjs/ui/foundations';
 
 /**
  * Press event passed to onPress handler
@@ -15,7 +15,7 @@ export type PressEvent = {
  * Toggle component prop types
  *
  * ## Type-level Invariants
- * - onClick is PROHIBITED — use onPress instead
+ * - onClick is PROHIBITED â€” use onPress instead
  * - pressed is controlled state (no onChange, consumer manages state)
  * - asChild discriminates between native button and polymorphic rendering
  *
@@ -61,3 +61,4 @@ export type ToggleAsChildProps = ToggleOwnProps & {
  * Discriminated union of Toggle prop types
  */
 export type ToggleProps = ToggleButtonProps | ToggleAsChildProps;
+

@@ -1,10 +1,10 @@
-import {
+﻿import {
   Slot,
   composeRefs,
   mergeProps,
   pressable,
   rovingFocus,
-} from '@askrjs/askr-ui/foundations';
+} from '@askrjs/ui/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import { resolvePartId } from '../../_internal/id';
 import { isJsxElement, toChildArray } from '../../_internal/jsx';
@@ -218,3 +218,4 @@ export function MenubarPortal(props: MenubarPortalProps): JSX.Element | null {
     ),
   }) as JSX.Element | null;
 }
+

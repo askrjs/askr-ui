@@ -1,4 +1,4 @@
-# UI: Composition
+﻿# UI: Composition
 
 Patterns for composing `askr-ui` primitives into application components.
 
@@ -9,8 +9,8 @@ Askr UI is composed, not configured.
 Rather than `<Button icon="save" iconPosition="left">`, you compose:
 
 ```tsx
-import { Button } from '@askrjs/askr-ui';
-import { SaveIcon } from '@askrjs/askr-lucide';
+import { Button } from '@askrjs/ui';
+import { SaveIcon } from '@askrjs/lucide';
 
 <Button onPress={save}>
   <SaveIcon size={14} aria-hidden="true" /> Save changes
@@ -22,7 +22,7 @@ This keeps component APIs narrow. Behavior scales through composition, not prop 
 ## Field + Label composition
 
 ```tsx
-import { Field, FieldLabel, Input } from '@askrjs/askr-ui';
+import { Field, FieldLabel, Input } from '@askrjs/ui';
 
 <Field id="email">
   <FieldLabel fieldId="email">Email address</FieldLabel>
@@ -45,8 +45,8 @@ import {
   DialogClose,
   DialogPortal,
   DialogOverlay,
-} from '@askrjs/askr-ui';
-import { Button } from '@askrjs/askr-ui';
+} from '@askrjs/ui';
+import { Button } from '@askrjs/ui';
 
 <Dialog>
   <DialogTrigger>
@@ -76,7 +76,7 @@ import {
   SelectPortal,
   SelectContent,
   SelectItem,
-} from '@askrjs/askr-ui';
+} from '@askrjs/ui';
 
 <Select value={timezone()} onValueChange={setTimezone}>
   <SelectTrigger aria-label="Timezone">
@@ -96,3 +96,4 @@ import {
 - [Components](./components.md)
 - [Foundations](./foundations.md)
 - [Forms guide](../guides/forms.md)
+

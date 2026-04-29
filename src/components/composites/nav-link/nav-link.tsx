@@ -1,5 +1,5 @@
-import { Link, currentRoute } from '@askrjs/askr/router';
-import { Slot, mergeProps, type JSXElement } from '@askrjs/askr-ui/foundations';
+﻿import { Link, currentRoute } from '@askrjs/askr/router';
+import { Slot, mergeProps, type JSXElement } from '@askrjs/ui/foundations';
 import type { NavLinkAsChildProps, NavLinkProps } from './nav-link.types';
 
 type RouteSnapshot = ReturnType<typeof currentRoute>;
@@ -121,3 +121,4 @@ export function NavLink(props: NavLinkProps | NavLinkAsChildProps) {
 
   return <Link {...finalProps}>{children}</Link>;
 }
+

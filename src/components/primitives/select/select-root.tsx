@@ -1,5 +1,5 @@
-import { For, state } from '@askrjs/askr';
-import { controllableState } from '@askrjs/askr-ui/foundations';
+﻿import { For, state } from '@askrjs/askr';
+import { controllableState } from '@askrjs/ui/foundations';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import { collectJsxElements, toChildArray } from '../../_internal/jsx';
 import { getPersistentPortal } from '../../_internal/overlay';
@@ -111,3 +111,4 @@ export function Select(props: SelectProps) {
     </SelectRootContext.Scope>
   );
 }
+
