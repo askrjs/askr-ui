@@ -28,7 +28,6 @@
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
@@ -69,17 +68,14 @@
   "scripts": {
     "build": "vp pack",
     "dev": "vp pack --watch",
-    "verify:foundations": "node scripts/check-foundations-contract.js",
-    "test:unit": "npm run test:types && vp test run --config vitest.node.config.ts && vp test run --config vitest.jsdom.config.ts",
-    "test:component": "vp test run --config vitest.browser.config.ts",
-    "test": "npm run verify:foundations && npm run test:unit && npm run test:component",
-    "quality": "npm run build && npm test && npm run bench",
-    "test:types": "tsc -p tsconfig.type-tests.json --noEmit",
-    "bench": "cross-env NODE_ENV=production vp test bench --run --reporter=default --config vitest.bench.config.ts",
-    "inventory": "node scripts/generate-inventory.js",
-    "inventory:verify": "node scripts/generate-inventory.js --verify",
     "fmt": "vp fmt .",
-    "lint": "vp fmt --check .",
+    "lint": "vp lint .",
+    "verify:foundations": "node scripts/check-foundations-contract.js",
+    "test": "npm run verify:foundations && npm run test:unit && npm run test:component",
+    "test:component": "vp test run --config vitest.browser.config.ts",
+    "test:types": "tsc -p tsconfig.type-tests.json --noEmit",
+    "test:unit": "npm run test:types && vp test run --config vitest.node.config.ts && vp test run --config vitest.jsdom.config.ts",
+    "bench": "cross-env NODE_ENV=production vp test bench --run --reporter=default --config vitest.bench.config.ts",
     "generate": "node scripts/generate.js",
     "prepublishOnly": "npm run build"
   },
@@ -99,11 +95,6 @@
   },
   "peerDependencies": {
     "@askrjs/askr": "0.0.1"
-  },
-  "peerDependenciesMeta": {
-    "@askrjs/askr": {
-      "optional": false
-    }
   },
   "engines": {
     "node": ">=18"
