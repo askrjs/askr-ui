@@ -1,17 +1,13 @@
-Perfect — this is where you **lock the library in**.
-
-Below are the **non-negotiable rules** for askr-ui, followed by a **copy-paste component template** every component must start from.
-
----
-
 # askr-ui Component Rules
+
+These are the required implementation rules for `askr-ui` components. New components should start from the template below and keep the public API component-first.
 
 ## 1. Components Only
 
-- ✅ Export **components**
-- ❌ No hooks
-- ❌ No factories
-- ❌ No render props
+- Export **components**
+- Do not export hooks
+- Do not export factories
+- Do not expose render-prop APIs
 
 ```ts
 // GOOD
@@ -21,7 +17,7 @@ export function DialogTrigger() {}
 // BAD
 useDialog()
 createDialog()
-<Dialog>{(state) => …}</Dialog>
+<Dialog>{(state) => ...}</Dialog>
 ```
 
 ---
@@ -79,10 +75,10 @@ No silent no-ops.
 - Every such usage must be commented at the call site and covered by a determinism test
 
 ```tsx
-// GOOD — timer is necessary for auto-dismiss; covered by determinism test
+// GOOD - timer is necessary for auto-dismiss; covered by determinism test
 const id = setTimeout(() => dismiss(toastId), duration);
 
-// BAD — timer used to defer state without documented justification
+// BAD - timer used to defer state without documented justification
 setTimeout(() => setOpen(false), 0);
 ```
 
@@ -123,10 +119,10 @@ setTimeout(() => setOpen(false), 0);
 - All theme-driven styling remains the consumer's responsibility
 
 ```tsx
-// GOOD — structural behavior owned by layout primitive
+// GOOD - structural behavior owned by layout primitive
 <div style={{ display: 'flex', flexDirection: direction }} />
 
-// BAD — visual styling injected by the component
+// BAD - visual styling injected by the component
 <div style={{ backgroundColor: 'blue', borderRadius: '4px' }} />
 ```
 
@@ -172,16 +168,16 @@ function readExampleContext(): ExampleState {
  * ------------------------------------------- */
 
 export interface ExampleProps {
-  open?: boolean;
-  defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  children?: unknown;
+  open": boolean;
+  defaultOpen": boolean;
+  onOpenChange": (open: boolean) => void;
+  children": unknown;
 }
 
 export function Example(props: ExampleProps) {
   const [open, setOpen] = createControllableState(
     props.open,
-    props.defaultOpen ?? false,
+    props.defaultOpen "" false,
     props.onOpenChange
   );
 
@@ -202,8 +198,8 @@ export function Example(props: ExampleProps) {
  * ------------------------------------------- */
 
 export interface ExampleTriggerProps {
-  asChild?: boolean;
-  children?: unknown;
+  asChild": boolean;
+  children": unknown;
 }
 
 export function ExampleTrigger(props: ExampleTriggerProps) {
@@ -249,7 +245,7 @@ Every component PR must answer **yes** to all:
 
 This template:
 
-- Scales from **Button → Dialog → DataGrid**
+- Scales from **Button -> Dialog -> DataGrid**
 - Is AI-friendly (Copilot will follow it)
 - Prevents accidental React-isms
 - Makes askr-ui _feel like a real UI library_

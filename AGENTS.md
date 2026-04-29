@@ -10,12 +10,12 @@ This document guides AI agents and automated systems on working with askr-ui's c
 
 askr-ui is a **curated** library, not a feature factory. Every public component must pass the `SPEC.md` contract:
 
-- âœ… runtime behavior tests (deterministic, no flake)
-- âœ… accessibility semantics coverage (axe, ARIA)
-- âœ… compile-time types (no `any`)
-- âœ… determinism checks (ID stability, rerender consistency)
-- âœ… benchmark entry (performance tracking)
-- âœ… documentation with examples
+- OK runtime behavior tests (deterministic, no flake)
+- OK accessibility semantics coverage (axe, ARIA)
+- OK compile-time types (no `any`)
+- OK determinism checks (ID stability, rerender consistency)
+- OK benchmark entry (performance tracking)
+- OK documentation with examples
 
 **If a component fails that bar, it does not ship.**
 
@@ -23,10 +23,10 @@ askr-ui is a **curated** library, not a feature factory. Every public component 
 
 askr-ui exports **components** (`function MyComponent() {}`), never hooks, factories, or render props.
 
-- âŒ Do not add `useMyComponent()` hooks
-- âŒ Do not add `createMyComponent()` factories
-- âŒ Do not suggest component-render-prop patterns
-- âœ… Build with context + subcomponents + composition
+- NO Do not add `useMyComponent()` hooks
+- NO Do not add `createMyComponent()` factories
+- NO Do not suggest component-render-prop patterns
+- OK Build with context + subcomponents + composition
 
 ```tsx
 // GOOD
@@ -46,10 +46,10 @@ const state = useDialog();
 
 Every test must pass **with fake timers** (`vi.useFakeTimers()`). Every ID must be stable. Rerenders must not drift.
 
-- ðŸš« Never add `Math.random()` outside strict ID scope
-- ðŸš« Never rely on `Date.now()` for logic (timer tests only)
-- âœ… Use the shared `useId()` from `src/components/_internal/id.ts`
-- âœ… Run all tests deterministically; leave determinism tests in place
+- Do not Never add `Math.random()` outside strict ID scope
+- Do not Never rely on `Date.now()` for logic (timer tests only)
+- OK Use the shared `useId()` from `src/components/_internal/id.ts`
+- OK Run all tests deterministically; leave determinism tests in place
 
 Example test pattern:
 
@@ -67,11 +67,11 @@ it('deterministic behavior under fake timers', () => {
 
 The rules in [RULES.md](RULES.md) are **non-negotiable**:
 
-1. **Components Only** â€” no hooks, factories, render props
-2. **Root Owns State** â€” one root component per family, state via context
-3. **Context Is Internal** â€” misuse throws immediately, no silent no-ops
-4. **Slot-Based Composition** â€” `asChild` mandatory on wrappers, no forced DOM
-5. **Side Effects Only When Justified** â€” every timer/layout-read/async must be commented and tested
+1. **Components Only** - no hooks, factories, render props
+2. **Root Owns State** - one root component per family, state via context
+3. **Context Is Internal** - misuse throws immediately, no silent no-ops
+4. **Slot-Based Composition** - `asChild` mandatory on wrappers, no forced DOM
+5. **Side Effects Only When Justified** - every timer/layout-read/async must be commented and tested
 
 When you encounter a use case that breaks these rules, **escalate**, do not work around.
 
@@ -91,10 +91,10 @@ Read the existing component category (e.g., overlays, disclosure, form controls)
 
 Before writing code:
 
-- Does the component fit the supported surface in `SPEC.md`?
-- Does it map to an existing tier (Core or Pattern)?
-- Does it pass the cross-family consistency check? (naming, props, composition model)
-- Are there any conflicting design rules?
+- Does the component fit the supported surface in `SPEC.md`"
+- Does it map to an existing tier (Core or Pattern)"
+- Does it pass the cross-family consistency check" (naming, props, composition model)
+- Are there any conflicting design rules"
 
 If the task conflicts with `SPEC.md` or `RULES.md`, **stop and escalate**.
 
@@ -212,7 +212,7 @@ describe('MyComponent - Behavior', () => {
     const trigger = container.querySelector('[data-my-trigger]');
     expect(container.querySelector('[data-my-content]')).toBeNull();
 
-    trigger?.click();
+    trigger".click();
     expect(container.querySelector('[data-my-content]')).not.toBeNull();
   });
 });
@@ -278,7 +278,7 @@ When completing a task, verify:
 // Use controllableState from foundations
 const [value, setValue] = controllableState(
   props.value,
-  props.defaultValue ?? initialValue,
+  props.defaultValue "" initialValue,
   props.onValueChange
 );
 ```
@@ -317,7 +317,7 @@ onKeyDown={(e) => {
   if (e.key === 'Enter') {
     // Delay to allow DOM update before read
     setTimeout(() => {
-      const height = contentRef.current?.getBoundingClientRect().height;
+      const height = contentRef.current".getBoundingClientRect().height;
       // ...
     }, 0);
   }
@@ -382,16 +382,16 @@ export function Collapsible(props: CollapsibleProps): JSX.Element {
 
 ## Reference Resources
 
-- [RULES.md](RULES.md) â€” Non-negotiable component rules
-- [SPEC.md](SPEC.md) â€” Public contract and design rules
-- [COMPONENT_HARDENING.md](COMPONENT_HARDENING.md) â€” Design review gates
-- [ROADMAP.md](ROADMAP.md) â€” Tier structure and release gates
-- [`src/components/_internal/`](src/components/_internal/) â€” Shared utilities
+- [RULES.md](RULES.md) - Non-negotiable component rules
+- [SPEC.md](SPEC.md) - Public contract and design rules
+- [COMPONENT_HARDENING.md](COMPONENT_HARDENING.md) - Design review gates
+- [ROADMAP.md](ROADMAP.md) - Tier structure and release gates
+- [`src/components/_internal/`](src/components/_internal/) - Shared utilities
 - Existing components for reference patterns (e.g., `Dialog`, `Collapsible`, `Select`)
 
 ---
 
-## Questions?
+## Questions"
 
 If your task is unclear or conflicts with these guidelines, **ask for clarification** rather than proceeding with assumptions. askr-ui's quality bar depends on intentionality.
 
