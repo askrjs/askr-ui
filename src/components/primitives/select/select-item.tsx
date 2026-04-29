@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   composeRefs,
   mergeProps,
@@ -130,4 +130,3 @@ export function SelectItemText(
 
   return <span {...finalProps}>{children}</span>;
 }
-

@@ -394,4 +394,3 @@ export function Collapsible(props: CollapsibleProps): JSX.Element {
 ## Questions"
 
 If your task is unclear or conflicts with these guidelines, **ask for clarification** rather than proceeding with assumptions. askr-ui's quality bar depends on intentionality.
-

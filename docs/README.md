@@ -22,4 +22,3 @@ npm install @askrjs/ui @askrjs/askr
 import { Button } from '@askrjs/ui';
 import { Dialog, DialogTrigger, DialogContent } from '@askrjs/ui';
 ```
-

@@ -1,4 +1,4 @@
-﻿import { defineContext, readContext } from '@askrjs/askr';
+import { defineContext, readContext } from '@askrjs/askr';
 import { Slot, mergeProps } from '@askrjs/ui/foundations';
 import { mergeCssVar } from '../../_internal/style';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
@@ -112,4 +112,3 @@ export function ProgressIndicator(
 
   return <div {...finalProps}>{children}</div>;
 }
-

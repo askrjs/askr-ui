@@ -1,4 +1,4 @@
-﻿import { readFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 
 let runtimeExports;
 try {
@@ -40,11 +40,11 @@ import { dirname, join } from 'node:path';
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const indexTypePaths = [
   join(scriptDir, '../dist/foundations/index.d.ts'),
+  join(scriptDir, '../dist/index.d.ts'),
   join(scriptDir, '../../askr-ui/dist/foundations/index.d.ts'),
-  join(
-    scriptDir,
-    '../node_modules/@askrjs/ui/dist/foundations/index.d.ts'
-  ),
+  join(scriptDir, '../../askr-ui/dist/index.d.ts'),
+  join(scriptDir, '../node_modules/@askrjs/ui/dist/foundations/index.d.ts'),
+  join(scriptDir, '../node_modules/@askrjs/ui/dist/index.d.ts'),
 ];
 
 let indexTypes;
@@ -80,4 +80,3 @@ for (const marker of typeMarkers) {
 console.log(
   `Foundations contract verified: ${runtimeKeys.length} runtime exports present.`
 );
-

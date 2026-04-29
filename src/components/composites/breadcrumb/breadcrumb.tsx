@@ -1,4 +1,4 @@
-﻿import { Slot, mergeProps } from '@askrjs/ui/foundations';
+import { Slot, mergeProps } from '@askrjs/ui/foundations';
 import type {
   BreadcrumbAsChildProps,
   BreadcrumbCurrentAsChildProps,
@@ -134,4 +134,3 @@ export function BreadcrumbSeparator(
 
   return <span {...finalProps}>{children ?? '/'}</span>;
 }
-

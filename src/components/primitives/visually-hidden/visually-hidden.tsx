@@ -1,4 +1,4 @@
-﻿import { Slot, mergeProps } from '@askrjs/ui/foundations';
+import { Slot, mergeProps } from '@askrjs/ui/foundations';
 import type {
   VisuallyHiddenAsChildProps,
   VisuallyHiddenSpanProps,
@@ -33,4 +33,3 @@ export function VisuallyHidden(
 
   return <span {...finalProps}>{children}</span>;
 }
-

@@ -1,4 +1,4 @@
-﻿import { state } from '@askrjs/askr';
+import { state } from '@askrjs/askr';
 import {
   Presence,
   Slot,
@@ -220,4 +220,3 @@ export function MenubarSubContent(
     path: sub.path,
   });
 }
-

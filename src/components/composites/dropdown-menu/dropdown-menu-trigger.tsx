@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   composeRefs,
   mergeProps,
@@ -82,4 +82,3 @@ export function DropdownMenuPortal(
     children: props.children,
   }) as JSX.Element | null;
 }
-

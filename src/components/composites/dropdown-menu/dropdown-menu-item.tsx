@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   composeRefs,
   mergeProps,
@@ -112,4 +112,3 @@ export function DropdownMenuItem(
     </button>
   );
 }
-

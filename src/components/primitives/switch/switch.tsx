@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   controllableState,
   mergeProps,
@@ -78,4 +78,3 @@ export function Switch(props: SwitchButtonProps | SwitchAsChildProps) {
     </>
   );
 }
-

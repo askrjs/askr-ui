@@ -1,4 +1,4 @@
-﻿import { defineContext, readContext } from '@askrjs/askr';
+import { defineContext, readContext } from '@askrjs/askr';
 import {
   Slot,
   controllableState,
@@ -287,4 +287,3 @@ export function PaginationEllipsis(
 
   return <span {...finalProps}>{children ?? '...'}</span>;
 }
-

@@ -1,4 +1,4 @@
-﻿import { Slot, mergeProps } from '@askrjs/ui/foundations';
+import { Slot, mergeProps } from '@askrjs/ui/foundations';
 import { readNavigationMenuRootContext } from './navigation-menu.shared';
 import type {
   NavigationMenuIndicatorProps,
@@ -31,4 +31,3 @@ export function NavigationMenuIndicator(
     <div {...finalProps}>{children}</div>
   );
 }
-

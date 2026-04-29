@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   composeRefs,
   controllableState,
@@ -347,4 +347,3 @@ export function SliderThumb(props: SliderThumbProps | SliderThumbAsChildProps) {
 
   return <div {...finalProps}>{children}</div>;
 }
-

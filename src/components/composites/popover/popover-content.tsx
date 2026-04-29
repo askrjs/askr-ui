@@ -1,4 +1,4 @@
-﻿import {
+import {
   Presence,
   Slot,
   composeRefs,
@@ -100,4 +100,3 @@ export function PopoverContent(
     </Presence>
   );
 }
-

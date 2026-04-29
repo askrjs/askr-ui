@@ -1,4 +1,4 @@
-﻿import { debounceEvent } from '@askrjs/askr/fx';
+import { debounceEvent } from '@askrjs/askr/fx';
 import { Slot, focusable, mergeProps } from '@askrjs/ui/foundations';
 import type {
   DebouncedInputProps,
@@ -69,4 +69,3 @@ export function DebouncedInput(props: DebouncedInputProps) {
     <Input {...rest} disabled={isDisabled} type={type} onInput={handleInput} />
   );
 }
-

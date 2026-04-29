@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   composeRefs,
   hoverable,
@@ -67,4 +67,3 @@ export function TooltipTrigger(
     </button>
   );
 }
-

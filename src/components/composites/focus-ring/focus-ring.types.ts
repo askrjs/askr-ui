@@ -1,4 +1,4 @@
-﻿import type { JSXElement, Ref } from '@askrjs/ui/foundations';
+import type { JSXElement, Ref } from '@askrjs/ui/foundations';
 
 export type FocusRingOwnProps = {
   children?: unknown;
@@ -18,4 +18,3 @@ export type FocusRingAsChildProps = FocusRingOwnProps & {
   children: JSXElement;
   ref?: Ref<unknown>;
 };
-

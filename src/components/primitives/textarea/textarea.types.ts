@@ -1,4 +1,4 @@
-﻿import type { JSXElement, Ref } from '@askrjs/ui/foundations';
+import type { JSXElement, Ref } from '@askrjs/ui/foundations';
 
 export type TextareaOwnProps = {
   children?: unknown;
@@ -22,4 +22,3 @@ export type TextareaAsChildProps = TextareaOwnProps & {
 };
 
 export type TextareaProps = TextareaElementProps | TextareaAsChildProps;
-

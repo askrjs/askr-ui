@@ -1,4 +1,4 @@
-﻿import {
+import {
   Presence,
   Slot,
   composeRefs,
@@ -567,4 +567,3 @@ export function ToastClose(props: ToastCloseProps | ToastCloseAsChildProps) {
     </button>
   );
 }
-

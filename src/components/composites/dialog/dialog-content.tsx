@@ -1,4 +1,4 @@
-﻿import {
+import {
   Presence,
   Slot,
   composeRefs,
@@ -86,4 +86,3 @@ export function DialogContent(
     </Presence>
   );
 }
-

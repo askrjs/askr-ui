@@ -1,4 +1,4 @@
-﻿import type { JSXElement } from '@askrjs/askr/foundations';
+import type { JSXElement } from '@askrjs/askr/foundations';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -595,4 +595,3 @@ void [
   fieldProps,
   buttonNativeProps,
 ];
-

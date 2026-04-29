@@ -1,4 +1,4 @@
-﻿import { readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 import * as askrUi from '../src';
@@ -97,4 +97,3 @@ describe('Docs contract', () => {
     }
   });
 });
-

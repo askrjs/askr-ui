@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   controllableState,
   mergeProps,
@@ -151,4 +151,3 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
     />
   );
 }
-

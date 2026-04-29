@@ -1,4 +1,4 @@
-﻿import { state } from '@askrjs/askr';
+import { state } from '@askrjs/askr';
 import { mergeProps, rovingFocus } from '@askrjs/ui/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
@@ -114,4 +114,3 @@ export function Menubar(props: MenubarProps) {
     </MenubarRootContext.Scope>
   );
 }
-

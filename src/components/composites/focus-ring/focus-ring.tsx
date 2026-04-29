@@ -1,4 +1,4 @@
-﻿import { Slot, mergeProps } from '@askrjs/ui/foundations';
+import { Slot, mergeProps } from '@askrjs/ui/foundations';
 import {
   isKeyboardModality,
   markKeyboardModality,
@@ -54,4 +54,3 @@ export function FocusRing(props: FocusRingProps | FocusRingAsChildProps) {
 
   return <div {...finalProps}>{children}</div>;
 }
-

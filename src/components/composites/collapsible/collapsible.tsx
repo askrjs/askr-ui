@@ -1,4 +1,4 @@
-﻿import { defineContext, readContext } from '@askrjs/askr';
+import { defineContext, readContext } from '@askrjs/askr';
 import {
   Slot,
   Presence,
@@ -267,4 +267,3 @@ export function CollapsibleContent(
     </Presence>
   );
 }
-

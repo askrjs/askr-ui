@@ -1,4 +1,4 @@
-﻿import type { Orientation } from '@askrjs/ui/foundations';
+import type { Orientation } from '@askrjs/ui/foundations';
 import type {
   BoxAsChildProps,
   BoxProps,
@@ -42,4 +42,3 @@ export type MenuLabelAsChildProps = BoxAsChildProps;
 
 export type MenuSeparatorProps = BoxProps<'div', HTMLDivElement>;
 export type MenuSeparatorAsChildProps = BoxAsChildProps;
-

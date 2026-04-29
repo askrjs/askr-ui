@@ -1,4 +1,4 @@
-﻿import { askr } from '@askrjs/vite';
+import { askr } from '@askrjs/vite';
 import { defineConfig } from 'vite-plus';
 import { fileURLToPath } from 'node:url';
 
@@ -28,4 +28,3 @@ export const sharedVitestConfig = defineConfig({
     preserveSymlinks: true,
   },
 });
-

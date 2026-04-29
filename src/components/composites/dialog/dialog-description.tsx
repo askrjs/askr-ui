@@ -1,4 +1,4 @@
-﻿import { composeRefs, Slot, mergeProps } from '@askrjs/ui/foundations';
+import { composeRefs, Slot, mergeProps } from '@askrjs/ui/foundations';
 import { readDialogRootContext } from './dialog.shared';
 import type {
   DialogDescriptionAsChildProps,
@@ -35,4 +35,3 @@ export function DialogDescription(
 
   return <p {...finalProps}>{children}</p>;
 }
-

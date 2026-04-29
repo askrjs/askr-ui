@@ -1,4 +1,4 @@
-﻿import type { JSXElement, Ref } from '@askrjs/ui/foundations';
+import type { JSXElement, Ref } from '@askrjs/ui/foundations';
 
 /**
  * Press event passed to onPress handler
@@ -74,4 +74,3 @@ export type CheckboxAsChildProps = CheckboxOwnProps & {
  * Discriminated union of Checkbox prop types
  */
 export type CheckboxProps = CheckboxInputProps | CheckboxAsChildProps;
-

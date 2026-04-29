@@ -1,4 +1,4 @@
-﻿import { createCollection } from '@askrjs/ui/foundations';
+import { createCollection } from '@askrjs/ui/foundations';
 
 export type CompositeCollectionMetadata = {
   index: number;
@@ -112,4 +112,3 @@ export function disabledIndexes(
     .map((item, index) => (item.disabled ? index : -1))
     .filter((index) => index !== -1);
 }
-

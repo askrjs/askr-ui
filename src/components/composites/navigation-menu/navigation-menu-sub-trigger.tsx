@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   composeRefs,
   mergeProps,
@@ -105,4 +105,3 @@ export function NavigationMenuSubTrigger(
     </button>
   );
 }
-

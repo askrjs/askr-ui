@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   composeRefs,
   mergeProps,
@@ -111,4 +111,3 @@ export function TabsTrigger(props: TabsTriggerProps | TabsTriggerAsChildProps) {
     </button>
   );
 }
-

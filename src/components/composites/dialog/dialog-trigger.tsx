@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   composeRefs,
   mergeProps,
@@ -66,4 +66,3 @@ export function DialogTrigger(
     </button>
   );
 }
-
