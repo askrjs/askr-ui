@@ -97,4 +97,3 @@ Every public release must pass:
 - milestone-era docs and deferred API language are removed
 - `Menubar` and `NavigationMenu` join the supported root and subpath API
 - portal parts are documented against the supported portal-slot contract used by the runtime
-

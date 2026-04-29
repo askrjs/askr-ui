@@ -1,4 +1,4 @@
-﻿import { Slot, mergeProps } from '@askrjs/ui/foundations';
+import { Slot, mergeProps } from '@askrjs/ui/foundations';
 import type {
   MenubarGroupAsChildProps,
   MenubarGroupProps,
@@ -59,4 +59,3 @@ export function MenubarSeparator(
     <div {...finalProps}>{children}</div>
   );
 }
-

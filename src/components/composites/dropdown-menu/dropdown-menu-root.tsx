@@ -1,4 +1,4 @@
-﻿import { For, state } from '@askrjs/askr';
+import { For, state } from '@askrjs/askr';
 import { controllableState } from '@askrjs/ui/foundations';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import { toChildArray } from '../../_internal/jsx';
@@ -72,4 +72,3 @@ export function DropdownMenu(props: DropdownMenuProps) {
     </DropdownMenuRootContext.Scope>
   );
 }
-

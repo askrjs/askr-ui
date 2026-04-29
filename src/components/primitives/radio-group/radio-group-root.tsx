@@ -1,4 +1,4 @@
-﻿import { For, state } from '@askrjs/askr';
+import { For, state } from '@askrjs/askr';
 import {
   controllableState,
   mergeProps,
@@ -217,4 +217,3 @@ export function RadioGroup(props: RadioGroupProps) {
     </RadioGroupRootContext.Scope>
   );
 }
-

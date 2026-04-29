@@ -11,15 +11,11 @@
       "@askrjs/askr/resources": ["../askr/dist/resources/index.d.ts"],
       "@askrjs/ui": ["./src/index.ts"],
       "@askrjs/ui/foundations": ["./src/foundations/index.ts"],
-      "@askrjs/ui/primitives/*": [
-        "./src/components/primitives/*/index.ts"
-      ],
+      "@askrjs/ui/primitives/*": ["./src/components/primitives/*/index.ts"],
       "@askrjs/ui/composites/field/*": [
         "./src/components/composites/field/*.tsx"
       ],
-      "@askrjs/ui/composites/*": [
-        "./src/components/composites/*/index.ts"
-      ],
+      "@askrjs/ui/composites/*": ["./src/components/composites/*/index.ts"],
       "@askrjs/ui/patterns/*": ["./src/components/patterns/*/index.ts"]
     }
   },
@@ -30,4 +26,3 @@
     "types/**/*.d.ts"
   ]
 }
-

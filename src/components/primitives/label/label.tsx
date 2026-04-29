@@ -1,4 +1,4 @@
-﻿import { For } from '@askrjs/askr';
+import { For } from '@askrjs/askr';
 import { Slot, mergeProps } from '@askrjs/ui/foundations';
 import { isJsxElement, toChildArray } from '../../_internal/jsx';
 import type { LabelAsChildProps, LabelLabelProps } from './label.types';
@@ -32,4 +32,3 @@ export function Label(props: LabelLabelProps | LabelAsChildProps) {
 
   return <label {...finalProps}>{keyedChildren}</label>;
 }
-

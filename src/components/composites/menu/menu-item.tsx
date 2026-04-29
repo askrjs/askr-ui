@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   composeRefs,
   mergeProps,
@@ -93,4 +93,3 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
     </button>
   );
 }
-

@@ -1,4 +1,4 @@
-﻿import { controllableState } from '@askrjs/ui/foundations';
+import { controllableState } from '@askrjs/ui/foundations';
 import { resolveCompoundId } from '../../_internal/id';
 import {
   applyFilters,
@@ -751,4 +751,3 @@ export function createDataTable<T>(
 
   return instance;
 }
-

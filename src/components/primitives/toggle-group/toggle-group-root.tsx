@@ -1,4 +1,4 @@
-﻿import { state } from '@askrjs/askr';
+import { state } from '@askrjs/askr';
 import {
   controllableState,
   mergeProps,
@@ -194,4 +194,3 @@ export function ToggleGroup(props: ToggleGroupProps) {
     </ToggleGroupRootContext.Scope>
   );
 }
-

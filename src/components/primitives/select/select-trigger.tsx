@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   composeRefs,
   mergeProps,
@@ -101,4 +101,3 @@ export function SelectPortal(props: SelectPortalProps): JSX.Element | null {
     children: props.children,
   }) as JSX.Element | null;
 }
-

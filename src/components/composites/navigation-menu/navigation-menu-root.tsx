@@ -1,4 +1,4 @@
-﻿import { For, state } from '@askrjs/askr';
+import { For, state } from '@askrjs/askr';
 import { mergeProps } from '@askrjs/ui/foundations';
 import { resolveCompoundId } from '../../_internal/id';
 import { toChildArray } from '../../_internal/jsx';
@@ -90,4 +90,3 @@ export function NavigationMenu(props: NavigationMenuProps) {
     </NavigationMenuRootContext.Scope>
   );
 }
-

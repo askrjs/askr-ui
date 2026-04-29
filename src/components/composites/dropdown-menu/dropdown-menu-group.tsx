@@ -1,4 +1,4 @@
-﻿import { Slot, mergeProps } from '@askrjs/ui/foundations';
+import { Slot, mergeProps } from '@askrjs/ui/foundations';
 import type {
   DropdownMenuGroupAsChildProps,
   DropdownMenuGroupProps,
@@ -58,4 +58,3 @@ export function DropdownMenuSeparator(
 
   return <div {...finalProps}>{children}</div>;
 }
-

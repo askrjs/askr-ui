@@ -1,4 +1,4 @@
-﻿import { state } from '@askrjs/askr';
+import { state } from '@askrjs/askr';
 import {
   Slot,
   composeRefs,
@@ -213,4 +213,3 @@ export function NavigationMenuContent(
 
   return <PortalHost />;
 }
-

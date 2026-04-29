@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   composeRefs,
   mergeProps,
@@ -101,4 +101,3 @@ export function RadioGroupItem(
     </button>
   );
 }
-

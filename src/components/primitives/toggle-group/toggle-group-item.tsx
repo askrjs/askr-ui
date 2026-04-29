@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   composeRefs,
   mergeProps,
@@ -114,4 +114,3 @@ export function ToggleGroupItem(
     </button>
   );
 }
-

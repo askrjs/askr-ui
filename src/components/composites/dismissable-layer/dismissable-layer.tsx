@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   composeRefs,
   createLayer,
@@ -186,4 +186,3 @@ export function DismissableLayer(
 
   return <div {...finalProps}>{children}</div>;
 }
-

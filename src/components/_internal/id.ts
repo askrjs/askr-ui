@@ -1,4 +1,4 @@
-﻿import { formatId } from '@askrjs/ui/foundations';
+import { formatId } from '@askrjs/ui/foundations';
 import { serializeForId } from './jsx';
 
 export function hashString(value: string): string {
@@ -29,4 +29,3 @@ export function resolvePartId(rootId: string, part: string): string {
     id: part,
   });
 }
-

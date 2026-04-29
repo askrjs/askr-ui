@@ -1,4 +1,4 @@
-﻿import type { JSXElement, Ref } from '@askrjs/ui/foundations';
+import type { JSXElement, Ref } from '@askrjs/ui/foundations';
 
 /**
  * Press event passed to onPress handler
@@ -61,4 +61,3 @@ export type ToggleAsChildProps = ToggleOwnProps & {
  * Discriminated union of Toggle prop types
  */
 export type ToggleProps = ToggleButtonProps | ToggleAsChildProps;
-

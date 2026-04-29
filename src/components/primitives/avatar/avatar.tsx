@@ -1,4 +1,4 @@
-﻿import { state } from '@askrjs/askr';
+import { state } from '@askrjs/askr';
 import {
   Presence,
   Slot,
@@ -173,4 +173,3 @@ export function AvatarFallback(
     </Presence>
   );
 }
-

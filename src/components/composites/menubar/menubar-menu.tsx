@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   composeRefs,
   mergeProps,
@@ -218,4 +218,3 @@ export function MenubarPortal(props: MenubarPortalProps): JSX.Element | null {
     ),
   }) as JSX.Element | null;
 }
-

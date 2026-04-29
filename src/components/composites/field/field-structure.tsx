@@ -1,4 +1,4 @@
-﻿import { mergeProps } from '@askrjs/ui/foundations';
+import { mergeProps } from '@askrjs/ui/foundations';
 import type {
   FieldLegendProps,
   FieldProps,
@@ -89,4 +89,3 @@ export function FieldRow(props: FieldRowProps) {
 
   return <label {...finalProps}>{children}</label>;
 }
-

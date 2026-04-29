@@ -1,4 +1,4 @@
-﻿import type { JSXElement, Orientation, Ref } from '@askrjs/ui/foundations';
+import type { JSXElement, Orientation, Ref } from '@askrjs/ui/foundations';
 
 export type RadioGroupOwnProps = {
   value?: string;
@@ -39,4 +39,3 @@ export type RadioGroupItemAsChildProps = RadioGroupItemOwnProps & {
   children: JSXElement;
   ref?: Ref<unknown>;
 };
-

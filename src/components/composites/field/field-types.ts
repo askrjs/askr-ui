@@ -1,4 +1,4 @@
-﻿import type { JSXElement, Ref } from '@askrjs/ui/foundations';
+import type { JSXElement, Ref } from '@askrjs/ui/foundations';
 import type { CheckboxInputProps } from '../../primitives/checkbox';
 import type { InputInputProps } from '../../primitives/input';
 import type { RadioGroupProps } from '../../primitives/radio-group';
@@ -197,4 +197,3 @@ export type FieldRadioGroupProps = Omit<
   required?: boolean;
   disabled?: boolean;
 };
-

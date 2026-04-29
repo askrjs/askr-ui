@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   composeRefs,
   mergeProps,
@@ -74,4 +74,3 @@ export function NavigationMenuLink(
     <a {...finalProps}>{children}</a>
   );
 }
-

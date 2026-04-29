@@ -1,4 +1,4 @@
-﻿import {
+import {
   Slot,
   composeRefs,
   mergeProps,
@@ -262,4 +262,3 @@ export function MenubarSubTrigger(
     </button>
   );
 }
-

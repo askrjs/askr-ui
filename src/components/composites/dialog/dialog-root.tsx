@@ -1,4 +1,4 @@
-﻿import { For, state } from '@askrjs/askr';
+import { For, state } from '@askrjs/askr';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import { toChildArray } from '../../_internal/jsx';
 import {
@@ -122,4 +122,3 @@ export function Dialog(props: DialogProps) {
     </DialogRootContext.Scope>
   );
 }
-

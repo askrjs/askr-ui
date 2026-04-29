@@ -1,4 +1,4 @@
-﻿import type { Collection } from '@askrjs/ui/foundations';
+import type { Collection } from '@askrjs/ui/foundations';
 
 const FOCUSABLE_SELECTOR = [
   'a[href]',
@@ -72,4 +72,3 @@ export function focusSelectedCollectionItem<
   match.focus();
   return true;
 }
-

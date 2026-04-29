@@ -1,4 +1,4 @@
-﻿import type { JSXElement, Ref } from '@askrjs/ui/foundations';
+import type { JSXElement, Ref } from '@askrjs/ui/foundations';
 
 /**
  * Collapsible component prop types
@@ -78,4 +78,3 @@ export interface CollapsibleContentAsChildProps {
   /** Ref forwarding */
   ref?: Ref<unknown>;
 }
-

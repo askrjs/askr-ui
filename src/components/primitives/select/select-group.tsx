@@ -1,4 +1,4 @@
-﻿import { Slot, mergeProps } from '@askrjs/ui/foundations';
+import { Slot, mergeProps } from '@askrjs/ui/foundations';
 import { resolvePartId } from '../../_internal/id';
 import { collectJsxElements } from '../../_internal/jsx';
 import {
@@ -107,4 +107,3 @@ export function SelectSeparator(
 
   return <div {...finalProps}>{children}</div>;
 }
-

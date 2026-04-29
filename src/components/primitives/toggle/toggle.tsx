@@ -1,4 +1,4 @@
-﻿import { Slot, pressable, mergeProps } from '@askrjs/ui/foundations';
+import { Slot, pressable, mergeProps } from '@askrjs/ui/foundations';
 import type { ToggleButtonProps, ToggleAsChildProps } from './toggle.types';
 
 /**
@@ -81,4 +81,3 @@ export function Toggle(props: ToggleButtonProps | ToggleAsChildProps) {
     </button>
   );
 }
-

@@ -10,7 +10,14 @@ them in application code instead of expanding component props.
 ## Example
 
 ```tsx
-import { Button, Dialog, DialogContent, DialogOverlay, DialogPortal, DialogTrigger } from '@askrjs/ui';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogOverlay,
+  DialogPortal,
+  DialogTrigger,
+} from '@askrjs/ui';
 import { SaveIcon } from '@askrjs/lucide';
 
 <Dialog>

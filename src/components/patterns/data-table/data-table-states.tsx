@@ -1,4 +1,4 @@
-﻿import { mergeProps } from '@askrjs/ui/foundations';
+import { mergeProps } from '@askrjs/ui/foundations';
 import { DATA_TABLE_A11Y_CONTRACT } from './data-table.a11y';
 import type {
   DataTableEmptyProps,
@@ -42,4 +42,3 @@ export function DataTableError<T>(props: DataTableErrorProps) {
 
   return <div {...finalProps}>{children ?? 'An error occurred'}</div>;
 }
-
