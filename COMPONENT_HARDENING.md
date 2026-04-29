@@ -175,11 +175,11 @@ Run this loop every week until all phases are complete:
 
 1. Re-rank high-risk components and blockers.
 2. Validate dependency map against current work.
-3. Verify gate evidence for components moved to done.
+3. Verify gate evidence for components marked done.
 4. Expire or renew waivers with explicit rationale.
 5. Update notes with resolved decisions and regressions.
 
-## Phase 1 — Reference Primitives
+## Phase 1 - Reference Primitives
 
 | Component | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                       |
 | --------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | --------------------------------------------------------------------------------------------------------------------------- |
@@ -188,7 +188,7 @@ Run this loop every week until all phases are complete:
 | Input     | done   | done       | done          | done | done         | done  | covered | done         | `asChild` now fails loudly unless the host is a native `<input>`; targeted behavior, a11y, and determinism suites are green |
 | Separator | done   | done       | done          | done | done         | done  | covered | done         | Semantic vs decorative separator contract locked                                                                            |
 
-## Phase 2 — Presentational Primitives
+## Phase 2 - Presentational Primitives
 
 | Component      | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                              |
 | -------------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
@@ -200,7 +200,7 @@ Run this loop every week until all phases are complete:
 | ProgressCircle | done   | done       | done          | done | done         | done  | covered | done         | Scoped-context root/indicator contract replaced tree rewriting and hidden injected props; Spinner alias remains stable on top      |
 | VisuallyHidden | done   | done       | done          | done | done         | done  | covered | done         | Hidden-content contract is stable and deterministic; focused behavior, a11y, and determinism suites are green                      |
 
-## Phase 3 — Layout Primitives
+## Phase 3 - Layout Primitives
 
 | Component | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                                               |
 | --------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -209,7 +209,7 @@ Run this loop every week until all phases are complete:
 | Grid      | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated layout benchmark coverage now lives in `benches/components/grid.bench.tsx`      |
 | Spacer    | done   | done       | done          | done | done         | done  | covered | done         | Focused behavior, a11y, and determinism suites are green; dedicated layout benchmark coverage now lives in `benches/components/spacer.bench.tsx`    |
 
-## Phase 4 — Form And Selection Primitives
+## Phase 4 - Form And Selection Primitives
 
 | Component   | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                                  |
 | ----------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
@@ -222,7 +222,7 @@ Run this loop every week until all phases are complete:
 | ToggleGroup | done   | done       | done          | done | done         | done  | covered | done         | Context replaces item injection and the file is split; live collection snapshots now drive item metadata                               |
 | Select      | done   | done       | done          | done | done         | done  | covered | done         | File split plus declaration-backed metadata store remove the root item scan while preserving closed trigger text and overlay semantics |
 
-## Phase 5 — Infrastructure Composites
+## Phase 5 - Infrastructure Composites
 
 | Component        | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                                                                |
 | ---------------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -231,7 +231,7 @@ Run this loop every week until all phases are complete:
 | DismissableLayer | done   | done       | done          | done | done         | done  | covered | done         | Outside-interaction dismissal rules are locked; focused behavior, a11y, and determinism suites are green                                                             |
 | Field            | done   | done       | done          | done | done         | done  | covered | done         | Context replaces injected props; FieldTextarea and a shared control adapter consolidate the wrapper layer, with focused behavior, a11y, and determinism suites green |
 
-## Phase 6 — Disclosure Composites
+## Phase 6 - Disclosure Composites
 
 | Component   | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                                                                                                                     |
 | ----------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -239,7 +239,7 @@ Run this loop every week until all phases are complete:
 | Accordion   | done   | done       | done          | done | done         | done  | covered | done         | Root/item/parts now use scoped context instead of hidden injected props and tree rewriting; focused behavior, a11y, and determinism suites are green                                                                      |
 | Tabs        | done   | done       | done          | done | done         | done  | covered | done         | Context replaces injected props and the file is split; live collection snapshots drive runtime metadata with a narrow uncontrolled no-default fallback scan, and focused behavior, a11y, and determinism suites are green |
 
-## Phase 7 — Overlay And Menu Composites
+## Phase 7 - Overlay And Menu Composites
 
 | Component    | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                                                              |
 | ------------ | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -250,7 +250,7 @@ Run this loop every week until all phases are complete:
 | Popover      | done   | done       | done          | done | done         | done  | covered | done         | Scoped root context and split files preserve overlay semantics; focused behavior, a11y, and determinism suites are green                                           |
 | Tooltip      | done   | done       | done          | done | done         | done  | covered | done         | Scoped root context and split files preserve delayed/open behavior; focused behavior, a11y, and determinism suites are green                                       |
 
-## Phase 8 — Navigation And Feedback Composites
+## Phase 8 - Navigation And Feedback Composites
 
 | Component      | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                                                                                 |
 | -------------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -260,7 +260,7 @@ Run this loop every week until all phases are complete:
 | NavigationMenu | done   | done       | done          | done | done         | done  | covered | done         | Root/content now use registration-backed scoped context metadata instead of element-type scanning or placeholder indexes; focused behavior, a11y, and determinism suites are green    |
 | Toast          | done   | done       | done          | done | done         | done  | covered | done         | Provider/toast scoped contexts replaced tree rewriting and hidden injected props; behavior, a11y, and determinism suites are green                                                    |
 
-## Phase 9 — Patterns
+## Phase 9 - Patterns
 
 | Component     | Status | API/Naming | Slots/Styling | A11y | Architecture | Tests | Perf    | Docs/Exports | Notes                                                                                                                                                                                                                                 |
 | ------------- | ------ | ---------- | ------------- | ---- | ------------ | ----- | ------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

@@ -10,12 +10,12 @@ askr-ui is a **curated headless component library** focused on coherence over fe
 
 **Public components must pass a quality bar:**
 
-- ✅ runtime behavior tests (deterministic, no flakes)
-- ✅ accessibility semantics (ARIA, axe coverage)
-- ✅ compile-time types (no `any`, full coverage)
-- ✅ deterministic behavior (stable IDs, consistent rerenders)
-- ✅ documentation with examples
-- ✅ benchmark entry for performance tracking
+- OK runtime behavior tests (deterministic, no flakes)
+- OK accessibility semantics (ARIA, axe coverage)
+- OK compile-time types (no `any`, full coverage)
+- OK deterministic behavior (stable IDs, consistent rerenders)
+- OK documentation with examples
+- OK benchmark entry for performance tracking
 
 If a component doesn't meet this bar, it doesn't ship.
 
@@ -25,10 +25,10 @@ If a component doesn't meet this bar, it doesn't ship.
 
 ### Read the Governance
 
-1. **[RULES.md](RULES.md)** — Non-negotiable component rules (5 core constraints)
-2. **[SPEC.md](SPEC.md)** — Public contract, tiers (Core vs. Pattern), and design rules
-3. **[COMPONENT_HARDENING.md](COMPONENT_HARDENING.md)** — Design review gates (gate 7 is mandatory for new public components)
-4. **[ROADMAP.md](ROADMAP.md)** — Component tiers and stability status
+1. **[RULES.md](RULES.md)** - Non-negotiable component rules (5 core constraints)
+2. **[SPEC.md](SPEC.md)** - Public contract, tiers (Core vs. Pattern), and design rules
+3. **[COMPONENT_HARDENING.md](COMPONENT_HARDENING.md)** - Design review gates (gate 7 is mandatory for new public components)
+4. **[ROADMAP.md](ROADMAP.md)** - Component tiers and stability status
 
 ### Understand Component Families
 
@@ -79,7 +79,7 @@ npm run fmt && npm run lint && npm test && npm run bench
    - Proposed props (state model, event handlers)
    - Use case / why it belongs in Core vs. Pattern
 
-2. **Await design feedback** — verify alignment with:
+2. **Await design feedback** - verify alignment with:
    - [SPEC.md](SPEC.md) tiers and design rules
    - Cross-family naming and patterns
    - Whether complexity should live in patterns, not core
@@ -93,14 +93,14 @@ npm run fmt && npm run lint && npm test && npm run bench
    - Documentation / example usage
    - All quality gates passing
 
-5. **Expect review against design gates** — see [COMPONENT_HARDENING.md](COMPONENT_HARDENING.md) gate 7
+5. **Expect review against design gates** - see [COMPONENT_HARDENING.md](COMPONENT_HARDENING.md) gate 7
 
 ### Documentation Improvements
 
 Improvements to docs, examples, or governance files are always welcome:
 
 1. **Fork and edit** the file (e.g., `docs/`, `README.md`, `SPEC.md`, etc.)
-2. **Ensure clarity and accuracy** — link to relevant code and rules
+2. **Ensure clarity and accuracy** - link to relevant code and rules
 3. **Submit PR** with clear rationale for the change
 
 ### Test Coverage
@@ -144,18 +144,18 @@ npm run fmt && npm run lint && npm test && npm run bench
 
 ### Key Commands
 
-- `npm run build` — Build library for distribution
-- `npm run build:types` — Generate TypeScript declarations
-- `npm run dev` — Watch mode (for development)
-- `npm run test:unit` — Run node + jsdom coverage
-- `npm run test:component` — Run browser-mode component coverage
-- `npm test` — Run foundations, unit, and browser coverage
-- `npm run quality` — Run build, tests, and benchmarks for release gating
-- `npm run test:types` — Check type definitions
-- `npm run bench` — Run benchmarks
-- `npm run fmt` — Format code (prettier)
-- `npm run lint` — Check formatting
-- `npm run verify:foundations` — Verify `@askrjs/askr` contract
+- `npm run build` - Build library for distribution
+- `npm run build:types` - Generate TypeScript declarations
+- `npm run dev` - Watch mode (for development)
+- `npm run test:unit` - Run node + jsdom coverage
+- `npm run test:component` - Run browser-mode component coverage
+- `npm test` - Run foundations, unit, and browser coverage
+- `npm run quality` - Run build, tests, and benchmarks for release gating
+- `npm run test:types` - Check type definitions
+- `npm run bench` - Run benchmarks
+- `npm run fmt` - Format code (prettier)
+- `npm run lint` - Check formatting
+- `npm run verify:foundations` - Verify `@askrjs/askr` contract
 
 ### File Structure
 
@@ -204,11 +204,11 @@ ROADMAP.md                      # Tier structure and planned additions
 
 From [RULES.md](RULES.md):
 
-1. **Components Only** — export `function MyComponent() {}`, never hooks, factories, or render props
-2. **Root Owns State** — one root component per family, state via private context
-3. **Context Is Internal** — context misuse throws immediately, no silent no-ops
-4. **Slot-Based Composition** — `asChild` / slot behavior mandatory on wrappers, no forced DOM
-5. **Side Effects Only When Justified** — every timer, layout read, or async must be commented and tested
+1. **Components Only** - export `function MyComponent() {}`, never hooks, factories, or render props
+2. **Root Owns State** - one root component per family, state via private context
+3. **Context Is Internal** - context misuse throws immediately, no silent no-ops
+4. **Slot-Based Composition** - `asChild` / slot behavior mandatory on wrappers, no forced DOM
+5. **Side Effects Only When Justified** - every timer, layout read, or async must be commented and tested
 
 ### Type Safety
 
@@ -224,10 +224,10 @@ interface MyComponentProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
   'children'
 > {
-  open?: boolean;
-  defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  asChild?: boolean;
+  open": boolean;
+  defaultOpen": boolean;
+  onOpenChange": (open: boolean) => void;
+  asChild": boolean;
   children: React.ReactNode;
 }
 
@@ -325,7 +325,7 @@ Behavior, accessibility, and determinism tests for public components should live
 ```markdown
 ## Description
 
-What does this PR accomplish? Why is it needed?
+What does this PR accomplish" Why is it needed"
 
 ## Changes
 
@@ -333,9 +333,9 @@ What does this PR accomplish? Why is it needed?
 
 ## Testing
 
-- How was this tested?
-- New tests added?
-- Manual testing done?
+- How was this tested"
+- New tests added"
+- Manual testing done"
 
 ## Checklist
 
@@ -365,7 +365,7 @@ Your PR may be reviewed against:
 
 ## Common Pitfalls
 
-### ❌ Adding Hooks
+### NO Adding Hooks
 
 ```tsx
 // WRONG
@@ -375,7 +375,7 @@ export const useMyComponent = () => {
 };
 ```
 
-✅ **Right**: Use component + context
+OK **Right**: Use component + context
 
 ```tsx
 export function MyComponent() {
@@ -384,7 +384,7 @@ export function MyComponent() {
 }
 ```
 
-### ❌ Silent No-Ops
+### NO Silent No-Ops
 
 ```tsx
 // WRONG
@@ -392,7 +392,7 @@ const context = useContext(myContext);
 if (!context) return null; // silent failure
 ```
 
-✅ **Right**: Fail loud
+OK **Right**: Fail loud
 
 ```tsx
 function readMyContext() {
@@ -404,7 +404,7 @@ function readMyContext() {
 }
 ```
 
-### ❌ Unintentional Flakes
+### NO Unintentional Flakes
 
 ```tsx
 // WRONG
@@ -414,7 +414,7 @@ it('does something', () => {
 });
 ```
 
-✅ **Right**: Use fake timers
+OK **Right**: Use fake timers
 
 ```tsx
 it('does something', () => {
@@ -426,14 +426,14 @@ it('does something', () => {
 });
 ```
 
-### ❌ Implementation-Detail Tests
+### NO Implementation-Detail Tests
 
 ```tsx
 // WRONG
 expect(component.querySelector('[data-internal-foo]')).toExist();
 ```
 
-✅ **Right**: Test behavior
+OK **Right**: Test behavior
 
 ```tsx
 expect(component.querySelector('[role="dialog"]')).toHaveAttribute(
