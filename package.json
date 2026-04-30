@@ -40,11 +40,6 @@
       "import": "./dist/components/primitives/*/*.js",
       "require": "./dist/components/primitives/*/*.cjs"
     },
-    "./composites/field/*": {
-      "types": "./dist/components/composites/field/*.d.ts",
-      "import": "./dist/components/composites/field/*.js",
-      "require": "./dist/components/composites/field/*.cjs"
-    },
     "./composites/*": {
       "types": "./dist/components/composites/*/*.d.ts",
       "import": "./dist/components/composites/*/*.js",

@@ -7,11 +7,7 @@
     "paths": {
       "@askrjs/ui": ["./src/index.ts"],
       "@askrjs/ui/primitives/*": ["./src/components/primitives/*/index.ts"],
-      "@askrjs/ui/composites/field/*": [
-        "./src/components/composites/field/*.tsx"
-      ],
-      "@askrjs/ui/composites/*": ["./src/components/composites/*/index.ts"],
-      "@askrjs/ui/patterns/*": ["./src/components/patterns/*/index.ts"]
+      "@askrjs/ui/composites/*": ["./src/components/composites/*/index.ts"]
     }
   },
   "include": [

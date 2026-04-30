@@ -22,7 +22,6 @@ import * as CollapsibleModule from '../../src/components/composites/collapsible/
 import * as DialogModule from '../../src/components/composites/dialog/index';
 import * as DismissableLayerModule from '../../src/components/composites/dismissable-layer/index';
 import * as DropdownMenuModule from '../../src/components/composites/dropdown-menu/index';
-import * as FieldModule from '../../src/components/composites/field/index';
 import * as FocusScopeModule from '../../src/components/composites/focus-scope/index';
 import * as MenuModule from '../../src/components/composites/menu/index';
 import * as MenubarModule from '../../src/components/composites/menubar/index';
@@ -67,7 +66,6 @@ export const componentSurface = [
     module: DismissableLayerModule,
   },
   { bucket: 'composites', name: 'dropdown-menu', module: DropdownMenuModule },
-  { bucket: 'composites', name: 'field', module: FieldModule },
   { bucket: 'composites', name: 'focus-scope', module: FocusScopeModule },
   { bucket: 'composites', name: 'menu', module: MenuModule },
   { bucket: 'composites', name: 'menubar', module: MenubarModule },
@@ -122,7 +120,6 @@ export const docsCategories = [
       'label',
       'input',
       'textarea',
-      'field',
       'radio-group',
       'switch',
       'select',
@@ -132,7 +129,7 @@ export const docsCategories = [
   },
   {
     label: 'Focus',
-    names: ['focus-ring', 'focus-scope', 'dismissable-layer'],
+    names: ['focus-scope', 'dismissable-layer'],
   },
   {
     label: 'Overlay',

@@ -11,11 +11,10 @@ root import and narrower subpaths when needed.
 - Focus: focus management and dismissal helpers
 - Overlays: dialogs, popovers, menus, and tooltips
 - Disclosure: accordion, collapsible, and tabs
-- Status: badges, progress, skeletons, and toasts
+- Status: progress and toasts
 - Identity: avatar and related identity primitives
 - Tables: semantic table primitives
 - Navigation: menubar and navigation menu
-- Layout: structural layout primitives and app shells
 
 ## See also
 

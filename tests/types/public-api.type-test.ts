@@ -31,8 +31,6 @@ import {
   DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Field,
-  FieldInput,
   FocusScope,
   Menu,
   MenuContent,
@@ -96,8 +94,6 @@ import {
   type DropdownMenuContentProps,
   type DropdownMenuItemAsChildProps,
   type DropdownMenuItemProps,
-  type FieldInputProps,
-  type FieldProps,
   type FocusScopeAsChildProps,
   type FocusScopeProps,
   type MenuContentAsChildProps,
@@ -162,14 +158,10 @@ const menuFromSubpath: typeof Menu = MenuSubpath;
 const dropdownMenuFromSubpath: typeof DropdownMenu = DropdownMenuSubpath;
 const selectFromSubpath: typeof Select = SelectSubpath;
 const tooltipFromSubpath: typeof Tooltip = TooltipSubpath;
-const fieldFromRoot: typeof Field = Field;
-const fieldInputFromRoot: typeof FieldInput = FieldInput;
 const radioGroupFromRoot: typeof RadioGroup = RadioGroup;
 const radioGroupItemFromRoot: typeof RadioGroupItem = RadioGroupItem;
 const switchFromSubpath: typeof Switch = SwitchSubpath;
 const toggleFromSubpath: typeof Toggle = ToggleSubpath;
-
-const fieldInputProps: FieldInputProps = {};
 
 const focusScopeProps: FocusScopeProps = { trapped: true, loop: true };
 const focusScopeAsChildProps: FocusScopeAsChildProps = {
@@ -389,8 +381,6 @@ const selectItemAsChildProps: SelectItemAsChildProps = {
   children: slotChild,
 };
 
-const fieldProps: FieldProps = { id: 'email', invalid: true };
-
 const _invalidButtonAsChild: ButtonAsChildProps = {
   asChild: true,
   children: slotChild,
@@ -447,9 +437,6 @@ void [
   dropdownMenuFromSubpath,
   selectFromSubpath,
   tooltipFromSubpath,
-  fieldFromRoot,
-  fieldInputFromRoot,
-  fieldInputProps,
   radioGroupFromRoot,
   radioGroupItemFromRoot,
   switchFromSubpath,
@@ -576,6 +563,5 @@ void [
   selectContentAsChildProps,
   selectItemProps,
   selectItemAsChildProps,
-  fieldProps,
   buttonNativeProps,
 ];
