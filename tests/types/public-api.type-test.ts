@@ -33,7 +33,6 @@ import {
   DropdownMenuTrigger,
   Field,
   FieldInput,
-  FocusRing,
   FocusScope,
   Menu,
   MenuContent,
@@ -99,8 +98,6 @@ import {
   type DropdownMenuItemProps,
   type FieldInputProps,
   type FieldProps,
-  type FocusRingAsChildProps,
-  type FocusRingProps,
   type FocusScopeAsChildProps,
   type FocusScopeProps,
   type MenuContentAsChildProps,
@@ -144,7 +141,6 @@ import { Checkbox as CheckboxSubpath } from '@askrjs/ui/primitives/checkbox';
 import { Collapsible as CollapsibleSubpath } from '@askrjs/ui/composites/collapsible';
 import { Dialog as DialogSubpath } from '@askrjs/ui/composites/dialog';
 import { DropdownMenu as DropdownMenuSubpath } from '@askrjs/ui/composites/dropdown-menu';
-import { FocusRing as FocusRingSubpath } from '@askrjs/ui/composites/focus-ring';
 import { FocusScope as FocusScopeSubpath } from '@askrjs/ui/composites/focus-scope';
 import { Menu as MenuSubpath } from '@askrjs/ui/composites/menu';
 import { Popover as PopoverSubpath } from '@askrjs/ui/composites/popover';
@@ -158,7 +154,6 @@ const slotChild = {} as JSXElement;
 const buttonFromSubpath: typeof Button = ButtonSubpath;
 const checkboxFromSubpath: typeof Checkbox = CheckboxSubpath;
 const collapsibleFromSubpath: typeof Collapsible = CollapsibleSubpath;
-const focusRingFromSubpath: typeof FocusRing = FocusRingSubpath;
 const focusScopeFromSubpath: typeof FocusScope = FocusScopeSubpath;
 const dialogFromSubpath: typeof Dialog = DialogSubpath;
 const alertDialogFromSubpath: typeof AlertDialog = AlertDialogSubpath;
@@ -175,12 +170,6 @@ const switchFromSubpath: typeof Switch = SwitchSubpath;
 const toggleFromSubpath: typeof Toggle = ToggleSubpath;
 
 const fieldInputProps: FieldInputProps = {};
-
-const focusRingProps: FocusRingProps = { children: 'ring' };
-const focusRingAsChildProps: FocusRingAsChildProps = {
-  asChild: true,
-  children: slotChild,
-};
 
 const focusScopeProps: FocusScopeProps = { trapped: true, loop: true };
 const focusScopeAsChildProps: FocusScopeAsChildProps = {
@@ -450,7 +439,6 @@ void [
   buttonFromSubpath,
   checkboxFromSubpath,
   collapsibleFromSubpath,
-  focusRingFromSubpath,
   focusScopeFromSubpath,
   dialogFromSubpath,
   alertDialogFromSubpath,
@@ -494,7 +482,6 @@ void [
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-  FocusRing,
   FocusScope,
   MenuContent,
   MenuGroup,
@@ -517,8 +504,6 @@ void [
   TooltipContent,
   TooltipPortal,
   TooltipTrigger,
-  focusRingProps,
-  focusRingAsChildProps,
   focusScopeProps,
   focusScopeAsChildProps,
   dismissableLayerProps,

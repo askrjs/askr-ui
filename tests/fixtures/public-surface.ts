@@ -23,7 +23,6 @@ import * as DialogModule from '../../src/components/composites/dialog/index';
 import * as DismissableLayerModule from '../../src/components/composites/dismissable-layer/index';
 import * as DropdownMenuModule from '../../src/components/composites/dropdown-menu/index';
 import * as FieldModule from '../../src/components/composites/field/index';
-import * as FocusRingModule from '../../src/components/composites/focus-ring/index';
 import * as FocusScopeModule from '../../src/components/composites/focus-scope/index';
 import * as MenuModule from '../../src/components/composites/menu/index';
 import * as MenubarModule from '../../src/components/composites/menubar/index';
@@ -69,7 +68,6 @@ export const componentSurface = [
   },
   { bucket: 'composites', name: 'dropdown-menu', module: DropdownMenuModule },
   { bucket: 'composites', name: 'field', module: FieldModule },
-  { bucket: 'composites', name: 'focus-ring', module: FocusRingModule },
   { bucket: 'composites', name: 'focus-scope', module: FocusScopeModule },
   { bucket: 'composites', name: 'menu', module: MenuModule },
   { bucket: 'composites', name: 'menubar', module: MenubarModule },

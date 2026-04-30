@@ -32,7 +32,7 @@ The package exports components by family:
 
 - Foundations: `Button`, `Toggle`, `Checkbox`, `Input`, `Textarea`, `Label`,
   `RadioGroup`, `Switch`, `Select`, `Slider`, `ToggleGroup`, `VisuallyHidden`
-- Focus: `FocusRing`, `FocusScope`, `DismissableLayer`
+- Focus: `FocusScope`, `DismissableLayer`
 - Overlays: `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `DropdownMenu`,
   `Menu`
 - Disclosure: `Accordion`, `Collapsible`, `Tabs`

@@ -35,7 +35,7 @@ If a component doesn't meet this bar, it doesn't ship.
 Components are organized by purpose:
 
 - **Foundations & Form Controls**: `Button`, `Toggle`, `Checkbox`, `Input`, `Textarea`, `Label`, `Field`, `RadioGroup`, `Switch`
-- **Focus & Dismissal**: `FocusRing`, `FocusScope`, `DismissableLayer`
+- **Focus & Dismissal**: `FocusScope`, `DismissableLayer`
 - **Overlays & Selection**: `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Menu`, `DropdownMenu`, `Select`
 - **Disclosure & Content**: `Collapsible`, `Accordion`, `Tabs`
 - **Status & Identity**: `Badge`, `Avatar`, `Skeleton`, `Progress`, `Spinner`, `Toast`

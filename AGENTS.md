@@ -302,7 +302,7 @@ export function MyTrigger(props: MyTriggerProps) {
 ### Focus Management
 
 ```tsx
-// Use FocusRing and FocusScope from public API
+// Use FocusScope from public API
 <FocusScope trapped loop>
   <button>First</button>
   <button>Second</button>
