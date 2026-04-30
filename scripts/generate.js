@@ -131,7 +131,6 @@ function generatePackageJson() {
   const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
   const exportsMap = {
     '.': packageJson.exports['.'],
-    './foundations': createDistExport('./dist/foundations/index'),
   };
 
   for (const exportPattern of EXPORT_PATTERNS) {

@@ -9,12 +9,6 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-  Breadcrumb,
-  BreadcrumbCurrent,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -32,11 +26,6 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   NavigationMenuViewport,
-  Pagination,
-  PaginationEllipsis,
-  PaginationNext,
-  PaginationPage,
-  PaginationPrevious,
   Progress,
   ProgressCircle,
   ProgressCircleIndicator,
@@ -46,7 +35,6 @@ import {
   SliderThumb,
   SliderTrack,
   Table,
-  Spinner,
   Tabs,
   TabsContent,
   TabsList,
@@ -70,10 +58,6 @@ import {
   type AvatarFallbackProps,
   type AvatarImageProps,
   type AvatarProps,
-  type BreadcrumbCurrentAsChildProps,
-  type BreadcrumbCurrentProps,
-  type BreadcrumbLinkAsChildProps,
-  type BreadcrumbLinkProps,
   type MenubarContentAsChildProps,
   type MenubarContentProps,
   type MenubarItemAsChildProps,
@@ -96,9 +80,6 @@ import {
   type NavigationMenuTriggerProps,
   type NavigationMenuViewportAsChildProps,
   type NavigationMenuViewportProps,
-  type PaginationPageAsChildProps,
-  type PaginationPageProps,
-  type PaginationProps,
   type ProgressCircleProps,
   type ProgressProps,
   type SliderProps,
@@ -110,7 +91,6 @@ import {
   type TableHeaderCellProps,
   type TableProps,
   type TableRowProps,
-  type SpinnerProps,
   type TabsContentAsChildProps,
   type TabsContentProps,
   type TabsProps,
@@ -129,16 +109,13 @@ import {
 } from '@askrjs/ui';
 import { Accordion as AccordionSubpath } from '@askrjs/ui/composites/accordion';
 import { Avatar as AvatarSubpath } from '@askrjs/ui/primitives/avatar';
-import { Breadcrumb as BreadcrumbSubpath } from '@askrjs/ui/composites/breadcrumb';
 import { Collapsible as CollapsibleSubpath } from '@askrjs/ui/composites/collapsible';
 import { Menubar as MenubarSubpath } from '@askrjs/ui/composites/menubar';
 import { NavigationMenu as NavigationMenuSubpath } from '@askrjs/ui/composites/navigation-menu';
-import { Pagination as PaginationSubpath } from '@askrjs/ui/composites/pagination';
 import { Progress as ProgressSubpath } from '@askrjs/ui/primitives/progress';
 import { ProgressCircle as ProgressCircleSubpath } from '@askrjs/ui/primitives/progress-circle';
 import { Slider as SliderSubpath } from '@askrjs/ui/primitives/slider';
 import { Table as TableSubpath } from '@askrjs/ui/primitives/table';
-import { Spinner as SpinnerSubpath } from '@askrjs/ui/primitives/spinner';
 import { Tabs as TabsSubpath } from '@askrjs/ui/composites/tabs';
 import { ToastProvider as ToastSubpath } from '@askrjs/ui/composites/toast';
 import { ToggleGroup as ToggleGroupSubpath } from '@askrjs/ui/primitives/toggle-group';
@@ -147,16 +124,13 @@ const slotChild = {} as JSXElement;
 
 const accordionFromSubpath: typeof Accordion = AccordionSubpath;
 const avatarFromSubpath: typeof Avatar = AvatarSubpath;
-const breadcrumbFromSubpath: typeof Breadcrumb = BreadcrumbSubpath;
 const collapsibleFromSubpath: typeof Collapsible = CollapsibleSubpath;
 const menubarFromSubpath: typeof Menubar = MenubarSubpath;
 const navigationMenuFromSubpath: typeof NavigationMenu = NavigationMenuSubpath;
-const paginationFromSubpath: typeof Pagination = PaginationSubpath;
 const progressFromSubpath: typeof Progress = ProgressSubpath;
 const progressCircleFromSubpath: typeof ProgressCircle = ProgressCircleSubpath;
 const sliderFromSubpath: typeof Slider = SliderSubpath;
 const tableFromSubpath: typeof Table = TableSubpath;
-const spinnerFromSubpath: typeof Spinner = SpinnerSubpath;
 const tabsFromSubpath: typeof Tabs = TabsSubpath;
 const toastFromSubpath: typeof ToastProvider = ToastSubpath;
 const toggleGroupFromSubpath: typeof ToggleGroup = ToggleGroupSubpath;
@@ -172,7 +146,6 @@ const avatarFallbackAsChildProps: AvatarFallbackAsChildProps = {
 };
 const progressProps: ProgressProps = { value: 50, max: 100 };
 const progressCircleProps: ProgressCircleProps = { value: 75, max: 100 };
-const spinnerProps: SpinnerProps = { label: 'Working' };
 const tableProps: TableProps = { children: 'table' };
 const tableCaptionProps: TableCaptionProps = { children: 'Caption' };
 const tableHeadProps: TableHeadProps = { children: 'head' };
@@ -181,19 +154,6 @@ const tableFootProps: TableFootProps = { children: 'foot' };
 const tableRowProps: TableRowProps = { children: 'row' };
 const tableHeaderCellProps: TableHeaderCellProps = { children: 'name' };
 const tableCellProps: TableCellProps = { children: 'Alice' };
-const breadcrumbLinkProps: BreadcrumbLinkProps = {
-  href: '/docs',
-  children: 'Docs',
-};
-const breadcrumbLinkAsChildProps: BreadcrumbLinkAsChildProps = {
-  asChild: true,
-  children: slotChild,
-};
-const breadcrumbCurrentProps: BreadcrumbCurrentProps = { children: 'Current' };
-const breadcrumbCurrentAsChildProps: BreadcrumbCurrentAsChildProps = {
-  asChild: true,
-  children: slotChild,
-};
 const menubarProps: MenubarProps = { children: 'menu' };
 const menubarMenuProps: MenubarMenuProps = { children: 'menu' };
 const menubarTriggerProps: MenubarTriggerProps = { children: 'File' };
@@ -254,13 +214,6 @@ const navigationMenuIndicatorAsChildProps: NavigationMenuIndicatorAsChildProps =
     asChild: true,
     children: slotChild,
   };
-const paginationProps: PaginationProps = { count: 10, defaultPage: 2 };
-const paginationPageProps: PaginationPageProps = { page: 2, children: '2' };
-const paginationPageAsChildProps: PaginationPageAsChildProps = {
-  asChild: true,
-  children: slotChild,
-  page: 2,
-};
 const accordionSingleProps: AccordionSingleProps = { defaultValue: 'a' };
 const accordionMultipleProps: AccordionMultipleProps = {
   type: 'multiple',
@@ -363,16 +316,13 @@ const _invalidNavigationTrigger: NavigationMenuTriggerAsChildProps = {
 void [
   accordionFromSubpath,
   avatarFromSubpath,
-  breadcrumbFromSubpath,
   collapsibleFromSubpath,
   menubarFromSubpath,
   navigationMenuFromSubpath,
-  paginationFromSubpath,
   progressFromSubpath,
   progressCircleFromSubpath,
   sliderFromSubpath,
   tableFromSubpath,
-  spinnerFromSubpath,
   tabsFromSubpath,
   toastFromSubpath,
   toggleGroupFromSubpath,
@@ -381,12 +331,6 @@ void [
   Avatar,
   AvatarImage,
   AvatarFallback,
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbCurrent,
-  BreadcrumbSeparator,
   Menubar,
   MenubarMenu,
   MenubarTrigger,
@@ -405,10 +349,6 @@ void [
   CollapsibleContent,
   ProgressIndicator,
   ProgressCircleIndicator,
-  PaginationPrevious,
-  PaginationNext,
-  PaginationPage,
-  PaginationEllipsis,
   AccordionItem,
   AccordionHeader,
   AccordionTrigger,
@@ -433,7 +373,6 @@ void [
   avatarFallbackAsChildProps,
   progressProps,
   progressCircleProps,
-  spinnerProps,
   tableProps,
   tableCaptionProps,
   tableHeadProps,
@@ -442,10 +381,6 @@ void [
   tableRowProps,
   tableHeaderCellProps,
   tableCellProps,
-  breadcrumbLinkProps,
-  breadcrumbLinkAsChildProps,
-  breadcrumbCurrentProps,
-  breadcrumbCurrentAsChildProps,
   menubarProps,
   menubarMenuProps,
   menubarTriggerProps,
@@ -468,9 +403,6 @@ void [
   navigationMenuViewportAsChildProps,
   navigationMenuIndicatorProps,
   navigationMenuIndicatorAsChildProps,
-  paginationProps,
-  paginationPageProps,
-  paginationPageAsChildProps,
   accordionSingleProps,
   accordionMultipleProps,
   accordionTriggerProps,

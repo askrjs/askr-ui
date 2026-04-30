@@ -9,7 +9,6 @@ export const componentFamilies = [
   { bucket: 'primitives', name: 'radio-group' },
   { bucket: 'primitives', name: 'select' },
   { bucket: 'primitives', name: 'slider' },
-  { bucket: 'primitives', name: 'spinner' },
   { bucket: 'primitives', name: 'switch' },
   { bucket: 'primitives', name: 'table' },
   { bucket: 'primitives', name: 'textarea' },
@@ -18,7 +17,6 @@ export const componentFamilies = [
   { bucket: 'primitives', name: 'visually-hidden' },
   { bucket: 'composites', name: 'accordion' },
   { bucket: 'composites', name: 'alert-dialog' },
-  { bucket: 'composites', name: 'breadcrumb' },
   { bucket: 'composites', name: 'collapsible' },
   { bucket: 'composites', name: 'dialog' },
   { bucket: 'composites', name: 'dismissable-layer' },
@@ -29,8 +27,6 @@ export const componentFamilies = [
   { bucket: 'composites', name: 'menu' },
   { bucket: 'composites', name: 'menubar' },
   { bucket: 'composites', name: 'navigation-menu' },
-  { bucket: 'composites', name: 'nav-link' },
-  { bucket: 'composites', name: 'pagination' },
   { bucket: 'composites', name: 'popover' },
   { bucket: 'composites', name: 'tabs' },
   { bucket: 'composites', name: 'toast' },
@@ -77,7 +73,7 @@ export const docsCategories = [
   },
   {
     label: 'Status',
-    names: ['progress', 'progress-circle', 'toast', 'spinner'],
+    names: ['progress', 'progress-circle', 'toast'],
   },
   {
     label: 'Identity',
@@ -85,13 +81,7 @@ export const docsCategories = [
   },
   {
     label: 'Navigation',
-    names: [
-      'breadcrumb',
-      'nav-link',
-      'pagination',
-      'menubar',
-      'navigation-menu',
-    ],
+    names: ['menubar', 'navigation-menu'],
   },
   {
     label: 'Tables',
@@ -103,6 +93,7 @@ export const removedPublicExports = [
   'badge',
   'box',
   'center',
+  'breadcrumb',
   'container',
   'flex',
   'grid',
@@ -113,6 +104,7 @@ export const removedPublicExports = [
   'spacer',
   'stack',
   'sidebar-layout',
+  'spinner',
   'topbar-layout',
 ];
 

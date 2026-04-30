@@ -13,9 +13,3 @@ export type ProgressCircleProps = BoxProps<'div', HTMLDivElement> &
 
 export type ProgressCircleIndicatorProps = BoxProps<'div', HTMLDivElement>;
 export type ProgressCircleIndicatorAsChildProps = BoxAsChildProps;
-
-export type SpinnerOwnProps = Omit<ProgressCircleOwnProps, 'value'> & {
-  label?: string;
-};
-
-export type SpinnerProps = BoxProps<'div', HTMLDivElement> & SpinnerOwnProps;

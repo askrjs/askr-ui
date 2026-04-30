@@ -12,7 +12,6 @@ import type {
   ProgressCircleIndicatorAsChildProps,
   ProgressCircleIndicatorProps,
   ProgressCircleProps,
-  SpinnerProps,
 } from './progress-circle.types';
 
 type ProgressCircleRootContextValue = {
@@ -117,21 +116,4 @@ export function ProgressCircleIndicator(
   }
 
   return <div {...finalProps}>{children}</div>;
-}
-
-export function Spinner(props: SpinnerProps) {
-  const {
-    label,
-    'aria-label': ariaLabel,
-    ...rest
-  } = props as SpinnerProps & { 'aria-label'?: string };
-
-  return (
-    <ProgressCircle
-      {...rest}
-      aria-label={ariaLabel ?? label ?? 'Loading'}
-      value={null}
-      getValueLabel={() => label ?? 'Loading'}
-    />
-  );
 }
