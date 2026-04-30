@@ -81,7 +81,7 @@
   },
   "devDependencies": {
     "@askrjs/askr": "^0.0.29",
-    "@askrjs/vite": "0.0.1",
+    "@askrjs/vite": "^0.0.1",
     "@types/node": "^25.6.0",
     "axe-core": "^4.11.3",
     "cross-env": "^10.1.0",
