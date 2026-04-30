@@ -54,4 +54,4 @@ jobs:
           package-json-path: package.json
           registry: https://registry.npmjs.org/
           access: public
-          tag: ${{ steps.package.outputs.tag }}
+          npm-tag: ${{ steps.package.outputs.npm_tag }}
