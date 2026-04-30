@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, vi } from 'vite-plus/test';
+import { describe, it, expect, vi } from 'vite-plus/test';
 import { Button } from '../../../src/components/primitives/button/button';
 import { createIsland } from '@askrjs/askr';
 import { expectDeterministicRender } from '../../determinism';

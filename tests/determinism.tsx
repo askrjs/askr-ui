@@ -13,7 +13,7 @@ export function renderHtml(element: JSX.Element) {
 }
 
 function normalizeDeterministicMarkup(html: string) {
-  return html.replace(/ data-key="Symbol\(AskrContext[^\"]*\)"/g, '');
+  return html.replace(/ data-key="Symbol\(AskrContext[^"]*\)"/g, '');
 }
 
 export function expectDeterministicRender(factory: () => JSX.Element) {

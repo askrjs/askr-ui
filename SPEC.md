@@ -58,7 +58,7 @@ The public surface has two tiers. **Core** is what the library cannot remove wit
 
 ## Runtime Contract
 
-askr-ui depends on `@askrjs/ui/foundations` exposing the verified behavior-helper
+askr-ui depends on `@askrjs/askr/foundations` exposing the verified behavior-helper
 contract used in CI:
 
 - `createCollection`

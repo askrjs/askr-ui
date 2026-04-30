@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vite-plus/test';
+import { describe, it, expect } from 'vite-plus/test';
 import { Checkbox } from '../../../src/components/primitives/checkbox/checkbox';
 import { expectDeterministicRender } from '../../determinism';
 import { mount, unmount } from '../../test-utils';

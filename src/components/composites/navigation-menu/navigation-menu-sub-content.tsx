@@ -14,7 +14,7 @@ export function NavigationMenuSubContent(
 export function NavigationMenuSubContent(
   props: NavigationMenuSubContentProps | NavigationMenuSubContentAsChildProps
 ) {
-  const item = readNavigationMenuItemContext();
+  readNavigationMenuItemContext();
 
   return (
     <NavigationMenuContent {...(props as NavigationMenuSubContentProps)} />

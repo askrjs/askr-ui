@@ -1,5 +1,5 @@
 import { defineContext, readContext } from '@askrjs/askr';
-import { Slot, mergeProps } from '@askrjs/ui/foundations';
+import { Slot, mergeProps } from '@askrjs/askr/foundations';
 import { mergeCssVar } from '../../_internal/style';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import {

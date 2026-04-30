@@ -99,7 +99,6 @@ import {
   type DropdownMenuItemProps,
   type FieldInputProps,
   type FieldProps,
-  type FieldTextareaProps,
   type FocusRingAsChildProps,
   type FocusRingProps,
   type FocusScopeAsChildProps,

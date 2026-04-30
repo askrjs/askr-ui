@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vite-plus/test';
+import { describe, it, expect } from 'vite-plus/test';
 import { Button } from '../../../src/components/primitives/button/button';
 import { createIsland } from '@askrjs/askr';
 import { expectNoAxeViolations } from '../../accessibility';

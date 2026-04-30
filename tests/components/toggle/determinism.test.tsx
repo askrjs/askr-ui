@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vite-plus/test';
+import { describe, it, expect, vi } from 'vite-plus/test';
 import { Toggle } from '../../../src/components/primitives/toggle/toggle';
 import { expectDeterministicRender } from '../../determinism';
 import { mount, unmount } from '../../test-utils';

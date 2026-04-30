@@ -4,7 +4,7 @@ import {
   mergeProps,
   pressable,
   rovingFocus,
-} from '@askrjs/ui/foundations';
+} from '@askrjs/askr/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import { resolvePartId } from '../../_internal/id';
 import { isJsxElement, toChildArray } from '../../_internal/jsx';

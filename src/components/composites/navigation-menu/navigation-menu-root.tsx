@@ -1,5 +1,5 @@
 import { For, state } from '@askrjs/askr';
-import { mergeProps } from '@askrjs/ui/foundations';
+import { mergeProps } from '@askrjs/askr/foundations';
 import { resolveCompoundId } from '../../_internal/id';
 import { toChildArray } from '../../_internal/jsx';
 import { getPersistentPortal } from '../../_internal/overlay';

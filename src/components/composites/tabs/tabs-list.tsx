@@ -1,4 +1,4 @@
-import { Slot, mergeProps, rovingFocus } from '@askrjs/ui/foundations';
+import { Slot, mergeProps, rovingFocus } from '@askrjs/askr/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import {
   disabledIndexes,

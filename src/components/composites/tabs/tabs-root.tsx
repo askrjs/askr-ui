@@ -1,5 +1,5 @@
 import { state } from '@askrjs/askr';
-import { mergeProps } from '@askrjs/ui/foundations';
+import { mergeProps } from '@askrjs/askr/foundations';
 import { resource } from '@askrjs/askr/resources';
 import {
   getCompositeCollection,

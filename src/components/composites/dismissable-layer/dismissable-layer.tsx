@@ -4,7 +4,7 @@ import {
   createLayer,
   dismissable,
   mergeProps,
-} from '@askrjs/ui/foundations';
+} from '@askrjs/askr/foundations';
 import { resolveCompoundId } from '../../_internal/id';
 import type {
   DismissableLayerAsChildProps,

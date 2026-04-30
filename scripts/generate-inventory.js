@@ -142,7 +142,7 @@ async function walkFiles(dirPath, matcher) {
 
 function extractImportedSymbols(source, modulePatternSource) {
   const importPattern = new RegExp(
-    `import\\s*{([^}]*)}\\s*from\\s*['\"]${modulePatternSource}['\"];?`,
+    `import\\s*{([^}]*)}\\s*from\\s*['"]${modulePatternSource}['"]?;?`,
     'g'
   );
   const symbols = new Set();

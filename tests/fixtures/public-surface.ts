@@ -12,6 +12,7 @@ import * as SelectModule from '../../src/components/primitives/select/index';
 import * as SliderModule from '../../src/components/primitives/slider/index';
 import * as SpinnerModule from '../../src/components/primitives/spinner/index';
 import * as SwitchModule from '../../src/components/primitives/switch/index';
+import * as TableModule from '../../src/components/primitives/table/index';
 import * as TextareaModule from '../../src/components/primitives/textarea/index';
 import * as ToggleModule from '../../src/components/primitives/toggle/index';
 import * as ToggleGroupModule from '../../src/components/primitives/toggle-group/index';
@@ -35,7 +36,6 @@ import * as PopoverModule from '../../src/components/composites/popover/index';
 import * as TabsModule from '../../src/components/composites/tabs/index';
 import * as ToastModule from '../../src/components/composites/toast/index';
 import * as TooltipModule from '../../src/components/composites/tooltip/index';
-import * as DataTableModule from '../../src/components/patterns/data-table/index';
 
 export const componentSurface = [
   { bucket: 'primitives', name: 'avatar', module: AvatarModule },
@@ -54,6 +54,7 @@ export const componentSurface = [
   { bucket: 'primitives', name: 'slider', module: SliderModule },
   { bucket: 'primitives', name: 'spinner', module: SpinnerModule },
   { bucket: 'primitives', name: 'switch', module: SwitchModule },
+  { bucket: 'primitives', name: 'table', module: TableModule },
   { bucket: 'primitives', name: 'textarea', module: TextareaModule },
   { bucket: 'primitives', name: 'toggle', module: ToggleModule },
   { bucket: 'primitives', name: 'toggle-group', module: ToggleGroupModule },
@@ -89,7 +90,6 @@ export const componentSurface = [
   { bucket: 'composites', name: 'tabs', module: TabsModule },
   { bucket: 'composites', name: 'toast', module: ToastModule },
   { bucket: 'composites', name: 'tooltip', module: TooltipModule },
-  { bucket: 'patterns', name: 'data-table', module: DataTableModule },
 ] as const;
 
 export const publicValueExports = Array.from(
@@ -176,7 +176,7 @@ export const docsCategories = [
     ],
   },
   {
-    label: 'Patterns',
-    names: ['data-table'],
+    label: 'Tables',
+    names: ['table'],
   },
 ] as const;

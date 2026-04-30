@@ -3,7 +3,7 @@ import {
   composeRefs,
   controllableState,
   mergeProps,
-} from '@askrjs/ui/foundations';
+} from '@askrjs/askr/foundations';
 import { mergeCssVar } from '../../_internal/style';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import {

@@ -1,4 +1,4 @@
-import { createCollection } from '@askrjs/ui/foundations';
+import { createCollection } from '@askrjs/askr/foundations';
 import { extractTextContent } from './jsx';
 
 export type MenuItemMetadata = {

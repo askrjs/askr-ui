@@ -1,4 +1,4 @@
-import { mergeProps } from '@askrjs/ui/foundations';
+import { mergeProps } from '@askrjs/askr/foundations';
 import type {
   FieldLegendProps,
   FieldProps,

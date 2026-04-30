@@ -1,4 +1,4 @@
-import { Slot, mergeProps, pressable } from '@askrjs/ui/foundations';
+import { Slot, mergeProps, pressable } from '@askrjs/askr/foundations';
 import { readPopoverRootContext } from './popover.shared';
 import type {
   PopoverCloseAsChildProps,

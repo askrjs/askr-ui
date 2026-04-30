@@ -8,18 +8,25 @@ askr-ui owns interaction behavior, state coordination, accessibility wiring,
 and structural composition. It does not impose visual styling. Pair it with
 `askr-themes` for default visuals, or supply your own CSS.
 
+Shared foundation implementations are centralized in `@askrjs/askr/foundations`.
+
 ## Package shape
 
 The package is organized into three documentation areas:
 
-- [Foundations](./foundations.md) for low-level behavior contracts
 - [Components](./components.md) for the public component surface
 - [Composition](./composition.md) for examples that combine primitives
 
 Use the package root for most application code:
 
 ```ts
-import { Button, Dialog, DialogTrigger, DialogContent } from '@askrjs/ui';
+import {
+  Button,
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  Table,
+} from '@askrjs/ui';
 ```
 
 ## See also

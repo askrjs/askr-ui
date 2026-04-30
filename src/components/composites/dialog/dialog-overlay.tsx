@@ -1,4 +1,4 @@
-import { Presence, Slot, mergeProps } from '@askrjs/ui/foundations';
+import { Presence, Slot, mergeProps } from '@askrjs/askr/foundations';
 import { readDialogRootContext } from './dialog.shared';
 import type {
   DialogOverlayAsChildProps,

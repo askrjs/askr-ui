@@ -1,4 +1,4 @@
-import { createCollection } from '@askrjs/ui/foundations';
+import { createCollection } from '@askrjs/askr/foundations';
 
 export type CompositeCollectionMetadata = {
   index: number;

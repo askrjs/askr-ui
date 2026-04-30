@@ -1,4 +1,4 @@
-import type { Ref } from '@askrjs/ui/foundations';
+import type { Ref } from '@askrjs/askr/foundations';
 import type { BoxAsChildProps, BoxProps } from '../../_internal/types';
 
 export type AvatarLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';
