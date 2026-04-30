@@ -7,7 +7,7 @@ askr-ui is curated as a headless component library, not a milestone tracker. A c
 ## Stable
 
 - Foundations and form controls: `Button`, `Toggle`, `Checkbox`, `VisuallyHidden`, `Separator`, `Label`, `Input`, `Textarea`, `Field`, `RadioGroup`, `Switch`
-- Focus and dismissal: `FocusRing`, `FocusScope`, `DismissableLayer`
+- Focus and dismissal: `FocusScope`, `DismissableLayer`
 - Overlays and selection: `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Menu`, `DropdownMenu`, `Select`
 - Disclosure and content: `Collapsible`, `Accordion`, `Tabs`
 - Status and identity: `Badge`, `Avatar`, `Skeleton`, `Progress`, `ProgressCircle`, `Spinner`, `Toast`

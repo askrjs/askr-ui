@@ -22,7 +22,6 @@ export const componentFamilies = [
   { bucket: 'composites', name: 'dismissable-layer' },
   { bucket: 'composites', name: 'dropdown-menu' },
   { bucket: 'composites', name: 'field' },
-  { bucket: 'composites', name: 'focus-ring' },
   { bucket: 'composites', name: 'focus-scope' },
   { bucket: 'composites', name: 'menu' },
   { bucket: 'composites', name: 'menubar' },
@@ -54,7 +53,7 @@ export const docsCategories = [
   },
   {
     label: 'Focus',
-    names: ['focus-ring', 'focus-scope', 'dismissable-layer'],
+    names: ['focus-scope', 'dismissable-layer'],
   },
   {
     label: 'Overlay',
