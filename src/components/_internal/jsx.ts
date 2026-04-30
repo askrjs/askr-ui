@@ -1,4 +1,4 @@
-import type { JSXElement } from '@askrjs/ui/foundations';
+import type { JSXElement } from '@askrjs/askr/foundations';
 
 export function isJsxElement(value: unknown): value is JSXElement {
   return (

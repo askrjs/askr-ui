@@ -11,6 +11,7 @@ export const componentFamilies = [
   { bucket: 'primitives', name: 'slider' },
   { bucket: 'primitives', name: 'spinner' },
   { bucket: 'primitives', name: 'switch' },
+  { bucket: 'primitives', name: 'table' },
   { bucket: 'primitives', name: 'textarea' },
   { bucket: 'primitives', name: 'toggle' },
   { bucket: 'primitives', name: 'toggle-group' },
@@ -34,7 +35,6 @@ export const componentFamilies = [
   { bucket: 'composites', name: 'tabs' },
   { bucket: 'composites', name: 'toast' },
   { bucket: 'composites', name: 'tooltip' },
-  { bucket: 'patterns', name: 'data-table' },
 ];
 
 export const docsCategories = [
@@ -94,8 +94,8 @@ export const docsCategories = [
     ],
   },
   {
-    label: 'Patterns',
-    names: ['data-table'],
+    label: 'Tables',
+    names: ['table'],
   },
 ];
 

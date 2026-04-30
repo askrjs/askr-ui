@@ -3,7 +3,7 @@ import {
   controllableState,
   mergeProps,
   rovingFocus,
-} from '@askrjs/ui/foundations';
+} from '@askrjs/askr/foundations';
 import { focusSelectedCollectionItem } from '../../_internal/focus';
 import {
   disabledIndexes,
@@ -47,7 +47,7 @@ function RadioGroupRootView(props: {
   disabled: boolean;
   value: string;
 }) {
-  const { children, name, disabled, value } = props;
+  const { name, disabled, value } = props;
   const root = readRadioGroupRootContext();
   const collection = getCompositeCollection(root.groupId);
   const disabledItemIndexes = disabledIndexes(root.items);

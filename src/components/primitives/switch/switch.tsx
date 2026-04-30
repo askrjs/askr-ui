@@ -3,7 +3,7 @@ import {
   controllableState,
   mergeProps,
   pressable,
-} from '@askrjs/ui/foundations';
+} from '@askrjs/askr/foundations';
 import type { SwitchAsChildProps, SwitchButtonProps } from './switch.types';
 
 export function Switch(props: SwitchButtonProps): JSX.Element;

@@ -4,7 +4,7 @@ import {
   mergeProps,
   pressable,
   rovingFocus,
-} from '@askrjs/ui/foundations';
+} from '@askrjs/askr/foundations';
 import {
   registerCompositeNode,
   getCompositeCollection,

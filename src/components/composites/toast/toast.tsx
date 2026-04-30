@@ -5,7 +5,7 @@ import {
   controllableState,
   mergeProps,
   pressable,
-} from '@askrjs/ui/foundations';
+} from '@askrjs/askr/foundations';
 import { state } from '@askrjs/askr';
 import { resource } from '@askrjs/askr/resources';
 import { DismissableLayer } from '../../composites/dismissable-layer';

@@ -36,5 +36,4 @@ import { SaveIcon } from '@askrjs/lucide';
 ## See also
 
 - [askr-ui](./askr-ui.md)
-- [Foundations](./foundations.md)
 - [Components](./components.md)

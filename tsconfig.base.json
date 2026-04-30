@@ -13,12 +13,6 @@
     "forceConsistentCasingInFileNames": true,
     "composite": true,
     "moduleResolution": "bundler",
-    "paths": {
-      "@askrjs/askr": ["../askr/dist/index.d.ts"],
-      "@askrjs/askr/foundations": ["../askr/dist/foundations/index.d.ts"],
-      "@askrjs/askr/fx": ["../askr/dist/fx/index.d.ts"],
-      "@askrjs/askr/resources": ["../askr/dist/resources/index.d.ts"],
-      "@askrjs/ui/foundations": ["./src/foundations/index.ts"]
-    }
+    "paths": {}
   }
 }

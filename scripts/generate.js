@@ -28,10 +28,6 @@ const EXPORT_PATTERNS = [
     key: './composites/*',
     basePath: './dist/components/composites/*/*',
   },
-  {
-    key: './patterns/*',
-    basePath: './dist/components/patterns/*/*',
-  },
 ];
 
 function validateRegistry() {

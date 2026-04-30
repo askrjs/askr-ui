@@ -5,7 +5,7 @@ import {
   mergeProps,
   rovingFocus,
   Presence,
-} from '@askrjs/ui/foundations';
+} from '@askrjs/askr/foundations';
 import { DismissableLayer } from '../../composites/dismissable-layer';
 import { FocusScope } from '../../composites/focus-scope';
 import {
@@ -20,7 +20,6 @@ import {
   syncOverlayPosition,
   clearOverlayPosition,
 } from '../../_internal/overlay';
-import { resolvePartId } from '../../_internal/id';
 import { pathIsOpen } from '../../_internal/hierarchical-menu';
 import {
   NavigationMenuContentContext,

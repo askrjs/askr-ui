@@ -1,82 +1,50 @@
-import { readFile } from 'node:fs/promises';
-
-let runtimeExports;
-try {
-  runtimeExports = await import('@askrjs/ui/foundations');
-} catch (err) {
-  console.warn(
-    `Warning: Could not import @askrjs/ui/foundations: ${err.message}`
-  );
-  runtimeExports = {};
-}
-
-const runtimeKeys = [
-  'Presence',
-  'createCollection',
-  'createLayer',
-  'pressable',
-  'focusable',
-  'dismissable',
-  'rovingFocus',
-  'mergeProps',
-  'composeRefs',
-  'controllableState',
-];
-
-for (const key of runtimeKeys) {
-  if (
-    (runtimeExports && !(key in runtimeExports)) ||
-    runtimeExports[key] === undefined
-  ) {
-    if (Object.keys(runtimeExports).length > 0) {
-      throw new Error(`Missing runtime foundations export: ${key}`);
-    }
-  }
-}
-
+import { readFile, readdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
-const indexTypePaths = [
-  join(scriptDir, '../dist/foundations/index.d.ts'),
-  join(scriptDir, '../dist/index.d.ts'),
-  join(scriptDir, '../../askr-ui/dist/foundations/index.d.ts'),
-  join(scriptDir, '../../askr-ui/dist/index.d.ts'),
-  join(scriptDir, '../node_modules/@askrjs/ui/dist/foundations/index.d.ts'),
-  join(scriptDir, '../node_modules/@askrjs/ui/dist/index.d.ts'),
-];
+const packageJsonPath = join(scriptDir, '../package.json');
+const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf8'));
 
-let indexTypes;
-for (const path of indexTypePaths) {
-  try {
-    indexTypes = await readFile(path, 'utf8');
-    break;
-  } catch (err) {
-    continue;
+if (packageJson.exports?.['./foundations']) {
+  throw new Error('Unexpected ./foundations export in @askrjs/ui package.json');
+}
+
+const foundationsDir = join(scriptDir, '../src/foundations');
+try {
+  const entries = await readdir(foundationsDir);
+  if (entries.length > 0) {
+    throw new Error(
+      `Foundations source directory still exists: ${foundationsDir}`
+    );
+  }
+} catch (error) {
+  if (error?.code !== 'ENOENT') {
+    throw error;
   }
 }
 
-if (!indexTypes) {
-  throw new Error(
-    `Could not find @askrjs/ui foundations type definitions in any location: ${indexTypePaths.join(', ')}`
-  );
+async function* walk(dir) {
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    const absolutePath = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      yield* walk(absolutePath);
+      continue;
+    }
+
+    if (entry.isFile()) {
+      yield absolutePath;
+    }
+  }
 }
 
-const typeMarkers = [
-  'Ref',
-  'Orientation',
-  'Presence',
-  'createLayer',
-  'createCollection',
-];
-
-for (const marker of typeMarkers) {
-  if (!indexTypes.includes(marker)) {
-    throw new Error(`Missing type foundations export marker: ${marker}`);
+for await (const absolutePath of walk(join(scriptDir, '../src'))) {
+  const contents = await readFile(absolutePath, 'utf8');
+  if (contents.includes('@askrjs/ui/foundations')) {
+    throw new Error(`Unexpected legacy foundations import in ${absolutePath}`);
   }
 }
 
 console.log(
-  `Foundations contract verified: ${runtimeKeys.length} runtime exports present.`
+  'Foundations ownership verified: no local foundations entrypoint remains.'
 );

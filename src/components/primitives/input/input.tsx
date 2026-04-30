@@ -1,5 +1,5 @@
 import { debounceEvent } from '@askrjs/askr/fx';
-import { Slot, focusable, mergeProps } from '@askrjs/ui/foundations';
+import { Slot, focusable, mergeProps } from '@askrjs/askr/foundations';
 import type {
   DebouncedInputProps,
   InputAsChildProps,

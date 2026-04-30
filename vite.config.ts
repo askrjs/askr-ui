@@ -18,15 +18,12 @@ export default defineConfig({
     jsxImportSource: '@askrjs/askr',
   },
   resolve: {
-    alias: {
-      '@askrjs/ui/foundations': resolve(srcRoot, 'foundations/index.ts'),
-    },
+    alias: {},
     preserveSymlinks: true,
   },
   pack: {
     entry: {
       index: resolve(srcRoot, 'index.ts'),
-      'foundations/index': resolve(srcRoot, 'foundations/index.ts'),
       'components/composites/field/field': resolve(
         srcRoot,
         'components/composites/field/field.tsx'
@@ -50,7 +47,6 @@ export default defineConfig({
     lib: {
       entry: {
         index: resolve(srcRoot, 'index.ts'),
-        'foundations/index': resolve(srcRoot, 'foundations/index.ts'),
         'components/composites/field/field': resolve(
           srcRoot,
           'components/composites/field/field.tsx'

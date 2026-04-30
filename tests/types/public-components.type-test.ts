@@ -45,6 +45,7 @@ import {
   SliderRange,
   SliderThumb,
   SliderTrack,
+  Table,
   Spinner,
   Tabs,
   TabsContent,
@@ -101,6 +102,14 @@ import {
   type ProgressCircleProps,
   type ProgressProps,
   type SliderProps,
+  type TableBodyProps,
+  type TableCaptionProps,
+  type TableCellProps,
+  type TableFootProps,
+  type TableHeadProps,
+  type TableHeaderCellProps,
+  type TableProps,
+  type TableRowProps,
   type SpinnerProps,
   type TabsContentAsChildProps,
   type TabsContentProps,
@@ -128,6 +137,7 @@ import { Pagination as PaginationSubpath } from '@askrjs/ui/composites/paginatio
 import { Progress as ProgressSubpath } from '@askrjs/ui/primitives/progress';
 import { ProgressCircle as ProgressCircleSubpath } from '@askrjs/ui/primitives/progress-circle';
 import { Slider as SliderSubpath } from '@askrjs/ui/primitives/slider';
+import { Table as TableSubpath } from '@askrjs/ui/primitives/table';
 import { Spinner as SpinnerSubpath } from '@askrjs/ui/primitives/spinner';
 import { Tabs as TabsSubpath } from '@askrjs/ui/composites/tabs';
 import { ToastProvider as ToastSubpath } from '@askrjs/ui/composites/toast';
@@ -145,6 +155,7 @@ const paginationFromSubpath: typeof Pagination = PaginationSubpath;
 const progressFromSubpath: typeof Progress = ProgressSubpath;
 const progressCircleFromSubpath: typeof ProgressCircle = ProgressCircleSubpath;
 const sliderFromSubpath: typeof Slider = SliderSubpath;
+const tableFromSubpath: typeof Table = TableSubpath;
 const spinnerFromSubpath: typeof Spinner = SpinnerSubpath;
 const tabsFromSubpath: typeof Tabs = TabsSubpath;
 const toastFromSubpath: typeof ToastProvider = ToastSubpath;
@@ -162,6 +173,14 @@ const avatarFallbackAsChildProps: AvatarFallbackAsChildProps = {
 const progressProps: ProgressProps = { value: 50, max: 100 };
 const progressCircleProps: ProgressCircleProps = { value: 75, max: 100 };
 const spinnerProps: SpinnerProps = { label: 'Working' };
+const tableProps: TableProps = { children: 'table' };
+const tableCaptionProps: TableCaptionProps = { children: 'Caption' };
+const tableHeadProps: TableHeadProps = { children: 'head' };
+const tableBodyProps: TableBodyProps = { children: 'body' };
+const tableFootProps: TableFootProps = { children: 'foot' };
+const tableRowProps: TableRowProps = { children: 'row' };
+const tableHeaderCellProps: TableHeaderCellProps = { children: 'name' };
+const tableCellProps: TableCellProps = { children: 'Alice' };
 const breadcrumbLinkProps: BreadcrumbLinkProps = {
   href: '/docs',
   children: 'Docs',
@@ -352,6 +371,7 @@ void [
   progressFromSubpath,
   progressCircleFromSubpath,
   sliderFromSubpath,
+  tableFromSubpath,
   spinnerFromSubpath,
   tabsFromSubpath,
   toastFromSubpath,
@@ -414,6 +434,14 @@ void [
   progressProps,
   progressCircleProps,
   spinnerProps,
+  tableProps,
+  tableCaptionProps,
+  tableHeadProps,
+  tableBodyProps,
+  tableFootProps,
+  tableRowProps,
+  tableHeaderCellProps,
+  tableCellProps,
   breadcrumbLinkProps,
   breadcrumbLinkAsChildProps,
   breadcrumbCurrentProps,

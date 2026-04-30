@@ -3,7 +3,7 @@ import {
   composeRefs,
   mergeProps,
   pressable,
-} from '@askrjs/ui/foundations';
+} from '@askrjs/askr/foundations';
 import { readPopoverRootContext } from './popover.shared';
 import type {
   PopoverTriggerAsChildProps,

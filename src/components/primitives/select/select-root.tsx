@@ -1,5 +1,5 @@
 import { For, state } from '@askrjs/askr';
-import { controllableState } from '@askrjs/ui/foundations';
+import { controllableState } from '@askrjs/askr/foundations';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import { collectJsxElements, toChildArray } from '../../_internal/jsx';
 import { getPersistentPortal } from '../../_internal/overlay';
@@ -75,7 +75,7 @@ export function Select(props: SelectProps) {
   const declaredItems = collectJsxElements(
     children,
     (element) => element.type === SelectItem
-  ).map((element, index) => ({
+  ).map((element) => ({
     disabled: Boolean(element.props?.disabled),
     value:
       typeof element.props?.value === 'string'

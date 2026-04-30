@@ -4,7 +4,7 @@ import {
   controllableState,
   mergeProps,
   pressable,
-} from '@askrjs/ui/foundations';
+} from '@askrjs/askr/foundations';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import { buildPaginationModel, clampPage } from '../../_internal/pagination';
 import type {

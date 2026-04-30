@@ -1,6 +1,5 @@
-import { describe, it, expect, afterEach } from 'vite-plus/test';
+import { describe, it, expect } from 'vite-plus/test';
 import { Toggle } from '../../../src/components/primitives/toggle/toggle';
-import { createIsland } from '@askrjs/askr';
 import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';
 import { TOGGLE_A11Y_CONTRACT } from '../../../src/components/primitives/toggle/toggle.a11y';

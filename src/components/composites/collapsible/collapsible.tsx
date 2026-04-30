@@ -7,8 +7,8 @@ import {
   formatId,
   mergeProps,
   pressable,
-} from '@askrjs/ui/foundations';
-import type { JSXElement } from '@askrjs/ui/foundations';
+} from '@askrjs/askr/foundations';
+import type { JSXElement } from '@askrjs/askr/foundations';
 import type {
   CollapsibleContentAsChildProps,
   CollapsibleContentProps,
@@ -36,14 +36,6 @@ function isJsxElement(value: unknown): value is JSXElement {
     '$$typeof' in value &&
     'props' in value
   );
-}
-
-function toChildArray(children: unknown): unknown[] {
-  if (Array.isArray(children)) {
-    return children;
-  }
-
-  return children === undefined || children === null ? [] : [children];
 }
 
 function serializeForId(value: unknown): string {
