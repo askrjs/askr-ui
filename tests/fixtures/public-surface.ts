@@ -10,7 +10,6 @@ import * as ProgressCircleModule from '../../src/components/primitives/progress-
 import * as RadioGroupModule from '../../src/components/primitives/radio-group/index';
 import * as SelectModule from '../../src/components/primitives/select/index';
 import * as SliderModule from '../../src/components/primitives/slider/index';
-import * as SpinnerModule from '../../src/components/primitives/spinner/index';
 import * as SwitchModule from '../../src/components/primitives/switch/index';
 import * as TableModule from '../../src/components/primitives/table/index';
 import * as TextareaModule from '../../src/components/primitives/textarea/index';
@@ -19,7 +18,6 @@ import * as ToggleGroupModule from '../../src/components/primitives/toggle-group
 import * as VisuallyHiddenModule from '../../src/components/primitives/visually-hidden/index';
 import * as AccordionModule from '../../src/components/composites/accordion/index';
 import * as AlertDialogModule from '../../src/components/composites/alert-dialog/index';
-import * as BreadcrumbModule from '../../src/components/composites/breadcrumb/index';
 import * as CollapsibleModule from '../../src/components/composites/collapsible/index';
 import * as DialogModule from '../../src/components/composites/dialog/index';
 import * as DismissableLayerModule from '../../src/components/composites/dismissable-layer/index';
@@ -30,8 +28,6 @@ import * as FocusScopeModule from '../../src/components/composites/focus-scope/i
 import * as MenuModule from '../../src/components/composites/menu/index';
 import * as MenubarModule from '../../src/components/composites/menubar/index';
 import * as NavigationMenuModule from '../../src/components/composites/navigation-menu/index';
-import * as NavLinkModule from '../../src/components/composites/nav-link/index';
-import * as PaginationModule from '../../src/components/composites/pagination/index';
 import * as PopoverModule from '../../src/components/composites/popover/index';
 import * as TabsModule from '../../src/components/composites/tabs/index';
 import * as ToastModule from '../../src/components/composites/toast/index';
@@ -52,7 +48,6 @@ export const componentSurface = [
   { bucket: 'primitives', name: 'radio-group', module: RadioGroupModule },
   { bucket: 'primitives', name: 'select', module: SelectModule },
   { bucket: 'primitives', name: 'slider', module: SliderModule },
-  { bucket: 'primitives', name: 'spinner', module: SpinnerModule },
   { bucket: 'primitives', name: 'switch', module: SwitchModule },
   { bucket: 'primitives', name: 'table', module: TableModule },
   { bucket: 'primitives', name: 'textarea', module: TextareaModule },
@@ -65,7 +60,6 @@ export const componentSurface = [
   },
   { bucket: 'composites', name: 'accordion', module: AccordionModule },
   { bucket: 'composites', name: 'alert-dialog', module: AlertDialogModule },
-  { bucket: 'composites', name: 'breadcrumb', module: BreadcrumbModule },
   { bucket: 'composites', name: 'collapsible', module: CollapsibleModule },
   { bucket: 'composites', name: 'dialog', module: DialogModule },
   {
@@ -84,8 +78,6 @@ export const componentSurface = [
     name: 'navigation-menu',
     module: NavigationMenuModule,
   },
-  { bucket: 'composites', name: 'nav-link', module: NavLinkModule },
-  { bucket: 'composites', name: 'pagination', module: PaginationModule },
   { bucket: 'composites', name: 'popover', module: PopoverModule },
   { bucket: 'composites', name: 'tabs', module: TabsModule },
   { bucket: 'composites', name: 'toast', module: ToastModule },
@@ -106,6 +98,7 @@ export const removedPublicExports = [
   'Badge',
   'Box',
   'Center',
+  'Breadcrumb',
   'Container',
   'Flex',
   'Grid',
@@ -116,6 +109,7 @@ export const removedPublicExports = [
   'Spacer',
   'Stack',
   'SidebarLayout',
+  'Spinner',
   'TopbarLayout',
 ] as const;
 
@@ -159,7 +153,7 @@ export const docsCategories = [
   },
   {
     label: 'Status',
-    names: ['progress', 'progress-circle', 'toast', 'spinner'],
+    names: ['progress', 'progress-circle', 'toast'],
   },
   {
     label: 'Identity',
@@ -167,13 +161,7 @@ export const docsCategories = [
   },
   {
     label: 'Navigation',
-    names: [
-      'breadcrumb',
-      'nav-link',
-      'pagination',
-      'menubar',
-      'navigation-menu',
-    ],
+    names: ['menubar', 'navigation-menu'],
   },
   {
     label: 'Tables',

@@ -1,8 +1,4 @@
-export {
-  ProgressCircle,
-  ProgressCircleIndicator,
-  Spinner,
-} from './progress-circle';
+export { ProgressCircle, ProgressCircleIndicator } from './progress-circle';
 export {
   PROGRESS_CIRCLE_A11Y_CONTRACT,
   type ProgressCircleA11yContract,
@@ -12,6 +8,4 @@ export type {
   ProgressCircleProps,
   ProgressCircleIndicatorProps,
   ProgressCircleIndicatorAsChildProps,
-  SpinnerOwnProps,
-  SpinnerProps,
 } from './progress-circle.types';
