@@ -24,10 +24,6 @@ export default defineConfig({
   pack: {
     entry: {
       index: resolve(srcRoot, 'index.ts'),
-      'components/composites/field/field': resolve(
-        srcRoot,
-        'components/composites/field/field.tsx'
-      ),
     },
     format: ['esm', 'cjs'],
     outDir: 'dist',
@@ -47,10 +43,6 @@ export default defineConfig({
     lib: {
       entry: {
         index: resolve(srcRoot, 'index.ts'),
-        'components/composites/field/field': resolve(
-          srcRoot,
-          'components/composites/field/field.tsx'
-        ),
       },
     },
     rollupOptions: {

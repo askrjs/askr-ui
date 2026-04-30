@@ -21,10 +21,6 @@ const EXPORT_PATTERNS = [
     basePath: './dist/components/primitives/*/*',
   },
   {
-    key: './composites/field/*',
-    basePath: './dist/components/composites/field/*',
-  },
-  {
     key: './composites/*',
     basePath: './dist/components/composites/*/*',
   },

@@ -22,7 +22,6 @@ export * from './composites/collapsible';
 export * from './composites/dialog';
 export * from './composites/dismissable-layer';
 export * from './composites/dropdown-menu';
-export * from './composites/field';
 export * from './composites/focus-scope';
 export * from './composites/menu';
 export * from './composites/menubar';
