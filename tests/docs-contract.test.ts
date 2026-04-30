@@ -2,7 +2,10 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 import * as askrUi from '../src';
-import { publicValueExports } from './fixtures/public-surface';
+import {
+  publicValueExports,
+  removedPublicExports,
+} from './fixtures/public-surface';
 
 type PackageExports = Record<string, unknown>;
 
@@ -22,7 +25,7 @@ function exportSupportsPath(exportKey: string, concretePath: string) {
 function extractDocumentedImports(docs: string) {
   return Array.from(
     docs.matchAll(
-      /import\s*\{([^}]*)\}\s*from\s*['"](@askrjs\/askr-ui(?:\/[A-Za-z0-9-/*]+)?)['"]/g
+      /import\s*\{([^}]*)\}\s*from\s*['"](@askrjs\/ui(?:\/[A-Za-z0-9-/*]+)?)['"]/g
     ),
     (match) => ({
       symbols: match[1]
@@ -89,10 +92,17 @@ describe('Docs contract', () => {
       ).toBe(true);
     }
 
-    for (const symbol of publishedSymbols) {
+    for (const symbol of removedPublicExports) {
       expect(
         documentedSymbols.has(symbol),
-        `Published export is missing from docs: ${symbol}`
+        `Removed export is still documented: ${symbol}`
+      ).toBe(false);
+    }
+
+    for (const symbol of publishedSymbols) {
+      expect(
+        symbol in askrUi,
+        `Published export is missing from package surface: ${symbol}`
       ).toBe(true);
     }
   });
