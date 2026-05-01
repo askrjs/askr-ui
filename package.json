@@ -65,8 +65,8 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "@askrjs/askr": "^0.0.29",
-    "@askrjs/vite": "^0.0.1",
+    "@askrjs/askr": ">=0.0.30 <0.1.0",
+    "@askrjs/vite": "^0.0.2",
     "@types/node": "^25.6.0",
     "axe-core": "^4.11.4",
     "cross-env": "^10.1.0",
@@ -79,7 +79,7 @@
     "vitest-axe": "^0.1.0"
   },
   "peerDependencies": {
-    "@askrjs/askr": "^0.0.29"
+    "@askrjs/askr": ">=0.0.30 <0.1.0"
   },
   "engines": {
     "node": ">=18"
