@@ -30,7 +30,7 @@ import { Button, Dialog, DialogTrigger, DialogContent } from '@askrjs/ui';
 
 The package exports components by family:
 
-- Foundations: `Button`, `Toggle`, `Checkbox`, `Input`, `Textarea`, `Label`,
+- Primitives: `Button`, `Toggle`, `Checkbox`, `Input`, `Textarea`, `Label`,
   `RadioGroup`, `Switch`, `Select`, `Slider`, `ToggleGroup`, `VisuallyHidden`
 - Focus: `FocusScope`, `DismissableLayer`
 - Overlays: `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `DropdownMenu`,
