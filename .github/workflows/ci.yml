@@ -62,14 +62,41 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
-
       - name: Lint
         run: npm run lint
 
       - name: Build
         run: npm run build
 
-      - name: Test
-        run: npm test
+      - name: Unit and jsdom tests
+        run: npm run test:unit && npm run test:jsdom
+
+  browser:
+    name: Browser Integration (${{ matrix.os }})
+    needs: ci
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium firefox webkit
+
+      - name: Browser integration tests
+        run: npm run test:browser
