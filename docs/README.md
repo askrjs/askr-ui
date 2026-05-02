@@ -12,6 +12,7 @@ Shared foundation implementations are owned by `@askrjs/askr/foundations`.
 - [Overview](./askr-ui.md) - What askr-ui is and component categories
 - [Components](./components.md) - Full component reference
 - [Composition](./composition.md) - Patterns for composing primitives
+- [Gap analysis](./ownership-gap-analysis.md) - Ownership split for primitives coverage
 
 ## Quick start
 
