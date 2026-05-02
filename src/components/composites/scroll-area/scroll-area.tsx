@@ -3,6 +3,7 @@ import { Slot, mergeProps } from '@askrjs/askr/foundations';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import { toChildArray } from '../../_internal/jsx';
 import { readContext, defineContext } from '@askrjs/askr';
+import { mergeStyles as mergeStyleValue } from '../../_internal/style';
 import type {
   ScrollAreaAsChildProps,
   ScrollAreaCornerProps,
@@ -90,8 +91,7 @@ export function ScrollAreaViewport(
     ref,
     id: root.viewportId,
     'data-slot': 'scroll-area-viewport',
-    'data-state': 'ready',
-    style: mergeStyles(
+    style: mergeStyleValue(
       {
         display: 'block',
         overflow: 'auto',
@@ -120,7 +120,7 @@ export function ScrollAreaScrollbar(props: ScrollAreaScrollbarProps): JSX.Elemen
     'data-orientation': orientation,
     'data-state': 'visible',
     'aria-hidden': 'true',
-    style: mergeStyles(
+    style: mergeStyleValue(
       {
         display: 'flex',
         flex: '0 0 auto',
@@ -140,7 +140,7 @@ export function ScrollAreaThumb(props: ScrollAreaThumbProps): JSX.Element {
     ref,
     id: root.thumbId,
     'data-slot': 'scroll-area-thumb',
-    style: mergeStyles(
+    style: mergeStyleValue(
       {
         display: 'block',
         flex: '1 1 auto',
@@ -162,7 +162,7 @@ export function ScrollAreaCorner(props: ScrollAreaCornerProps): JSX.Element {
     id: root.cornerId,
     'data-slot': 'scroll-area-corner',
     'aria-hidden': 'true',
-    style: mergeStyles(
+    style: mergeStyleValue(
       {
         display: 'block',
         flex: '0 0 auto',
@@ -172,20 +172,4 @@ export function ScrollAreaCorner(props: ScrollAreaCornerProps): JSX.Element {
   });
 
   return <div {...finalProps}>{children}</div>;
-}
-
-function mergeStyles(
-  base: Record<string, string | number>,
-  user: unknown
-): string {
-  const merged: Record<string, unknown> = { ...base };
-
-  if (user && typeof user === 'object') {
-    Object.assign(merged, user as Record<string, unknown>);
-  }
-
-  return Object.entries(merged)
-    .filter(([, value]) => value !== undefined && value !== null)
-    .map(([key, value]) => key.replace(/([A-Z])/g, '-$1').toLowerCase() + ':' + String(value))
-    .join(';');
 }

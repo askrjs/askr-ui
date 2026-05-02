@@ -23,3 +23,36 @@ export function mergeCssVar(
 
   return decl;
 }
+
+function serializeStyleValue(style: unknown): string {
+  if (!style) {
+    return '';
+  }
+
+  if (typeof style === 'string') {
+    return style.trim();
+  }
+
+  if (typeof style !== 'object') {
+    return '';
+  }
+
+  return Object.entries(style as Record<string, unknown>)
+    .filter(([, value]) => value !== undefined && value !== null)
+    .map(
+      ([key, value]) =>
+        `${key.replace(/([A-Z])/g, (character) => `-${character.toLowerCase()}`)}:${String(value)}`
+    )
+    .join(';');
+}
+
+export function mergeStyles(
+  base: unknown,
+  style: unknown
+): string | undefined {
+  const parts = [serializeStyleValue(base), serializeStyleValue(style)].filter(
+    Boolean
+  );
+
+  return parts.length > 0 ? parts.join(';') : undefined;
+}

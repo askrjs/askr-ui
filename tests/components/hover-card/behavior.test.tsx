@@ -15,9 +15,11 @@ describe('HoverCard - Behavior', () => {
     container = undefined;
   });
 
-  it('renders open state and canonical trigger/content hooks', async () => {
+  it('opens and closes from hover and focus state changes', async () => {
+    vi.useFakeTimers();
+
     container = mount(
-      <HoverCard defaultOpen>
+      <HoverCard>
         <HoverCardTrigger>Preview</HoverCardTrigger>
         <HoverCardContent>Details</HoverCardContent>
       </HoverCard>
@@ -27,24 +29,46 @@ describe('HoverCard - Behavior', () => {
       '[data-slot="hover-card-trigger"]'
     ) as HTMLElement;
 
-    let content = document.body.querySelector(
-      '[data-slot="hover-card-content"]'
-    ) as HTMLElement | null;
+    trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(1);
+    await flushUpdates();
 
-    expect(trigger.getAttribute('aria-expanded')).toBe('true');
-    expect(content?.getAttribute('data-state')).toBe('open');
+    const openTrigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
 
-    expect(trigger.getAttribute('aria-expanded')).toBe('true');
-    expect(content?.getAttribute('data-state')).toBe('open');
+    expect(openTrigger.getAttribute('data-state')).toBe('open');
+    expect(
+      document.body.querySelector('[data-slot="hover-card-content"]')
+    ).not.toBeNull();
+
+    openTrigger.dispatchEvent(
+      new PointerEvent('pointerleave', { bubbles: true })
+    );
+    await vi.runAllTimersAsync();
+    await flushUpdates();
+
+    const closedTrigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
+
+    expect(closedTrigger.getAttribute('data-state')).toBe('closed');
+    expect(
+      document.body.querySelector('[data-slot="hover-card-content"]')
+    ).toBeNull();
+
   });
 
-  it('supports asChild composition on the trigger and content', async () => {
+  it('supports asChild composition and ref forwarding', async () => {
+    const triggerRef = { current: null as HTMLAnchorElement | null };
+    const contentRef = { current: null as HTMLElement | null };
+
     container = mount(
       <HoverCard defaultOpen>
-        <HoverCardTrigger asChild>
+        <HoverCardTrigger asChild ref={triggerRef}>
           <a href="/preview">Preview</a>
         </HoverCardTrigger>
-        <HoverCardContent asChild>
+        <HoverCardContent asChild ref={contentRef}>
           <section>Details</section>
         </HoverCardContent>
       </HoverCard>
@@ -59,5 +83,7 @@ describe('HoverCard - Behavior', () => {
 
     expect(trigger?.getAttribute('data-slot')).toBe('hover-card-trigger');
     expect(content?.getAttribute('data-slot')).toBe('hover-card-content');
+    expect(triggerRef.current).toBe(trigger);
+    expect(contentRef.current).toBe(content);
   });
 });

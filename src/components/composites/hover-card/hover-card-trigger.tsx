@@ -1,6 +1,7 @@
 import {
   Slot,
   composeRefs,
+  hoverable,
   mergeProps,
   pressable,
 } from '@askrjs/askr/foundations';
@@ -27,19 +28,23 @@ export function HoverCardTrigger(
     ...rest
   } = props;
   const root = readHoverCardRootContext();
+  const hoverProps = hoverable({
+    disabled,
+    onEnter: () => {
+      root.scheduleOpen();
+    },
+    onLeave: () => {
+      root.scheduleClose();
+    },
+  });
   const interactionProps = pressable({
     disabled,
-    onPress: (event) => {
-      onPress?.(event);
-
-      if (!event.defaultPrevented) {
-        root.setOpen(true);
-      }
-    },
+    onPress,
     isNativeButton: !asChild,
   });
   const finalProps = mergeProps(rest, {
     ...interactionProps,
+    ...hoverProps,
     ref: composeRefs(
       ref as
         | ((value: HTMLElement | null) => void)
@@ -57,24 +62,6 @@ export function HoverCardTrigger(
     'data-slot': 'hover-card-trigger',
     'data-disabled': disabled ? 'true' : undefined,
     'data-state': root.open ? 'open' : 'closed',
-    onPointerEnter: () => {
-      root.scheduleOpen();
-    },
-    onPointerLeave: () => {
-      root.scheduleClose();
-    },
-    onMouseEnter: () => {
-      root.scheduleOpen();
-    },
-    onMouseLeave: () => {
-      root.scheduleClose();
-    },
-    onMouseOver: () => {
-      root.scheduleOpen();
-    },
-    onMouseOut: () => {
-      root.scheduleClose();
-    },
     onFocus: () => {
       root.cancelClose();
       root.setOpen(true);
