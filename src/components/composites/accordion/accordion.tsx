@@ -45,24 +45,6 @@ import {
   type AccordionRootContextValue,
 } from './accordion.shared';
 
-function createAccordionValueState(props: AccordionProps) {
-  if (props.type === 'multiple') {
-    const multipleProps = props as AccordionMultipleProps;
-    return controllableState({
-      value: multipleProps.value,
-      defaultValue: multipleProps.defaultValue ?? [],
-      onChange: multipleProps.onValueChange,
-    });
-  }
-
-  const singleProps = props as AccordionSingleProps;
-  return controllableState({
-    value: singleProps.value,
-    defaultValue: singleProps.defaultValue ?? '',
-    onChange: singleProps.onValueChange,
-  });
-}
-
 function AccordionRootView(props: {
   children?: unknown;
   finalProps: Record<string, unknown>;
@@ -111,7 +93,18 @@ export function Accordion(props: AccordionProps) {
     ...rest
   } = props;
   const accordionId = resolveCompoundId('accordion', id, children);
-  const valueState = createAccordionValueState(props);
+  const valueState =
+    type === 'multiple'
+      ? controllableState({
+          value: (props as AccordionMultipleProps).value,
+          defaultValue: (props as AccordionMultipleProps).defaultValue ?? [],
+          onChange: (props as AccordionMultipleProps).onValueChange,
+        })
+      : controllableState({
+          value: (props as AccordionSingleProps).value,
+          defaultValue: (props as AccordionSingleProps).defaultValue ?? '',
+          onChange: (props as AccordionSingleProps).onValueChange,
+        });
   const collection = getCompositeCollection(accordionId);
   const items = getCompositeCollectionItems(collection).filter(
     (item): item is typeof item & { value: string } =>
