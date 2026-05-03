@@ -34,9 +34,7 @@ describe('Form - Behavior', () => {
 
     await flushUpdates();
 
-    const section = container.querySelector(
-      'section'
-    ) as HTMLElement | null;
+    const section = container.querySelector('section') as HTMLElement | null;
 
     expect(section?.getAttribute('data-slot')).toBe('form');
   });

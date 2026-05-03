@@ -1,4 +1,9 @@
-import { Presence, Slot, composeRefs, mergeProps } from '@askrjs/askr/foundations';
+import {
+  Presence,
+  Slot,
+  composeRefs,
+  mergeProps,
+} from '@askrjs/askr/foundations';
 import { DismissableLayer } from '../../composites/dismissable-layer';
 import { FocusScope } from '../../composites/focus-scope';
 import {
@@ -10,7 +15,9 @@ import type {
   HoverCardContentProps,
 } from './hover-card.types';
 
-export function HoverCardContent(props: HoverCardContentProps): JSX.Element | null;
+export function HoverCardContent(
+  props: HoverCardContentProps
+): JSX.Element | null;
 export function HoverCardContent(
   props: HoverCardContentAsChildProps
 ): JSX.Element | null;

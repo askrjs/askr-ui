@@ -18,7 +18,10 @@ export type HoverCardOwnProps = {
 
 export type HoverCardProps = HoverCardOwnProps;
 
-export type HoverCardTriggerProps = ButtonLikeProps<'button', HTMLButtonElement>;
+export type HoverCardTriggerProps = ButtonLikeProps<
+  'button',
+  HTMLButtonElement
+>;
 export type HoverCardTriggerAsChildProps = ButtonLikeAsChildProps;
 
 export type HoverCardPortalProps = {

@@ -27,7 +27,8 @@ export type HoverCardRootContextValue = {
   clearPosition: () => void;
 };
 
-export const HoverCardRootContext = defineContext<HoverCardRootContextValue | null>(null);
+export const HoverCardRootContext =
+  defineContext<HoverCardRootContextValue | null>(null);
 
 export function readHoverCardRootContext(): HoverCardRootContextValue {
   const context = readContext(HoverCardRootContext);

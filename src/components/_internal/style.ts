@@ -46,10 +46,7 @@ function serializeStyleValue(style: unknown): string {
     .join(';');
 }
 
-export function mergeStyles(
-  base: unknown,
-  style: unknown
-): string | undefined {
+export function mergeStyles(base: unknown, style: unknown): string | undefined {
   const parts = [serializeStyleValue(base), serializeStyleValue(style)].filter(
     Boolean
   );

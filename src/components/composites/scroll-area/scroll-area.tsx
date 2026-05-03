@@ -74,9 +74,7 @@ export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
   );
 }
 
-export function ScrollAreaViewport(
-  props: ScrollAreaViewportProps
-): JSX.Element;
+export function ScrollAreaViewport(props: ScrollAreaViewportProps): JSX.Element;
 export function ScrollAreaViewport(
   props: ScrollAreaViewportAsChildProps
 ): JSX.Element;
@@ -110,7 +108,9 @@ export function ScrollAreaViewport(
   return <div {...finalProps}>{children}</div>;
 }
 
-export function ScrollAreaScrollbar(props: ScrollAreaScrollbarProps): JSX.Element {
+export function ScrollAreaScrollbar(
+  props: ScrollAreaScrollbarProps
+): JSX.Element {
   const { children, orientation = 'vertical', ref, style, ...rest } = props;
   const root = readScrollAreaRootContext();
   const finalProps = mergeProps(rest, {

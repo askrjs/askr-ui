@@ -61,7 +61,8 @@ export function HoverCard(props: HoverCardProps) {
   const contentId = resolvePartId(hoverCardId, 'content');
   const portal = getPersistentPortal(hoverCardId);
   const overlayNodes = getOverlayNodes(hoverCardId);
-  let contentPosition: HoverCardPositionOptions = resolveHoverCardPositionOptions();
+  let contentPosition: HoverCardPositionOptions =
+    resolveHoverCardPositionOptions();
   let openTimer: ReturnType<typeof setTimeout> | undefined;
   let closeTimer: ReturnType<typeof setTimeout> | undefined;
 
