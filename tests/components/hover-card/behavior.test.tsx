@@ -56,7 +56,6 @@ describe('HoverCard - Behavior', () => {
     expect(
       document.body.querySelector('[data-slot="hover-card-content"]')
     ).toBeNull();
-
   });
 
   it('supports asChild composition and ref forwarding', async () => {

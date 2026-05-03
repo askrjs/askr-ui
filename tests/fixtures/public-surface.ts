@@ -42,7 +42,11 @@ export const componentSurface = [
   { bucket: 'primitives', name: 'form', module: FormModule },
   { bucket: 'primitives', name: 'label', module: LabelModule },
   { bucket: 'primitives', name: 'progress', module: ProgressModule },
-  { bucket: 'primitives', name: 'progress-circle', module: ProgressCircleModule },
+  {
+    bucket: 'primitives',
+    name: 'progress-circle',
+    module: ProgressCircleModule,
+  },
   { bucket: 'primitives', name: 'radio-group', module: RadioGroupModule },
   { bucket: 'primitives', name: 'select', module: SelectModule },
   { bucket: 'primitives', name: 'slider', module: SliderModule },
@@ -51,18 +55,30 @@ export const componentSurface = [
   { bucket: 'primitives', name: 'textarea', module: TextareaModule },
   { bucket: 'primitives', name: 'toggle', module: ToggleModule },
   { bucket: 'primitives', name: 'toggle-group', module: ToggleGroupModule },
-  { bucket: 'primitives', name: 'visually-hidden', module: VisuallyHiddenModule },
+  {
+    bucket: 'primitives',
+    name: 'visually-hidden',
+    module: VisuallyHiddenModule,
+  },
   { bucket: 'composites', name: 'accordion', module: AccordionModule },
   { bucket: 'composites', name: 'alert-dialog', module: AlertDialogModule },
   { bucket: 'composites', name: 'collapsible', module: CollapsibleModule },
   { bucket: 'composites', name: 'dialog', module: DialogModule },
-  { bucket: 'composites', name: 'dismissable-layer', module: DismissableLayerModule },
+  {
+    bucket: 'composites',
+    name: 'dismissable-layer',
+    module: DismissableLayerModule,
+  },
   { bucket: 'composites', name: 'dropdown-menu', module: DropdownMenuModule },
   { bucket: 'composites', name: 'focus-scope', module: FocusScopeModule },
   { bucket: 'composites', name: 'hover-card', module: HoverCardModule },
   { bucket: 'composites', name: 'menu', module: MenuModule },
   { bucket: 'composites', name: 'menubar', module: MenubarModule },
-  { bucket: 'composites', name: 'navigation-menu', module: NavigationMenuModule },
+  {
+    bucket: 'composites',
+    name: 'navigation-menu',
+    module: NavigationMenuModule,
+  },
   { bucket: 'composites', name: 'popover', module: PopoverModule },
   { bucket: 'composites', name: 'scroll-area', module: ScrollAreaModule },
   { bucket: 'composites', name: 'tabs', module: TabsModule },
@@ -70,87 +86,92 @@ export const componentSurface = [
   { bucket: 'composites', name: 'tooltip', module: TooltipModule },
 ] as const;
 
-export const publicValueExports = Array.from(new Set(componentSurface.flatMap((entry) => Object.keys(entry.module).filter((name) => name !== 'default' && !name.startsWith('__'))))).sort();
+export const publicValueExports = Array.from(
+  new Set(
+    componentSurface.flatMap((entry) =>
+      Object.keys(entry.module).filter(
+        (name) => name !== 'default' && !name.startsWith('__')
+      )
+    )
+  )
+).sort();
 
-export const removedPublicExports = ["Badge","Box","Center","Breadcrumb","Container","Flex","Grid","Inline","Section","Separator","Skeleton","Spacer","Stack","SidebarLayout","Spinner","TopbarLayout"] as const;
+export const removedPublicExports = [
+  'Badge',
+  'Box',
+  'Center',
+  'Breadcrumb',
+  'Container',
+  'Flex',
+  'Grid',
+  'Inline',
+  'Section',
+  'Separator',
+  'Skeleton',
+  'Spacer',
+  'Stack',
+  'SidebarLayout',
+  'Spinner',
+  'TopbarLayout',
+] as const;
 
 export const docsCategories = [
   {
-    "label": "Foundation",
-    "names": [
-      "button",
-      "toggle",
-      "checkbox",
-      "visually-hidden",
-      "label",
-      "input",
-      "form",
-      "textarea",
-      "radio-group",
-      "switch",
-      "select",
-      "slider",
-      "toggle-group"
-    ]
+    label: 'Foundation',
+    names: [
+      'button',
+      'toggle',
+      'checkbox',
+      'visually-hidden',
+      'label',
+      'input',
+      'form',
+      'textarea',
+      'radio-group',
+      'switch',
+      'select',
+      'slider',
+      'toggle-group',
+    ],
   },
   {
-    "label": "Focus",
-    "names": [
-      "focus-scope",
-      "dismissable-layer"
-    ]
+    label: 'Focus',
+    names: ['focus-scope', 'dismissable-layer'],
   },
   {
-    "label": "Overlay",
-    "names": [
-      "dialog",
-      "alert-dialog",
-      "popover",
-      "hover-card",
-      "tooltip",
-      "dropdown-menu",
-      "menu"
-    ]
+    label: 'Overlay',
+    names: [
+      'dialog',
+      'alert-dialog',
+      'popover',
+      'hover-card',
+      'tooltip',
+      'dropdown-menu',
+      'menu',
+    ],
   },
   {
-    "label": "Layout",
-    "names": [
-      "scroll-area"
-    ]
+    label: 'Layout',
+    names: ['scroll-area'],
   },
   {
-    "label": "Disclosure",
-    "names": [
-      "accordion",
-      "collapsible",
-      "tabs"
-    ]
+    label: 'Disclosure',
+    names: ['accordion', 'collapsible', 'tabs'],
   },
   {
-    "label": "Status",
-    "names": [
-      "progress",
-      "progress-circle",
-      "toast"
-    ]
+    label: 'Status',
+    names: ['progress', 'progress-circle', 'toast'],
   },
   {
-    "label": "Identity",
-    "names": [
-      "avatar"
-    ]
+    label: 'Identity',
+    names: ['avatar'],
   },
   {
-    "label": "Navigation",
-    "names": [
-      "menubar",
-      "navigation-menu"
-    ]
+    label: 'Navigation',
+    names: ['menubar', 'navigation-menu'],
   },
   {
-    "label": "Tables",
-    "names": [
-      "table"
-    ]
-  }
+    label: 'Tables',
+    names: ['table'],
+  },
 ] as const;
