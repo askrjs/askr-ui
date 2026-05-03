@@ -31,6 +31,35 @@ describe('Accordion - Behavior', () => {
     unmount(container);
   });
 
+  it('mounts single and multiple accordions without render-time state errors', () => {
+    expect(() => {
+      container = mount(
+        <div>
+          <Accordion defaultValue="one" collapsible>
+            <AccordionItem value="one">
+              <AccordionHeader>
+                <AccordionTrigger>One</AccordionTrigger>
+              </AccordionHeader>
+              <AccordionContent>First</AccordionContent>
+            </AccordionItem>
+          </Accordion>
+          <Accordion type="multiple" defaultValue={['one']}>
+            <AccordionItem value="one">
+              <AccordionHeader>
+                <AccordionTrigger>One multiple</AccordionTrigger>
+              </AccordionHeader>
+              <AccordionContent>First multiple</AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      );
+    }).not.toThrow();
+
+    expect(container.querySelectorAll('[data-slot="accordion"]')).toHaveLength(
+      2
+    );
+  });
+
   it('should support single and multiple open state', async () => {
     container = mount(
       <div>

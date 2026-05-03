@@ -27,24 +27,6 @@ import type {
   ToggleGroupSingleProps,
 } from './toggle-group.types';
 
-function createToggleGroupValueState(props: ToggleGroupProps) {
-  if (props.type === 'multiple') {
-    const multipleProps = props as ToggleGroupMultipleProps;
-    return controllableState({
-      value: multipleProps.value,
-      defaultValue: multipleProps.defaultValue ?? [],
-      onChange: multipleProps.onValueChange,
-    });
-  }
-
-  const singleProps = props as ToggleGroupSingleProps;
-  return controllableState({
-    value: singleProps.value,
-    defaultValue: singleProps.defaultValue ?? '',
-    onChange: singleProps.onValueChange,
-  });
-}
-
 function ToggleGroupScopeView(props: {
   children?: unknown;
   finalProps: Record<string, unknown>;
@@ -118,7 +100,18 @@ export function ToggleGroup(props: ToggleGroupProps) {
     value: item.value as string,
     disabled: item.disabled,
   }));
-  const valueState = createToggleGroupValueState(props);
+  const valueState =
+    type === 'multiple'
+      ? controllableState({
+          value: (props as ToggleGroupMultipleProps).value,
+          defaultValue: (props as ToggleGroupMultipleProps).defaultValue ?? [],
+          onChange: (props as ToggleGroupMultipleProps).onValueChange,
+        })
+      : controllableState({
+          value: (props as ToggleGroupSingleProps).value,
+          defaultValue: (props as ToggleGroupSingleProps).defaultValue ?? '',
+          onChange: (props as ToggleGroupSingleProps).onValueChange,
+        });
   let itemsSyncQueued = false;
   const notifyItemsChanged = () => {
     itemsVersion.set((currentVersion) => currentVersion + 1);

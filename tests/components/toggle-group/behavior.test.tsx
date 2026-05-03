@@ -26,6 +26,25 @@ describe('ToggleGroup - Behavior', () => {
     container = undefined;
   });
 
+  it('mounts single and multiple toggle groups without render-time state errors', () => {
+    expect(() => {
+      container = mount(
+        <div>
+          <ToggleGroup defaultValue="left">
+            <ToggleGroupItem value="left">Left</ToggleGroupItem>
+          </ToggleGroup>
+          <ToggleGroup type="multiple" defaultValue={['left']}>
+            <ToggleGroupItem value="left">Left multiple</ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+      );
+    }).not.toThrow();
+
+    expect(
+      container.querySelectorAll('[data-slot="toggle-group"]')
+    ).toHaveLength(2);
+  });
+
   it('renders the group container and pressed hooks for single selection', () => {
     container = mount(
       <ToggleGroup defaultValue="left" orientation="vertical">
