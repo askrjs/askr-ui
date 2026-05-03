@@ -3,7 +3,6 @@ import {
   Presence,
   Slot,
   composeRefs,
-  controllableState,
   mergeProps,
   pressable,
   rovingFocus,
@@ -93,18 +92,81 @@ export function Accordion(props: AccordionProps) {
     ...rest
   } = props;
   const accordionId = resolveCompoundId('accordion', id, children);
-  const valueState =
+  const isControlled =
     type === 'multiple'
-      ? controllableState({
-          value: (props as AccordionMultipleProps).value,
-          defaultValue: (props as AccordionMultipleProps).defaultValue ?? [],
-          onChange: (props as AccordionMultipleProps).onValueChange,
-        })
-      : controllableState({
-          value: (props as AccordionSingleProps).value,
-          defaultValue: (props as AccordionSingleProps).defaultValue ?? '',
-          onChange: (props as AccordionSingleProps).onValueChange,
-        });
+      ? (props as AccordionMultipleProps).value !== undefined
+      : (props as AccordionSingleProps).value !== undefined;
+  const internalValueState = state(
+    type === 'multiple'
+      ? ((props as AccordionMultipleProps).defaultValue ?? [])
+      : ((props as AccordionSingleProps).defaultValue ?? '')
+  );
+  const valueState = (() => {
+    const read = () => {
+      if (type === 'multiple') {
+        return isControlled
+          ? ((props as AccordionMultipleProps).value ?? [])
+          : internalValueState();
+      }
+
+      return isControlled
+        ? ((props as AccordionSingleProps).value ?? '')
+        : internalValueState();
+    };
+
+    read.set = (
+      nextOrUpdater:
+        | string
+        | string[]
+        | ((prev: string | string[]) => string | string[])
+    ) => {
+      const prev = read();
+      const next =
+        typeof nextOrUpdater === 'function'
+          ? (nextOrUpdater as (prev: string | string[]) => string | string[])(
+              prev
+            )
+          : nextOrUpdater;
+
+      if (Object.is(prev, next)) {
+        return;
+      }
+
+      if (type === 'multiple') {
+        const nextValue = Array.isArray(next) ? next : next ? [next] : [];
+
+        if (isControlled) {
+          (props as AccordionMultipleProps).onValueChange?.(nextValue);
+          return;
+        }
+
+        internalValueState.set(nextValue);
+        (props as AccordionMultipleProps).onValueChange?.(nextValue);
+        return;
+      }
+
+      const nextValue = Array.isArray(next)
+        ? (next[0] ?? '')
+        : String(next ?? '');
+
+      if (isControlled) {
+        (props as AccordionSingleProps).onValueChange?.(nextValue);
+        return;
+      }
+
+      internalValueState.set(nextValue);
+      (props as AccordionSingleProps).onValueChange?.(nextValue);
+    };
+
+    return read as typeof read & {
+      set(
+        nextOrUpdater:
+          | string
+          | string[]
+          | ((prev: string | string[]) => string | string[])
+      ): void;
+    };
+  })();
   const collection = getCompositeCollection(accordionId);
   const items = getCompositeCollectionItems(collection).filter(
     (item): item is typeof item & { value: string } =>
