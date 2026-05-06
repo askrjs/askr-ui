@@ -67,12 +67,12 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "@askrjs/askr": "^0.0.31",
+    "@askrjs/askr": "^0.0.33",
     "@askrjs/vite": ">=0.0.2 <0.1.0",
     "@types/node": "^25.6.0",
     "axe-core": "^4.11.4",
     "cross-env": "^10.1.0",
-    "jiti": "^2.6.1",
+    "jiti": "^2.7.0",
     "jsdom": "^29.1.1",
     "playwright": "^1.59.1",
     "tsd": "^0.33.0",
