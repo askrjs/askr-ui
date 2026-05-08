@@ -20,7 +20,7 @@ composition, and styling.
 
 - Form and control primitives: `Button`, `Input`, `Textarea`, `Checkbox`,
   `RadioGroup`, `Select`, `Slider`, `Switch`, `Toggle`, `ToggleGroup`, `Label`
-- Disclosure and overlay behavior: `Accordion`, `Collapsible`, `Tabs`,
+- Disclosure and overlay behavior: `Accordion`, `Collapsible`,
   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `DropdownMenu`, `Menu`,
   `Menubar`, `NavigationMenu`
 - Utility and support primitives: `FocusScope`, `DismissableLayer`, `Avatar`,
@@ -98,7 +98,7 @@ like this:
 | ----------------- | ------- | ---------------- | -------------------------------------------------------------------- |
 | Controls          | Strong  | Styled by themes | Matches the core primitives mental model well                        |
 | Overlays          | Strong  | Styled by themes | `Dialog`, `Popover`, `Tooltip`, menus are already there              |
-| Disclosure        | Strong  | Styled by themes | `Accordion`, `Collapsible`, `Tabs` are in good shape                 |
+| Disclosure        | Strong  | Styled by themes | `Accordion` and `Collapsible` are in good shape                      |
 | Layout / chrome   | Minimal | Strong           | Best owned by `askr-themes`                                          |
 | Visual primitives | Minimal | Strong           | Better fit for theme package than headless UI                        |
 | Utility extras    | Mixed   | Mixed            | `Separator` is theme-owned; `AspectRatio` / `ScrollArea` remain open |

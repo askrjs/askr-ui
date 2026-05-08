@@ -29,7 +29,6 @@ export const componentFamilies = [
   { bucket: 'composites', name: 'navigation-menu' },
   { bucket: 'composites', name: 'popover' },
   { bucket: 'composites', name: 'scroll-area' },
-  { bucket: 'composites', name: 'tabs' },
   { bucket: 'composites', name: 'toast' },
   { bucket: 'composites', name: 'tooltip' },
 ];
@@ -75,7 +74,7 @@ export const docsCategories = [
   },
   {
     label: 'Disclosure',
-    names: ['accordion', 'collapsible', 'tabs'],
+    names: ['accordion', 'collapsible'],
   },
   {
     label: 'Status',

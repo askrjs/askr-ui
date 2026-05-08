@@ -30,6 +30,5 @@ export * from './composites/menubar';
 export * from './composites/navigation-menu';
 export * from './composites/popover';
 export * from './composites/scroll-area';
-export * from './composites/tabs';
 export * from './composites/toast';
 export * from './composites/tooltip';
