@@ -35,10 +35,6 @@ import {
   SliderThumb,
   SliderTrack,
   Table,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
   Toast,
   ToastAction,
   ToastClose,
@@ -91,11 +87,6 @@ import {
   type TableHeaderCellProps,
   type TableProps,
   type TableRowProps,
-  type TabsContentAsChildProps,
-  type TabsContentProps,
-  type TabsProps,
-  type TabsTriggerAsChildProps,
-  type TabsTriggerProps,
   type ToastActionAsChildProps,
   type ToastActionProps,
   type ToastCloseAsChildProps,
@@ -116,7 +107,6 @@ import { Progress as ProgressSubpath } from '@askrjs/ui/primitives/progress';
 import { ProgressCircle as ProgressCircleSubpath } from '@askrjs/ui/primitives/progress-circle';
 import { Slider as SliderSubpath } from '@askrjs/ui/primitives/slider';
 import { Table as TableSubpath } from '@askrjs/ui/primitives/table';
-import { Tabs as TabsSubpath } from '@askrjs/ui/composites/tabs';
 import { ToastProvider as ToastSubpath } from '@askrjs/ui/composites/toast';
 import { ToggleGroup as ToggleGroupSubpath } from '@askrjs/ui/primitives/toggle-group';
 
@@ -131,7 +121,6 @@ const progressFromSubpath: typeof Progress = ProgressSubpath;
 const progressCircleFromSubpath: typeof ProgressCircle = ProgressCircleSubpath;
 const sliderFromSubpath: typeof Slider = SliderSubpath;
 const tableFromSubpath: typeof Table = TableSubpath;
-const tabsFromSubpath: typeof Tabs = TabsSubpath;
 const toastFromSubpath: typeof ToastProvider = ToastSubpath;
 const toggleGroupFromSubpath: typeof ToggleGroup = ToggleGroupSubpath;
 const menubarFromRoot: typeof Menubar = askrUi.Menubar;
@@ -229,25 +218,6 @@ const accordionContentAsChildProps: AccordionContentAsChildProps = {
   asChild: true,
   children: slotChild,
 };
-const tabsProps: TabsProps = { defaultValue: 'overview' };
-const tabsTriggerProps: TabsTriggerProps = {
-  value: 'overview',
-  children: 'Overview',
-};
-const tabsTriggerAsChildProps: TabsTriggerAsChildProps = {
-  asChild: true,
-  children: slotChild,
-  value: 'overview',
-};
-const tabsContentProps: TabsContentProps = {
-  value: 'overview',
-  children: 'Panel',
-};
-const tabsContentAsChildProps: TabsContentAsChildProps = {
-  asChild: true,
-  children: slotChild,
-  value: 'overview',
-};
 const toggleGroupSingleProps: ToggleGroupSingleProps = { defaultValue: 'left' };
 const toggleGroupMultipleProps: ToggleGroupMultipleProps = {
   type: 'multiple',
@@ -283,14 +253,6 @@ const _invalidAccordionTrigger: AccordionTriggerAsChildProps = {
   type: 'button',
 };
 
-const _invalidTabsTrigger: TabsTriggerAsChildProps = {
-  asChild: true,
-  children: slotChild,
-  value: 'overview',
-  // @ts-expect-error asChild tabs trigger props must not accept native button type.
-  type: 'button',
-};
-
 const _invalidToggleGroupItem: ToggleGroupItemAsChildProps = {
   asChild: true,
   children: slotChild,
@@ -323,7 +285,6 @@ void [
   progressCircleFromSubpath,
   sliderFromSubpath,
   tableFromSubpath,
-  tabsFromSubpath,
   toastFromSubpath,
   toggleGroupFromSubpath,
   menubarFromRoot,
@@ -353,9 +314,6 @@ void [
   AccordionHeader,
   AccordionTrigger,
   AccordionContent,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
   ToggleGroupItem,
   ToastProvider,
   ToastViewport,
@@ -409,11 +367,6 @@ void [
   accordionTriggerAsChildProps,
   accordionContentProps,
   accordionContentAsChildProps,
-  tabsProps,
-  tabsTriggerProps,
-  tabsTriggerAsChildProps,
-  tabsContentProps,
-  tabsContentAsChildProps,
   toggleGroupSingleProps,
   toggleGroupMultipleProps,
   toggleGroupItemProps,

@@ -10,7 +10,7 @@ root import and narrower subpaths when needed.
 - Primitives: core controls such as buttons, inputs, selects, and toggles
 - Focus: focus management and dismissal helpers
 - Overlays: dialogs, popovers, menus, and tooltips
-- Disclosure: accordion, collapsible, and tabs
+- Disclosure: accordion and collapsible
 - Status: progress and toasts
 - Identity: avatar and related identity primitives
 - Tables: semantic table primitives

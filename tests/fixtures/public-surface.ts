@@ -30,7 +30,6 @@ import * as MenubarModule from '../../src/components/composites/menubar/index';
 import * as NavigationMenuModule from '../../src/components/composites/navigation-menu/index';
 import * as PopoverModule from '../../src/components/composites/popover/index';
 import * as ScrollAreaModule from '../../src/components/composites/scroll-area/index';
-import * as TabsModule from '../../src/components/composites/tabs/index';
 import * as ToastModule from '../../src/components/composites/toast/index';
 import * as TooltipModule from '../../src/components/composites/tooltip/index';
 
@@ -81,7 +80,6 @@ export const componentSurface = [
   },
   { bucket: 'composites', name: 'popover', module: PopoverModule },
   { bucket: 'composites', name: 'scroll-area', module: ScrollAreaModule },
-  { bucket: 'composites', name: 'tabs', module: TabsModule },
   { bucket: 'composites', name: 'toast', module: ToastModule },
   { bucket: 'composites', name: 'tooltip', module: TooltipModule },
 ] as const;
@@ -156,7 +154,7 @@ export const docsCategories = [
   },
   {
     label: 'Disclosure',
-    names: ['accordion', 'collapsible', 'tabs'],
+    names: ['accordion', 'collapsible'],
   },
   {
     label: 'Status',

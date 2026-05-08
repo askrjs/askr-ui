@@ -35,7 +35,7 @@ The package exports components by family:
 - Focus: `FocusScope`, `DismissableLayer`
 - Overlays: `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `DropdownMenu`,
   `Menu`
-- Disclosure: `Accordion`, `Collapsible`, `Tabs`
+- Disclosure: `Accordion`, `Collapsible`
 - Status: `Progress`, `ProgressCircle`, `Toast`
 - Identity: `Avatar`
 - Tables: `Table`, `TableCaption`, `TableHead`, `TableBody`, `TableFoot`,
