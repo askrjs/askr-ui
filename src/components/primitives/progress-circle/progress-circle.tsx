@@ -1,6 +1,10 @@
 import { defineContext, readContext } from '@askrjs/askr';
-import { Slot, mergeProps } from '@askrjs/askr/foundations';
-import { mergeCssVar } from '../../_internal/style';
+import { Slot, composeRefs, mergeProps } from '@askrjs/askr/foundations';
+import {
+  dynamicAttributeSelector,
+  removeDynamicStyleRule,
+  setDynamicStyleRule,
+} from '../../_internal/dynamic-style';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import {
   defaultProgressValueLabel,
@@ -44,7 +48,16 @@ function ProgressCircleRootScopeView(props: {
 }
 
 export function ProgressCircle(props: ProgressCircleProps) {
-  const { children, getValueLabel, id, max, ref, value, ...rest } = props;
+  const {
+    children,
+    getValueLabel,
+    id,
+    max,
+    ref,
+    style: _style,
+    value,
+    ...rest
+  } = props;
   const progressCircleId = resolveCompoundId('progress-circle', id, children);
   const normalizedMax = normalizeProgressMax(max);
   const normalizedValue = normalizeProgressValue(value, normalizedMax);
@@ -52,14 +65,30 @@ export function ProgressCircle(props: ProgressCircleProps) {
     getValueLabel?.(normalizedValue, normalizedMax) ??
     defaultProgressValueLabel(normalizedValue, normalizedMax);
   const percentage = progressPercentage(normalizedValue, normalizedMax);
+  const progressCircleRuleKey = `progress-circle:${progressCircleId}`;
+  const progressCirclePercentageValue =
+    percentage === null ? '25%' : `${percentage}%`;
+  setDynamicStyleRule(
+    progressCircleRuleKey,
+    dynamicAttributeSelector('id', progressCircleId),
+    {
+      '--ak-progress-percentage': progressCirclePercentageValue,
+    }
+  );
   const finalProps = mergeProps(rest, {
-    ref,
-    id: progressCircleId,
-    style: mergeCssVar(
-      (rest as { style?: unknown }).style,
-      '--ak-progress-percentage',
-      percentage === null ? '25%' : `${percentage}%`
+    ref: composeRefs(
+      ref as
+        | ((value: HTMLElement | null) => void)
+        | { current: HTMLElement | null }
+        | null
+        | undefined,
+      (node: HTMLElement | null) => {
+        if (!node) {
+          removeDynamicStyleRule(progressCircleRuleKey);
+        }
+      }
     ),
+    id: progressCircleId,
     role: 'progressbar',
     'aria-valuemin': '0',
     'aria-valuemax': String(normalizedMax),

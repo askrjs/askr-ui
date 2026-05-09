@@ -4,7 +4,11 @@ import {
   controllableState,
   mergeProps,
 } from '@askrjs/askr/foundations';
-import { mergeCssVar } from '../../_internal/style';
+import {
+  dynamicAttributeSelector,
+  removeDynamicStyleRule,
+  setDynamicStyleRule,
+} from '../../_internal/dynamic-style';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import {
   rangePercentage,
@@ -159,6 +163,7 @@ export function Slider(props: SliderProps) {
     onValueChange,
     orientation = 'horizontal',
     ref,
+    style: _style,
     value,
     ...rest
   } = props;
@@ -184,14 +189,29 @@ export function Slider(props: SliderProps) {
   rootContext.disabled = disabled;
   rootContext.trackId = resolvePartId(sliderId, 'track');
   rootContext.thumbId = resolvePartId(sliderId, 'thumb');
+  const sliderRuleKey = `slider:${sliderId}`;
+  setDynamicStyleRule(
+    sliderRuleKey,
+    dynamicAttributeSelector('data-askr-slider-id', sliderId),
+    {
+      '--ak-slider-percentage': `${percentage}%`,
+    }
+  );
   const finalProps = mergeProps(rest, {
-    ref,
-    style: mergeCssVar(
-      (rest as { style?: unknown }).style,
-      '--ak-slider-percentage',
-      `${percentage}%`
+    ref: composeRefs(
+      ref as
+        | ((value: HTMLElement | null) => void)
+        | { current: HTMLElement | null }
+        | null
+        | undefined,
+      (node: HTMLElement | null) => {
+        if (!node) {
+          removeDynamicStyleRule(sliderRuleKey);
+        }
+      }
     ),
     'data-slot': 'slider',
+    'data-askr-slider-id': sliderId,
     'data-slider': 'true',
     'data-orientation': orientation,
     'data-disabled': disabled ? 'true' : undefined,

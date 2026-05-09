@@ -114,7 +114,8 @@ describe('Tooltip - Behavior', () => {
 
     expect(content?.getAttribute('data-side')).toBe('right');
     expect(content?.dataset.side).toBe('right');
-    expect((content as HTMLElement | null)?.style.left).toBe('148px');
-    expect((content as HTMLElement | null)?.style.top).toBe('90px');
+    expect((content as HTMLElement | null)?.getAttribute('style')).toBeNull();
+    expect(getComputedStyle(content as Element).left).toBe('148px');
+    expect(getComputedStyle(content as Element).top).toBe('90px');
   });
 });

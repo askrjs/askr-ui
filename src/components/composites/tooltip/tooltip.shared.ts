@@ -1,12 +1,12 @@
 import { defineContext, readContext } from '@askrjs/askr';
-import type { OverlayPortal } from '../../_internal/overlay';
+import { OVERLAY_Z_INDEX, type OverlayPortal } from '../../_internal/overlay';
 import type { TooltipContentOwnProps } from './tooltip.types';
 
 export type TooltipPositionOptions = {
   side: NonNullable<TooltipContentOwnProps['side']>;
   align: NonNullable<TooltipContentOwnProps['align']>;
   sideOffset: NonNullable<TooltipContentOwnProps['sideOffset']>;
-  zIndex: 60;
+  zIndex: typeof OVERLAY_Z_INDEX.tooltip;
 };
 
 export type TooltipRootContextValue = {
@@ -43,6 +43,6 @@ export function resolveTooltipPositionOptions(
     side: options.side ?? 'top',
     align: options.align ?? 'center',
     sideOffset: options.sideOffset ?? 0,
-    zIndex: 60,
+    zIndex: OVERLAY_Z_INDEX.tooltip,
   };
 }

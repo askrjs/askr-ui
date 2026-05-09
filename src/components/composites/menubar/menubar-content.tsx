@@ -14,6 +14,7 @@ import { getCompositeCollection } from '../../_internal/composite';
 import {
   clearOverlayPosition,
   getOverlayNodes,
+  OVERLAY_Z_INDEX,
   syncOverlayPosition,
 } from '../../_internal/overlay';
 import {
@@ -135,6 +136,7 @@ function renderMenubarSurfaceContent(
             side,
             align,
             sideOffset,
+            zIndex: OVERLAY_Z_INDEX.dropdown,
           });
         } else {
           clearOverlayPosition(contentContext.overlayId);

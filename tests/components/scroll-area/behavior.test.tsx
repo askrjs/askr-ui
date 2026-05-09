@@ -45,7 +45,7 @@ describe('ScrollArea - Behavior', () => {
     ).toBeTruthy();
   });
 
-  it('merges viewport styles and rejects orphan parts', async () => {
+  it('does not emit inline viewport styles and rejects orphan parts', async () => {
     container = mount(
       <ScrollArea>
         <ScrollAreaViewport
@@ -65,10 +65,7 @@ describe('ScrollArea - Behavior', () => {
       '[data-slot="scroll-area-viewport"]'
     ) as HTMLElement | null;
 
-    expect(viewport?.style.display).toBe('block');
-    expect(viewport?.style.overflowY).toBe('scroll');
-    expect(viewport?.style.contain).toBe('paint');
-    expect(viewport?.style.width).toBe('100%');
+    expect(viewport?.getAttribute('style')).toBeNull();
 
     expect(() =>
       ScrollAreaViewport({

@@ -1,5 +1,9 @@
 import { defineContext, readContext } from '@askrjs/askr';
-import type { OverlayPortal } from '../../_internal/overlay';
+import {
+  OVERLAY_Z_INDEX,
+  type OverlayPortal,
+  type OverlayZIndex,
+} from '../../_internal/overlay';
 
 export type HoverCardPositionOptions = {
   mode?: 'anchored';
@@ -7,7 +11,7 @@ export type HoverCardPositionOptions = {
   align?: 'start' | 'center' | 'end';
   sideOffset?: number;
   viewportPadding?: number;
-  zIndex?: number;
+  zIndex?: OverlayZIndex;
 };
 
 export type HoverCardRootContextValue = {
@@ -49,6 +53,6 @@ export function resolveHoverCardPositionOptions(
     align: position.align ?? 'center',
     sideOffset: position.sideOffset ?? 6,
     viewportPadding: position.viewportPadding ?? 12,
-    zIndex: position.zIndex ?? 40,
+    zIndex: position.zIndex ?? OVERLAY_Z_INDEX.popover,
   };
 }

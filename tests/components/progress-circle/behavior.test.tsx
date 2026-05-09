@@ -28,7 +28,7 @@ describe('ProgressCircle - Behavior', () => {
     }
   });
 
-  it('should emit --ak-progress-percentage as a CSS custom property on the root', () => {
+  it('should expose --ak-progress-percentage without an inline style attribute', () => {
     const container = mount(
       <ProgressCircle value={30} max={60}>
         <ProgressCircleIndicator />
@@ -39,8 +39,11 @@ describe('ProgressCircle - Behavior', () => {
       const root = container.querySelector(
         `[role="${PROGRESS_CIRCLE_A11Y_CONTRACT.ROLE}"]`
       ) as HTMLElement;
+      expect(root.getAttribute('style')).toBeNull();
       expect(
-        root.style.getPropertyValue('--ak-progress-percentage').trim()
+        getComputedStyle(root)
+          .getPropertyValue('--ak-progress-percentage')
+          .trim()
       ).toBe('50%');
     } finally {
       unmount(container);

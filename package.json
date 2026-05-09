@@ -67,7 +67,7 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "@askrjs/askr": "^0.0.34",
+    "@askrjs/askr": "^0.0.35",
     "@askrjs/vite": ">=0.0.2 <0.1.0",
     "@types/node": "^25.6.2",
     "axe-core": "^4.11.4",

@@ -3,7 +3,6 @@ import { Slot, mergeProps } from '@askrjs/askr/foundations';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import { toChildArray } from '../../_internal/jsx';
 import { readContext, defineContext } from '@askrjs/askr';
-import { mergeStyles as mergeStyleValue } from '../../_internal/style';
 import type {
   ScrollAreaAsChildProps,
   ScrollAreaCornerProps,
@@ -83,22 +82,12 @@ export function ScrollAreaViewport(
     style?: unknown;
   }
 ) {
-  const { asChild, children, ref, style, ...rest } = props;
+  const { asChild, children, ref, style: _style, ...rest } = props;
   const root = readScrollAreaRootContext();
   const finalProps = mergeProps(rest, {
     ref,
     id: root.viewportId,
     'data-slot': 'scroll-area-viewport',
-    style: mergeStyleValue(
-      {
-        display: 'block',
-        overflow: 'auto',
-        width: '100%',
-        height: '100%',
-        WebkitOverflowScrolling: 'touch',
-      },
-      style
-    ),
   });
 
   if (asChild) {
@@ -111,7 +100,13 @@ export function ScrollAreaViewport(
 export function ScrollAreaScrollbar(
   props: ScrollAreaScrollbarProps
 ): JSX.Element {
-  const { children, orientation = 'vertical', ref, style, ...rest } = props;
+  const {
+    children,
+    orientation = 'vertical',
+    ref,
+    style: _style,
+    ...rest
+  } = props;
   const root = readScrollAreaRootContext();
   const finalProps = mergeProps(rest, {
     ref,
@@ -120,55 +115,31 @@ export function ScrollAreaScrollbar(
     'data-orientation': orientation,
     'data-state': 'visible',
     'aria-hidden': 'true',
-    style: mergeStyleValue(
-      {
-        display: 'flex',
-        flex: '0 0 auto',
-        userSelect: 'none',
-      },
-      style
-    ),
   });
 
   return <div {...finalProps}>{children}</div>;
 }
 
 export function ScrollAreaThumb(props: ScrollAreaThumbProps): JSX.Element {
-  const { children, ref, style, ...rest } = props;
+  const { children, ref, style: _style, ...rest } = props;
   const root = readScrollAreaRootContext();
   const finalProps = mergeProps(rest, {
     ref,
     id: root.thumbId,
     'data-slot': 'scroll-area-thumb',
-    style: mergeStyleValue(
-      {
-        display: 'block',
-        flex: '1 1 auto',
-        minWidth: '100%',
-        minHeight: '100%',
-      },
-      style
-    ),
   });
 
   return <div {...finalProps}>{children}</div>;
 }
 
 export function ScrollAreaCorner(props: ScrollAreaCornerProps): JSX.Element {
-  const { children, ref, style, ...rest } = props;
+  const { children, ref, style: _style, ...rest } = props;
   const root = readScrollAreaRootContext();
   const finalProps = mergeProps(rest, {
     ref,
     id: root.cornerId,
     'data-slot': 'scroll-area-corner',
     'aria-hidden': 'true',
-    style: mergeStyleValue(
-      {
-        display: 'block',
-        flex: '0 0 auto',
-      },
-      style
-    ),
   });
 
   return <div {...finalProps}>{children}</div>;

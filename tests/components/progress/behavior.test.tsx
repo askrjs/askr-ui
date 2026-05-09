@@ -31,7 +31,7 @@ describe('Progress - Behavior', () => {
     }
   });
 
-  it('should emit --ak-progress-percentage as a CSS custom property on the root', () => {
+  it('should expose --ak-progress-percentage without an inline style attribute', () => {
     const container = mount(
       <Progress value={40} max={80}>
         <ProgressIndicator />
@@ -42,8 +42,11 @@ describe('Progress - Behavior', () => {
       const root = container.querySelector(
         `[role="${PROGRESS_A11Y_CONTRACT.ROLE}"]`
       ) as HTMLElement;
+      expect(root.getAttribute('style')).toBeNull();
       expect(
-        root.style.getPropertyValue('--ak-progress-percentage').trim()
+        getComputedStyle(root)
+          .getPropertyValue('--ak-progress-percentage')
+          .trim()
       ).toBe('50%');
     } finally {
       unmount(container);

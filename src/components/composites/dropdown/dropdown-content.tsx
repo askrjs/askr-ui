@@ -12,6 +12,7 @@ import { getMenuCollection } from '../../_internal/menu';
 import {
   clearOverlayPosition,
   getOverlayNodes,
+  OVERLAY_Z_INDEX,
   syncOverlayPosition,
 } from '../../_internal/overlay';
 import {
@@ -80,6 +81,7 @@ export function DropdownContent(
             side,
             align,
             sideOffset,
+            zIndex: OVERLAY_Z_INDEX.dropdown,
           });
         } else {
           clearOverlayPosition(root.dropdownId);
