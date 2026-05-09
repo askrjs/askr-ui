@@ -1,4 +1,5 @@
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
+import { setDynamicStyleRule } from '../../_internal/dynamic-style';
 import type {
   VisuallyHiddenAsChildProps,
   VisuallyHiddenSpanProps,
@@ -6,24 +7,29 @@ import type {
 
 const visuallyHiddenAttrs = {
   'data-askr-visually-hidden': 'true',
-  style: [
-    'position:absolute',
-    'width:1px',
-    'height:1px',
-    'padding:0',
-    'margin:-1px',
-    'overflow:hidden',
-    'clip:rect(0, 0, 0, 0)',
-    'white-space:nowrap',
-    'border:0',
-  ].join(';'),
 } as const;
+
+function ensureVisuallyHiddenRule() {
+  setDynamicStyleRule('visually-hidden', '[data-askr-visually-hidden="true"]', {
+    position: 'absolute',
+    width: '1px',
+    height: '1px',
+    padding: '0',
+    margin: '-1px',
+    overflow: 'hidden',
+    clip: 'rect(0, 0, 0, 0)',
+    'white-space': 'nowrap',
+    border: '0',
+  });
+}
 
 export function VisuallyHidden(props: VisuallyHiddenSpanProps): JSX.Element;
 export function VisuallyHidden(props: VisuallyHiddenAsChildProps): JSX.Element;
 export function VisuallyHidden(
   props: VisuallyHiddenSpanProps | VisuallyHiddenAsChildProps
 ) {
+  ensureVisuallyHiddenRule();
+
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, { ...visuallyHiddenAttrs, ref });
 

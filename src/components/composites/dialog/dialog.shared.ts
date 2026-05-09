@@ -1,10 +1,10 @@
 import { defineContext, readContext } from '@askrjs/askr';
-import type { OverlayPortal } from '../../_internal/overlay';
+import { OVERLAY_Z_INDEX, type OverlayPortal } from '../../_internal/overlay';
 
 export type DialogPositionOptions = {
   mode: 'centered';
   viewportPadding: 20;
-  zIndex: 50;
+  zIndex: typeof OVERLAY_Z_INDEX.modal;
 };
 
 export type DialogRootContextValue = {
@@ -44,6 +44,6 @@ export function resolveDialogPositionOptions(): DialogPositionOptions {
   return {
     mode: 'centered',
     viewportPadding: 20,
-    zIndex: 50,
+    zIndex: OVERLAY_Z_INDEX.modal,
   };
 }

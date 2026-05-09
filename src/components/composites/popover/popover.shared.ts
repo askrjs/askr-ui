@@ -1,12 +1,12 @@
 import { defineContext, readContext } from '@askrjs/askr';
-import type { OverlayPortal } from '../../_internal/overlay';
+import { OVERLAY_Z_INDEX, type OverlayPortal } from '../../_internal/overlay';
 import type { PopoverContentOwnProps } from './popover.types';
 
 export type PopoverPositionOptions = {
   side: NonNullable<PopoverContentOwnProps['side']>;
   align: NonNullable<PopoverContentOwnProps['align']>;
   sideOffset: NonNullable<PopoverContentOwnProps['sideOffset']>;
-  zIndex: 50;
+  zIndex: typeof OVERLAY_Z_INDEX.popover;
 };
 
 export type PopoverRootContextValue = {
@@ -44,6 +44,6 @@ export function resolvePopoverPositionOptions(
     side: options.side ?? 'bottom',
     align: options.align ?? 'center',
     sideOffset: options.sideOffset ?? 0,
-    zIndex: 50,
+    zIndex: OVERLAY_Z_INDEX.popover,
   };
 }

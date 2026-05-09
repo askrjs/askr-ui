@@ -1,6 +1,10 @@
 import { defineContext, readContext } from '@askrjs/askr';
-import { Slot, mergeProps } from '@askrjs/askr/foundations';
-import { mergeCssVar } from '../../_internal/style';
+import { Slot, composeRefs, mergeProps } from '@askrjs/askr/foundations';
+import {
+  dynamicAttributeSelector,
+  removeDynamicStyleRule,
+  setDynamicStyleRule,
+} from '../../_internal/dynamic-style';
 import { resolveCompoundId, resolvePartId } from '../../_internal/id';
 import {
   defaultProgressValueLabel,
@@ -43,7 +47,16 @@ function ProgressRootScopeView(props: {
 }
 
 export function Progress(props: ProgressProps) {
-  const { children, getValueLabel, id, max, ref, value, ...rest } = props;
+  const {
+    children,
+    getValueLabel,
+    id,
+    max,
+    ref,
+    style: _style,
+    value,
+    ...rest
+  } = props;
   const progressId = resolveCompoundId('progress', id, children);
   const normalizedMax = normalizeProgressMax(max);
   const normalizedValue = normalizeProgressValue(value, normalizedMax);
@@ -51,14 +64,30 @@ export function Progress(props: ProgressProps) {
     getValueLabel?.(normalizedValue, normalizedMax) ??
     defaultProgressValueLabel(normalizedValue, normalizedMax);
   const percentage = progressPercentage(normalizedValue, normalizedMax);
+  const progressRuleKey = `progress:${progressId}`;
+  const progressPercentageValue =
+    percentage === null ? '100%' : `${percentage}%`;
+  setDynamicStyleRule(
+    progressRuleKey,
+    dynamicAttributeSelector('id', progressId),
+    {
+      '--ak-progress-percentage': progressPercentageValue,
+    }
+  );
   const finalProps = mergeProps(rest, {
-    ref,
-    id: progressId,
-    style: mergeCssVar(
-      (rest as { style?: unknown }).style,
-      '--ak-progress-percentage',
-      percentage === null ? '100%' : `${percentage}%`
+    ref: composeRefs(
+      ref as
+        | ((value: HTMLElement | null) => void)
+        | { current: HTMLElement | null }
+        | null
+        | undefined,
+      (node: HTMLElement | null) => {
+        if (!node) {
+          removeDynamicStyleRule(progressRuleKey);
+        }
+      }
     ),
+    id: progressId,
     role: 'progressbar',
     'aria-valuemin': '0',
     'aria-valuemax': String(normalizedMax),

@@ -1,4 +1,9 @@
 import { definePortal } from '@askrjs/askr/foundations';
+import {
+  dynamicAttributeSelector,
+  removeDynamicStyleRule,
+  setDynamicStyleRule,
+} from './dynamic-style';
 
 export type OverlaySide = 'top' | 'right' | 'bottom' | 'left';
 export type OverlayAlign = 'start' | 'center' | 'end';
@@ -6,6 +11,19 @@ export type OverlayPortal = {
   (): JSX.Element | null;
   render(props: { children?: unknown }): JSX.Element | null;
 };
+
+export const OVERLAY_Z_INDEX = {
+  dropdown: 'var(--ak-z-dropdown, 1000)',
+  modalBackdrop: 'var(--ak-z-modal-backdrop, 1300)',
+  modal: 'var(--ak-z-modal, 1400)',
+  popover: 'var(--ak-z-popover, 1500)',
+  toast: 'var(--ak-z-toast, 1550)',
+  tooltip: 'var(--ak-z-tooltip, 1600)',
+} as const;
+
+export type OverlayZIndex =
+  | number
+  | (typeof OVERLAY_Z_INDEX)[keyof typeof OVERLAY_Z_INDEX];
 
 type OverlayNodes = {
   trigger: HTMLElement | null;
@@ -25,8 +43,10 @@ type OverlayPositionOptions = {
   sideOffset?: number;
   matchTriggerWidth?: boolean;
   viewportPadding?: number;
-  zIndex?: number;
+  zIndex?: OverlayZIndex;
 };
+
+type OverlayPositionDeclarations = Record<string, number | string | undefined>;
 
 function createOverlayPortal(): OverlayPortal {
   return definePortal<unknown>() as OverlayPortal;
@@ -136,20 +156,18 @@ function applyAnchoredPosition(
   trigger: HTMLElement,
   content: HTMLElement,
   options: Required<OverlayPositionOptions>
-) {
+): OverlayPositionDeclarations {
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
   const triggerRect = trigger.getBoundingClientRect();
-
-  if (options.matchTriggerWidth) {
-    content.style.minWidth = `${Math.round(triggerRect.width)}px`;
-  }
-
   const contentRect = content.getBoundingClientRect();
+  const contentWidth = options.matchTriggerWidth
+    ? Math.max(contentRect.width, triggerRect.width)
+    : contentRect.width;
   const resolvedSide = resolveAnchoredSide(
     options.side,
     triggerRect,
-    contentRect,
+    { width: contentWidth, height: contentRect.height } as DOMRect,
     viewportWidth,
     viewportHeight,
     options.sideOffset,
@@ -164,7 +182,7 @@ function applyAnchoredPosition(
       options.align,
       triggerRect.left,
       triggerRect.right,
-      contentRect.width
+      contentWidth
     );
     top =
       resolvedSide === 'bottom'
@@ -180,12 +198,12 @@ function applyAnchoredPosition(
     left =
       resolvedSide === 'right'
         ? triggerRect.right + options.sideOffset
-        : triggerRect.left - contentRect.width - options.sideOffset;
+        : triggerRect.left - contentWidth - options.sideOffset;
   }
 
   const maxLeft = Math.max(
     options.viewportPadding,
-    viewportWidth - contentRect.width - options.viewportPadding
+    viewportWidth - contentWidth - options.viewportPadding
   );
   const maxTop = Math.max(
     options.viewportPadding,
@@ -193,21 +211,23 @@ function applyAnchoredPosition(
   );
 
   content.dataset.side = resolvedSide;
-  content.style.position = 'fixed';
-  content.style.inset = 'auto';
-  content.style.margin = '0';
-  content.style.left = `${Math.round(
-    clamp(left, options.viewportPadding, maxLeft)
-  )}px`;
-  content.style.top = `${Math.round(
-    clamp(top, options.viewportPadding, maxTop)
-  )}px`;
+
+  return {
+    position: 'fixed',
+    inset: 'auto',
+    margin: '0',
+    left: `${Math.round(clamp(left, options.viewportPadding, maxLeft))}px`,
+    top: `${Math.round(clamp(top, options.viewportPadding, maxTop))}px`,
+    'min-width': options.matchTriggerWidth
+      ? `${Math.round(triggerRect.width)}px`
+      : undefined,
+  };
 }
 
 function applyCenteredPosition(
   content: HTMLElement,
   options: Required<OverlayPositionOptions>
-) {
+): OverlayPositionDeclarations {
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
   const contentRect = content.getBoundingClientRect();
@@ -220,23 +240,25 @@ function applyCenteredPosition(
     viewportHeight - contentRect.height - options.viewportPadding
   );
 
-  content.style.position = 'fixed';
-  content.style.inset = 'auto';
-  content.style.margin = '0';
-  content.style.left = `${Math.round(
-    clamp(
-      (viewportWidth - contentRect.width) / 2,
-      options.viewportPadding,
-      maxLeft
-    )
-  )}px`;
-  content.style.top = `${Math.round(
-    clamp(
-      (viewportHeight - contentRect.height) / 2,
-      options.viewportPadding,
-      maxTop
-    )
-  )}px`;
+  return {
+    position: 'fixed',
+    inset: 'auto',
+    margin: '0',
+    left: `${Math.round(
+      clamp(
+        (viewportWidth - contentRect.width) / 2,
+        options.viewportPadding,
+        maxLeft
+      )
+    )}px`,
+    top: `${Math.round(
+      clamp(
+        (viewportHeight - contentRect.height) / 2,
+        options.viewportPadding,
+        maxTop
+      )
+    )}px`,
+  };
 }
 
 export function clearOverlayPosition(id: string) {
@@ -265,14 +287,17 @@ export function syncOverlayPosition(
     return;
   }
 
+  const mode = options.mode ?? 'anchored';
   const resolvedOptions: Required<OverlayPositionOptions> = {
-    mode: options.mode ?? 'anchored',
+    mode,
     side: options.side ?? 'bottom',
     align: options.align ?? 'start',
     sideOffset: options.sideOffset ?? 0,
     matchTriggerWidth: options.matchTriggerWidth ?? false,
     viewportPadding: options.viewportPadding ?? 12,
-    zIndex: options.zIndex ?? (options.mode === 'centered' ? 50 : 40),
+    zIndex:
+      options.zIndex ??
+      (mode === 'centered' ? OVERLAY_Z_INDEX.modal : OVERLAY_Z_INDEX.popover),
   };
 
   let frame = 0;
@@ -285,18 +310,22 @@ export function syncOverlayPosition(
       return;
     }
 
-    content.style.zIndex = String(resolvedOptions.zIndex);
+    content.setAttribute('data-askr-overlay-id', id);
+    const selector = dynamicAttributeSelector('data-askr-overlay-id', id);
 
-    if (resolvedOptions.mode === 'centered') {
-      applyCenteredPosition(content, resolvedOptions);
-      return;
+    const position =
+      resolvedOptions.mode === 'centered'
+        ? applyCenteredPosition(content, resolvedOptions)
+        : trigger
+          ? applyAnchoredPosition(trigger, content, resolvedOptions)
+          : null;
+
+    if (position) {
+      setDynamicStyleRule(`overlay:${id}`, selector, {
+        ...position,
+        'z-index': resolvedOptions.zIndex,
+      });
     }
-
-    if (!trigger) {
-      return;
-    }
-
-    applyAnchoredPosition(trigger, content, resolvedOptions);
   };
 
   const scheduleUpdate = () => {
@@ -336,5 +365,7 @@ export function syncOverlayPosition(
     window.removeEventListener('scroll', scheduleUpdate, true);
     resizeObserver?.disconnect();
     resizeObserver = null;
+    nodes.content?.removeAttribute('data-askr-overlay-id');
+    removeDynamicStyleRule(`overlay:${id}`);
   };
 }
