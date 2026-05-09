@@ -13,23 +13,21 @@ import {
 } from '../../_internal/menu';
 import { resolvePartId } from '../../_internal/id';
 import {
-  readDropdownMenuRenderContext,
-  readDropdownMenuRootContext,
-  resolveDropdownMenuState,
-} from './dropdown-menu.shared';
+  readDropdownRenderContext,
+  readDropdownRootContext,
+  resolveDropdownState,
+} from './dropdown.shared';
 import type {
-  DropdownMenuItemAsChildProps,
-  DropdownMenuItemProps,
-} from './dropdown-menu.types';
+  DropdownItemAsChildProps,
+  DropdownItemProps,
+} from './dropdown.types';
 
-export function DropdownMenuItem(
-  props: DropdownMenuItemProps
+export function DropdownItem(props: DropdownItemProps): JSX.Element | null;
+export function DropdownItem(
+  props: DropdownItemAsChildProps
 ): JSX.Element | null;
-export function DropdownMenuItem(
-  props: DropdownMenuItemAsChildProps
-): JSX.Element | null;
-export function DropdownMenuItem(
-  props: DropdownMenuItemProps | DropdownMenuItemAsChildProps
+export function DropdownItem(
+  props: DropdownItemProps | DropdownItemAsChildProps
 ) {
   const {
     asChild,
@@ -40,17 +38,16 @@ export function DropdownMenuItem(
     type: typeProp,
     ...rest
   } = props;
-  const root = readDropdownMenuRootContext();
-  const renderContext = readDropdownMenuRenderContext();
+  const root = readDropdownRootContext();
+  const renderContext = readDropdownRenderContext();
   const itemIndex = renderContext.claimItemIndex();
-  const itemId = resolvePartId(root.dropdownMenuId, `item-${itemIndex}`);
+  const itemId = resolvePartId(root.dropdownId, `item-${itemIndex}`);
   const itemText = resolveMenuItemText(children);
-  const { items, currentIndex, disabledIndexes } =
-    resolveDropdownMenuState(root);
+  const { items, currentIndex, disabledIndexes } = resolveDropdownState(root);
   const hasEnabledItems = items.some(
     (_item, index) => !disabledIndexes.includes(index)
   );
-  const collection = getMenuCollection(root.dropdownMenuId);
+  const collection = getMenuCollection(root.dropdownId);
   const nav = rovingFocus({
     currentIndex,
     itemCount: Math.max(items.length, 1),
@@ -98,7 +95,7 @@ export function DropdownMenuItem(
     id: itemId,
     role: 'menuitem',
     'aria-disabled': disabled ? 'true' : undefined,
-    'data-slot': 'dropdown-menu-item',
+    'data-slot': 'dropdown-item',
     'data-disabled': disabled ? 'true' : undefined,
   });
 

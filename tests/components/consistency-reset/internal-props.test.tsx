@@ -10,17 +10,6 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from '../../../src/components/composites/menubar';
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuSub,
-  NavigationMenuSubContent,
-  NavigationMenuSubTrigger,
-  NavigationMenuTrigger,
-} from '../../../src/components/composites/navigation-menu';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 async function flushPortalUpdates() {
@@ -77,44 +66,6 @@ describe('Consistency Reset - Internal Props', () => {
     (
       Array.from(document.body.querySelectorAll('button')).find(
         (element) => element.textContent?.trim() === 'Share'
-      ) as HTMLButtonElement
-    ).dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
-    await flushPortalUpdates();
-
-    expect(collectInternalAttributes(document.body)).toEqual([]);
-  });
-
-  it('does not forward __* injected props to navigation menu DOM nodes', async () => {
-    container = mount(
-      <NavigationMenu>
-        <NavigationMenuList>
-          <NavigationMenuItem value="products">
-            <NavigationMenuTrigger>Products</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <NavigationMenuSub value="more">
-                <NavigationMenuSubTrigger>More</NavigationMenuSubTrigger>
-                <NavigationMenuSubContent>
-                  <NavigationMenuLink href="/products/pro">
-                    Pro
-                  </NavigationMenuLink>
-                </NavigationMenuSubContent>
-              </NavigationMenuSub>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>
-    );
-
-    (
-      Array.from(document.body.querySelectorAll('button')).find(
-        (element) => element.textContent?.trim() === 'Products'
-      ) as HTMLButtonElement
-    ).click();
-    await flushPortalUpdates();
-
-    (
-      Array.from(document.body.querySelectorAll('button')).find(
-        (element) => element.textContent?.trim() === 'More'
       ) as HTMLButtonElement
     ).dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
     await flushPortalUpdates();

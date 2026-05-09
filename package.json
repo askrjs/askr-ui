@@ -69,7 +69,7 @@
   "devDependencies": {
     "@askrjs/askr": "^0.0.34",
     "@askrjs/vite": ">=0.0.2 <0.1.0",
-    "@types/node": "^25.6.0",
+    "@types/node": "^25.6.2",
     "axe-core": "^4.11.4",
     "cross-env": "^10.1.0",
     "jiti": "^2.7.0",

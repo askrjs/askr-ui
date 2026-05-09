@@ -5,21 +5,21 @@ import {
   pressable,
 } from '@askrjs/askr/foundations';
 import { getOverlayNodes } from '../../_internal/overlay';
-import { readDropdownMenuRootContext } from './dropdown-menu.shared';
+import { readDropdownRootContext } from './dropdown.shared';
 import type {
-  DropdownMenuPortalProps,
-  DropdownMenuTriggerAsChildProps,
-  DropdownMenuTriggerProps,
-} from './dropdown-menu.types';
+  DropdownPortalProps,
+  DropdownTriggerAsChildProps,
+  DropdownTriggerProps,
+} from './dropdown.types';
 
-export function DropdownMenuTrigger(
-  props: DropdownMenuTriggerProps
+export function DropdownTrigger(
+  props: DropdownTriggerProps
 ): JSX.Element | null;
-export function DropdownMenuTrigger(
-  props: DropdownMenuTriggerAsChildProps
+export function DropdownTrigger(
+  props: DropdownTriggerAsChildProps
 ): JSX.Element | null;
-export function DropdownMenuTrigger(
-  props: DropdownMenuTriggerProps | DropdownMenuTriggerAsChildProps
+export function DropdownTrigger(
+  props: DropdownTriggerProps | DropdownTriggerAsChildProps
 ) {
   const {
     asChild,
@@ -30,8 +30,8 @@ export function DropdownMenuTrigger(
     type: typeProp,
     ...rest
   } = props;
-  const root = readDropdownMenuRootContext();
-  const overlayNodes = getOverlayNodes(root.dropdownMenuId);
+  const root = readDropdownRootContext();
+  const overlayNodes = getOverlayNodes(root.dropdownId);
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
@@ -57,7 +57,7 @@ export function DropdownMenuTrigger(
     'aria-haspopup': 'menu',
     'aria-expanded': root.open ? 'true' : 'false',
     'aria-controls': root.contentId,
-    'data-slot': 'dropdown-menu-trigger',
+    'data-slot': 'dropdown-trigger',
     'data-disabled': disabled ? 'true' : undefined,
     'data-state': root.open ? 'open' : 'closed',
   });
@@ -73,10 +73,8 @@ export function DropdownMenuTrigger(
   );
 }
 
-export function DropdownMenuPortal(
-  props: DropdownMenuPortalProps
-): JSX.Element | null {
-  const root = readDropdownMenuRootContext();
+export function DropdownPortal(props: DropdownPortalProps): JSX.Element | null {
+  const root = readDropdownRootContext();
 
   return root.portal.render({
     children: props.children,
