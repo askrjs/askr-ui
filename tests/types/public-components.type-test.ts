@@ -18,14 +18,6 @@ import {
   MenubarMenu,
   MenubarPortal,
   MenubarTrigger,
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuIndicator,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuViewport,
   Progress,
   ProgressCircle,
   ProgressCircleIndicator,
@@ -62,20 +54,6 @@ import {
   type MenubarProps,
   type MenubarTriggerAsChildProps,
   type MenubarTriggerProps,
-  type NavigationMenuContentAsChildProps,
-  type NavigationMenuContentProps,
-  type NavigationMenuIndicatorAsChildProps,
-  type NavigationMenuIndicatorProps,
-  type NavigationMenuItemProps,
-  type NavigationMenuLinkAsChildProps,
-  type NavigationMenuLinkProps,
-  type NavigationMenuListAsChildProps,
-  type NavigationMenuListProps,
-  type NavigationMenuProps,
-  type NavigationMenuTriggerAsChildProps,
-  type NavigationMenuTriggerProps,
-  type NavigationMenuViewportAsChildProps,
-  type NavigationMenuViewportProps,
   type ProgressCircleProps,
   type ProgressProps,
   type SliderProps,
@@ -102,7 +80,6 @@ import { Accordion as AccordionSubpath } from '@askrjs/ui/composites/accordion';
 import { Avatar as AvatarSubpath } from '@askrjs/ui/primitives/avatar';
 import { Collapsible as CollapsibleSubpath } from '@askrjs/ui/composites/collapsible';
 import { Menubar as MenubarSubpath } from '@askrjs/ui/composites/menubar';
-import { NavigationMenu as NavigationMenuSubpath } from '@askrjs/ui/composites/navigation-menu';
 import { Progress as ProgressSubpath } from '@askrjs/ui/primitives/progress';
 import { ProgressCircle as ProgressCircleSubpath } from '@askrjs/ui/primitives/progress-circle';
 import { Slider as SliderSubpath } from '@askrjs/ui/primitives/slider';
@@ -116,7 +93,6 @@ const accordionFromSubpath: typeof Accordion = AccordionSubpath;
 const avatarFromSubpath: typeof Avatar = AvatarSubpath;
 const collapsibleFromSubpath: typeof Collapsible = CollapsibleSubpath;
 const menubarFromSubpath: typeof Menubar = MenubarSubpath;
-const navigationMenuFromSubpath: typeof NavigationMenu = NavigationMenuSubpath;
 const progressFromSubpath: typeof Progress = ProgressSubpath;
 const progressCircleFromSubpath: typeof ProgressCircle = ProgressCircleSubpath;
 const sliderFromSubpath: typeof Slider = SliderSubpath;
@@ -124,7 +100,6 @@ const tableFromSubpath: typeof Table = TableSubpath;
 const toastFromSubpath: typeof ToastProvider = ToastSubpath;
 const toggleGroupFromSubpath: typeof ToggleGroup = ToggleGroupSubpath;
 const menubarFromRoot: typeof Menubar = askrUi.Menubar;
-const navigationMenuFromRoot: typeof NavigationMenu = askrUi.NavigationMenu;
 
 const avatarProps: AvatarProps = { children: 'avatar' };
 const avatarImageProps: AvatarImageProps = { src: '/avatar.png', alt: 'User' };
@@ -160,49 +135,6 @@ const menubarItemAsChildProps: MenubarItemAsChildProps = {
   asChild: true,
   children: slotChild,
 };
-const navigationMenuProps: NavigationMenuProps = { children: 'nav' };
-const navigationMenuListProps: NavigationMenuListProps = { children: 'list' };
-const navigationMenuListAsChildProps: NavigationMenuListAsChildProps = {
-  asChild: true,
-  children: slotChild,
-};
-const navigationMenuItemProps: NavigationMenuItemProps = {
-  value: 'products',
-  children: 'item',
-};
-const navigationMenuTriggerProps: NavigationMenuTriggerProps = {
-  children: 'Products',
-};
-const navigationMenuTriggerAsChildProps: NavigationMenuTriggerAsChildProps = {
-  asChild: true,
-  children: slotChild,
-};
-const navigationMenuContentProps: NavigationMenuContentProps = {
-  children: 'Panel',
-};
-const navigationMenuContentAsChildProps: NavigationMenuContentAsChildProps = {
-  asChild: true,
-  children: slotChild,
-};
-const navigationMenuLinkProps: NavigationMenuLinkProps = {
-  href: '/products',
-  children: 'Products',
-};
-const navigationMenuLinkAsChildProps: NavigationMenuLinkAsChildProps = {
-  asChild: true,
-  children: slotChild,
-};
-const navigationMenuViewportProps: NavigationMenuViewportProps = {};
-const navigationMenuViewportAsChildProps: NavigationMenuViewportAsChildProps = {
-  asChild: true,
-  children: slotChild,
-};
-const navigationMenuIndicatorProps: NavigationMenuIndicatorProps = {};
-const navigationMenuIndicatorAsChildProps: NavigationMenuIndicatorAsChildProps =
-  {
-    asChild: true,
-    children: slotChild,
-  };
 const accordionSingleProps: AccordionSingleProps = { defaultValue: 'a' };
 const accordionMultipleProps: AccordionMultipleProps = {
   type: 'multiple',
@@ -268,19 +200,11 @@ const _invalidMenubarTrigger: MenubarTriggerAsChildProps = {
   type: 'button',
 };
 
-const _invalidNavigationTrigger: NavigationMenuTriggerAsChildProps = {
-  asChild: true,
-  children: slotChild,
-  // @ts-expect-error asChild navigation menu trigger props must not accept native button type.
-  type: 'button',
-};
-
 void [
   accordionFromSubpath,
   avatarFromSubpath,
   collapsibleFromSubpath,
   menubarFromSubpath,
-  navigationMenuFromSubpath,
   progressFromSubpath,
   progressCircleFromSubpath,
   sliderFromSubpath,
@@ -288,7 +212,6 @@ void [
   toastFromSubpath,
   toggleGroupFromSubpath,
   menubarFromRoot,
-  navigationMenuFromRoot,
   Avatar,
   AvatarImage,
   AvatarFallback,
@@ -298,14 +221,6 @@ void [
   MenubarPortal,
   MenubarContent,
   MenubarItem,
-  NavigationMenu,
-  NavigationMenuList,
-  NavigationMenuItem,
-  NavigationMenuTrigger,
-  NavigationMenuContent,
-  NavigationMenuLink,
-  NavigationMenuViewport,
-  NavigationMenuIndicator,
   CollapsibleTrigger,
   CollapsibleContent,
   ProgressIndicator,
@@ -347,20 +262,6 @@ void [
   menubarContentAsChildProps,
   menubarItemProps,
   menubarItemAsChildProps,
-  navigationMenuProps,
-  navigationMenuListProps,
-  navigationMenuListAsChildProps,
-  navigationMenuItemProps,
-  navigationMenuTriggerProps,
-  navigationMenuTriggerAsChildProps,
-  navigationMenuContentProps,
-  navigationMenuContentAsChildProps,
-  navigationMenuLinkProps,
-  navigationMenuLinkAsChildProps,
-  navigationMenuViewportProps,
-  navigationMenuViewportAsChildProps,
-  navigationMenuIndicatorProps,
-  navigationMenuIndicatorAsChildProps,
   accordionSingleProps,
   accordionMultipleProps,
   accordionTriggerProps,

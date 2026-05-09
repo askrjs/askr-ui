@@ -22,12 +22,11 @@ import * as AlertDialogModule from '../../src/components/composites/alert-dialog
 import * as CollapsibleModule from '../../src/components/composites/collapsible/index';
 import * as DialogModule from '../../src/components/composites/dialog/index';
 import * as DismissableLayerModule from '../../src/components/composites/dismissable-layer/index';
-import * as DropdownMenuModule from '../../src/components/composites/dropdown-menu/index';
+import * as DropdownModule from '../../src/components/composites/dropdown/index';
 import * as FocusScopeModule from '../../src/components/composites/focus-scope/index';
 import * as HoverCardModule from '../../src/components/composites/hover-card/index';
 import * as MenuModule from '../../src/components/composites/menu/index';
 import * as MenubarModule from '../../src/components/composites/menubar/index';
-import * as NavigationMenuModule from '../../src/components/composites/navigation-menu/index';
 import * as PopoverModule from '../../src/components/composites/popover/index';
 import * as ScrollAreaModule from '../../src/components/composites/scroll-area/index';
 import * as ToastModule from '../../src/components/composites/toast/index';
@@ -68,16 +67,11 @@ export const componentSurface = [
     name: 'dismissable-layer',
     module: DismissableLayerModule,
   },
-  { bucket: 'composites', name: 'dropdown-menu', module: DropdownMenuModule },
+  { bucket: 'composites', name: 'dropdown', module: DropdownModule },
   { bucket: 'composites', name: 'focus-scope', module: FocusScopeModule },
   { bucket: 'composites', name: 'hover-card', module: HoverCardModule },
   { bucket: 'composites', name: 'menu', module: MenuModule },
   { bucket: 'composites', name: 'menubar', module: MenubarModule },
-  {
-    bucket: 'composites',
-    name: 'navigation-menu',
-    module: NavigationMenuModule,
-  },
   { bucket: 'composites', name: 'popover', module: PopoverModule },
   { bucket: 'composites', name: 'scroll-area', module: ScrollAreaModule },
   { bucket: 'composites', name: 'toast', module: ToastModule },
@@ -144,7 +138,7 @@ export const docsCategories = [
       'popover',
       'hover-card',
       'tooltip',
-      'dropdown-menu',
+      'dropdown',
       'menu',
     ],
   },
@@ -166,7 +160,7 @@ export const docsCategories = [
   },
   {
     label: 'Navigation',
-    names: ['menubar', 'navigation-menu'],
+    names: ['menubar'],
   },
   {
     label: 'Tables',

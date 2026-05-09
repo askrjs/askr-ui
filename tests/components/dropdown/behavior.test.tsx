@@ -1,14 +1,14 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuTrigger,
-} from '../../../src/components/composites/dropdown-menu';
+  Dropdown,
+  DropdownContent,
+  DropdownItem,
+  DropdownPortal,
+  DropdownTrigger,
+} from '../../../src/components/composites/dropdown';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
-describe('DropdownMenu - Behavior', () => {
+describe('Dropdown - Behavior', () => {
   let container: HTMLElement;
 
   afterEach(() => {
@@ -17,14 +17,14 @@ describe('DropdownMenu - Behavior', () => {
 
   it('toggles trigger expansion state when activated', async () => {
     container = mount(
-      <DropdownMenu>
-        <DropdownMenuTrigger>Open menu</DropdownMenuTrigger>
-        <DropdownMenuPortal>
-          <DropdownMenuContent>
-            <DropdownMenuItem>Archive</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenuPortal>
-      </DropdownMenu>
+      <Dropdown>
+        <DropdownTrigger>Open dropdown</DropdownTrigger>
+        <DropdownPortal>
+          <DropdownContent>
+            <DropdownItem>Archive</DropdownItem>
+          </DropdownContent>
+        </DropdownPortal>
+      </Dropdown>
     );
 
     let trigger = container.querySelector(
@@ -44,21 +44,21 @@ describe('DropdownMenu - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('supports nested menu item composition without direct child injection', async () => {
+  it('supports nested dropdown item composition without direct child injection', async () => {
     container = mount(
-      <DropdownMenu defaultOpen>
-        <DropdownMenuTrigger>Open menu</DropdownMenuTrigger>
-        <DropdownMenuPortal>
-          <DropdownMenuContent>
+      <Dropdown defaultOpen>
+        <DropdownTrigger>Open dropdown</DropdownTrigger>
+        <DropdownPortal>
+          <DropdownContent>
             <div>
-              <DropdownMenuItem>Archive</DropdownMenuItem>
+              <DropdownItem>Archive</DropdownItem>
             </div>
             <div>
-              <DropdownMenuItem>Delete</DropdownMenuItem>
+              <DropdownItem>Delete</DropdownItem>
             </div>
-          </DropdownMenuContent>
-        </DropdownMenuPortal>
-      </DropdownMenu>
+          </DropdownContent>
+        </DropdownPortal>
+      </Dropdown>
     );
 
     await flushUpdates();
@@ -72,23 +72,23 @@ describe('DropdownMenu - Behavior', () => {
     expect(items[1]?.getAttribute('tabindex')).toBe('-1');
   });
 
-  it('keeps menu open when all items are disabled and arrow navigation is attempted', async () => {
+  it('keeps dropdown open when all items are disabled and arrow navigation is attempted', async () => {
     container = mount(
-      <DropdownMenu defaultOpen>
-        <DropdownMenuTrigger>Open menu</DropdownMenuTrigger>
-        <DropdownMenuPortal>
-          <DropdownMenuContent>
-            <DropdownMenuItem disabled>Archive</DropdownMenuItem>
-            <DropdownMenuItem disabled>Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenuPortal>
-      </DropdownMenu>
+      <Dropdown defaultOpen>
+        <DropdownTrigger>Open dropdown</DropdownTrigger>
+        <DropdownPortal>
+          <DropdownContent>
+            <DropdownItem disabled>Archive</DropdownItem>
+            <DropdownItem disabled>Delete</DropdownItem>
+          </DropdownContent>
+        </DropdownPortal>
+      </Dropdown>
     );
 
     await flushUpdates();
 
     const content = document.body.querySelector(
-      '[data-slot="dropdown-menu-content"]'
+      '[data-slot="dropdown-content"]'
     ) as HTMLDivElement;
     content.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })

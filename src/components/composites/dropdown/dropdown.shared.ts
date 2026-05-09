@@ -7,8 +7,8 @@ import {
 } from '../../_internal/menu';
 import type { OverlayPortal } from '../../_internal/overlay';
 
-export type DropdownMenuRootContextValue = {
-  dropdownMenuId: string;
+export type DropdownRootContextValue = {
+  dropdownId: string;
   open: boolean;
   setOpen: (open: boolean) => void;
   contentId: string;
@@ -17,44 +17,42 @@ export type DropdownMenuRootContextValue = {
   setCurrentIndex: (index: number) => void;
 };
 
-export type DropdownMenuRenderContextValue = {
+export type DropdownRenderContextValue = {
   claimItemIndex: () => number;
 };
 
-export type DropdownMenuResolvedState = {
+export type DropdownResolvedState = {
   items: MenuItemMetadata[];
   currentIndex: number;
   disabledIndexes: number[];
 };
 
-export const DropdownMenuRootContext =
-  defineContext<DropdownMenuRootContextValue | null>(null);
-export const DropdownMenuRenderContext =
-  defineContext<DropdownMenuRenderContextValue | null>(null);
+export const DropdownRootContext =
+  defineContext<DropdownRootContextValue | null>(null);
+export const DropdownRenderContext =
+  defineContext<DropdownRenderContextValue | null>(null);
 
-export function readDropdownMenuRootContext(): DropdownMenuRootContextValue {
-  const context = readContext(DropdownMenuRootContext);
+export function readDropdownRootContext(): DropdownRootContextValue {
+  const context = readContext(DropdownRootContext);
 
   if (!context) {
-    throw new Error(
-      'DropdownMenu components must be used within <DropdownMenu>'
-    );
+    throw new Error('Dropdown components must be used within <Dropdown>');
   }
 
   return context;
 }
 
-export function readDropdownMenuRenderContext(): DropdownMenuRenderContextValue {
-  const context = readContext(DropdownMenuRenderContext);
+export function readDropdownRenderContext(): DropdownRenderContextValue {
+  const context = readContext(DropdownRenderContext);
 
   if (!context) {
-    throw new Error('DropdownMenuItem must be used within <DropdownMenu>');
+    throw new Error('DropdownItem must be used within <Dropdown>');
   }
 
   return context;
 }
 
-export function createDropdownMenuRenderContext(): DropdownMenuRenderContextValue {
+export function createDropdownRenderContext(): DropdownRenderContextValue {
   let nextItemIndex = 0;
 
   return {
@@ -66,10 +64,10 @@ export function createDropdownMenuRenderContext(): DropdownMenuRenderContextValu
   };
 }
 
-export function resolveDropdownMenuState(
-  root: DropdownMenuRootContextValue
-): DropdownMenuResolvedState {
-  const items = getMenuCollectionItems(getMenuCollection(root.dropdownMenuId));
+export function resolveDropdownState(
+  root: DropdownRootContextValue
+): DropdownResolvedState {
+  const items = getMenuCollectionItems(getMenuCollection(root.dropdownId));
   const fallbackIndex = firstEnabledIndex(items);
   const candidateIndex = root.currentIndexCandidate;
   const currentIndex =

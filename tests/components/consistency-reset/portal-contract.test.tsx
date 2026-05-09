@@ -12,12 +12,12 @@ import {
   PopoverTrigger,
 } from '../../../src/components/composites/popover';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuTrigger,
-} from '../../../src/components/composites/dropdown-menu';
+  Dropdown,
+  DropdownContent,
+  DropdownItem,
+  DropdownPortal,
+  DropdownTrigger,
+} from '../../../src/components/composites/dropdown';
 import {
   Select,
   SelectContent,
@@ -56,14 +56,14 @@ describe('Consistency Reset - Portal Contract', () => {
           </PopoverPortal>
           <PopoverTrigger>Open popover</PopoverTrigger>
         </Popover>
-        <DropdownMenu key="dropdown-menu" defaultOpen>
-          <DropdownMenuPortal>
-            <DropdownMenuContent>
-              <DropdownMenuItem>Archive</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenuPortal>
-          <DropdownMenuTrigger>Open menu</DropdownMenuTrigger>
-        </DropdownMenu>
+        <Dropdown key="dropdown" defaultOpen>
+          <DropdownPortal>
+            <DropdownContent>
+              <DropdownItem>Archive</DropdownItem>
+            </DropdownContent>
+          </DropdownPortal>
+          <DropdownTrigger>Open dropdown</DropdownTrigger>
+        </Dropdown>
         <Select key="select" defaultOpen defaultValue="askr">
           <SelectPortal>
             <SelectContent>
@@ -93,7 +93,7 @@ describe('Consistency Reset - Portal Contract', () => {
     expect(text.indexOf('Open popover')).toBeLessThan(
       text.indexOf('Popover body')
     );
-    expect(text.indexOf('Open menu')).toBeLessThan(text.indexOf('Archive'));
+    expect(text.indexOf('Open dropdown')).toBeLessThan(text.indexOf('Archive'));
     expect(text.indexOf('Tooltip trigger')).toBeLessThan(
       text.indexOf('Tooltip body')
     );

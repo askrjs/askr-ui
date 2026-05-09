@@ -15,22 +15,22 @@ import {
   syncOverlayPosition,
 } from '../../_internal/overlay';
 import {
-  readDropdownMenuRootContext,
-  resolveDropdownMenuState,
-} from './dropdown-menu.shared';
+  readDropdownRootContext,
+  resolveDropdownState,
+} from './dropdown.shared';
 import type {
-  DropdownMenuContentAsChildProps,
-  DropdownMenuContentProps,
-} from './dropdown-menu.types';
+  DropdownContentAsChildProps,
+  DropdownContentProps,
+} from './dropdown.types';
 
-export function DropdownMenuContent(
-  props: DropdownMenuContentProps
+export function DropdownContent(
+  props: DropdownContentProps
 ): JSX.Element | null;
-export function DropdownMenuContent(
-  props: DropdownMenuContentAsChildProps
+export function DropdownContent(
+  props: DropdownContentAsChildProps
 ): JSX.Element | null;
-export function DropdownMenuContent(
-  props: DropdownMenuContentProps | DropdownMenuContentAsChildProps
+export function DropdownContent(
+  props: DropdownContentProps | DropdownContentAsChildProps
 ) {
   const {
     asChild,
@@ -42,14 +42,13 @@ export function DropdownMenuContent(
     sideOffset = 0,
     ...rest
   } = props;
-  const root = readDropdownMenuRootContext();
-  const { items, currentIndex, disabledIndexes } =
-    resolveDropdownMenuState(root);
+  const root = readDropdownRootContext();
+  const { items, currentIndex, disabledIndexes } = resolveDropdownState(root);
   const hasEnabledItems = items.some(
     (_item, index) => !disabledIndexes.includes(index)
   );
-  const overlayNodes = getOverlayNodes(root.dropdownMenuId);
-  const collection = getMenuCollection(root.dropdownMenuId);
+  const overlayNodes = getOverlayNodes(root.dropdownId);
+  const collection = getMenuCollection(root.dropdownId);
   const nav = rovingFocus({
     currentIndex,
     itemCount: Math.max(items.length, 1),
@@ -77,13 +76,13 @@ export function DropdownMenuContent(
       (node: HTMLElement | null) => {
         overlayNodes.content = node;
         if (node && root.open) {
-          syncOverlayPosition(root.dropdownMenuId, {
+          syncOverlayPosition(root.dropdownId, {
             side,
             align,
             sideOffset,
           });
         } else {
-          clearOverlayPosition(root.dropdownMenuId);
+          clearOverlayPosition(root.dropdownId);
         }
 
         if (node && root.open && hasEnabledItems) {
@@ -93,7 +92,7 @@ export function DropdownMenuContent(
     ),
     id: root.contentId,
     role: 'menu',
-    'data-slot': 'dropdown-menu-content',
+    'data-slot': 'dropdown-content',
     'data-state': root.open ? 'open' : 'closed',
     'data-side': side,
     'data-align': align,

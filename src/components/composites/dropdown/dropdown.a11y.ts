@@ -1,8 +1,8 @@
 /**
- * Dropdown menu accessibility contract.
+ * Dropdown accessibility contract.
  */
 
-export const DROPDOWN_MENU_A11Y_CONTRACT = {
+export const DROPDOWN_A11Y_CONTRACT = {
   CONTENT_ROLE: 'menu' as const,
   ITEM_ROLE: 'menuitem' as const,
   DATA_ATTRIBUTES: {
@@ -19,4 +19,4 @@ export const DROPDOWN_MENU_A11Y_CONTRACT = {
   },
 } as const;
 
-export type DropdownMenuA11yContract = typeof DROPDOWN_MENU_A11Y_CONTRACT;
+export type DropdownA11yContract = typeof DROPDOWN_A11Y_CONTRACT;

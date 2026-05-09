@@ -1,21 +1,21 @@
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
 import type {
-  DropdownMenuGroupAsChildProps,
-  DropdownMenuGroupProps,
-  DropdownMenuLabelAsChildProps,
-  DropdownMenuLabelProps,
-  DropdownMenuSeparatorAsChildProps,
-  DropdownMenuSeparatorProps,
-} from './dropdown-menu.types';
+  DropdownGroupAsChildProps,
+  DropdownGroupProps,
+  DropdownLabelAsChildProps,
+  DropdownLabelProps,
+  DropdownSeparatorAsChildProps,
+  DropdownSeparatorProps,
+} from './dropdown.types';
 
-export function DropdownMenuGroup(
-  props: DropdownMenuGroupProps | DropdownMenuGroupAsChildProps
+export function DropdownGroup(
+  props: DropdownGroupProps | DropdownGroupAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
     role: 'group',
-    'data-slot': 'dropdown-menu-group',
+    'data-slot': 'dropdown-group',
   });
 
   if (asChild) {
@@ -25,14 +25,14 @@ export function DropdownMenuGroup(
   return <div {...finalProps}>{children}</div>;
 }
 
-export function DropdownMenuLabel(
-  props: DropdownMenuLabelProps | DropdownMenuLabelAsChildProps
+export function DropdownLabel(
+  props: DropdownLabelProps | DropdownLabelAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
-    'data-slot': 'dropdown-menu-label',
-    'data-dropdown-menu-label': 'true',
+    'data-slot': 'dropdown-label',
+    'data-dropdown-label': 'true',
   });
 
   if (asChild) {
@@ -42,14 +42,14 @@ export function DropdownMenuLabel(
   return <div {...finalProps}>{children}</div>;
 }
 
-export function DropdownMenuSeparator(
-  props: DropdownMenuSeparatorProps | DropdownMenuSeparatorAsChildProps
+export function DropdownSeparator(
+  props: DropdownSeparatorProps | DropdownSeparatorAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
     ref,
     role: 'separator',
-    'data-slot': 'dropdown-menu-separator',
+    'data-slot': 'dropdown-separator',
   });
 
   if (asChild) {

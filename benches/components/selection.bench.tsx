@@ -1,10 +1,10 @@
 import { bench, describe } from 'vite-plus/test';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuTrigger,
+  Dropdown,
+  DropdownContent,
+  DropdownItem,
+  DropdownPortal,
+  DropdownTrigger,
 } from '../../src/components';
 import { Menu, MenuContent, MenuItem } from '../../src/components';
 import {
@@ -28,17 +28,17 @@ describe('Menu and Select benches', () => {
     });
   });
 
-  bench('create DropdownMenu tree', () => {
-    DropdownMenu({
+  bench('create Dropdown tree', () => {
+    Dropdown({
       defaultOpen: true,
       children: (
         <>
-          <DropdownMenuTrigger>Open menu</DropdownMenuTrigger>
-          <DropdownMenuPortal>
-            <DropdownMenuContent>
-              <DropdownMenuItem>Archive</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenuPortal>
+          <DropdownTrigger>Open dropdown</DropdownTrigger>
+          <DropdownPortal>
+            <DropdownContent>
+              <DropdownItem>Archive</DropdownItem>
+            </DropdownContent>
+          </DropdownPortal>
         </>
       ),
     });

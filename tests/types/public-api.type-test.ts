@@ -23,14 +23,14 @@ import {
   DialogTitle,
   DialogTrigger,
   DismissableLayer,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  Dropdown,
+  DropdownContent,
+  DropdownGroup,
+  DropdownItem,
+  DropdownLabel,
+  DropdownPortal,
+  DropdownSeparator,
+  DropdownTrigger,
   FocusScope,
   Menu,
   MenuContent,
@@ -90,10 +90,10 @@ import {
   type DialogTriggerProps,
   type DismissableLayerAsChildProps,
   type DismissableLayerProps,
-  type DropdownMenuContentAsChildProps,
-  type DropdownMenuContentProps,
-  type DropdownMenuItemAsChildProps,
-  type DropdownMenuItemProps,
+  type DropdownContentAsChildProps,
+  type DropdownContentProps,
+  type DropdownItemAsChildProps,
+  type DropdownItemProps,
   type FocusScopeAsChildProps,
   type FocusScopeProps,
   type MenuContentAsChildProps,
@@ -136,7 +136,7 @@ import { Button as ButtonSubpath } from '@askrjs/ui/primitives/button';
 import { Checkbox as CheckboxSubpath } from '@askrjs/ui/primitives/checkbox';
 import { Collapsible as CollapsibleSubpath } from '@askrjs/ui/composites/collapsible';
 import { Dialog as DialogSubpath } from '@askrjs/ui/composites/dialog';
-import { DropdownMenu as DropdownMenuSubpath } from '@askrjs/ui/composites/dropdown-menu';
+import { Dropdown as DropdownSubpath } from '@askrjs/ui/composites/dropdown';
 import { FocusScope as FocusScopeSubpath } from '@askrjs/ui/composites/focus-scope';
 import { Menu as MenuSubpath } from '@askrjs/ui/composites/menu';
 import { Popover as PopoverSubpath } from '@askrjs/ui/composites/popover';
@@ -155,7 +155,7 @@ const dialogFromSubpath: typeof Dialog = DialogSubpath;
 const alertDialogFromSubpath: typeof AlertDialog = AlertDialogSubpath;
 const popoverFromSubpath: typeof Popover = PopoverSubpath;
 const menuFromSubpath: typeof Menu = MenuSubpath;
-const dropdownMenuFromSubpath: typeof DropdownMenu = DropdownMenuSubpath;
+const dropdownFromSubpath: typeof Dropdown = DropdownSubpath;
 const selectFromSubpath: typeof Select = SelectSubpath;
 const tooltipFromSubpath: typeof Tooltip = TooltipSubpath;
 const radioGroupFromRoot: typeof RadioGroup = RadioGroup;
@@ -341,13 +341,13 @@ const menuItemAsChildProps: MenuItemAsChildProps = {
   children: slotChild,
 };
 
-const dropdownMenuContentProps: DropdownMenuContentProps = {};
-const dropdownMenuContentAsChildProps: DropdownMenuContentAsChildProps = {
+const dropdownContentProps: DropdownContentProps = {};
+const dropdownContentAsChildProps: DropdownContentAsChildProps = {
   asChild: true,
   children: slotChild,
 };
-const dropdownMenuItemProps: DropdownMenuItemProps = { children: 'Action' };
-const dropdownMenuItemAsChildProps: DropdownMenuItemAsChildProps = {
+const dropdownItemProps: DropdownItemProps = { children: 'Action' };
+const dropdownItemAsChildProps: DropdownItemAsChildProps = {
   asChild: true,
   children: slotChild,
 };
@@ -434,7 +434,7 @@ void [
   alertDialogFromSubpath,
   popoverFromSubpath,
   menuFromSubpath,
-  dropdownMenuFromSubpath,
+  dropdownFromSubpath,
   selectFromSubpath,
   tooltipFromSubpath,
   radioGroupFromRoot,
@@ -459,13 +459,13 @@ void [
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownContent,
+  DropdownGroup,
+  DropdownItem,
+  DropdownLabel,
+  DropdownPortal,
+  DropdownSeparator,
+  DropdownTrigger,
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -550,10 +550,10 @@ void [
   menuContentAsChildProps,
   menuItemProps,
   menuItemAsChildProps,
-  dropdownMenuContentProps,
-  dropdownMenuContentAsChildProps,
-  dropdownMenuItemProps,
-  dropdownMenuItemAsChildProps,
+  dropdownContentProps,
+  dropdownContentAsChildProps,
+  dropdownItemProps,
+  dropdownItemAsChildProps,
   selectProps,
   selectTriggerProps,
   selectTriggerAsChildProps,

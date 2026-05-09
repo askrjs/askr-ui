@@ -21,8 +21,8 @@ composition, and styling.
 - Form and control primitives: `Button`, `Input`, `Textarea`, `Checkbox`,
   `RadioGroup`, `Select`, `Slider`, `Switch`, `Toggle`, `ToggleGroup`, `Label`
 - Disclosure and overlay behavior: `Accordion`, `Collapsible`,
-  `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `DropdownMenu`, `Menu`,
-  `Menubar`, `NavigationMenu`
+  `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Dropdown`, `Menu`,
+  `Menubar`
 - Utility and support primitives: `FocusScope`, `DismissableLayer`, `Avatar`,
   `Progress`, `ProgressCircle`, `Table`, `VisuallyHidden`
 - Composition model: `asChild` / `Slot`-style composition is already a first-class

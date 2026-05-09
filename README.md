@@ -33,13 +33,13 @@ The package exports components by family:
 - Primitives: `Button`, `Toggle`, `Checkbox`, `Input`, `Textarea`, `Label`,
   `RadioGroup`, `Switch`, `Select`, `Slider`, `ToggleGroup`, `VisuallyHidden`
 - Focus: `FocusScope`, `DismissableLayer`
-- Overlays: `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `DropdownMenu`,
+- Overlays: `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Dropdown`,
   `Menu`
 - Disclosure: `Accordion`, `Collapsible`
 - Status: `Progress`, `ProgressCircle`, `Toast`
 - Identity: `Avatar`
 - Tables: `Table`, `TableCaption`, `TableHead`, `TableBody`, `TableFoot`,
   `TableRow`, `TableHeaderCell`, `TableCell`
-- Navigation: `Menubar`, `NavigationMenu`
+- Navigation: `Menubar`
 
 For the full surface and composition examples, start with the docs above.
