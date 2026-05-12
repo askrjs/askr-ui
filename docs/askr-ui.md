@@ -12,8 +12,10 @@ Shared foundation implementations are centralized in `@askrjs/askr/foundations`.
 
 ## Package shape
 
-The package is organized into three documentation areas:
+The package is organized into an overview page plus three supporting
+documentation areas:
 
+- [Foundations](./foundations.md) for the shared runtime helpers askr-ui uses
 - [Components](./components.md) for the public component surface
 - [Composition](./composition.md) for examples that combine primitives
 

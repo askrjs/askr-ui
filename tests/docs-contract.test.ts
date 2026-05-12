@@ -47,7 +47,13 @@ describe('Docs contract', () => {
     const exportKeys = Object.keys(packageJson.exports).filter(
       (key) => key !== './package.json'
     );
-    const docs = ['README.md', 'askr-ui.md', 'components.md', 'composition.md']
+    const docs = [
+      'README.md',
+      'askr-ui.md',
+      'foundations.md',
+      'components.md',
+      'composition.md',
+    ]
       .map((filename) =>
         readFileSync(join(process.cwd(), 'docs', filename), 'utf8')
       )
@@ -73,7 +79,13 @@ describe('Docs contract', () => {
   });
 
   it('keeps the documented component names aligned with the published surface', () => {
-    const docs = ['README.md', 'askr-ui.md', 'components.md', 'composition.md']
+    const docs = [
+      'README.md',
+      'askr-ui.md',
+      'foundations.md',
+      'components.md',
+      'composition.md',
+    ]
       .map((filename) =>
         readFileSync(join(process.cwd(), 'docs', filename), 'utf8')
       )

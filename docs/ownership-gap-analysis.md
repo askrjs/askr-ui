@@ -48,13 +48,13 @@ outside `askr-ui`.
 The remaining gaps are still real, but they are narrower than a flat
 feature-parity checklist would suggest:
 
-- `askr-ui` does not yet expose direct equivalents for some families such as
-  `ScrollArea`, `HoverCard`, `Context Menu`, `Form`, `AccessibleIcon`, and
-  `Aspect Ratio`
-- Some of those are behavior-first primitives that would fit `askr-ui`
-  naturally, while others are better candidates for `askr-themes` if we want a
-  visual/layout wrapper instead of a new behavioral primitive
-- Documentation is shallower than the mature primitives model’s public docs
+- `askr-ui` still does not expose direct equivalents for a few behavior-first
+  families, most notably `AccessibleIcon` and `Context Menu`
+- The previously listed `ScrollArea`, `HoverCard`, `Form`, and `Aspect Ratio`
+  families are already shipped, so they are not gaps anymore
+- Any future addition should be justified by behavior, accessibility, or
+  composition value rather than parity pressure
+- Documentation is shallower than the mature primitives model's public docs
   set; there are dedicated pages for composition, styling, accessibility, and
   component anatomy, while `askr-ui` is still more reference-oriented than
   guided
@@ -73,7 +73,7 @@ The biggest risk is not missing a specific component. It is ownership drift:
 
 - `askr-ui` depends on `@askrjs/askr/foundations`, so version skew can break
   types and tests even when source looks correct
-- `askr-themes` already owns some of the “missing” surface area, so a naive
+- `askr-themes` already owns some of the "missing" surface area, so a naive
   checklist would overcount work in `askr-ui`
 - Without an explicit boundary, future additions can end up in the wrong
   package and make the public surface harder to reason about
@@ -90,7 +90,9 @@ like this:
   composition-aware overlay/control family
 - `askr-themes`: any visual wrapper, app scaffold, shell chrome, or layout
   helper that can be expressed as styling and composition
-- shared docs: the boundary rules, examples, and “when to use which package”
+- shared docs: the boundary rules, examples, and "when to use which package"
+- Open families remain backlog items until a separate scope decision approves
+  them
 
 ## Reference Matrix
 
@@ -101,7 +103,7 @@ like this:
 | Disclosure        | Strong  | Styled by themes | `Accordion` and `Collapsible` are in good shape                      |
 | Layout / chrome   | Minimal | Strong           | Best owned by `askr-themes`                                          |
 | Visual primitives | Minimal | Strong           | Better fit for theme package than headless UI                        |
-| Utility extras    | Mixed   | Mixed            | `Separator` is theme-owned; `AspectRatio` / `ScrollArea` remain open |
+| Utility extras    | Mixed   | Mixed            | `Separator` is theme-owned; remaining open gaps are backlog-only |
 | Docs / guidance   | Fair    | Fair             | Both packages would benefit from clearer ownership examples          |
 
 ## Bottom Line
@@ -112,4 +114,4 @@ pass gap list suggests. The bigger opportunity is to keep the boundary crisp:
 - Headless interaction belongs in `askr-ui`
 - Visual wrappers and shell composition belong in `askr-themes`
 - Anything that crosses that boundary should be called out explicitly instead
-  of being treated as generic “missing parity”
+  of being treated as generic "missing parity"
