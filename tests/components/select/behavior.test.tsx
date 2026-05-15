@@ -224,4 +224,39 @@ describe('Select - Behavior', () => {
     expect(input.value).toBe('askr');
     expect(nextTrigger.textContent).toContain('Askr');
   });
+
+  it('keeps all disabled select items unfocusable when navigation is attempted', async () => {
+    container = mount(
+      <Select defaultOpen defaultValue="askr">
+        <SelectTrigger>
+          <SelectValue placeholder="Choose one" />
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectContent>
+            <SelectItem value="askr" disabled>
+              Askr
+            </SelectItem>
+            <SelectItem value="solid" disabled>
+              Solid
+            </SelectItem>
+          </SelectContent>
+        </SelectPortal>
+      </Select>
+    );
+
+    await flushUpdates();
+    await flushUpdates();
+
+    const content = document.body.querySelector(
+      '[data-slot="select-content"]'
+    ) as HTMLDivElement;
+    const items = Array.from(
+      document.body.querySelectorAll('[role="option"]')
+    ) as HTMLElement[];
+
+    expect(items).toHaveLength(2);
+    expect(items.every((item) => item.getAttribute('tabindex') === '-1')).toBe(
+      true
+    );
+  });
 });

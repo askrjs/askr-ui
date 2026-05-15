@@ -128,13 +128,6 @@ function getToastRootContext(toastId: string): ToastRootContextValue {
   return created;
 }
 
-function ToastProviderView(props: {
-  children?: unknown;
-  finalProps: Record<string, unknown>;
-}) {
-  return <div {...props.finalProps}>{props.children}</div>;
-}
-
 function ToastRegistrationView(props: {
   key?: string;
   registration: ToastRegistration;
@@ -346,7 +339,7 @@ export function ToastProvider(props: ToastProviderProps) {
 
   return (
     <ToastProviderContext.Scope value={providerContext}>
-      <ToastProviderView finalProps={finalProps}>{children}</ToastProviderView>
+      <div {...finalProps}>{children}</div>
     </ToastProviderContext.Scope>
   );
 }

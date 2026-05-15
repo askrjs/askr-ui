@@ -33,18 +33,22 @@ export function TooltipTrigger(
       root.setOpen(false);
     },
   });
+  const setNode = (node: HTMLElement | null) => {
+    root.setTriggerNode(node);
+  };
+  const refHandler = ref
+    ? composeRefs(
+        ref as
+          | ((value: HTMLElement | null) => void)
+          | { current: HTMLElement | null }
+          | null
+          | undefined,
+        setNode
+      )
+    : setNode;
   const finalProps = mergeProps(rest, {
     ...hoverProps,
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      (node: HTMLElement | null) => {
-        root.setTriggerNode(node);
-      }
-    ),
+    ref: refHandler,
     onFocus: () => {
       root.setOpen(true);
     },

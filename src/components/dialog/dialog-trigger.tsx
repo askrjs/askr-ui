@@ -36,18 +36,22 @@ export function DialogTrigger(
     },
     isNativeButton: !asChild,
   });
+  const setNode = (node: HTMLElement | null) => {
+    root.setTriggerNode(node);
+  };
+  const refHandler = ref
+    ? composeRefs(
+        ref as
+          | ((value: HTMLElement | null) => void)
+          | { current: HTMLElement | null }
+          | null
+          | undefined,
+        setNode
+      )
+    : setNode;
   const finalProps = mergeProps(rest, {
     ...interactionProps,
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      (node: HTMLElement | null) => {
-        root.setTriggerNode(node);
-      }
-    ),
+    ref: refHandler,
     'aria-haspopup': 'dialog',
     'aria-expanded': root.open ? 'true' : 'false',
     'aria-controls': root.contentId,

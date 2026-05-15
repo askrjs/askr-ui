@@ -7,17 +7,21 @@ export function DialogTitle(props: DialogTitleAsChildProps): JSX.Element;
 export function DialogTitle(props: DialogTitleProps | DialogTitleAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const root = readDialogRootContext();
+  const setNode = (node: HTMLElement | null) => {
+    root.setTitleNode(node);
+  };
+  const refHandler = ref
+    ? composeRefs(
+        ref as
+          | ((value: HTMLElement | null) => void)
+          | { current: HTMLElement | null }
+          | null
+          | undefined,
+        setNode
+      )
+    : setNode;
   const finalProps = mergeProps(rest, {
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      (node: HTMLElement | null) => {
-        root.setTitleNode(node);
-      }
-    ),
+    ref: refHandler,
     id: root.titleId,
     'data-slot': 'dialog-title',
   });

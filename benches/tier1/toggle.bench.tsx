@@ -24,7 +24,9 @@ describe('Toggle benches', () => {
       onPress: () => {},
     } as ToggleAsChildProps);
   });
+});
 
+describe('Toggle benches - activation', () => {
   bench('activation - dispatch click on native button (with handler)', () => {
     const fn = () => {};
     const el = Toggle({
@@ -33,7 +35,9 @@ describe('Toggle benches', () => {
     } as ToggleButtonProps) as unknown as Element;
     el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   });
+});
 
+describe('Toggle benches - activation asChild', () => {
   bench('activation - dispatch click on asChild child (with handler)', () => {
     const fn = () => {};
     const child = <div />;

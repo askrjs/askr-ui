@@ -150,15 +150,19 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
     }
   };
 
+  const refHandler = ref
+    ? composeRefs(
+        ref as
+          | ((value: HTMLElement | null) => void)
+          | { current: HTMLElement | null }
+          | null
+          | undefined,
+        setNode
+      )
+    : setNode;
+
   const finalProps = mergeProps(rest, {
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      setNode
-    ),
+    ref: refHandler,
     tabIndex: asChild ? tabIndex : (tabIndex ?? -1),
     'data-focus-scope': 'true',
     onKeyDown: handleKeyDown,

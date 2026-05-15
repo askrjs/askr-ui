@@ -5,9 +5,9 @@ export default defineConfig({
   test: {
     ...sharedVitestConfig.test,
     environment: 'jsdom',
-    include: ['benches/**/*.bench.ts', 'benches/**/*.bench.tsx'],
+    include: ['benches/tier2/**/*.bench.ts', 'benches/tier2/**/*.bench.tsx'],
     benchmark: {
-      include: ['benches/**/*.bench.ts', 'benches/**/*.bench.tsx'],
+      include: ['benches/tier2/**/*.bench.ts', 'benches/tier2/**/*.bench.tsx'],
     },
   },
   plugins: sharedVitestConfig.plugins,

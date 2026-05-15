@@ -5,19 +5,25 @@ import {
   type CheckboxInputProps,
 } from '../../src/components';
 
-describe('Checkbox benches', () => {
+describe('Checkbox benches - native', () => {
   bench('create native <input type="checkbox">', () => {
     Checkbox({} as CheckboxInputProps);
   });
+});
 
+describe('Checkbox benches - checked', () => {
   bench('create with checked state', () => {
     Checkbox({ checked: true } as CheckboxInputProps);
   });
+});
 
+describe('Checkbox benches - indeterminate', () => {
   bench('create with indeterminate state', () => {
     Checkbox({ checked: true, indeterminate: true } as CheckboxInputProps);
   });
+});
 
+describe('Checkbox benches - asChild', () => {
   bench('create with asChild and prop merging', () => {
     const child = <div />;
     Checkbox({
@@ -28,7 +34,9 @@ describe('Checkbox benches', () => {
       onPress: () => {},
     } as CheckboxAsChildProps);
   });
+});
 
+describe('Checkbox benches - activation native', () => {
   bench('activation - dispatch click on native input (with handler)', () => {
     const fn = () => {};
     const el = Checkbox({
@@ -36,7 +44,9 @@ describe('Checkbox benches', () => {
     } as CheckboxInputProps) as unknown as Element;
     el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   });
+});
 
+describe('Checkbox benches - activation asChild', () => {
   bench('activation - dispatch click on asChild child (with handler)', () => {
     const fn = () => {};
     const child = <div />;
@@ -48,13 +58,17 @@ describe('Checkbox benches', () => {
     } as CheckboxAsChildProps) as unknown as Element;
     el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   });
+});
 
+describe('Checkbox benches - checked transitions', () => {
   bench('state transitions - checked false -> true -> false', () => {
     Checkbox({ checked: false } as CheckboxInputProps);
     Checkbox({ checked: true } as CheckboxInputProps);
     Checkbox({ checked: false } as CheckboxInputProps);
   });
+});
 
+describe('Checkbox benches - indeterminate transitions', () => {
   bench('state transitions - indeterminate toggling', () => {
     Checkbox({ checked: false, indeterminate: false } as CheckboxInputProps);
     Checkbox({ checked: true, indeterminate: true } as CheckboxInputProps);

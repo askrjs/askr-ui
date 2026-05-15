@@ -3,20 +3,14 @@ import {
   composeRefs,
   mergeProps,
   pressable,
-  rovingFocus,
 } from '@askrjs/askr/foundations';
-import { focusSelectedCollectionItem } from '../_internal/focus';
 import {
   getMenuCollection,
   registerCollectionNode,
   resolveMenuItemText,
 } from '../_internal/menu';
 import { resolvePartId } from '../_internal/id';
-import {
-  readMenuRenderContext,
-  readMenuRootContext,
-  resolveMenuState,
-} from './menu.shared';
+import { readMenuRenderContext, readMenuRootContext } from './menu.shared';
 import type { MenuItemAsChildProps, MenuItemProps } from './menu.types';
 
 export function MenuItem(props: MenuItemProps): JSX.Element | null;
@@ -36,19 +30,7 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
   const itemIndex = renderContext.claimItemIndex();
   const itemId = resolvePartId(root.menuId, `item-${itemIndex}`);
   const itemText = resolveMenuItemText(children);
-  const { items, currentIndex, disabledIndexes } = resolveMenuState(root);
   const collection = getMenuCollection(root.menuId);
-  const nav = rovingFocus({
-    currentIndex,
-    itemCount: Math.max(items.length, 1),
-    orientation: root.orientation,
-    loop: root.loop,
-    isDisabled: (index) => disabledIndexes.includes(index),
-    onNavigate: (index) => {
-      root.setCurrentIndex(index);
-      focusSelectedCollectionItem(collection, index);
-    },
-  });
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
@@ -61,7 +43,7 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
   });
   const finalProps = mergeProps(rest, {
     ...interactionProps,
-    ...nav.item(itemIndex),
+    ...root.navigation.item(itemIndex),
     ref: composeRefs(
       ref as
         | ((value: HTMLElement | null) => void)

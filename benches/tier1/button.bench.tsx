@@ -11,7 +11,7 @@ describe('Button benches', () => {
   });
 
   bench('create with asChild and prop merging', () => {
-    const child = document.createElement('div');
+    const child = <div />;
     Button({
       asChild: true,
       children: child,
@@ -19,7 +19,9 @@ describe('Button benches', () => {
       onPress: () => {},
     } as unknown as ButtonAsChildProps);
   });
+});
 
+describe('Button benches - activation', () => {
   bench('activation - dispatch click on native button (with handler)', () => {
     const fn = () => {};
     const el = Button({
@@ -28,10 +30,12 @@ describe('Button benches', () => {
     } as unknown as ButtonNativeProps) as unknown as HTMLElement;
     el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   });
+});
 
+describe('Button benches - activation asChild', () => {
   bench('activation - dispatch click on asChild child (with handler)', () => {
     const fn = () => {};
-    const child = document.createElement('div');
+    const child = <div />;
     const el = Button({
       asChild: true,
       children: child,

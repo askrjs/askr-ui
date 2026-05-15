@@ -113,7 +113,21 @@ export function extractTextContent(value: unknown): string {
 
 export function serializeForId(value: unknown): string {
   if (Array.isArray(value)) {
-    return value.map((item) => serializeForId(item)).join('|');
+    if (value.length === 0) {
+      return '';
+    }
+
+    let serialized = '';
+
+    for (let index = 0; index < value.length; index += 1) {
+      if (index > 0) {
+        serialized += '|';
+      }
+
+      serialized += serializeForId(value[index]);
+    }
+
+    return serialized;
   }
 
   if (value === undefined || value === null || typeof value === 'boolean') {
@@ -131,21 +145,42 @@ export function serializeForId(value: unknown): string {
         : typeof value.type === 'function'
           ? value.type.name || 'component'
           : 'component';
-    const propEntries = Object.entries(value.props ?? {})
-      .filter(
-        ([key, entryValue]) =>
-          key !== 'children' &&
-          key !== 'ref' &&
-          !key.startsWith('on') &&
-          (typeof entryValue === 'string' ||
-            typeof entryValue === 'number' ||
-            typeof entryValue === 'boolean')
-      )
-      .sort(([left], [right]) => left.localeCompare(right))
-      .map(([key, entryValue]) => `${key}:${String(entryValue)}`)
-      .join(',');
+    const props = value.props ?? {};
+    const propEntries: string[] = [];
 
-    return `${typeName}[${propEntries}](${serializeForId(value.props?.children)})`;
+    for (const key in props) {
+      if (!Object.prototype.hasOwnProperty.call(props, key)) {
+        continue;
+      }
+
+      if (key === 'children' || key === 'ref' || key.startsWith('on')) {
+        continue;
+      }
+
+      const entryValue = props[key as keyof typeof props];
+
+      if (
+        typeof entryValue === 'string' ||
+        typeof entryValue === 'number' ||
+        typeof entryValue === 'boolean'
+      ) {
+        propEntries.push(`${key}:${String(entryValue)}`);
+      }
+    }
+
+    propEntries.sort((left, right) => left.localeCompare(right));
+
+    let serializedProps = '';
+
+    for (let index = 0; index < propEntries.length; index += 1) {
+      if (index > 0) {
+        serializedProps += ',';
+      }
+
+      serializedProps += propEntries[index];
+    }
+
+    return `${typeName}[${serializedProps}](${serializeForId(value.props?.children)})`;
   }
 
   return typeof value;

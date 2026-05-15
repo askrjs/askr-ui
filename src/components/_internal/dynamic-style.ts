@@ -1,6 +1,7 @@
 type StyleValue = number | string | null | undefined;
 
 const dynamicRules = new Map<string, string>();
+let dynamicStyleElement: HTMLStyleElement | null = null;
 
 function escapeCssString(value: string) {
   return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
@@ -11,17 +12,23 @@ function getDynamicStyleElement() {
     return null;
   }
 
+  if (dynamicStyleElement?.isConnected) {
+    return dynamicStyleElement;
+  }
+
   const existing = document.querySelector<HTMLStyleElement>(
     'style[data-askr-dynamic-styles]'
   );
 
   if (existing) {
+    dynamicStyleElement = existing;
     return existing;
   }
 
   const created = document.createElement('style');
   created.setAttribute('data-askr-dynamic-styles', 'true');
   document.head.appendChild(created);
+  dynamicStyleElement = created;
   return created;
 }
 
@@ -35,6 +42,42 @@ function syncDynamicStyleElement() {
   style.textContent = Array.from(dynamicRules.values()).join('\n');
 }
 
+function buildDynamicStyleRule(
+  selector: string,
+  declarations: Record<string, StyleValue>
+) {
+  let body = '';
+  let declarationCount = 0;
+
+  for (const name in declarations) {
+    if (!Object.prototype.hasOwnProperty.call(declarations, name)) {
+      continue;
+    }
+
+    const value = declarations[name];
+
+    if (value === undefined || value === null) {
+      continue;
+    }
+
+    const declaration = `${name}: ${String(value)};`;
+
+    if (declarationCount === 0) {
+      body = declaration;
+    } else {
+      body += ` ${declaration}`;
+    }
+
+    declarationCount += 1;
+  }
+
+  if (!declarationCount) {
+    return null;
+  }
+
+  return `${selector} { ${body} }`;
+}
+
 export function dynamicAttributeSelector(name: string, value: string) {
   return `[${name}="${escapeCssString(value)}"]`;
 }
@@ -44,17 +87,18 @@ export function setDynamicStyleRule(
   selector: string,
   declarations: Record<string, StyleValue>
 ) {
-  const body = Object.entries(declarations)
-    .filter(([, value]) => value !== undefined && value !== null)
-    .map(([name, value]) => `${name}: ${String(value)};`)
-    .join(' ');
+  const rule = buildDynamicStyleRule(selector, declarations);
 
-  if (!body) {
+  if (!rule) {
     removeDynamicStyleRule(key);
     return;
   }
 
-  dynamicRules.set(key, `${selector} { ${body} }`);
+  if (dynamicRules.get(key) === rule && dynamicStyleElement?.isConnected) {
+    return;
+  }
+
+  dynamicRules.set(key, rule);
   syncDynamicStyleElement();
 }
 

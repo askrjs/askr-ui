@@ -74,6 +74,7 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
     onChange: onCheckedChange,
   });
   const isControlled = checked !== undefined;
+  const currentChecked = checkedState();
 
   const toggleChecked = (event: PressEvent) => {
     onPress?.(event);
@@ -85,7 +86,6 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
     checkedState.set(!checkedState());
   };
 
-  const currentChecked = checkedState();
   const ariaChecked = indeterminate
     ? 'mixed'
     : currentChecked

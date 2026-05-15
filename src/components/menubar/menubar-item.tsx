@@ -101,22 +101,26 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
     },
     isNativeButton: !asChild,
   });
+  const setNode = (node: HTMLElement | null) => {
+    registerCompositeNode(surfaceId, collection, node, {
+      index: surfaceIndex,
+      disabled,
+    });
+  };
+  const refHandler = ref
+    ? composeRefs(
+        ref as
+          | ((value: HTMLElement | null) => void)
+          | { current: HTMLElement | null }
+          | null
+          | undefined,
+        setNode
+      )
+    : setNode;
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     ...nav.item(surfaceIndex),
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      (node: HTMLElement | null) => {
-        registerCompositeNode(surfaceId, collection, node, {
-          index: surfaceIndex,
-          disabled,
-        });
-      }
-    ),
+    ref: refHandler,
     id: surfaceId,
     role: 'menuitem',
     'aria-disabled': disabled ? 'true' : undefined,
@@ -209,23 +213,27 @@ export function MenubarSubTrigger(
     },
     isNativeButton: !asChild,
   });
+  const setNode = (node: HTMLElement | null) => {
+    getOverlayNodes(sub.triggerId).trigger = node;
+    registerCompositeNode(sub.triggerId, collection, node, {
+      index: sub.surfaceIndex,
+      disabled,
+    });
+  };
+  const refHandler = ref
+    ? composeRefs(
+        ref as
+          | ((value: HTMLElement | null) => void)
+          | { current: HTMLElement | null }
+          | null
+          | undefined,
+        setNode
+      )
+    : setNode;
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     ...nav.item(sub.surfaceIndex),
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      (node: HTMLElement | null) => {
-        getOverlayNodes(sub.triggerId).trigger = node;
-        registerCompositeNode(sub.triggerId, collection, node, {
-          index: sub.surfaceIndex,
-          disabled,
-        });
-      }
-    ),
+    ref: refHandler,
     id: sub.triggerId,
     role: 'menuitem',
     'aria-haspopup': 'menu',

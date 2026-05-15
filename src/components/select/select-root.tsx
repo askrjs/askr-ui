@@ -1,7 +1,7 @@
-import { For, state } from '@askrjs/askr';
+import { state } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
-import { collectJsxElements, toChildArray } from '../_internal/jsx';
+import { collectJsxElements } from '../_internal/jsx';
 import { getPersistentPortal } from '../_internal/overlay';
 import { resolveMenuItemText } from '../_internal/menu';
 import { SelectItem } from './select-item';
@@ -10,42 +10,10 @@ import {
   readSelectRootContext,
   SelectRenderContext,
   SelectRootContext,
+  resolveSelectState,
   type SelectRootContextValue,
 } from './select.shared';
 import type { SelectProps } from './select.types';
-
-function SelectRootView(props: {
-  children?: unknown;
-  name?: string;
-  disabled: boolean;
-}) {
-  const root = readSelectRootContext();
-  const PortalHost = root.portal;
-  const keyedChildren = (
-    <For
-      each={() => toChildArray(props.children)}
-      by={(_child, index) => index}
-    >
-      {(child) => child as never}
-    </For>
-  );
-  root.portal.render({ children: null });
-
-  return (
-    <>
-      {keyedChildren}
-      {PortalHost ? <PortalHost key="select-root-portal" /> : null}
-      {props.name ? (
-        <input
-          type="hidden"
-          name={props.name}
-          value={root.value}
-          disabled={props.disabled}
-        />
-      ) : null}
-    </>
-  );
-}
 
 export function Select(props: SelectProps) {
   const {
@@ -86,27 +54,45 @@ export function Select(props: SelectProps) {
       element.props?.textValue as string | undefined
     ),
   }));
-  const rootContext: SelectRootContextValue = {
+  const rootContextBase = {
     selectId,
+    value: valueState(),
+    currentIndexCandidate: currentIndexState(),
+    disabled,
+    declaredItems,
+  };
+  const resolvedState = resolveSelectState(rootContextBase);
+  const rootContext: SelectRootContextValue = {
+    ...rootContextBase,
     open: openState(),
     setOpen: openState.set,
     contentId: resolvePartId(selectId, 'content'),
     portal: getPersistentPortal(selectId),
-    value: valueState(),
     setValue: valueState.set,
-    currentIndexCandidate: currentIndexState(),
     setCurrentIndex: currentIndexState.set,
-    disabled,
-    declaredItems,
+    resolvedState,
   };
   const runtimeRenderContext = createSelectRenderContext();
+  const PortalHost = rootContext.portal;
+
+  // Keep the persistent portal host synchronized before rendering the root surface.
+  PortalHost.render({ children: null });
 
   return (
     <SelectRootContext.Scope value={rootContext}>
       <SelectRenderContext.Scope value={runtimeRenderContext}>
-        <SelectRootView name={name} disabled={disabled}>
+        <>
           {children}
-        </SelectRootView>
+          {PortalHost ? <PortalHost key="select-root-portal" /> : null}
+          {name ? (
+            <input
+              type="hidden"
+              name={name}
+              value={rootContext.value}
+              disabled={disabled}
+            />
+          ) : null}
+        </>
       </SelectRenderContext.Scope>
     </SelectRootContext.Scope>
   );

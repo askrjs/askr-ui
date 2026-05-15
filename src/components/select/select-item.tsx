@@ -13,10 +13,8 @@ import {
 } from '../_internal/menu';
 import { resolvePartId } from '../_internal/id';
 import {
-  getSelectDisabledIndexes,
   readSelectRenderContext,
   readSelectRootContext,
-  resolveSelectState,
 } from './select.shared';
 import type {
   SelectItemAsChildProps,
@@ -45,9 +43,10 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
   const isDisabled = root.disabled || disabled;
 
   const itemId = resolvePartId(root.selectId, `item-${itemIndex}`);
-  const { items, currentIndex } = resolveSelectState(root);
+  const { items, currentIndex, disabledIndexes } = root.resolvedState;
   const collection = getMenuCollection(root.selectId);
-  const disabledIndexes = getSelectDisabledIndexes(items, root.disabled);
+  const hasEnabledItems =
+    items.length > 0 && disabledIndexes.length < items.length;
   const nav = rovingFocus({
     currentIndex,
     itemCount: Math.max(items.length, 1),
@@ -55,6 +54,10 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
     loop: true,
     isDisabled: (index) => disabledIndexes.includes(index),
     onNavigate: (index) => {
+      if (!hasEnabledItems) {
+        return;
+      }
+
       root.setCurrentIndex(index);
       focusSelectedCollectionItem(collection, index);
     },

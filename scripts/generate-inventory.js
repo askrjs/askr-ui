@@ -7,7 +7,11 @@ const componentsIndexPath = path.join(rootDir, 'src/components/index.ts');
 const sourceComponentsDir = path.join(rootDir, 'src/components');
 const componentTestsDir = path.join(rootDir, 'tests/components');
 const testsDir = path.join(rootDir, 'tests');
-const benchesDir = path.join(rootDir, 'benches/components');
+const benchDirs = [
+  path.join(rootDir, 'benches/tier1'),
+  path.join(rootDir, 'benches/tier2'),
+  path.join(rootDir, 'benches/tier3'),
+];
 const docsDir = path.join(rootDir, 'docs');
 const readmePath = path.join(rootDir, 'README.md');
 const logPath = path.join(rootDir, 'bench-results.log');
@@ -280,8 +284,15 @@ function createSortedCoverageMap(coverageSets) {
 
 async function collectBenchInventory(matchableFamilies) {
   const benchFiles = (
-    await listFiles(benchesDir, (fileName) => /\.bench\.tsx?$/.test(fileName))
-  ).map(toRelativePath);
+    await Promise.all(
+      benchDirs.map((benchDir) =>
+        listFiles(benchDir, (fileName) => /\.bench\.tsx?$/.test(fileName))
+      )
+    )
+  )
+    .flat()
+    .map(toRelativePath)
+    .sort((left, right) => left.localeCompare(right));
   const coverageSets = createCoverageMap(matchableFamilies);
   const records = [];
 
@@ -456,7 +467,7 @@ function renderSummary(summary) {
   return [
     '# Repository Inventory',
     '',
-    'Generated from `src/components/index.ts`, source component directories, `tests/components`, `benches/components`, and markdown docs.',
+    'Generated from `src/components/index.ts`, source component directories, `tests/components`, `benches/tier1`, `benches/tier2`, `benches/tier3`, and markdown docs.',
     '',
     `- Public component families: ${summary.totalFamilies}`,
     `- Source component directories: ${summary.totalSourceFamilies}`,

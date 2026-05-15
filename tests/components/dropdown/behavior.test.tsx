@@ -62,6 +62,7 @@ describe('Dropdown - Behavior', () => {
     );
 
     await flushUpdates();
+    await flushUpdates();
 
     const items = Array.from(
       document.body.querySelectorAll('[role="menuitem"]')
@@ -86,6 +87,7 @@ describe('Dropdown - Behavior', () => {
     );
 
     await flushUpdates();
+    await flushUpdates();
 
     const content = document.body.querySelector(
       '[data-slot="dropdown-content"]'
@@ -102,6 +104,9 @@ describe('Dropdown - Behavior', () => {
 
     expect(trigger?.getAttribute('aria-expanded')).toBe('true');
     expect(items).toHaveLength(2);
+    expect(items.every((item) => item.getAttribute('tabindex') === '-1')).toBe(
+      true
+    );
     expect(
       items.every((item) => item.getAttribute('aria-disabled') === 'true')
     ).toBe(true);

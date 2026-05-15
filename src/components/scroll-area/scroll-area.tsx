@@ -1,7 +1,5 @@
-import { For } from '@askrjs/askr';
 import { Slot, mergeProps } from '@askrjs/askr/foundations';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
-import { toChildArray } from '../_internal/jsx';
 import { readContext, defineContext } from '@askrjs/askr';
 import type {
   ScrollAreaAsChildProps,
@@ -35,19 +33,6 @@ function readScrollAreaRootContext(): ScrollAreaRootContextValue {
   return context;
 }
 
-function ScrollAreaRootView(props: { children?: unknown }) {
-  const keyedChildren = (
-    <For
-      each={() => toChildArray(props.children)}
-      by={(_child, index) => index}
-    >
-      {(child) => child as never}
-    </For>
-  );
-
-  return <>{keyedChildren}</>;
-}
-
 export function ScrollArea(props: ScrollAreaProps): JSX.Element;
 export function ScrollArea(props: ScrollAreaAsChildProps): JSX.Element;
 export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
@@ -68,7 +53,7 @@ export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
 
   return (
     <ScrollAreaRootContext.Scope value={rootContext}>
-      <ScrollAreaRootView>{children}</ScrollAreaRootView>
+      {children}
     </ScrollAreaRootContext.Scope>
   );
 }

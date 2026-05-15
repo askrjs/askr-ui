@@ -13,10 +13,8 @@ import {
 } from '../_internal/composite';
 import { isDisclosureValueOpen } from '../_internal/disclosure';
 import { resolveCompoundId } from '../_internal/id';
-import { isJsxElement, toChildArray } from '../_internal/jsx';
 import {
   createToggleGroupRenderContext,
-  readToggleGroupRootContext,
   ToggleGroupRenderContext,
   ToggleGroupRootContext,
   type ToggleGroupRootContextValue,
@@ -26,56 +24,6 @@ import type {
   ToggleGroupProps,
   ToggleGroupSingleProps,
 } from './toggle-group.types';
-
-function ToggleGroupScopeView(props: {
-  children?: unknown;
-  finalProps: Record<string, unknown>;
-  renderContext: ReturnType<typeof createToggleGroupRenderContext>;
-}) {
-  return (
-    <ToggleGroupRenderContext.Scope value={props.renderContext}>
-      <ToggleGroupRootView
-        finalProps={props.finalProps}
-        children={props.children}
-      />
-    </ToggleGroupRenderContext.Scope>
-  );
-}
-
-function ToggleGroupRootView(props: {
-  children?: unknown;
-  finalProps: Record<string, unknown>;
-}) {
-  const root = readToggleGroupRootContext();
-  const collection = getCompositeCollection(root.groupId);
-  const disabledItemIndexes = disabledIndexes(root.items);
-  const nav = rovingFocus({
-    currentIndex: root.currentIndex,
-    itemCount: Math.max(root.items.length, 1),
-    orientation: root.orientation,
-    loop: root.loop,
-    isDisabled: (index) => disabledItemIndexes.includes(index),
-    onNavigate: (index) => {
-      root.setCurrentIndex(index);
-      focusSelectedCollectionItem(collection, index);
-    },
-  });
-  const mergedProps = mergeProps(props.finalProps, {
-    ...nav.container,
-  });
-  const keyedChildren = toChildArray(props.children).map((child, index) => {
-    if (!isJsxElement(child) || child.key != null) {
-      return child;
-    }
-
-    return {
-      ...child,
-      key: `toggle-group-root-${index}`,
-    };
-  });
-
-  return <div {...mergedProps}>{keyedChildren}</div>;
-}
 
 export function ToggleGroup(props: ToggleGroupProps) {
   const {
@@ -139,8 +87,9 @@ export function ToggleGroup(props: ToggleGroupProps) {
       Array.isArray(nextValue) ? (nextValue[0] ?? '') : nextValue
     );
   };
+  const currentValue = valueState();
   const selectedIndex = items.findIndex((item) =>
-    isDisclosureValueOpen(type, valueState(), item.value)
+    isDisclosureValueOpen(type, currentValue, item.value)
   );
   const initialCurrentIndex =
     selectedIndex >= 0 && !items[selectedIndex]?.disabled
@@ -152,10 +101,11 @@ export function ToggleGroup(props: ToggleGroupProps) {
     items[currentIndexCandidate] && !items[currentIndexCandidate]?.disabled
       ? currentIndexCandidate
       : firstEnabledCompositeIndex(items);
+  const disabledItemIndexes = disabledIndexes(items);
   const rootContext: ToggleGroupRootContextValue = {
     groupId,
     type,
-    value: valueState(),
+    value: currentValue,
     setValue,
     notifyItemsChanged,
     scheduleItemsSync,
@@ -165,6 +115,7 @@ export function ToggleGroup(props: ToggleGroupProps) {
     currentIndex,
     setCurrentIndex: currentIndexState.set,
     items,
+    disabledItemIndexes,
   };
   const renderContext = createToggleGroupRenderContext();
   const finalProps = mergeProps(rest, {
@@ -175,15 +126,24 @@ export function ToggleGroup(props: ToggleGroupProps) {
     'data-toggle-group': 'true',
     'data-disabled': disabled ? 'true' : undefined,
   });
+  const nav = rovingFocus({
+    currentIndex,
+    itemCount: Math.max(items.length, 1),
+    orientation,
+    loop,
+    isDisabled: (index) => disabledItemIndexes.includes(index),
+    onNavigate: (index) => {
+      currentIndexState.set(index);
+      focusSelectedCollectionItem(collection, index);
+    },
+  });
+  const mergedProps = mergeProps(finalProps, nav.container);
 
   return (
     <ToggleGroupRootContext.Scope value={rootContext}>
-      <ToggleGroupScopeView
-        finalProps={finalProps as Record<string, unknown>}
-        renderContext={renderContext}
-      >
-        {children}
-      </ToggleGroupScopeView>
+      <ToggleGroupRenderContext.Scope value={renderContext}>
+        <div {...mergedProps}>{children}</div>
+      </ToggleGroupRenderContext.Scope>
     </ToggleGroupRootContext.Scope>
   );
 }

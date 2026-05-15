@@ -23,6 +23,7 @@ type ProgressRootContextValue = {
   value: number | null;
   max: number;
   valueLabel: string;
+  percentage: number | null;
 };
 
 const ProgressRootContext = defineContext<ProgressRootContextValue | null>(
@@ -37,13 +38,6 @@ function readProgressRootContext(): ProgressRootContextValue {
   }
 
   return context;
-}
-
-function ProgressRootScopeView(props: {
-  finalProps: Record<string, unknown>;
-  children?: unknown;
-}) {
-  return <div {...props.finalProps}>{props.children}</div>;
 }
 
 export function Progress(props: ProgressProps) {
@@ -103,13 +97,12 @@ export function Progress(props: ProgressProps) {
     value: normalizedValue,
     max: normalizedMax,
     valueLabel,
+    percentage,
   };
 
   return (
     <ProgressRootContext.Scope value={rootContext}>
-      <ProgressRootScopeView finalProps={finalProps as Record<string, unknown>}>
-        {children}
-      </ProgressRootScopeView>
+      <div {...(finalProps as Record<string, unknown>)}>{children}</div>
     </ProgressRootContext.Scope>
   );
 }
@@ -123,7 +116,6 @@ export function ProgressIndicator(
 ) {
   const { asChild, children, ref, ...rest } = props;
   const root = readProgressRootContext();
-  const percentage = progressPercentage(root.value, root.max);
   const finalProps = mergeProps(rest, {
     ref,
     id: resolvePartId(root.progressId, 'indicator'),
@@ -132,7 +124,8 @@ export function ProgressIndicator(
     'data-state': root.value === null ? 'indeterminate' : 'determinate',
     'data-value': root.value === null ? undefined : String(root.value),
     'data-max': String(root.max),
-    'data-percentage': percentage === null ? undefined : String(percentage),
+    'data-percentage':
+      root.percentage === null ? undefined : String(root.percentage),
   });
 
   if (asChild) {

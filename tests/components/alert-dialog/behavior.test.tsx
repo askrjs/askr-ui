@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -39,5 +39,37 @@ describe('AlertDialog - Behavior', () => {
       '[aria-haspopup="dialog"]'
     ) as HTMLButtonElement;
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('forwards dismiss callbacks from alert dialog content', async () => {
+    const onDismiss = vi.fn();
+
+    container = mount(
+      <AlertDialog defaultOpen>
+        <AlertDialogTrigger>Open alert</AlertDialogTrigger>
+        <AlertDialogPortal>
+          <AlertDialogContent onDismiss={onDismiss}>
+            Confirm action
+          </AlertDialogContent>
+        </AlertDialogPortal>
+      </AlertDialog>
+    );
+
+    await flushUpdates();
+
+    const content = document.body.querySelector(
+      '[data-slot="dialog-content"]'
+    ) as HTMLElement;
+    content.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' })
+    );
+
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    expect(
+      document.body.querySelector('[data-slot="dialog-content"]')
+    ).toBeNull();
   });
 });

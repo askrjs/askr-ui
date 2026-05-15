@@ -23,6 +23,7 @@ type ProgressCircleRootContextValue = {
   value: number | null;
   max: number;
   valueLabel: string;
+  percentage: number | null;
 };
 
 const ProgressCircleRootContext =
@@ -38,13 +39,6 @@ function readProgressCircleRootContext(): ProgressCircleRootContextValue {
   }
 
   return context;
-}
-
-function ProgressCircleRootScopeView(props: {
-  finalProps: Record<string, unknown>;
-  children?: unknown;
-}) {
-  return <div {...props.finalProps}>{props.children}</div>;
 }
 
 export function ProgressCircle(props: ProgressCircleProps) {
@@ -104,15 +98,12 @@ export function ProgressCircle(props: ProgressCircleProps) {
     value: normalizedValue,
     max: normalizedMax,
     valueLabel,
+    percentage,
   };
 
   return (
     <ProgressCircleRootContext.Scope value={rootContext}>
-      <ProgressCircleRootScopeView
-        finalProps={finalProps as Record<string, unknown>}
-      >
-        {children}
-      </ProgressCircleRootScopeView>
+      <div {...(finalProps as Record<string, unknown>)}>{children}</div>
     </ProgressCircleRootContext.Scope>
   );
 }
@@ -128,7 +119,6 @@ export function ProgressCircleIndicator(
 ) {
   const { asChild, children, ref, ...rest } = props;
   const root = readProgressCircleRootContext();
-  const percentage = progressPercentage(root.value, root.max);
   const finalProps = mergeProps(rest, {
     ref,
     id: resolvePartId(root.progressCircleId, 'indicator'),
@@ -137,7 +127,8 @@ export function ProgressCircleIndicator(
     'data-state': root.value === null ? 'indeterminate' : 'determinate',
     'data-value': root.value === null ? undefined : String(root.value),
     'data-max': String(root.max),
-    'data-percentage': percentage === null ? undefined : String(percentage),
+    'data-percentage':
+      root.percentage === null ? undefined : String(root.percentage),
   });
 
   if (asChild) {

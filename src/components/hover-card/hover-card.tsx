@@ -1,7 +1,5 @@
-import { For } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
-import { toChildArray } from '../_internal/jsx';
 import {
   clearOverlayPosition,
   getOverlayNodes,
@@ -10,7 +8,6 @@ import {
 } from '../_internal/overlay';
 import {
   HoverCardRootContext,
-  readHoverCardRootContext,
   resolveHoverCardPositionOptions,
   type HoverCardPositionOptions,
   type HoverCardRootContextValue,
@@ -19,26 +16,6 @@ import type { HoverCardProps } from './hover-card.types';
 
 function scheduleHoverCardPortalSync(callback: () => void) {
   queueMicrotask(callback);
-}
-
-function HoverCardRootView(props: { children?: unknown }) {
-  const root = readHoverCardRootContext();
-  const PortalHost = root.portal;
-  const keyedChildren = (
-    <For
-      each={() => toChildArray(props.children)}
-      by={(_child, index) => index}
-    >
-      {(child) => child as never}
-    </For>
-  );
-
-  return (
-    <>
-      {keyedChildren}
-      {PortalHost ? <PortalHost key="hover-card-root-portal" /> : null}
-    </>
-  );
 }
 
 export function HoverCard(props: HoverCardProps) {
@@ -140,10 +117,14 @@ export function HoverCard(props: HoverCardProps) {
       clearOverlayPosition(hoverCardId);
     },
   };
+  const PortalHost = portal;
 
   return (
     <HoverCardRootContext.Scope value={rootContext}>
-      <HoverCardRootView>{children}</HoverCardRootView>
+      <>
+        {children}
+        {PortalHost ? <PortalHost key="hover-card-root-portal" /> : null}
+      </>
     </HoverCardRootContext.Scope>
   );
 }

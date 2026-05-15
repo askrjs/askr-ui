@@ -7,7 +7,6 @@ import {
 } from '@askrjs/askr/foundations';
 import { focusSelectedCollectionItem } from '../_internal/focus';
 import {
-  disabledIndexes,
   getCompositeCollection,
   registerCompositeNode,
 } from '../_internal/composite';
@@ -48,13 +47,12 @@ export function ToggleGroupItem(
   const itemId = resolvePartId(root.groupId, `item-${itemIndex}`);
   const collection = getCompositeCollection(root.groupId);
   const isDisabled = root.disabled || disabled;
-  const disabledItemIndexes = disabledIndexes(root.items);
   const nav = rovingFocus({
     currentIndex: root.currentIndex,
     itemCount: Math.max(root.items.length, 1),
     orientation: root.orientation,
     loop: root.loop,
-    isDisabled: (index) => disabledItemIndexes.includes(index),
+    isDisabled: (index) => root.disabledItemIndexes.includes(index),
     onNavigate: (index) => {
       root.setCurrentIndex(index);
       focusSelectedCollectionItem(collection, index);

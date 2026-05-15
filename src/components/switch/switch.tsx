@@ -29,6 +29,7 @@ export function Switch(props: SwitchButtonProps | SwitchAsChildProps) {
     defaultValue: defaultChecked,
     onChange: onCheckedChange,
   });
+  const currentChecked = checkedState();
 
   const interactionProps = pressable({
     disabled,
@@ -40,10 +41,10 @@ export function Switch(props: SwitchButtonProps | SwitchAsChildProps) {
     ...interactionProps,
     ref,
     role: 'switch',
-    'aria-checked': checkedState() ? 'true' : 'false',
+    'aria-checked': currentChecked ? 'true' : 'false',
     'data-slot': 'switch',
     'data-disabled': disabled ? 'true' : undefined,
-    'data-state': checkedState() ? 'checked' : 'unchecked',
+    'data-state': currentChecked ? 'checked' : 'unchecked',
   });
 
   const hiddenInput = name ? (
@@ -54,7 +55,7 @@ export function Switch(props: SwitchButtonProps | SwitchAsChildProps) {
       tabIndex={-1}
       name={name}
       value={value}
-      checked={checkedState()}
+      checked={currentChecked}
       required={required}
       disabled={disabled}
     />

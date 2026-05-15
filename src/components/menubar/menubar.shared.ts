@@ -27,6 +27,12 @@ export type MenubarRootContextValue = {
   syncPortals: () => void;
   currentTriggerIndexCandidate: number;
   setCurrentTriggerIndex: (index: number) => void;
+  resolvedState: MenubarRootResolvedState;
+};
+
+export type MenubarRootStateInput = {
+  menubarId: string;
+  currentTriggerIndexCandidate: number;
 };
 
 export type MenubarRootRenderContextValue = {
@@ -181,7 +187,7 @@ export function createMenubarContentRenderContext(): MenubarContentRenderContext
 }
 
 export function resolveMenubarRootState(
-  root: MenubarRootContextValue
+  root: MenubarRootStateInput
 ): MenubarRootResolvedState {
   const items = getCompositeCollectionItems(
     getCompositeCollection(root.menubarId)

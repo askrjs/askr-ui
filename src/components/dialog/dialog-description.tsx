@@ -14,17 +14,21 @@ export function DialogDescription(
 ) {
   const { asChild, children, ref, ...rest } = props;
   const root = readDialogRootContext();
+  const setNode = (node: HTMLElement | null) => {
+    root.setDescriptionNode(node);
+  };
+  const refHandler = ref
+    ? composeRefs(
+        ref as
+          | ((value: HTMLElement | null) => void)
+          | { current: HTMLElement | null }
+          | null
+          | undefined,
+        setNode
+      )
+    : setNode;
   const finalProps = mergeProps(rest, {
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      (node: HTMLElement | null) => {
-        root.setDescriptionNode(node);
-      }
-    ),
+    ref: refHandler,
     id: root.descriptionId,
     'data-slot': 'dialog-description',
   });

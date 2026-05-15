@@ -1,7 +1,5 @@
-import { For } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
-import { toChildArray } from '../_internal/jsx';
 import {
   clearOverlayPosition,
   getOverlayNodes,
@@ -10,7 +8,6 @@ import {
 } from '../_internal/overlay';
 import {
   PopoverRootContext,
-  readPopoverRootContext,
   resolvePopoverPositionOptions,
   type PopoverPositionOptions,
   type PopoverRootContextValue,
@@ -19,26 +16,6 @@ import type { PopoverProps } from './popover.types';
 
 function schedulePopoverPortalSync(callback: () => void) {
   queueMicrotask(callback);
-}
-
-function PopoverRootView(props: { children?: unknown }) {
-  const root = readPopoverRootContext();
-  const PortalHost = root.portal;
-  const keyedChildren = (
-    <For
-      each={() => toChildArray(props.children)}
-      by={(_child, index) => index}
-    >
-      {(child) => child as never}
-    </For>
-  );
-
-  return (
-    <>
-      {keyedChildren}
-      {PortalHost ? <PortalHost key="popover-root-portal" /> : null}
-    </>
-  );
 }
 
 export function Popover(props: PopoverProps) {
@@ -93,10 +70,14 @@ export function Popover(props: PopoverProps) {
       clearOverlayPosition(popoverId);
     },
   };
+  const PortalHost = portal;
 
   return (
     <PopoverRootContext.Scope value={rootContext}>
-      <PopoverRootView>{children}</PopoverRootView>
+      <>
+        {children}
+        {PortalHost ? <PortalHost key="popover-root-portal" /> : null}
+      </>
     </PopoverRootContext.Scope>
   );
 }
