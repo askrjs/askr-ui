@@ -3,7 +3,7 @@ import {
   Button,
   type ButtonAsChildProps,
   type ButtonNativeProps,
-} from '../../src/components/primitives/button';
+} from '../../src/components/button';
 
 describe('Button benches', () => {
   bench('create native <button>', () => {

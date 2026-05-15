@@ -4,7 +4,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from '../../../src/components/composites/toast';
+} from '../../../src/components/toast';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Toast - Determinism', () => {

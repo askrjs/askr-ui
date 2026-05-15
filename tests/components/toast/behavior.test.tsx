@@ -8,7 +8,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from '../../../src/components/composites/toast';
+} from '../../../src/components/toast';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 function ControlledToastFixture() {

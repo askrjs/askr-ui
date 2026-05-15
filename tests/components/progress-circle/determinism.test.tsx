@@ -2,7 +2,7 @@ import { describe, it } from 'vite-plus/test';
 import {
   ProgressCircle,
   ProgressCircleIndicator,
-} from '../../../src/components/primitives/progress-circle';
+} from '../../../src/components/progress-circle';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('ProgressCircle - Determinism', () => {

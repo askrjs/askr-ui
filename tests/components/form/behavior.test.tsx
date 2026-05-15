@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test';
-import { Form } from '../../../src/components/primitives/form';
+import { Form } from '../../../src/components/form';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Form - Behavior', () => {

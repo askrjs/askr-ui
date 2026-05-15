@@ -2,7 +2,7 @@ import { describe, it } from 'vite-plus/test';
 import {
   ToggleGroup,
   ToggleGroupItem,
-} from '../../../src/components/primitives/toggle-group';
+} from '../../../src/components/toggle-group';
 import { expectDeterministicRender } from '../../determinism';
 import { mount, unmount } from '../../test-utils';
 

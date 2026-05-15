@@ -3,7 +3,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from '../../../src/components/primitives/avatar';
+} from '../../../src/components/avatar';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Avatar - Determinism', () => {

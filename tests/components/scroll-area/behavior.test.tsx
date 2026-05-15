@@ -5,7 +5,7 @@ import {
   ScrollAreaScrollbar,
   ScrollAreaThumb,
   ScrollAreaViewport,
-} from '../../../src/components/composites/scroll-area';
+} from '../../../src/components/scroll-area';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('ScrollArea - Behavior', () => {

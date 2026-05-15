@@ -9,7 +9,7 @@ import {
   MenubarSubContent,
   MenubarSubTrigger,
   MenubarTrigger,
-} from '../../../src/components/composites/menubar';
+} from '../../../src/components/menubar';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 async function flushPortalUpdates() {

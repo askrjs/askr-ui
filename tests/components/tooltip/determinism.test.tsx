@@ -4,7 +4,7 @@ import {
   TooltipContent,
   TooltipPortal,
   TooltipTrigger,
-} from '../../../src/components/composites/tooltip';
+} from '../../../src/components/tooltip';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Tooltip - Determinism', () => {

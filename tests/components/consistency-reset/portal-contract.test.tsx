@@ -4,20 +4,20 @@ import {
   DialogContent,
   DialogPortal,
   DialogTrigger,
-} from '../../../src/components/composites/dialog';
+} from '../../../src/components/dialog';
 import {
   Popover,
   PopoverContent,
   PopoverPortal,
   PopoverTrigger,
-} from '../../../src/components/composites/popover';
+} from '../../../src/components/popover';
 import {
   Dropdown,
   DropdownContent,
   DropdownItem,
   DropdownPortal,
   DropdownTrigger,
-} from '../../../src/components/composites/dropdown';
+} from '../../../src/components/dropdown';
 import {
   Select,
   SelectContent,
@@ -25,13 +25,13 @@ import {
   SelectPortal,
   SelectTrigger,
   SelectValue,
-} from '../../../src/components/primitives/select';
+} from '../../../src/components/select';
 import {
   Tooltip,
   TooltipContent,
   TooltipPortal,
   TooltipTrigger,
-} from '../../../src/components/composites/tooltip';
+} from '../../../src/components/tooltip';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Consistency Reset - Portal Contract', () => {

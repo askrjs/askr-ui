@@ -4,7 +4,7 @@ import {
   AlertDialogContent,
   AlertDialogPortal,
   AlertDialogTrigger,
-} from '../../../src/components/composites/alert-dialog';
+} from '../../../src/components/alert-dialog';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('AlertDialog - Behavior', () => {

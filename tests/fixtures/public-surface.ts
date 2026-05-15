@@ -1,36 +1,36 @@
-// Generated - do not edit. Run `npm run generate` to update.
+// Public surface fixture used by type and API tests.
 
-import * as AvatarModule from '../../src/components/primitives/avatar/index';
-import * as ButtonModule from '../../src/components/primitives/button/index';
-import * as CheckboxModule from '../../src/components/primitives/checkbox/index';
-import * as InputModule from '../../src/components/primitives/input/index';
-import * as FormModule from '../../src/components/primitives/form/index';
-import * as LabelModule from '../../src/components/primitives/label/index';
-import * as ProgressModule from '../../src/components/primitives/progress/index';
-import * as ProgressCircleModule from '../../src/components/primitives/progress-circle/index';
-import * as RadioGroupModule from '../../src/components/primitives/radio-group/index';
-import * as SelectModule from '../../src/components/primitives/select/index';
-import * as SliderModule from '../../src/components/primitives/slider/index';
-import * as SwitchModule from '../../src/components/primitives/switch/index';
-import * as TableModule from '../../src/components/primitives/table/index';
-import * as TextareaModule from '../../src/components/primitives/textarea/index';
-import * as ToggleModule from '../../src/components/primitives/toggle/index';
-import * as ToggleGroupModule from '../../src/components/primitives/toggle-group/index';
-import * as VisuallyHiddenModule from '../../src/components/primitives/visually-hidden/index';
-import * as AccordionModule from '../../src/components/composites/accordion/index';
-import * as AlertDialogModule from '../../src/components/composites/alert-dialog/index';
-import * as CollapsibleModule from '../../src/components/composites/collapsible/index';
-import * as DialogModule from '../../src/components/composites/dialog/index';
-import * as DismissableLayerModule from '../../src/components/composites/dismissable-layer/index';
-import * as DropdownModule from '../../src/components/composites/dropdown/index';
-import * as FocusScopeModule from '../../src/components/composites/focus-scope/index';
-import * as HoverCardModule from '../../src/components/composites/hover-card/index';
-import * as MenuModule from '../../src/components/composites/menu/index';
-import * as MenubarModule from '../../src/components/composites/menubar/index';
-import * as PopoverModule from '../../src/components/composites/popover/index';
-import * as ScrollAreaModule from '../../src/components/composites/scroll-area/index';
-import * as ToastModule from '../../src/components/composites/toast/index';
-import * as TooltipModule from '../../src/components/composites/tooltip/index';
+import * as AvatarModule from '../../src/components/avatar/index';
+import * as ButtonModule from '../../src/components/button/index';
+import * as CheckboxModule from '../../src/components/checkbox/index';
+import * as InputModule from '../../src/components/input/index';
+import * as FormModule from '../../src/components/form/index';
+import * as LabelModule from '../../src/components/label/index';
+import * as ProgressModule from '../../src/components/progress/index';
+import * as ProgressCircleModule from '../../src/components/progress-circle/index';
+import * as RadioGroupModule from '../../src/components/radio-group/index';
+import * as SelectModule from '../../src/components/select/index';
+import * as SliderModule from '../../src/components/slider/index';
+import * as SwitchModule from '../../src/components/switch/index';
+import * as TableModule from '../../src/components/table/index';
+import * as TextareaModule from '../../src/components/textarea/index';
+import * as ToggleModule from '../../src/components/toggle/index';
+import * as ToggleGroupModule from '../../src/components/toggle-group/index';
+import * as VisuallyHiddenModule from '../../src/components/visually-hidden/index';
+import * as AccordionModule from '../../src/components/accordion/index';
+import * as AlertDialogModule from '../../src/components/alert-dialog/index';
+import * as CollapsibleModule from '../../src/components/collapsible/index';
+import * as DialogModule from '../../src/components/dialog/index';
+import * as DismissableLayerModule from '../../src/components/dismissable-layer/index';
+import * as DropdownModule from '../../src/components/dropdown/index';
+import * as FocusScopeModule from '../../src/components/focus-scope/index';
+import * as HoverCardModule from '../../src/components/hover-card/index';
+import * as MenuModule from '../../src/components/menu/index';
+import * as MenubarModule from '../../src/components/menubar/index';
+import * as PopoverModule from '../../src/components/popover/index';
+import * as ScrollAreaModule from '../../src/components/scroll-area/index';
+import * as ToastModule from '../../src/components/toast/index';
+import * as TooltipModule from '../../src/components/tooltip/index';
 
 export const componentSurface = [
   { bucket: 'primitives', name: 'avatar', module: AvatarModule },

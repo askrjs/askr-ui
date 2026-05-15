@@ -1,8 +1,5 @@
 import { describe, it } from 'vite-plus/test';
-import {
-  DebouncedInput,
-  Input,
-} from '../../../src/components/primitives/input/input';
+import { DebouncedInput, Input } from '../../../src/components/input/input';
 import { expectDeterministicRender } from '../../determinism';
 import { mount, unmount } from '../../test-utils';
 

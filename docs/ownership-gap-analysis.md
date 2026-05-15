@@ -96,15 +96,15 @@ like this:
 
 ## Reference Matrix
 
-| Area              | askr-ui | askr-themes      | Notes                                                                |
-| ----------------- | ------- | ---------------- | -------------------------------------------------------------------- |
-| Controls          | Strong  | Styled by themes | Matches the core primitives mental model well                        |
-| Overlays          | Strong  | Styled by themes | `Dialog`, `Popover`, `Tooltip`, menus are already there              |
-| Disclosure        | Strong  | Styled by themes | `Accordion` and `Collapsible` are in good shape                      |
-| Layout / chrome   | Minimal | Strong           | Best owned by `askr-themes`                                          |
-| Visual primitives | Minimal | Strong           | Better fit for theme package than headless UI                        |
+| Area              | askr-ui | askr-themes      | Notes                                                            |
+| ----------------- | ------- | ---------------- | ---------------------------------------------------------------- |
+| Controls          | Strong  | Styled by themes | Matches the core primitives mental model well                    |
+| Overlays          | Strong  | Styled by themes | `Dialog`, `Popover`, `Tooltip`, menus are already there          |
+| Disclosure        | Strong  | Styled by themes | `Accordion` and `Collapsible` are in good shape                  |
+| Layout / chrome   | Minimal | Strong           | Best owned by `askr-themes`                                      |
+| Visual primitives | Minimal | Strong           | Better fit for theme package than headless UI                    |
 | Utility extras    | Mixed   | Mixed            | `Separator` is theme-owned; remaining open gaps are backlog-only |
-| Docs / guidance   | Fair    | Fair             | Both packages would benefit from clearer ownership examples          |
+| Docs / guidance   | Fair    | Fair             | Both packages would benefit from clearer ownership examples      |
 
 ## Bottom Line
 

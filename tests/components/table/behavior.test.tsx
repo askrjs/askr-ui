@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeaderCell,
   TableRow,
-} from '../../../src/components/primitives/table';
+} from '../../../src/components/table';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Table - Behavior', () => {

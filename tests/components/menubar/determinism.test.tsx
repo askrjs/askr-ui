@@ -6,7 +6,7 @@ import {
   MenubarMenu,
   MenubarPortal,
   MenubarTrigger,
-} from '../../../src/components/composites/menubar';
+} from '../../../src/components/menubar';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Menubar - Determinism', () => {

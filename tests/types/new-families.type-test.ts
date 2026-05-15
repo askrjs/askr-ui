@@ -24,9 +24,9 @@ import {
   type ScrollAreaViewportAsChildProps,
   type ScrollAreaViewportProps,
 } from '@askrjs/ui';
-import { Form as FormSubpath } from '@askrjs/ui/primitives/form';
-import { HoverCard as HoverCardSubpath } from '@askrjs/ui/composites/hover-card';
-import { ScrollArea as ScrollAreaSubpath } from '@askrjs/ui/composites/scroll-area';
+import { Form as FormSubpath } from '@askrjs/ui';
+import { HoverCard as HoverCardSubpath } from '@askrjs/ui';
+import { ScrollArea as ScrollAreaSubpath } from '@askrjs/ui';
 
 const slotChild = {} as JSXElement;
 
