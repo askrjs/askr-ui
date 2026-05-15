@@ -27,8 +27,23 @@ describe('Browser bench contract', () => {
     const contents = benchFiles.map(({ contents }) => contents).join('\n');
 
     expect(contents).toContain('mount 1k native buttons');
-    expect(contents).toContain('open and close dialog');
-    expect(contents).toContain('open and close popover');
-    expect(contents).toContain('open and close dropdown');
+    expect(contents).toContain(
+      'cycle 100 dialog open/close with listener cleanup'
+    );
+    expect(contents).toContain(
+      'cycle 100 popover open/close with listener cleanup'
+    );
+    expect(contents).toContain(
+      'cycle 100 dropdown open/close with listener cleanup'
+    );
+    expect(contents).toContain(
+      'cycle 100 select open/close with listener cleanup'
+    );
+    expect(contents).toContain(
+      'cycle 100 tooltip open/close with listener cleanup'
+    );
+    expect(contents).toContain(
+      'cycle 100 toast open/close with listener cleanup'
+    );
   });
 });

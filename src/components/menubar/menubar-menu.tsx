@@ -18,7 +18,6 @@ import {
   readMenubarMenuContext,
   readMenubarRootContext,
   readMenubarRootRenderContext,
-  resolveMenubarRootState,
   MenubarMenuContext,
   MenubarRootContext,
   type MenubarMenuContextValue,

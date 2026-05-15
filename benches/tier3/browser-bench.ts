@@ -49,11 +49,116 @@ export async function flushBrowserBenchUpdates() {
   await Promise.resolve();
 }
 
-export async function settleBrowserBenchEnvironment() {
-  resetBrowserBenchState();
+export async function settleBrowserBenchCycle() {
   await flushBrowserBenchUpdates();
   await nextAnimationFrame();
   await flushBrowserBenchUpdates();
+}
+
+type ListenerTargetRegistry = Map<
+  string,
+  Set<EventListenerOrEventListenerObject>
+>;
+
+export function createBrowserListenerTracker() {
+  const registrations = new Map<EventTarget, ListenerTargetRegistry>();
+  const prototype = EventTarget.prototype as EventTarget & {
+    addEventListener: typeof EventTarget.prototype.addEventListener;
+    removeEventListener: typeof EventTarget.prototype.removeEventListener;
+  };
+  const originalAddEventListener = prototype.addEventListener;
+  const originalRemoveEventListener = prototype.removeEventListener;
+
+  const getCaptureKey = (options?: boolean | AddEventListenerOptions) =>
+    typeof options === 'boolean' ? options : Boolean(options?.capture);
+
+  const getListenerRegistry = (target: EventTarget) => {
+    const existing = registrations.get(target);
+
+    if (existing) {
+      return existing;
+    }
+
+    const created: ListenerTargetRegistry = new Map();
+    registrations.set(target, created);
+    return created;
+  };
+
+  const recordListener = (
+    target: EventTarget,
+    type: string,
+    listener: EventListenerOrEventListenerObject | null,
+    options: boolean | AddEventListenerOptions | undefined,
+    operation: 'add' | 'remove'
+  ) => {
+    if (!listener) {
+      return;
+    }
+
+    const registry = getListenerRegistry(target);
+    const key = `${type}:${getCaptureKey(options) ? '1' : '0'}`;
+    const listeners = registry.get(key) ?? new Set();
+
+    if (operation === 'add') {
+      listeners.add(listener);
+    } else {
+      listeners.delete(listener);
+    }
+
+    if (listeners.size === 0) {
+      registry.delete(key);
+    } else {
+      registry.set(key, listeners);
+    }
+
+    if (registry.size === 0) {
+      registrations.delete(target);
+    }
+  };
+
+  prototype.addEventListener = function (
+    this: EventTarget,
+    type: string,
+    listener: EventListenerOrEventListenerObject | null,
+    options?: boolean | AddEventListenerOptions
+  ) {
+    recordListener(this, type, listener, options, 'add');
+    return originalAddEventListener.call(this, type, listener, options);
+  };
+
+  prototype.removeEventListener = function (
+    this: EventTarget,
+    type: string,
+    listener: EventListenerOrEventListenerObject | null,
+    options?: boolean | EventListenerOptions
+  ) {
+    recordListener(this, type, listener, options, 'remove');
+    return originalRemoveEventListener.call(this, type, listener, options);
+  };
+
+  return {
+    countActiveListeners() {
+      let count = 0;
+
+      for (const registry of registrations.values()) {
+        for (const listeners of registry.values()) {
+          count += listeners.size;
+        }
+      }
+
+      return count;
+    },
+    dispose() {
+      prototype.addEventListener = originalAddEventListener;
+      prototype.removeEventListener = originalRemoveEventListener;
+      registrations.clear();
+    },
+  };
+}
+
+export async function settleBrowserBenchEnvironment() {
+  resetBrowserBenchState();
+  await settleBrowserBenchCycle();
 }
 
 export function createTier3BenchOptions(): BenchOptions {

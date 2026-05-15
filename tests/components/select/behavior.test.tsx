@@ -247,9 +247,6 @@ describe('Select - Behavior', () => {
     await flushUpdates();
     await flushUpdates();
 
-    const content = document.body.querySelector(
-      '[data-slot="select-content"]'
-    ) as HTMLDivElement;
     const items = Array.from(
       document.body.querySelectorAll('[role="option"]')
     ) as HTMLElement[];

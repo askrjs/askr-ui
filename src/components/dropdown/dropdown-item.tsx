@@ -43,9 +43,9 @@ export function DropdownItem(
   const itemId = resolvePartId(root.dropdownId, `item-${itemIndex}`);
   const itemText = resolveMenuItemText(children);
   const { items, currentIndex, disabledIndexes } = root.resolvedState;
-  const hasEnabledItems =
-    items.length > 0 &&
-    items.some((_item, index) => !disabledIndexes.includes(index));
+  const hasEnabledItems = items.some(
+    (_item, index) => !disabledIndexes.includes(index)
+  );
   const collection = getMenuCollection(root.dropdownId);
   const nav = rovingFocus({
     currentIndex,
