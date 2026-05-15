@@ -1,7 +1,5 @@
-import { For } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
-import { toChildArray } from '../_internal/jsx';
 import {
   clearOverlayPosition,
   getOverlayNodes,
@@ -9,7 +7,6 @@ import {
   syncOverlayPosition,
 } from '../_internal/overlay';
 import {
-  readTooltipRootContext,
   resolveTooltipPositionOptions,
   TooltipRootContext,
   type TooltipPositionOptions,
@@ -19,26 +16,6 @@ import type { TooltipProps } from './tooltip.types';
 
 function scheduleTooltipPortalSync(callback: () => void) {
   queueMicrotask(callback);
-}
-
-function TooltipRootView(props: { children?: unknown }) {
-  const root = readTooltipRootContext();
-  const PortalHost = root.portal;
-  const keyedChildren = (
-    <For
-      each={() => toChildArray(props.children)}
-      by={(_child, index) => index}
-    >
-      {(child) => child as never}
-    </For>
-  );
-
-  return (
-    <>
-      {keyedChildren}
-      {PortalHost ? <PortalHost key="tooltip-root-portal" /> : null}
-    </>
-  );
 }
 
 export function Tooltip(props: TooltipProps) {
@@ -91,10 +68,14 @@ export function Tooltip(props: TooltipProps) {
       clearOverlayPosition(tooltipId);
     },
   };
+  const PortalHost = portal;
 
   return (
     <TooltipRootContext.Scope value={rootContext}>
-      <TooltipRootView>{children}</TooltipRootView>
+      <>
+        {children}
+        {PortalHost ? <PortalHost key="tooltip-root-portal" /> : null}
+      </>
     </TooltipRootContext.Scope>
   );
 }

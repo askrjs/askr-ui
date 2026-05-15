@@ -62,21 +62,10 @@ export function AlertDialogTrigger(
   return <DialogTrigger {...props} onPress={handlePress} />;
 }
 
-export function AlertDialogPortal(
-  props: AlertDialogPortalProps
-): JSX.Element | null {
-  return <DialogPortal {...props} />;
-}
-
-export function AlertDialogOverlay(
-  props: AlertDialogOverlayProps | AlertDialogOverlayAsChildProps
-): JSX.Element | null {
-  if (props.asChild) {
-    return <DialogOverlay {...props} />;
-  }
-
-  return <DialogOverlay {...props} />;
-}
+export {
+  DialogPortal as AlertDialogPortal,
+  DialogOverlay as AlertDialogOverlay,
+};
 
 export function AlertDialogContent(
   props: AlertDialogContentProps | AlertDialogContentAsChildProps
@@ -90,87 +79,46 @@ export function AlertDialogContent(
     ...rest
   } = props;
   const root = readDialogRootContext();
-  void onDismiss;
 
   const isAsChild = props.asChild === true;
+  const handleEscapeKeyDown = (event: KeyboardEvent) => {
+    onEscapeKeyDown?.(event);
 
-  if (isAsChild) {
-    const contentProps: AlertDialogContentAsChildProps = {
-      ...(rest as Omit<AlertDialogContentAsChildProps, 'children' | 'asChild'>),
-      asChild: true,
-      children: children as JSX.Element,
-      onEscapeKeyDown: (event: KeyboardEvent) => {
-        onEscapeKeyDown?.(event);
-
-        if (!event.defaultPrevented) {
-          root.setOpen(false);
-        }
-      },
-      onPointerDownOutside: (event: PointerEvent) => {
-        onPointerDownOutside?.(event);
-        event.preventDefault();
-      },
-      onInteractOutside,
-    };
-
-    return <DialogContent {...contentProps} />;
-  }
-
-  const contentProps: AlertDialogContentProps = {
+    if (!event.defaultPrevented) {
+      root.setOpen(false);
+    }
+  };
+  const handlePointerDownOutside = (event: PointerEvent) => {
+    onPointerDownOutside?.(event);
+    event.preventDefault();
+  };
+  const sharedProps = {
     ...(rest as Omit<AlertDialogContentProps, 'children'>),
-    onEscapeKeyDown: (event: KeyboardEvent) => {
-      onEscapeKeyDown?.(event);
-
-      if (!event.defaultPrevented) {
-        root.setOpen(false);
-      }
-    },
-    onPointerDownOutside: (event: PointerEvent) => {
-      onPointerDownOutside?.(event);
-      event.preventDefault();
-    },
+    onEscapeKeyDown: handleEscapeKeyDown,
+    onPointerDownOutside: handlePointerDownOutside,
     onInteractOutside,
+    onDismiss,
   };
 
-  return <DialogContent {...contentProps}>{children}</DialogContent>;
-}
-
-export function AlertDialogTitle(
-  props: AlertDialogTitleProps | AlertDialogTitleAsChildProps
-) {
-  if (props.asChild) {
-    return <DialogTitle {...props} />;
+  if (isAsChild) {
+    return (
+      <DialogContent
+        {...(sharedProps as Omit<
+          AlertDialogContentAsChildProps,
+          'children' | 'asChild'
+        >)}
+        asChild
+        children={children as JSX.Element}
+      />
+    );
   }
 
-  return <DialogTitle {...props} />;
+  return <DialogContent {...sharedProps}>{children}</DialogContent>;
 }
 
-export function AlertDialogDescription(
-  props: AlertDialogDescriptionProps | AlertDialogDescriptionAsChildProps
-) {
-  if (props.asChild) {
-    return <DialogDescription {...props} />;
-  }
-
-  return <DialogDescription {...props} />;
-}
-
-export function AlertDialogAction(
-  props: AlertDialogActionProps | AlertDialogActionAsChildProps
-) {
-  if (props.asChild) {
-    return <DialogClose {...props} />;
-  }
-
-  return <DialogClose {...props} />;
-}
-
-export function AlertDialogCancel(
-  props: AlertDialogCancelProps | AlertDialogCancelAsChildProps
-) {
-  if (props.asChild) {
-    return <DialogClose {...props} />;
-  }
-
-  return <DialogClose {...props} />;
-}
+export {
+  DialogTitle as AlertDialogTitle,
+  DialogDescription as AlertDialogDescription,
+  DialogClose as AlertDialogAction,
+  DialogClose as AlertDialogCancel,
+};

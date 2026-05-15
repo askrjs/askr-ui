@@ -1,4 +1,4 @@
-import { For, state } from '@askrjs/askr';
+import { state } from '@askrjs/askr';
 import {
   controllableState,
   mergeProps,
@@ -21,25 +21,6 @@ import {
   type RadioGroupRootContextValue,
 } from './radio-group.shared';
 import type { RadioGroupProps } from './radio-group.types';
-
-function RadioGroupScopeView(props: {
-  children?: unknown;
-  name?: string;
-  disabled: boolean;
-  value: string;
-  renderContext: ReturnType<typeof createRadioGroupRenderContext>;
-}) {
-  return (
-    <RadioGroupRenderContext.Scope value={props.renderContext}>
-      <RadioGroupRootView
-        children={props.children}
-        name={props.name}
-        disabled={props.disabled}
-        value={props.value}
-      />
-    </RadioGroupRenderContext.Scope>
-  );
-}
 
 function RadioGroupRootView(props: {
   children?: unknown;
@@ -68,12 +49,7 @@ function RadioGroupRootView(props: {
       }
     },
   });
-  const finalProps = mergeProps(
-    {},
-    {
-      ...nav.container,
-    }
-  );
+  const finalProps = nav.container;
   const keyedChildren = toChildArray(props.children).map((child, index) => {
     if (!isJsxElement(child) || child.key != null) {
       return child;
@@ -97,18 +73,8 @@ function RadioGroupRootView(props: {
       />
     );
   }
-  const renderedList = (
-    <For
-      each={() => renderedChildren}
-      by={(child, index) =>
-        isJsxElement(child) && child.key != null ? String(child.key) : index
-      }
-    >
-      {(child) => child as JSX.Element}
-    </For>
-  );
 
-  return <div {...finalProps}>{renderedList}</div>;
+  return <div {...finalProps}>{renderedChildren}</div>;
 }
 
 export function RadioGroup(props: RadioGroupProps) {
@@ -138,6 +104,7 @@ export function RadioGroup(props: RadioGroupProps) {
     defaultValue,
     onChange: onValueChange,
   });
+  const currentValue = valueState();
   const items = getCompositeCollectionItems(collection).map((item) => ({
     value: String(item.value ?? ''),
     disabled: item.disabled,
@@ -157,7 +124,7 @@ export function RadioGroup(props: RadioGroupProps) {
       notifyItemsChanged();
     });
   };
-  const selectedIndex = items.findIndex((item) => item.value === valueState());
+  const selectedIndex = items.findIndex((item) => item.value === currentValue);
   const fallbackIndex = firstEnabledCompositeIndex(items);
   const currentIndexState = state(
     selectedIndex >= 0 && !items[selectedIndex]?.disabled
@@ -206,14 +173,14 @@ export function RadioGroup(props: RadioGroupProps) {
 
   return (
     <RadioGroupRootContext.Scope value={rootContext}>
-      <RadioGroupScopeView
-        renderContext={renderContext}
-        name={name}
-        disabled={disabled}
-        value={valueState()}
-      >
-        <div {...finalProps}>{keyedChildren}</div>
-      </RadioGroupScopeView>
+      <RadioGroupRenderContext.Scope value={renderContext}>
+        <RadioGroupRootView
+          children={<div {...finalProps}>{keyedChildren}</div>}
+          name={name}
+          disabled={disabled}
+          value={currentValue}
+        />
+      </RadioGroupRenderContext.Scope>
     </RadioGroupRootContext.Scope>
   );
 }

@@ -16,10 +16,8 @@ import {
   syncOverlayPosition,
 } from '../_internal/overlay';
 import {
-  getSelectDisabledIndexes,
   readSelectRenderContext,
   readSelectRootContext,
-  resolveSelectState,
   SelectRenderContext,
   SelectRootContext,
 } from './select.shared';
@@ -48,10 +46,11 @@ export function SelectContent(
 
   const root = readSelectRootContext();
   const renderContext = readSelectRenderContext();
-  const { items, currentIndex } = resolveSelectState(root);
+  const { items, currentIndex, disabledIndexes } = root.resolvedState;
   const overlayNodes = getOverlayNodes(root.selectId);
   const collection = getMenuCollection(root.selectId);
-  const disabledIndexes = getSelectDisabledIndexes(items, root.disabled);
+  const hasEnabledItems =
+    items.length > 0 && disabledIndexes.length < items.length;
   const nav = rovingFocus({
     currentIndex,
     itemCount: Math.max(items.length, 1),
@@ -85,7 +84,7 @@ export function SelectContent(
           clearOverlayPosition(root.selectId);
         }
 
-        if (node && root.open) {
+        if (node && root.open && hasEnabledItems) {
           focusSelectedCollectionItem(collection, currentIndex);
         }
       }

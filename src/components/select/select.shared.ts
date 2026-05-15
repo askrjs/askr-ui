@@ -6,6 +6,14 @@ import {
 } from '../_internal/menu';
 import type { OverlayPortal } from '../_internal/overlay';
 
+export type SelectStateInput = {
+  selectId: string;
+  value: string;
+  currentIndexCandidate: number;
+  disabled: boolean;
+  declaredItems: SelectItemMetadata[];
+};
+
 export type SelectItemMetadata = {
   disabled: boolean;
   value?: string;
@@ -24,6 +32,7 @@ export type SelectRootContextValue = {
   setCurrentIndex: (index: number) => void;
   disabled: boolean;
   declaredItems: SelectItemMetadata[];
+  resolvedState: SelectResolvedState;
 };
 
 export type SelectRenderContextValue = {
@@ -40,6 +49,7 @@ export type SelectResolvedState = {
   items: SelectItemMetadata[];
   currentIndex: number;
   selectedText: string;
+  disabledIndexes: number[];
 };
 
 export const SelectRootContext = defineContext<SelectRootContextValue | null>(
@@ -103,7 +113,7 @@ export function getSelectDisabledIndexes(
 }
 
 export function resolveSelectState(
-  root: SelectRootContextValue
+  root: SelectStateInput
 ): SelectResolvedState {
   const registeredItems = getMenuCollectionItems(
     getMenuCollection(root.selectId)
@@ -119,6 +129,8 @@ export function resolveSelectState(
   }));
   const selectedIndex = items.findIndex((item) => item.value === root.value);
   const fallbackIndex = firstEnabledIndex(effectiveItems);
+  const allItemsDisabled =
+    items.length > 0 && effectiveItems.every((item) => item.disabled);
   const candidateIndex = root.currentIndexCandidate;
   const currentIndex =
     selectedIndex >= 0 && !effectiveItems[selectedIndex]?.disabled
@@ -126,11 +138,14 @@ export function resolveSelectState(
       : effectiveItems[candidateIndex] &&
           !effectiveItems[candidateIndex]?.disabled
         ? candidateIndex
-        : fallbackIndex;
+        : allItemsDisabled
+          ? -1
+          : fallbackIndex;
 
   return {
     items,
     currentIndex,
     selectedText: items.find((item) => item.value === root.value)?.text ?? '',
+    disabledIndexes: getSelectDisabledIndexes(items, root.disabled),
   };
 }

@@ -19,6 +19,7 @@ export type ToggleGroupRootContextValue = {
   currentIndex: number;
   setCurrentIndex: (index: number) => void;
   items: ToggleGroupRootItem[];
+  disabledItemIndexes: number[];
 };
 
 export type ToggleGroupRenderContextValue = {

@@ -44,42 +44,6 @@ import {
   type AccordionRootContextValue,
 } from './accordion.shared';
 
-function AccordionRootView(props: {
-  children?: unknown;
-  finalProps: Record<string, unknown>;
-}) {
-  const keyedChildren = toChildArray(props.children).map((child, index) => {
-    if (!isJsxElement(child) || child.key != null) {
-      return child;
-    }
-
-    return {
-      ...child,
-      key: `accordion-root-${index}`,
-    };
-  });
-
-  return <div {...props.finalProps}>{keyedChildren}</div>;
-}
-
-function AccordionItemView(props: {
-  children?: unknown;
-  finalProps: Record<string, unknown>;
-}) {
-  const keyedChildren = toChildArray(props.children).map((child, index) => {
-    if (!isJsxElement(child) || child.key != null) {
-      return child;
-    }
-
-    return {
-      ...child,
-      key: `accordion-item-${index}`,
-    };
-  });
-
-  return <div {...props.finalProps}>{keyedChildren}</div>;
-}
-
 export function Accordion(props: AccordionProps) {
   const {
     children,
@@ -185,6 +149,7 @@ export function Accordion(props: AccordionProps) {
         ? candidateIndex
         : fallbackIndex;
   const disabledIndexList = disabledIndexes(items);
+  const currentValue = valueState();
   const setValue: AccordionRootContextValue['setValue'] = (nextValue) => {
     if (type === 'multiple') {
       (valueState.set as (value: string[]) => void)(
@@ -200,7 +165,7 @@ export function Accordion(props: AccordionProps) {
   const rootContext: AccordionRootContextValue = {
     accordionId,
     type,
-    value: valueState(),
+    value: currentValue,
     setValue,
     orientation,
     loop,
@@ -218,13 +183,21 @@ export function Accordion(props: AccordionProps) {
     'data-accordion': 'true',
     'data-orientation': orientation,
   });
+  const keyedChildren = toChildArray(children).map((child, index) => {
+    if (!isJsxElement(child) || child.key != null) {
+      return child;
+    }
+
+    return {
+      ...child,
+      key: `accordion-root-${index}`,
+    };
+  });
 
   return (
     <AccordionRootContext.Scope value={rootContext}>
       <AccordionRenderContext.Scope value={renderContext}>
-        <AccordionRootView finalProps={finalProps}>
-          {children}
-        </AccordionRootView>
+        <div {...finalProps}>{keyedChildren}</div>
       </AccordionRenderContext.Scope>
     </AccordionRootContext.Scope>
   );
@@ -257,10 +230,20 @@ export function AccordionItem(props: AccordionItemProps): JSX.Element {
     'data-disabled': itemDisabled ? 'true' : undefined,
     'data-orientation': root.orientation,
   });
+  const keyedChildren = toChildArray(children).map((child, index) => {
+    if (!isJsxElement(child) || child.key != null) {
+      return child;
+    }
+
+    return {
+      ...child,
+      key: `accordion-item-${index}`,
+    };
+  });
 
   return (
     <AccordionItemContext.Scope value={itemContext}>
-      <AccordionItemView finalProps={finalProps}>{children}</AccordionItemView>
+      <div {...finalProps}>{keyedChildren}</div>
     </AccordionItemContext.Scope>
   );
 }

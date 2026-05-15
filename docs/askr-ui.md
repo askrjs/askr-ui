@@ -45,6 +45,10 @@ import { Button } from '@askrjs/ui/button';
 import { Dialog } from '@askrjs/ui/dialog';
 ```
 
+The source layout stays intentionally flat as well: each component owns its
+own folder under `src/components/`, while shared helpers live in
+`src/components/_internal/`.
+
 ## See also
 
 - [askr-ui docs README](./README.md)

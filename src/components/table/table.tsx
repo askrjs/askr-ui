@@ -29,31 +29,6 @@ type TableHost =
   | 'th'
   | 'td';
 
-function renderTableHost(
-  host: TableHost,
-  props: Record<string, unknown>,
-  children: unknown
-): JSXElement {
-  switch (host) {
-    case 'table':
-      return <table {...props}>{children}</table>;
-    case 'caption':
-      return <caption {...props}>{children}</caption>;
-    case 'thead':
-      return <thead {...props}>{children}</thead>;
-    case 'tbody':
-      return <tbody {...props}>{children}</tbody>;
-    case 'tfoot':
-      return <tfoot {...props}>{children}</tfoot>;
-    case 'tr':
-      return <tr {...props}>{children}</tr>;
-    case 'th':
-      return <th {...props}>{children}</th>;
-    case 'td':
-      return <td {...props}>{children}</td>;
-  }
-}
-
 /**
  * Semantic table primitive family.
  */
@@ -71,7 +46,7 @@ export function Table(props: TableProps | TableAsChildProps) {
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return renderTableHost('table', finalProps, children);
+  return <table {...finalProps}>{children}</table>;
 }
 
 export function TableCaption(props: TableCaptionProps): JSX.Element;
@@ -90,7 +65,7 @@ export function TableCaption(
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return renderTableHost('caption', finalProps, children);
+  return <caption {...finalProps}>{children}</caption>;
 }
 
 export function TableHead(props: TableHeadProps): JSX.Element;
@@ -107,7 +82,7 @@ export function TableHead(props: TableHeadProps | TableHeadAsChildProps) {
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return renderTableHost('thead', finalProps, children);
+  return <thead {...finalProps}>{children}</thead>;
 }
 
 export function TableBody(props: TableBodyProps): JSX.Element;
@@ -124,7 +99,7 @@ export function TableBody(props: TableBodyProps | TableBodyAsChildProps) {
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return renderTableHost('tbody', finalProps, children);
+  return <tbody {...finalProps}>{children}</tbody>;
 }
 
 export function TableFoot(props: TableFootProps): JSX.Element;
@@ -141,7 +116,7 @@ export function TableFoot(props: TableFootProps | TableFootAsChildProps) {
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return renderTableHost('tfoot', finalProps, children);
+  return <tfoot {...finalProps}>{children}</tfoot>;
 }
 
 export function TableRow(props: TableRowProps): JSX.Element;
@@ -158,7 +133,7 @@ export function TableRow(props: TableRowProps | TableRowAsChildProps) {
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return renderTableHost('tr', finalProps, children);
+  return <tr {...finalProps}>{children}</tr>;
 }
 
 export function TableHeaderCell(props: TableHeaderCellProps): JSX.Element;
@@ -179,7 +154,7 @@ export function TableHeaderCell(
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return renderTableHost('th', finalProps, children);
+  return <th {...finalProps}>{children}</th>;
 }
 
 export function TableCell(props: TableCellProps): JSX.Element;
@@ -196,5 +171,5 @@ export function TableCell(props: TableCellProps | TableCellAsChildProps) {
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return renderTableHost('td', finalProps, children);
+  return <td {...finalProps}>{children}</td>;
 }

@@ -118,7 +118,7 @@ export function MenubarTrigger(
   const menu = readMenubarMenuContext();
 
   const { items, currentTriggerIndex, disabledTriggerIndexes } =
-    resolveMenubarRootState(root);
+    root.resolvedState;
   const collection = getCompositeCollection(root.menubarId);
   const nav = rovingFocus({
     currentIndex: currentTriggerIndex,
@@ -144,24 +144,28 @@ export function MenubarTrigger(
     },
     isNativeButton: !asChild,
   });
+  const setNode = (node: HTMLElement | null) => {
+    getOverlayNodes(menu.triggerId).trigger = node;
+    registerCompositeNode(menu.triggerId, collection, node, {
+      index: menu.menuIndex,
+      disabled,
+      value: menu.menuKey,
+    });
+  };
+  const refHandler = ref
+    ? composeRefs(
+        ref as
+          | ((value: HTMLElement | null) => void)
+          | { current: HTMLElement | null }
+          | null
+          | undefined,
+        setNode
+      )
+    : setNode;
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     ...nav.item(menu.menuIndex),
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      (node: HTMLElement | null) => {
-        getOverlayNodes(menu.triggerId).trigger = node;
-        registerCompositeNode(menu.triggerId, collection, node, {
-          index: menu.menuIndex,
-          disabled,
-          value: menu.menuKey,
-        });
-      }
-    ),
+    ref: refHandler,
     id: menu.triggerId,
     role: 'menuitem',
     'aria-haspopup': 'menu',

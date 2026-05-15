@@ -5,7 +5,7 @@ import {
   CollapsibleContent,
 } from '../../src/components';
 
-describe('Collapsible benches', () => {
+describe('Collapsible benches - closed', () => {
   bench('create closed collapsible', () => {
     Collapsible({
       children: [
@@ -14,7 +14,9 @@ describe('Collapsible benches', () => {
       ],
     });
   });
+});
 
+describe('Collapsible benches - open', () => {
   bench('create open collapsible', () => {
     Collapsible({
       defaultOpen: true,
@@ -24,7 +26,9 @@ describe('Collapsible benches', () => {
       ],
     });
   });
+});
 
+describe('Collapsible benches - disabled', () => {
   bench('create disabled collapsible', () => {
     Collapsible({
       disabled: true,
@@ -34,7 +38,9 @@ describe('Collapsible benches', () => {
       ],
     });
   });
+});
 
+describe('Collapsible benches - forceMount', () => {
   bench('create with forceMount', () => {
     Collapsible({
       defaultOpen: false,
@@ -44,7 +50,9 @@ describe('Collapsible benches', () => {
       ],
     });
   });
+});
 
+describe('Collapsible benches - state toggle', () => {
   bench('state toggle - open to closed to open', () => {
     const onOpenChange = (_open: boolean) => {
       // Simulates state change

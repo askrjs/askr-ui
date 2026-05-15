@@ -32,23 +32,27 @@ export function DialogContent(
     ...rest
   } = props;
   const root = readDialogRootContext();
-  const finalProps = mergeProps(rest, {
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      (node: HTMLElement | null) => {
-        root.setContentNode(node);
+  const setNode = (node: HTMLElement | null) => {
+    root.setContentNode(node);
 
-        if (node && root.open) {
-          root.syncPosition();
-        } else {
-          root.clearPosition();
-        }
-      }
-    ),
+    if (node && root.open) {
+      root.syncPosition();
+    } else {
+      root.clearPosition();
+    }
+  };
+  const refHandler = ref
+    ? composeRefs(
+        ref as
+          | ((value: HTMLElement | null) => void)
+          | { current: HTMLElement | null }
+          | null
+          | undefined,
+        setNode
+      )
+    : setNode;
+  const finalProps = mergeProps(rest, {
+    ref: refHandler,
     id: root.contentId,
     role,
     'aria-modal': root.modal ? 'true' : undefined,

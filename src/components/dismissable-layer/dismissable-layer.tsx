@@ -2,7 +2,6 @@ import {
   Slot,
   composeRefs,
   createLayer,
-  dismissable,
   mergeProps,
 } from '@askrjs/askr/foundations';
 import { resolveCompoundId } from '../_internal/id';
@@ -15,6 +14,9 @@ type LayerEntry = {
   node: HTMLElement | null;
   unregister: (() => void) | null;
   isTop: (() => boolean) | null;
+  setNode: (node: HTMLElement | null) => void;
+  handleKeyDown: (event: KeyboardEvent) => void;
+  handlePointerDownCapture: (event: PointerEvent) => void;
   lastEscapeEvent: KeyboardEvent | null;
   lastOutsidePointerEvent: PointerEvent | null;
   disabled: boolean;
@@ -39,6 +41,56 @@ function getLayerEntry(layerId: string): LayerEntry {
     node: null,
     unregister: null,
     isTop: null,
+    setNode: (node: HTMLElement | null) => {
+      if (created.node === node) {
+        return;
+      }
+
+      unregisterLayer(layerId);
+
+      if (!node) {
+        return;
+      }
+
+      created.node = node;
+      const layer = layerManager.register({
+        node,
+      });
+      created.unregister = () => {
+        layer.unregister();
+      };
+      created.isTop = () => layer.isTop();
+    },
+    handleKeyDown: (event: KeyboardEvent) => {
+      if (created.disabled) {
+        return;
+      }
+
+      if (event.key !== 'Escape') {
+        return;
+      }
+
+      created.lastEscapeEvent = event;
+      event.preventDefault?.();
+      event.stopPropagation?.();
+      runDismissCallbacks(layerId, 'escape');
+    },
+    handlePointerDownCapture: (event: PointerEvent) => {
+      if (created.disabled) {
+        return;
+      }
+
+      if (!(event.target instanceof Node)) {
+        return;
+      }
+
+      if (!created.node || created.node.contains(event.target)) {
+        return;
+      }
+
+      created.lastOutsidePointerEvent = event;
+      runDismissCallbacks(layerId, 'outside');
+    },
     lastEscapeEvent: null,
     lastOutsidePointerEvent: null,
     disabled: false,
@@ -121,63 +173,22 @@ export function DismissableLayer(
   entry.onInteractOutside = onInteractOutside;
   entry.onDismiss = onDismiss;
 
-  const setNode = (node: HTMLElement | null) => {
-    if (entry.node === node) {
-      return;
-    }
-
-    unregisterLayer(layerId);
-
-    if (!node) {
-      return;
-    }
-
-    entry.node = node;
-    const layer = layerManager.register({
-      node,
-    });
-    entry.unregister = () => {
-      layer.unregister();
-    };
-    entry.isTop = () => layer.isTop();
-  };
-
-  const dismissableProps = dismissable({
-    node: entry.node,
-    disabled,
-    onDismiss: (trigger) => {
-      runDismissCallbacks(layerId, trigger);
-    },
-  });
+  const refHandler = ref
+    ? composeRefs(
+        ref as
+          | ((value: HTMLElement | null) => void)
+          | { current: HTMLElement | null }
+          | null
+          | undefined,
+        entry.setNode
+      )
+    : entry.setNode;
 
   const finalProps = mergeProps(rest, {
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      setNode
-    ),
+    ref: refHandler,
     'data-dismissable-layer': 'true',
-    onKeyDown: (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        entry.lastEscapeEvent = event;
-      }
-
-      dismissableProps.onKeyDown(event);
-    },
-    onPointerDownCapture: (event: PointerEvent) => {
-      if (
-        entry.node &&
-        event.target instanceof Node &&
-        !entry.node.contains(event.target)
-      ) {
-        entry.lastOutsidePointerEvent = event;
-      }
-
-      dismissableProps.onPointerDownCapture(event);
-    },
+    onKeyDown: entry.handleKeyDown,
+    onPointerDownCapture: entry.handlePointerDownCapture,
   });
 
   if (asChild) {

@@ -120,33 +120,37 @@ function renderMenubarSurfaceContent(
       focusSelectedCollectionItem(collection, index);
     },
   });
+  const setNode = (node: HTMLElement | null) => {
+    overlayNodes.content = node;
+
+    if (node && open) {
+      syncOverlayPosition(contentContext.overlayId, {
+        side,
+        align,
+        sideOffset,
+        zIndex: OVERLAY_Z_INDEX.dropdown,
+      });
+    } else {
+      clearOverlayPosition(contentContext.overlayId);
+    }
+
+    if (node && open) {
+      focusSelectedCollectionItem(collection, currentIndex);
+    }
+  };
+  const refHandler = ref
+    ? composeRefs(
+        ref as
+          | ((value: HTMLElement | null) => void)
+          | { current: HTMLElement | null }
+          | null
+          | undefined,
+        setNode
+      )
+    : setNode;
   const finalProps = mergeProps(rest, {
     ...nav.container,
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      (node: HTMLElement | null) => {
-        overlayNodes.content = node;
-
-        if (node && open) {
-          syncOverlayPosition(contentContext.overlayId, {
-            side,
-            align,
-            sideOffset,
-            zIndex: OVERLAY_Z_INDEX.dropdown,
-          });
-        } else {
-          clearOverlayPosition(contentContext.overlayId);
-        }
-
-        if (node && open) {
-          focusSelectedCollectionItem(collection, currentIndex);
-        }
-      }
-    ),
+    ref: refHandler,
     id: contentContext.contentId,
     role: 'menu',
     'aria-labelledby': contentContext.triggerId,

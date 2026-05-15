@@ -9,7 +9,13 @@ const visuallyHiddenAttrs = {
   'data-askr-visually-hidden': 'true',
 } as const;
 
+let visuallyHiddenRuleRegistered = false;
+
 function ensureVisuallyHiddenRule() {
+  if (visuallyHiddenRuleRegistered) {
+    return;
+  }
+
   setDynamicStyleRule('visually-hidden', '[data-askr-visually-hidden="true"]', {
     position: 'absolute',
     width: '1px',
@@ -21,6 +27,10 @@ function ensureVisuallyHiddenRule() {
     'white-space': 'nowrap',
     border: '0',
   });
+
+  if (typeof document !== 'undefined') {
+    visuallyHiddenRuleRegistered = true;
+  }
 }
 
 export function VisuallyHidden(props: VisuallyHiddenSpanProps): JSX.Element;

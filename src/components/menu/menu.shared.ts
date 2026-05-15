@@ -1,4 +1,5 @@
 import { defineContext, readContext } from '@askrjs/askr';
+import type { RovingFocusResult } from '@askrjs/askr/foundations';
 import {
   firstEnabledIndex,
   getMenuCollection,
@@ -7,12 +8,19 @@ import {
 } from '../_internal/menu';
 import type { MenuOwnProps } from './menu.types';
 
+export type MenuStateInput = {
+  menuId: string;
+  currentIndexCandidate: number;
+};
+
 export type MenuRootContextValue = {
   menuId: string;
   orientation: MenuOwnProps['orientation'];
   loop: boolean;
   currentIndexCandidate: number;
   setCurrentIndex: (index: number) => void;
+  resolvedState: MenuResolvedState;
+  navigation: RovingFocusResult;
 };
 
 export type MenuRenderContextValue = {
@@ -62,9 +70,7 @@ export function createMenuRenderContext(): MenuRenderContextValue {
   };
 }
 
-export function resolveMenuState(
-  root: MenuRootContextValue
-): MenuResolvedState {
+export function resolveMenuState(root: MenuStateInput): MenuResolvedState {
   const items = getMenuCollectionItems(getMenuCollection(root.menuId));
   const fallbackIndex = firstEnabledIndex(items);
   const candidateIndex = root.currentIndexCandidate;

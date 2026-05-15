@@ -4,11 +4,10 @@ import {
   Presence,
   controllableState,
   composeRefs,
-  formatId,
   mergeProps,
   pressable,
 } from '@askrjs/askr/foundations';
-import type { JSXElement } from '@askrjs/askr/foundations';
+import { resolveCompoundId } from '../_internal/id';
 import type {
   CollapsibleContentAsChildProps,
   CollapsibleContentProps,
@@ -29,81 +28,12 @@ const CollapsibleRootContext =
 
 let pendingFocusRestoreId: string | null = null;
 
-function isJsxElement(value: unknown): value is JSXElement {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    '$$typeof' in value &&
-    'props' in value
-  );
-}
-
-function serializeForId(value: unknown): string {
-  if (Array.isArray(value)) {
-    return value.map((item) => serializeForId(item)).join('|');
-  }
-
-  if (value === undefined || value === null || typeof value === 'boolean') {
-    return '';
-  }
-
-  if (typeof value === 'string' || typeof value === 'number') {
-    return String(value);
-  }
-
-  if (isJsxElement(value)) {
-    const typeName =
-      typeof value.type === 'string'
-        ? value.type
-        : typeof value.type === 'function'
-          ? value.type.name || 'component'
-          : 'component';
-    const propEntries = Object.entries(value.props ?? {})
-      .filter(
-        ([key, entryValue]) =>
-          key !== 'children' &&
-          key !== 'ref' &&
-          !key.startsWith('on') &&
-          (typeof entryValue === 'string' ||
-            typeof entryValue === 'number' ||
-            typeof entryValue === 'boolean')
-      )
-      .sort(([left], [right]) => left.localeCompare(right))
-      .map(([key, entryValue]) => `${key}:${String(entryValue)}`)
-      .join(',');
-
-    return `${typeName}[${propEntries}](${serializeForId(value.props?.children)})`;
-  }
-
-  return typeof value;
-}
-
-function hashString(value: string): string {
-  let hash = 2166136261;
-
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index);
-    hash = Math.imul(hash, 16777619);
-  }
-
-  return (hash >>> 0).toString(36);
-}
-
 function resolveCollapsibleContentId(props: CollapsibleProps): string {
-  const identity =
-    props.id ??
-    `auto-${hashString(
-      [
-        props.defaultOpen ? 'open' : 'closed',
-        props.disabled ? 'disabled' : 'enabled',
-        serializeForId(props.children),
-      ].join('|')
-    )}`;
-
-  return formatId({
-    prefix: 'collapsible-content',
-    id: identity,
-  });
+  return resolveCompoundId('collapsible-content', props.id, [
+    props.defaultOpen ? 'open' : 'closed',
+    props.disabled ? 'disabled' : 'enabled',
+    props.children,
+  ]);
 }
 
 function readCollapsibleRootContext(): CollapsibleRootContextValue {

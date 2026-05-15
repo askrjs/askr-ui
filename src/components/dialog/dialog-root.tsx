@@ -1,6 +1,5 @@
-import { For, state } from '@askrjs/askr';
+import { state } from '@askrjs/askr';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
-import { toChildArray } from '../_internal/jsx';
 import {
   clearOverlayPosition,
   getOverlayNodes,
@@ -10,7 +9,6 @@ import {
 import { controllableState } from '@askrjs/askr/foundations';
 import {
   DialogRootContext,
-  readDialogRootContext,
   resolveDialogPositionOptions,
   type DialogPositionOptions,
   type DialogRootContextValue,
@@ -19,26 +17,6 @@ import type { DialogProps } from './dialog.types';
 
 function scheduleDialogPortalSync(callback: () => void) {
   queueMicrotask(callback);
-}
-
-function DialogRootView(props: { children?: unknown }) {
-  const root = readDialogRootContext();
-  const PortalHost = root.portal;
-  const keyedChildren = (
-    <For
-      each={() => toChildArray(props.children)}
-      by={(_child, index) => index}
-    >
-      {(child) => child as never}
-    </For>
-  );
-
-  return (
-    <>
-      {keyedChildren}
-      {PortalHost ? <PortalHost key="dialog-root-portal" /> : null}
-    </>
-  );
 }
 
 export function Dialog(props: DialogProps) {
@@ -50,12 +28,12 @@ export function Dialog(props: DialogProps) {
     onOpenChange,
     modal = true,
   } = props;
+  const dialogId = resolveCompoundId('dialog', id, children);
   const openState = controllableState({
     value: open,
     defaultValue: defaultOpen,
     onChange: onOpenChange,
   });
-  const dialogId = resolveCompoundId('dialog', id, children);
   const contentId = resolvePartId(dialogId, 'content');
   const titleId = resolvePartId(dialogId, 'title');
   const descriptionId = resolvePartId(dialogId, 'description');
@@ -64,6 +42,7 @@ export function Dialog(props: DialogProps) {
   const position: DialogPositionOptions = resolveDialogPositionOptions();
   const hasTitleState = state(false);
   const hasDescriptionState = state(false);
+  const PortalHost = portal;
 
   const rootContext: DialogRootContextValue = {
     dialogId,
@@ -117,7 +96,8 @@ export function Dialog(props: DialogProps) {
 
   return (
     <DialogRootContext.Scope value={rootContext}>
-      <DialogRootView>{children}</DialogRootView>
+      {children}
+      {PortalHost ? <PortalHost key="dialog-root-portal" /> : null}
     </DialogRootContext.Scope>
   );
 }

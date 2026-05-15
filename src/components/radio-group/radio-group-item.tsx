@@ -60,27 +60,31 @@ export function RadioGroupItem(
     },
     isNativeButton: !asChild,
   });
+  const setNode = (node: HTMLElement | null) => {
+    const changed = registerCompositeNode(itemId, collection, node, {
+      index: itemIndex,
+      disabled: isDisabled,
+      value,
+    });
+
+    if (changed) {
+      root.scheduleItemsSync();
+    }
+  };
+  const refHandler = ref
+    ? composeRefs(
+        ref as
+          | ((value: HTMLElement | null) => void)
+          | { current: HTMLElement | null }
+          | null
+          | undefined,
+        setNode
+      )
+    : setNode;
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     ...nav.item(itemIndex),
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      (node: HTMLElement | null) => {
-        const changed = registerCompositeNode(itemId, collection, node, {
-          index: itemIndex,
-          disabled: isDisabled,
-          value,
-        });
-
-        if (changed) {
-          root.scheduleItemsSync();
-        }
-      }
-    ),
+    ref: refHandler,
     id: itemId,
     role: 'radio',
     'aria-checked': checked ? 'true' : 'false',

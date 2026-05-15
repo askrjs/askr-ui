@@ -5,6 +5,10 @@ Reference for the public `@askrjs/ui` component surface.
 The package exports are flat: use the root import for common cases, and use
 the direct component paths when you want a narrower surface.
 
+The source tree follows the same idea: each public component owns its own
+folder under `src/components/`, and shared internals stay in
+`src/components/_internal/`.
+
 Use the direct component paths for grouped imports:
 
 ```ts
@@ -19,7 +23,9 @@ import { Button } from '@askrjs/ui/button';
 import { Dialog } from '@askrjs/ui/dialog';
 ```
 
-## Categories
+## Conceptual Groupings
+
+These are documentation groupings only. They are not source folders.
 
 - Primitives: core controls such as buttons, inputs, selects, and toggles
 - Focus: focus management and dismissal helpers

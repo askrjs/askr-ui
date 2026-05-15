@@ -146,13 +146,6 @@ function beginSliderDrag(root: SliderRootContextValue) {
   window.addEventListener('pointerup', entry.dragEnd);
 }
 
-function SliderRootView(props: {
-  children?: unknown;
-  finalProps: Record<string, unknown>;
-}) {
-  return <div {...props.finalProps}>{props.children}</div>;
-}
-
 export function Slider(props: SliderProps) {
   const {
     children,
@@ -219,7 +212,7 @@ export function Slider(props: SliderProps) {
 
   return (
     <SliderRootContext.Scope value={rootContext}>
-      <SliderRootView finalProps={finalProps}>
+      <div {...finalProps}>
         {children}
         {name ? (
           <input
@@ -229,7 +222,7 @@ export function Slider(props: SliderProps) {
             disabled={disabled}
           />
         ) : null}
-      </SliderRootView>
+      </div>
     </SliderRootContext.Scope>
   );
 }

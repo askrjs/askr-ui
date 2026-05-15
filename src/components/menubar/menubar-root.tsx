@@ -14,68 +14,11 @@ import {
   createMenubarRootRenderContext,
   MenubarRootContext,
   MenubarRootRenderContext,
-  readMenubarRootContext,
   resolveMenubarRootState,
+  type MenubarRootStateInput,
   type MenubarRootContextValue,
 } from './menubar.shared';
 import type { MenubarProps } from './menubar.types';
-
-function MenubarRuntimeView(props: {
-  children?: unknown;
-  ref: MenubarProps['ref'];
-  rest: Omit<MenubarProps, 'children' | 'id' | 'loop'>;
-}) {
-  const root = readMenubarRootContext();
-  const portalEpoch = root.portalEpoch;
-  const { items, currentTriggerIndex, disabledTriggerIndexes } =
-    resolveMenubarRootState(root);
-  const portalIds = collectJsxElements(
-    props.children,
-    (element) => element.type === MenubarMenu
-  ).map((_element, index) => resolvePartId(root.menubarId, `portal-${index}`));
-
-  const collection = getCompositeCollection(root.menubarId);
-  const nav = rovingFocus({
-    currentIndex: currentTriggerIndex,
-    itemCount: Math.max(items.length, 1),
-    orientation: 'horizontal',
-    loop: root.loop,
-    isDisabled: (index) => disabledTriggerIndexes.includes(index),
-    onNavigate: (index) => {
-      root.setCurrentTriggerIndex(index);
-      focusSelectedCollectionItem(collection, index);
-    },
-  });
-  const finalProps = mergeProps(props.rest, {
-    ...nav.container,
-    ref: props.ref,
-    role: 'menubar',
-    'data-slot': 'menubar',
-    'data-menubar': 'true',
-  });
-
-  return (
-    <>
-      <div {...finalProps}>
-        {toChildArray(props.children).map((child, index) => {
-          if (!isJsxElement(child) || child.key != null) {
-            return child;
-          }
-
-          return {
-            ...child,
-            key: `menubar-root-${index}`,
-          };
-        })}
-      </div>
-      {portalIds.map((portalId) => {
-        const PortalHost = getPersistentPortal(portalId);
-
-        return <PortalHost key={`${portalId}-${portalEpoch}`} />;
-      })}
-    </>
-  );
-}
 
 export function Menubar(props: MenubarProps) {
   const { children, id, loop = true, ref, ...rest } = props;
@@ -89,8 +32,14 @@ export function Menubar(props: MenubarProps) {
   const setCurrentTriggerIndex = (index: number) => {
     currentTriggerIndexState.set(index);
   };
-  const rootContext: MenubarRootContextValue = {
+  const rootContextBase: MenubarRootStateInput = {
     menubarId,
+    currentTriggerIndexCandidate: currentTriggerIndexState(),
+  };
+  const runtimeRenderContext = createMenubarRootRenderContext();
+  const rootState = resolveMenubarRootState(rootContextBase);
+  const rootContext: MenubarRootContextValue = {
+    ...rootContextBase,
     openPath: openPathState(),
     getOpenPath: openPathState,
     setOpenPath,
@@ -99,17 +48,52 @@ export function Menubar(props: MenubarProps) {
     syncPortals: () => {
       portalEpochState.set(portalEpochState() + 1);
     },
-    currentTriggerIndexCandidate: currentTriggerIndexState(),
     setCurrentTriggerIndex,
+    resolvedState: rootState,
   };
-  const runtimeRenderContext = createMenubarRootRenderContext();
+  const portalIds = collectJsxElements(
+    children,
+    (element) => element.type === MenubarMenu
+  ).map((_element, index) => resolvePartId(menubarId, `portal-${index}`));
+  const collection = getCompositeCollection(menubarId);
+  const nav = rovingFocus({
+    currentIndex: rootState.currentTriggerIndex,
+    itemCount: Math.max(rootState.items.length, 1),
+    orientation: 'horizontal',
+    loop,
+    isDisabled: (index) => rootState.disabledTriggerIndexes.includes(index),
+    onNavigate: (index) => {
+      currentTriggerIndexState.set(index);
+      focusSelectedCollectionItem(collection, index);
+    },
+  });
+  const finalProps = mergeProps(rest, {
+    ...nav.container,
+    ref,
+    role: 'menubar',
+    'data-slot': 'menubar',
+    'data-menubar': 'true',
+  });
+  const keyedChildren = toChildArray(children).map((child, index) => {
+    if (!isJsxElement(child) || child.key != null) {
+      return child;
+    }
+
+    return {
+      ...child,
+      key: `menubar-root-${index}`,
+    };
+  });
 
   return (
     <MenubarRootContext.Scope value={rootContext}>
       <MenubarRootRenderContext.Scope value={runtimeRenderContext}>
-        <MenubarRuntimeView ref={ref} rest={rest}>
-          {children}
-        </MenubarRuntimeView>
+        <div {...finalProps}>{keyedChildren}</div>
+        {portalIds.map((portalId) => {
+          const PortalHost = getPersistentPortal(portalId);
+
+          return <PortalHost key={`${portalId}-${rootContext.portalEpoch}`} />;
+        })}
       </MenubarRootRenderContext.Scope>
     </MenubarRootContext.Scope>
   );

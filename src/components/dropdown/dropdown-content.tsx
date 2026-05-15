@@ -15,10 +15,7 @@ import {
   OVERLAY_Z_INDEX,
   syncOverlayPosition,
 } from '../_internal/overlay';
-import {
-  readDropdownRootContext,
-  resolveDropdownState,
-} from './dropdown.shared';
+import { readDropdownRootContext } from './dropdown.shared';
 import type {
   DropdownContentAsChildProps,
   DropdownContentProps,
@@ -44,10 +41,10 @@ export function DropdownContent(
     ...rest
   } = props;
   const root = readDropdownRootContext();
-  const { items, currentIndex, disabledIndexes } = resolveDropdownState(root);
-  const hasEnabledItems = items.some(
-    (_item, index) => !disabledIndexes.includes(index)
-  );
+  const { items, currentIndex, disabledIndexes } = root.resolvedState;
+  const hasEnabledItems =
+    items.length > 0 &&
+    items.some((_item, index) => !disabledIndexes.includes(index));
   const overlayNodes = getOverlayNodes(root.dropdownId);
   const collection = getMenuCollection(root.dropdownId);
   const nav = rovingFocus({
@@ -55,8 +52,7 @@ export function DropdownContent(
     itemCount: Math.max(items.length, 1),
     orientation: 'vertical',
     loop: true,
-    isDisabled: (index) =>
-      hasEnabledItems ? disabledIndexes.includes(index) : false,
+    isDisabled: (index) => disabledIndexes.includes(index),
     onNavigate: (index) => {
       if (!hasEnabledItems) {
         return;
@@ -66,32 +62,37 @@ export function DropdownContent(
       focusSelectedCollectionItem(collection, index);
     },
   });
+  const setNode = (node: HTMLElement | null) => {
+    overlayNodes.content = node;
+
+    if (node && root.open) {
+      syncOverlayPosition(root.dropdownId, {
+        side,
+        align,
+        sideOffset,
+        zIndex: OVERLAY_Z_INDEX.dropdown,
+      });
+    } else {
+      clearOverlayPosition(root.dropdownId);
+    }
+
+    if (node && root.open && hasEnabledItems) {
+      focusSelectedCollectionItem(collection, currentIndex);
+    }
+  };
+  const refHandler = ref
+    ? composeRefs(
+        ref as
+          | ((value: HTMLElement | null) => void)
+          | { current: HTMLElement | null }
+          | null
+          | undefined,
+        setNode
+      )
+    : setNode;
   const finalProps = mergeProps(rest, {
     ...nav.container,
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      (node: HTMLElement | null) => {
-        overlayNodes.content = node;
-        if (node && root.open) {
-          syncOverlayPosition(root.dropdownId, {
-            side,
-            align,
-            sideOffset,
-            zIndex: OVERLAY_Z_INDEX.dropdown,
-          });
-        } else {
-          clearOverlayPosition(root.dropdownId);
-        }
-
-        if (node && root.open && hasEnabledItems) {
-          focusSelectedCollectionItem(collection, currentIndex);
-        }
-      }
-    ),
+    ref: refHandler,
     id: root.contentId,
     role: 'menu',
     'data-slot': 'dropdown-content',

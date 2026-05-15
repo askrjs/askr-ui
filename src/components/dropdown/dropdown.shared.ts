@@ -7,6 +7,11 @@ import {
 } from '../_internal/menu';
 import type { OverlayPortal } from '../_internal/overlay';
 
+export type DropdownStateInput = {
+  dropdownId: string;
+  currentIndexCandidate: number;
+};
+
 export type DropdownRootContextValue = {
   dropdownId: string;
   open: boolean;
@@ -15,6 +20,7 @@ export type DropdownRootContextValue = {
   portal: OverlayPortal;
   currentIndexCandidate: number;
   setCurrentIndex: (index: number) => void;
+  resolvedState: DropdownResolvedState;
 };
 
 export type DropdownRenderContextValue = {
@@ -65,15 +71,19 @@ export function createDropdownRenderContext(): DropdownRenderContextValue {
 }
 
 export function resolveDropdownState(
-  root: DropdownRootContextValue
+  root: DropdownStateInput
 ): DropdownResolvedState {
   const items = getMenuCollectionItems(getMenuCollection(root.dropdownId));
   const fallbackIndex = firstEnabledIndex(items);
+  const allItemsDisabled =
+    items.length > 0 && items.every((item) => item.disabled);
   const candidateIndex = root.currentIndexCandidate;
   const currentIndex =
     items[candidateIndex] && !items[candidateIndex]?.disabled
       ? candidateIndex
-      : fallbackIndex;
+      : allItemsDisabled
+        ? -1
+        : fallbackIndex;
 
   return {
     items,

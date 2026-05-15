@@ -235,7 +235,7 @@ For release gating, run `npm run quality` so build, tests, and benchmarks are ex
 
 ### Step 7: Add Benchmark Entry
 
-Create a benchmark file in `benches/components/my-component.bench.tsx`:
+Create a benchmark file in `benches/tier1/my-component.bench.tsx`:
 
 ```tsx
 import { bench, describe } from 'vite-plus/test';
