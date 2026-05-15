@@ -1,3 +1,23 @@
+/**
+ * Toast is the stacked notification family.
+ *
+ * Responsibilities:
+ * - ToastProvider owns the notification registry and default timing.
+ * - ToastViewport renders the current stack in declaration order.
+ * - Toast declares a notification entry; it does not render DOM by itself.
+ *
+ * @example
+ * ```tsx
+ * <ToastProvider duration={5000}>
+ *   <ToastViewport />
+ *   <Toast defaultOpen>
+ *     <ToastTitle>Saved</ToastTitle>
+ *     <ToastDescription>Changes stored</ToastDescription>
+ *     <ToastClose>Dismiss</ToastClose>
+ *   </Toast>
+ * </ToastProvider>
+ * ```
+ */
 import {
   Presence,
   Slot,
