@@ -1,3 +1,7 @@
+/**
+ * AlertDialog type aliases keep the confirmation-specific public names while
+ * reusing the Dialog contract underneath.
+ */
 import type {
   DialogCloseAsChildProps,
   DialogCloseProps,

@@ -28,6 +28,10 @@ export function Input(props: InputInputProps | InputAsChildProps) {
   return <input {...finalProps} disabled={disabled} />;
 }
 
+/**
+ * DebouncedInput is a convenience wrapper around Input that emits a settled
+ * value for search and filter surfaces.
+ */
 export function DebouncedInput(props: DebouncedInputProps) {
   const {
     debounceMs = 180,

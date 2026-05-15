@@ -115,6 +115,10 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
   );
 }
 
+/**
+ * SelectItemText marks the item text node so Select can resolve labels and
+ * style the text slot directly.
+ */
 export function SelectItemText(props: SelectItemTextProps): JSX.Element;
 export function SelectItemText(props: SelectItemTextAsChildProps): JSX.Element;
 export function SelectItemText(
