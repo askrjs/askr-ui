@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
-import { Button } from '../../../src/components/primitives/button';
+import { Button } from '../../../src/components/button';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Button - Behavior', () => {

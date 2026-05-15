@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeaderCell,
   TableRow,
-} from '../../../src/components/primitives/table';
+} from '../../../src/components/table';
 
 describe('Table - Accessibility', () => {
   it('has no automated axe violations for a semantic table', async () => {

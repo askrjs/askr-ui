@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
-import { Switch } from '../../../src/components/primitives/switch/switch';
+import { Switch } from '../../../src/components/switch/switch';
 import { mount, unmount } from '../../test-utils';
 import { flushUpdates } from '../../test-utils';
 

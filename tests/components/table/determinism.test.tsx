@@ -7,7 +7,7 @@ import {
   TableHead,
   TableHeaderCell,
   TableRow,
-} from '../../../src/components/primitives/table';
+} from '../../../src/components/table';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Table - Determinism', () => {

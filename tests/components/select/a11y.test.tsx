@@ -8,7 +8,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '../../../src/components/primitives/select';
+} from '../../../src/components/select';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Select - Accessibility', () => {

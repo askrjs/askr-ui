@@ -3,7 +3,7 @@ import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from '../../../src/components/composites/hover-card';
+} from '../../../src/components/hover-card';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('HoverCard - Behavior', () => {

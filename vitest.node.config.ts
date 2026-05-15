@@ -6,6 +6,10 @@ export default defineConfig({
   test: {
     ...sharedVitestConfig.test,
     environment: 'node',
-    include: ['tests/public-api.test.ts', 'tests/docs-contract.test.ts'],
+    include: [
+      'tests/public-api.test.ts',
+      'tests/export-map.test.ts',
+      'tests/docs-contract.test.ts',
+    ],
   },
 });

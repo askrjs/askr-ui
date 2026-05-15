@@ -3,7 +3,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from '../../../src/components/primitives/avatar';
+} from '../../../src/components/avatar';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Avatar - Accessibility', () => {

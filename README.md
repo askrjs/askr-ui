@@ -19,6 +19,13 @@ npm install @askrjs/ui @askrjs/askr
 import { Button, Dialog, DialogTrigger, DialogContent } from '@askrjs/ui';
 ```
 
+For narrower imports, use the direct component paths:
+
+```tsx
+import { Button, Checkbox, Input, Label } from '@askrjs/ui';
+import { Dialog, Popover, Tooltip } from '@askrjs/ui';
+```
+
 ## Docs
 
 - [askr-ui overview](./docs/askr-ui.md)
@@ -28,18 +35,23 @@ import { Button, Dialog, DialogTrigger, DialogContent } from '@askrjs/ui';
 
 ## Package shape
 
-The package exports components by family:
+The package exports components directly from the root and per-component subpaths:
 
-- Primitives: `Button`, `Toggle`, `Checkbox`, `Input`, `Textarea`, `Label`,
-  `RadioGroup`, `Switch`, `Select`, `Slider`, `ToggleGroup`, `VisuallyHidden`
-- Focus: `FocusScope`, `DismissableLayer`
-- Overlays: `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Dropdown`,
-  `Menu`
+- Core controls: `Button`, `Toggle`, `Checkbox`, `Input`, `Textarea`,
+  `Label`, `RadioGroup`, `Switch`, `Select`, `Slider`, `ToggleGroup`,
+  `VisuallyHidden`
+- Interaction helpers: `FocusScope`, `DismissableLayer`
+- Overlays: `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Dropdown`, `Menu`
 - Disclosure: `Accordion`, `Collapsible`
 - Status: `Progress`, `ProgressCircle`, `Toast`
 - Identity: `Avatar`
 - Tables: `Table`, `TableCaption`, `TableHead`, `TableBody`, `TableFoot`,
   `TableRow`, `TableHeaderCell`, `TableCell`
 - Navigation: `Menubar`
+
+Prefer the per-component subpaths when you want a smaller surface area:
+
+The per-component subpaths stay available for direct imports such as
+`@askrjs/ui/button` and `@askrjs/ui/dialog`.
 
 For the full surface and composition examples, start with the docs above.

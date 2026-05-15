@@ -2,10 +2,10 @@ import { describe, it } from 'vite-plus/test';
 import {
   ToggleGroup,
   ToggleGroupItem,
-} from '../../../src/components/primitives/toggle-group';
+} from '../../../src/components/toggle-group';
 import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';
-import { TOGGLE_GROUP_A11Y_CONTRACT } from '../../../src/components/primitives/toggle-group/toggle-group.a11y';
+import { TOGGLE_GROUP_A11Y_CONTRACT } from '../../../src/components/toggle-group/toggle-group.a11y';
 
 describe('ToggleGroup - Accessibility', () => {
   it('has no automated axe violations for native toggle group items', async () => {

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test';
-import { Textarea } from '../../../src/components/primitives/textarea/textarea';
+import { Textarea } from '../../../src/components/textarea/textarea';
 import { mount, unmount } from '../../test-utils';
 
 describe('Textarea - Behavior', () => {

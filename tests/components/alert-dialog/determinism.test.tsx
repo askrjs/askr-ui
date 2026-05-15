@@ -6,7 +6,7 @@ import {
   AlertDialogPortal,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '../../../src/components/composites/alert-dialog';
+} from '../../../src/components/alert-dialog';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('AlertDialog - Determinism', () => {

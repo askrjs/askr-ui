@@ -1,10 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
-import { Button } from '../../../src/components/primitives/button';
-import {
-  DebouncedInput,
-  Input,
-} from '../../../src/components/primitives/input';
+import { Button } from '../../../src/components/button';
+import { DebouncedInput, Input } from '../../../src/components/input';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Input - Behavior', () => {

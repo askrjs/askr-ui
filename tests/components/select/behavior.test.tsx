@@ -9,7 +9,7 @@ import {
   SelectPortal,
   SelectTrigger,
   SelectValue,
-} from '../../../src/components/primitives/select';
+} from '../../../src/components/select';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Select - Behavior', () => {

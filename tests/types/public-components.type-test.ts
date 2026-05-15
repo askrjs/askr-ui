@@ -76,16 +76,16 @@ import {
   type ToggleGroupMultipleProps,
   type ToggleGroupSingleProps,
 } from '@askrjs/ui';
-import { Accordion as AccordionSubpath } from '@askrjs/ui/composites/accordion';
-import { Avatar as AvatarSubpath } from '@askrjs/ui/primitives/avatar';
-import { Collapsible as CollapsibleSubpath } from '@askrjs/ui/composites/collapsible';
-import { Menubar as MenubarSubpath } from '@askrjs/ui/composites/menubar';
-import { Progress as ProgressSubpath } from '@askrjs/ui/primitives/progress';
-import { ProgressCircle as ProgressCircleSubpath } from '@askrjs/ui/primitives/progress-circle';
-import { Slider as SliderSubpath } from '@askrjs/ui/primitives/slider';
-import { Table as TableSubpath } from '@askrjs/ui/primitives/table';
-import { ToastProvider as ToastSubpath } from '@askrjs/ui/composites/toast';
-import { ToggleGroup as ToggleGroupSubpath } from '@askrjs/ui/primitives/toggle-group';
+import { Accordion as AccordionSubpath } from '@askrjs/ui';
+import { Avatar as AvatarSubpath } from '@askrjs/ui';
+import { Collapsible as CollapsibleSubpath } from '@askrjs/ui';
+import { Menubar as MenubarSubpath } from '@askrjs/ui';
+import { Progress as ProgressSubpath } from '@askrjs/ui';
+import { ProgressCircle as ProgressCircleSubpath } from '@askrjs/ui';
+import { Slider as SliderSubpath } from '@askrjs/ui';
+import { Table as TableSubpath } from '@askrjs/ui';
+import { ToastProvider as ToastSubpath } from '@askrjs/ui';
+import { ToggleGroup as ToggleGroupSubpath } from '@askrjs/ui';
 
 const slotChild = {} as JSXElement;
 

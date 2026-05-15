@@ -6,7 +6,7 @@ import {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-} from '../../../src/components/composites/dialog';
+} from '../../../src/components/dialog';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Dialog - Accessibility', () => {

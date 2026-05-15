@@ -31,6 +31,20 @@ import {
 } from '@askrjs/ui';
 ```
 
+Use direct component paths when you want a smaller and more explicit surface:
+
+```ts
+import { Button, Checkbox, Input } from '@askrjs/ui';
+import { Dialog, Popover, Tooltip } from '@askrjs/ui';
+```
+
+The component-level subpaths remain available for direct imports:
+
+```ts
+import { Button } from '@askrjs/ui/button';
+import { Dialog } from '@askrjs/ui/dialog';
+```
+
 ## See also
 
 - [askr-ui docs README](./README.md)

@@ -5,7 +5,7 @@ import {
   DropdownItem,
   DropdownPortal,
   DropdownTrigger,
-} from '../../../src/components/composites/dropdown';
+} from '../../../src/components/dropdown';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Dropdown - Accessibility', () => {

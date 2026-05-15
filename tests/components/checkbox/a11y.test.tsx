@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vite-plus/test';
-import { Checkbox } from '../../../src/components/primitives/checkbox/checkbox';
+import { Checkbox } from '../../../src/components/checkbox/checkbox';
 import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';
-import { CHECKBOX_A11Y_CONTRACT } from '../../../src/components/primitives/checkbox/checkbox.a11y';
+import { CHECKBOX_A11Y_CONTRACT } from '../../../src/components/checkbox/checkbox.a11y';
 
 describe('Checkbox - Accessibility', () => {
   it('has no automated axe violations for a labelled native checkbox', async () => {

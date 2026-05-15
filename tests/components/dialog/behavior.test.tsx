@@ -4,7 +4,7 @@ import {
   DialogPortal,
   DialogContent,
   DialogTrigger,
-} from '../../../src/components/composites/dialog';
+} from '../../../src/components/dialog';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Dialog - Behavior', () => {

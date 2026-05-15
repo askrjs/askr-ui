@@ -6,7 +6,7 @@ import {
   AlertDialogPortal,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '../../../src/components/composites/alert-dialog';
+} from '../../../src/components/alert-dialog';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('AlertDialog - Accessibility', () => {

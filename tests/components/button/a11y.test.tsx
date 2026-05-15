@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vite-plus/test';
-import { Button } from '../../../src/components/primitives/button/button';
+import { Button } from '../../../src/components/button/button';
 import { createIsland } from '@askrjs/askr';
 import { expectNoAxeViolations } from '../../accessibility';
-import { BUTTON_A11Y_CONTRACT } from '../../../src/components/primitives/button/button.a11y';
+import { BUTTON_A11Y_CONTRACT } from '../../../src/components/button/button.a11y';
 
 function mount(element: JSX.Element): HTMLElement {
   const container = document.createElement('div');

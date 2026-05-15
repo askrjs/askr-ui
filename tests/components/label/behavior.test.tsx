@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test';
-import { Label } from '../../../src/components/primitives/label/label';
+import { Label } from '../../../src/components/label/label';
 import { mount, unmount } from '../../test-utils';
 
 describe('Label - Behavior', () => {

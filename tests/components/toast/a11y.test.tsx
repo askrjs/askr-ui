@@ -6,7 +6,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from '../../../src/components/composites/toast';
+} from '../../../src/components/toast';
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Toast - Accessibility', () => {

@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vite-plus/test';
-import { Toggle } from '../../../src/components/primitives/toggle/toggle';
+import { Toggle } from '../../../src/components/toggle/toggle';
 import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';
-import { TOGGLE_A11Y_CONTRACT } from '../../../src/components/primitives/toggle/toggle.a11y';
+import { TOGGLE_A11Y_CONTRACT } from '../../../src/components/toggle/toggle.a11y';
 
 describe('Toggle - Accessibility', () => {
   it('has no automated axe violations for the native toggle path', async () => {

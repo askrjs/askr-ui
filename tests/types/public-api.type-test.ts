@@ -131,19 +131,19 @@ import {
   type TooltipTriggerAsChildProps,
   type TooltipTriggerProps,
 } from '@askrjs/ui';
-import { AlertDialog as AlertDialogSubpath } from '@askrjs/ui/composites/alert-dialog';
-import { Button as ButtonSubpath } from '@askrjs/ui/primitives/button';
-import { Checkbox as CheckboxSubpath } from '@askrjs/ui/primitives/checkbox';
-import { Collapsible as CollapsibleSubpath } from '@askrjs/ui/composites/collapsible';
-import { Dialog as DialogSubpath } from '@askrjs/ui/composites/dialog';
-import { Dropdown as DropdownSubpath } from '@askrjs/ui/composites/dropdown';
-import { FocusScope as FocusScopeSubpath } from '@askrjs/ui/composites/focus-scope';
-import { Menu as MenuSubpath } from '@askrjs/ui/composites/menu';
-import { Popover as PopoverSubpath } from '@askrjs/ui/composites/popover';
-import { Select as SelectSubpath } from '@askrjs/ui/primitives/select';
-import { Switch as SwitchSubpath } from '@askrjs/ui/primitives/switch';
-import { Toggle as ToggleSubpath } from '@askrjs/ui/primitives/toggle';
-import { Tooltip as TooltipSubpath } from '@askrjs/ui/composites/tooltip';
+import { AlertDialog as AlertDialogSubpath } from '@askrjs/ui';
+import { Button as ButtonSubpath } from '@askrjs/ui';
+import { Checkbox as CheckboxSubpath } from '@askrjs/ui';
+import { Collapsible as CollapsibleSubpath } from '@askrjs/ui';
+import { Dialog as DialogSubpath } from '@askrjs/ui';
+import { Dropdown as DropdownSubpath } from '@askrjs/ui';
+import { FocusScope as FocusScopeSubpath } from '@askrjs/ui';
+import { Menu as MenuSubpath } from '@askrjs/ui';
+import { Popover as PopoverSubpath } from '@askrjs/ui';
+import { Select as SelectSubpath } from '@askrjs/ui';
+import { Switch as SwitchSubpath } from '@askrjs/ui';
+import { Toggle as ToggleSubpath } from '@askrjs/ui';
+import { Tooltip as TooltipSubpath } from '@askrjs/ui';
 
 const slotChild = {} as JSXElement;
 

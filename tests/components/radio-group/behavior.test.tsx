@@ -2,10 +2,10 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import {
   RadioGroup,
   RadioGroupItem,
-} from '../../../src/components/primitives/radio-group';
+} from '../../../src/components/radio-group';
 import { mount, unmount } from '../../test-utils';
 import { flushUpdates } from '../../test-utils';
-import { RADIO_GROUP_A11Y_CONTRACT } from '../../../src/components/primitives/radio-group/radio-group.a11y';
+import { RADIO_GROUP_A11Y_CONTRACT } from '../../../src/components/radio-group/radio-group.a11y';
 
 function getRadioByText(container: HTMLElement, text: string): HTMLElement {
   const radio = Array.from(

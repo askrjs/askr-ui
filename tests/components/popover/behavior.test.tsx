@@ -4,13 +4,13 @@ import {
   PopoverContent,
   PopoverPortal,
   PopoverTrigger,
-} from '../../../src/components/composites/popover';
+} from '../../../src/components/popover';
 import {
   Dialog,
   DialogContent,
   DialogPortal,
   DialogTrigger,
-} from '../../../src/components/composites/dialog';
+} from '../../../src/components/dialog';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Popover - Behavior', () => {

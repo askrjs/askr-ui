@@ -30,3 +30,10 @@ import {
   Table,
 } from '@askrjs/ui';
 ```
+
+If you want a smaller import surface, use the tiered entrypoints:
+
+```tsx
+import { Button, Checkbox, Input, Label } from '@askrjs/ui';
+import { Dialog, Popover, Tooltip } from '@askrjs/ui';
+```

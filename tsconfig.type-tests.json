@@ -6,8 +6,8 @@
     "jsxImportSource": "@askrjs/askr",
     "paths": {
       "@askrjs/ui": ["./src/index.ts"],
-      "@askrjs/ui/primitives/*": ["./src/components/primitives/*/index.ts"],
-      "@askrjs/ui/composites/*": ["./src/components/composites/*/index.ts"]
+      "@askrjs/ui/button": ["./src/components/button/index.ts"],
+      "@askrjs/ui/dialog": ["./src/components/dialog/index.ts"]
     }
   },
   "include": [

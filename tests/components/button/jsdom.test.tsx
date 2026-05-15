@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
-import { Button } from '../../../src/components/primitives/button';
-import { Button as DistButton } from '../../../dist/components/primitives/button/button.js';
+import { Button } from '../../../src/components/button';
+import { Button as DistButton } from '../../../dist/components/button/button.js';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Button - jsdom regression', () => {

@@ -5,7 +5,7 @@ import {
   DropdownItem,
   DropdownPortal,
   DropdownTrigger,
-} from '../../../src/components/composites/dropdown';
+} from '../../../src/components/dropdown';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Dropdown - Determinism', () => {

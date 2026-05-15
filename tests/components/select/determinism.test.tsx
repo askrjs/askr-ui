@@ -7,7 +7,7 @@ import {
   SelectPortal,
   SelectTrigger,
   SelectValue,
-} from '../../../src/components/primitives/select';
+} from '../../../src/components/select';
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Select - Determinism', () => {
