@@ -311,6 +311,10 @@ function ToastRegistrationView(props: {
   );
 }
 
+/**
+ * ToastProvider owns the registry of active toast entries and the default
+ * display duration for the family.
+ */
 export function ToastProvider(props: ToastProviderProps) {
   const { children, duration = 5000, id, ref, ...rest } = props;
   const providerId = resolveCompoundId('toast-provider', id, children);
@@ -364,6 +368,9 @@ export function ToastProvider(props: ToastProviderProps) {
   );
 }
 
+/**
+ * ToastViewport renders the live toast stack and the notification region.
+ */
 export function ToastViewport(props: ToastViewportProps): JSX.Element;
 export function ToastViewport(props: ToastViewportAsChildProps): JSX.Element;
 export function ToastViewport(
@@ -399,6 +406,10 @@ export function ToastViewport(
   return <div {...finalProps}>{content}</div>;
 }
 
+/**
+ * Toast registers a notification entry with the provider and returns no DOM on
+ * its own.
+ */
 export function Toast(props: ToastProps): JSX.Element | null {
   const provider = readToastProviderContext();
   const toastId = resolveCompoundId('toast', props.id, props.children);
@@ -435,6 +446,9 @@ export function Toast(props: ToastProps): JSX.Element | null {
   return null;
 }
 
+/**
+ * ToastTitle marks the accessible title slot for a toast entry.
+ */
 export function ToastTitle(props: ToastTitleProps): JSX.Element;
 export function ToastTitle(props: ToastTitleAsChildProps): JSX.Element;
 export function ToastTitle(props: ToastTitleProps | ToastTitleAsChildProps) {
@@ -463,6 +477,9 @@ export function ToastTitle(props: ToastTitleProps | ToastTitleAsChildProps) {
   return <div {...finalProps}>{children}</div>;
 }
 
+/**
+ * ToastDescription marks the accessible description slot for a toast entry.
+ */
 export function ToastDescription(props: ToastDescriptionProps): JSX.Element;
 export function ToastDescription(
   props: ToastDescriptionAsChildProps
@@ -495,6 +512,9 @@ export function ToastDescription(
   return <div {...finalProps}>{children}</div>;
 }
 
+/**
+ * ToastAction closes the toast after handling a user-triggered action.
+ */
 export function ToastAction(props: ToastActionProps): JSX.Element;
 export function ToastAction(props: ToastActionAsChildProps): JSX.Element;
 export function ToastAction(props: ToastActionProps | ToastActionAsChildProps) {
@@ -538,6 +558,9 @@ export function ToastAction(props: ToastActionProps | ToastActionAsChildProps) {
   );
 }
 
+/**
+ * ToastClose is the dedicated dismiss control for a toast entry.
+ */
 export function ToastClose(props: ToastCloseProps): JSX.Element;
 export function ToastClose(props: ToastCloseAsChildProps): JSX.Element;
 export function ToastClose(props: ToastCloseProps | ToastCloseAsChildProps) {
