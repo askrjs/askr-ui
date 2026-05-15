@@ -7,7 +7,6 @@ import { resolveMenuItemText } from '../_internal/menu';
 import { SelectItem } from './select-item';
 import {
   createSelectRenderContext,
-  readSelectRootContext,
   SelectRenderContext,
   SelectRootContext,
   resolveSelectState,

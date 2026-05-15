@@ -11,20 +11,9 @@ import {
 import { resolveCompoundId } from '../_internal/id';
 import { readDialogRootContext } from '../dialog/dialog.shared';
 import type {
-  AlertDialogActionAsChildProps,
-  AlertDialogActionProps,
-  AlertDialogCancelAsChildProps,
-  AlertDialogCancelProps,
   AlertDialogContentAsChildProps,
   AlertDialogContentProps,
-  AlertDialogDescriptionAsChildProps,
-  AlertDialogDescriptionProps,
-  AlertDialogOverlayAsChildProps,
-  AlertDialogOverlayProps,
-  AlertDialogPortalProps,
   AlertDialogProps,
-  AlertDialogTitleAsChildProps,
-  AlertDialogTitleProps,
   AlertDialogTriggerAsChildProps,
   AlertDialogTriggerProps,
 } from './alert-dialog.types';

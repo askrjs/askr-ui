@@ -8,6 +8,7 @@ export default defineConfig({
     environment: 'node',
     include: [
       'tests/bench-contract.test.ts',
+      'tests/browser-bench-contract.test.ts',
       'tests/foundations-contract.test.ts',
       'tests/source-layout.test.ts',
       'tests/public-api.test.ts',

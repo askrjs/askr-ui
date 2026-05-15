@@ -42,9 +42,9 @@ export function DropdownContent(
   } = props;
   const root = readDropdownRootContext();
   const { items, currentIndex, disabledIndexes } = root.resolvedState;
-  const hasEnabledItems =
-    items.length > 0 &&
-    items.some((_item, index) => !disabledIndexes.includes(index));
+  const hasEnabledItems = items.some(
+    (_item, index) => !disabledIndexes.includes(index)
+  );
   const overlayNodes = getOverlayNodes(root.dropdownId);
   const collection = getMenuCollection(root.dropdownId);
   const nav = rovingFocus({

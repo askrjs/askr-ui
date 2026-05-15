@@ -19,16 +19,6 @@ import type {
   TableRowProps,
 } from './table.types';
 
-type TableHost =
-  | 'table'
-  | 'caption'
-  | 'thead'
-  | 'tbody'
-  | 'tfoot'
-  | 'tr'
-  | 'th'
-  | 'td';
-
 /**
  * Semantic table primitive family.
  */
