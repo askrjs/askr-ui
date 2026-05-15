@@ -36,6 +36,11 @@ These are documentation groupings only. They are not source folders.
 - Tables: semantic table primitives
 - Navigation: menubar and navigation menu
 
+Family notes:
+
+- AlertDialog is a Dialog specialization for blocking confirmations. Its action and cancel parts intentionally alias the same close behavior for compatibility.
+- Toast is a stacked notification family. `ToastProvider` owns the registry, `ToastViewport` renders the stack, and `Toast` registers entries rather than rendering standalone DOM.
+
 ## See also
 
 - [askr-ui](./askr-ui.md)
