@@ -12,6 +12,8 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
+  DebouncedInput,
+  Input,
   Menubar,
   MenubarContent,
   MenubarItem,
@@ -46,6 +48,10 @@ import {
   type AvatarFallbackProps,
   type AvatarImageProps,
   type AvatarProps,
+  type DebouncedInputProps,
+  type InputAsChildProps,
+  type InputInputProps,
+  type InputProps,
   type MenubarContentAsChildProps,
   type MenubarContentProps,
   type MenubarItemAsChildProps,
@@ -79,6 +85,8 @@ import {
 import { Accordion as AccordionSubpath } from '@askrjs/ui';
 import { Avatar as AvatarSubpath } from '@askrjs/ui';
 import { Collapsible as CollapsibleSubpath } from '@askrjs/ui';
+import { DebouncedInput as DebouncedInputSubpath } from '@askrjs/ui';
+import { Input as InputSubpath } from '@askrjs/ui';
 import { Menubar as MenubarSubpath } from '@askrjs/ui';
 import { Progress as ProgressSubpath } from '@askrjs/ui';
 import { ProgressCircle as ProgressCircleSubpath } from '@askrjs/ui';
@@ -92,6 +100,8 @@ const slotChild = {} as JSXElement;
 const accordionFromSubpath: typeof Accordion = AccordionSubpath;
 const avatarFromSubpath: typeof Avatar = AvatarSubpath;
 const collapsibleFromSubpath: typeof Collapsible = CollapsibleSubpath;
+const debouncedInputFromSubpath: typeof DebouncedInput = DebouncedInputSubpath;
+const inputFromSubpath: typeof Input = InputSubpath;
 const menubarFromSubpath: typeof Menubar = MenubarSubpath;
 const progressFromSubpath: typeof Progress = ProgressSubpath;
 const progressCircleFromSubpath: typeof ProgressCircle = ProgressCircleSubpath;
@@ -107,6 +117,17 @@ const avatarFallbackProps: AvatarFallbackProps = { children: 'JD' };
 const avatarFallbackAsChildProps: AvatarFallbackAsChildProps = {
   asChild: true,
   children: slotChild,
+};
+const inputProps: InputProps = { 'aria-label': 'Search' };
+const inputInputProps: InputInputProps = { placeholder: 'Search' };
+const inputAsChildProps: InputAsChildProps = {
+  asChild: true,
+  children: slotChild,
+};
+const debouncedInputProps: DebouncedInputProps = {
+  'aria-label': 'Search',
+  debounceMs: 150,
+  onDebouncedInput: (value: string) => value,
 };
 const progressProps: ProgressProps = { value: 50, max: 100 };
 const progressCircleProps: ProgressCircleProps = { value: 75, max: 100 };
@@ -200,10 +221,19 @@ const _invalidMenubarTrigger: MenubarTriggerAsChildProps = {
   type: 'button',
 };
 
+const _invalidInputAsChild: InputAsChildProps = {
+  asChild: true,
+  children: slotChild,
+  // @ts-expect-error asChild input props must not accept native input type.
+  type: 'search',
+};
+
 void [
   accordionFromSubpath,
   avatarFromSubpath,
   collapsibleFromSubpath,
+  debouncedInputFromSubpath,
+  inputFromSubpath,
   menubarFromSubpath,
   progressFromSubpath,
   progressCircleFromSubpath,
@@ -215,6 +245,8 @@ void [
   Avatar,
   AvatarImage,
   AvatarFallback,
+  Input,
+  DebouncedInput,
   Menubar,
   MenubarMenu,
   MenubarTrigger,
@@ -244,6 +276,10 @@ void [
   avatarImageProps,
   avatarFallbackProps,
   avatarFallbackAsChildProps,
+  inputProps,
+  inputInputProps,
+  inputAsChildProps,
+  debouncedInputProps,
   progressProps,
   progressCircleProps,
   tableProps,

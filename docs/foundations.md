@@ -1,9 +1,12 @@
 # Foundations
 
-`@askrjs/askr/foundations` is the shared helper layer used by `askr-ui` and
-other Askr packages that need the same low-level composition behavior.
+`@askrjs/askr/foundations` provides the low-level runtime helpers used to
+build headless components.
 
-Import it directly from the runtime package:
+## Role
+
+Foundations are implementation tools, not the application-facing API.
+They exist to keep composition behavior consistent across packages.
 
 ```ts
 import {
@@ -16,28 +19,25 @@ import {
 } from '@askrjs/askr/foundations';
 ```
 
-## What it is for
+## Common helpers
 
-Use the foundations layer when you need reusable implementation helpers that
-should stay consistent across packages:
-
-- `mergeProps` combines runtime props without dropping caller intent
+- `Slot` preserves caller markup without forcing DOM structure
+- `mergeProps` combines props while preserving caller intent
 - `composeHandlers` and `composeRefs` keep event and ref composition stable
-- `controllableState` coordinates controlled and uncontrolled state shapes
-- `formatId` keeps deterministic IDs aligned with the runtime contract
-- `Slot` lets components preserve caller markup without forcing DOM structure
+- `controllableState` standardizes controlled and uncontrolled state patterns
+- `formatId` keeps deterministic ids aligned with runtime expectations
 
-These helpers are implementation tools, not the primary package surface for
-application code. App code should normally reach for `@askrjs/ui` or
-`@askrjs/themes` instead of importing foundations directly.
+## When to use it
 
-## Boundary
+Use foundations only when you are implementing components or shared runtime
+behavior. Application code should normally import from `@askrjs/ui` or
+`@askrjs/themes` instead.
 
-`askr-ui` depends on this layer, but it does not own it.
+## Ownership boundary
 
-- Runtime and shared helpers live in `@askrjs/askr`
-- Behavioral components live in `@askrjs/ui`
-- Visual wrappers and theme CSS live in `@askrjs/themes`
+- `@askrjs/askr` owns the shared runtime and helper layer
+- `@askrjs/ui` owns behavior, accessibility, and composition
+- `@askrjs/themes` owns visual wrappers, layout, and styling
 
-When a change needs new foundation behavior, it belongs in the runtime package
-and should be verified there first.
+If a change requires a new helper, it belongs in the runtime package and must
+be validated there before it is consumed by component packages.
