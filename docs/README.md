@@ -1,19 +1,25 @@
-# @askrjs/ui
+# askr-ui docs
 
-Headless Askr UI components.
+This directory contains the source material for the public docs site.
+It is intentionally concise, opinionated, and aligned to the shipped package
+surface.
 
-`askr-ui` owns behavior and accessibility. Visual-only composition and display
-components live in `@askrjs/themes`.
+## What lives here
 
-Shared foundation implementations are owned by `@askrjs/askr/foundations`.
+- [Overview](./askr-ui.md) - package purpose, ownership, and entrypoints
+- [Foundations](./foundations.md) - shared runtime helpers used by askr-ui
+- [Components](./components.md) - public component families and export notes
+- [Composition](./composition.md) - common composition patterns and examples
+- [Gap analysis](./ownership-gap-analysis.md) - ownership boundaries and backlog
 
-## Contents
+## Package summary
 
-- [Overview](./askr-ui.md) - What askr-ui is and component categories
-- [Foundations](./foundations.md) - Shared runtime helpers used by askr-ui
-- [Components](./components.md) - Full component reference
-- [Composition](./composition.md) - Patterns for composing primitives
-- [Gap analysis](./ownership-gap-analysis.md) - Ownership split for primitives coverage
+`@askrjs/ui` provides headless UI primitives for Askr applications. It owns
+behavior, state coordination, accessibility wiring, and slot-based
+composition. It does not own visual styling.
+
+Use `@askrjs/ui` for application code and `@askrjs/askr/foundations` for
+shared runtime helpers that are part of the implementation contract.
 
 ## Quick start
 
@@ -22,18 +28,13 @@ npm install @askrjs/ui @askrjs/askr
 ```
 
 ```tsx
-import {
-  Button,
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  Table,
-} from '@askrjs/ui';
+import { Button, Dialog, DialogContent, DialogTrigger } from '@askrjs/ui';
 ```
 
-If you want a smaller import surface, use the tiered entrypoints:
+For larger surfaces, use grouped imports from the root package and direct
+component subpaths when you want one component at a time.
 
 ```tsx
-import { Button, Checkbox, Input, Label } from '@askrjs/ui';
-import { Dialog, Popover, Tooltip } from '@askrjs/ui';
+import { Checkbox, Input, Label } from '@askrjs/ui';
+import { Dialog } from '@askrjs/ui/dialog';
 ```

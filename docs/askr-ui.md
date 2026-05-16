@@ -1,55 +1,40 @@
 # askr-ui
 
-`@askrjs/ui` provides headless UI primitives for Askr applications.
+`@askrjs/ui` is the headless component package for Askr applications.
 
-## What askr-ui is
+## Purpose
 
-askr-ui owns interaction behavior, state coordination, accessibility wiring,
-and structural composition. It does not impose visual styling. Pair it with
-`askr-themes` for default visuals, or supply your own CSS.
+askr-ui owns behavior, accessibility, state coordination, and composable
+structure. It does not own visual styling. Consumers should pair it with
+`askr-themes` or their own CSS system for presentation.
 
-Shared foundation implementations are centralized in `@askrjs/askr/foundations`.
+## Entry points
 
-## Package shape
-
-The package is organized into an overview page plus three supporting
-documentation areas:
-
-- [Foundations](./foundations.md) for the shared runtime helpers askr-ui uses
-- [Components](./components.md) for the public component surface
-- [Composition](./composition.md) for examples that combine primitives
-
-Use the package root for most application code:
+- Use the package root for the common, curated public surface.
+- Use direct subpaths when you want a narrower, explicit import.
+- Use the component docs when you need the full surface for a family.
 
 ```ts
-import {
-  Button,
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  Table,
-} from '@askrjs/ui';
-```
-
-Use direct component paths when you want a smaller and more explicit surface:
-
-```ts
-import { Button, Checkbox, DebouncedInput, Input } from '@askrjs/ui';
+import { Button, Checkbox, Input, Label } from '@askrjs/ui';
 import { Dialog, Popover, Tooltip } from '@askrjs/ui';
-```
-
-The component-level subpaths remain available for direct imports:
-
-```ts
-import { Button } from '@askrjs/ui/button';
 import { Dialog } from '@askrjs/ui/dialog';
 ```
 
-The source layout stays intentionally flat as well: each component owns its
-own folder under `src/components/`, while shared helpers live in
-`src/components/_internal/`.
+## Documentation map
 
-## See also
+- [Foundations](./foundations.md) - runtime helpers that support composition
+- [Components](./components.md) - public families, aliases, and helper parts
+- [Composition](./composition.md) - recommended usage patterns and examples
 
-- [askr-ui docs README](./README.md)
-- [askr-themes](https://github.com/askrjs/askr-themes/tree/main/docs/askr-themes.md)
+## Implementation model
+
+The package follows a flat source layout:
+
+- each public component family lives in its own folder under `src/components/`
+- shared implementation helpers live under `src/components/_internal/`
+- public exports are intentionally curated and contract-tested
+
+## Related packages
+
+- `@askrjs/askr` - runtime and shared foundation helpers
+- `@askrjs/themes` - visual styling, layout wrappers, and theme-owned surface
