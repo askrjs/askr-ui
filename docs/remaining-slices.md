@@ -1,6 +1,6 @@
 # Remaining Slice Queue
 
-Generated from `src/components/index.ts`, `tests/components`, `benches/tier1`, `benches/tier2`, and `benches/tier3`.
+Generated from `src/components/index.ts`, `tests/components`, `benches/tier1`, `benches/tier2`, `benches/tier3`, and `benches/tier4`.
 
 - Public families parsed: 31
 - Queue groups: 5
