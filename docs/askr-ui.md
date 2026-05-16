@@ -34,7 +34,7 @@ import {
 Use direct component paths when you want a smaller and more explicit surface:
 
 ```ts
-import { Button, Checkbox, Input } from '@askrjs/ui';
+import { Button, Checkbox, DebouncedInput, Input } from '@askrjs/ui';
 import { Dialog, Popover, Tooltip } from '@askrjs/ui';
 ```
 
