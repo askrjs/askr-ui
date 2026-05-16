@@ -160,9 +160,9 @@ Do **not** skip testing. Tests are part of the component.
 
 **Test layers**
 
-- **Node**: `tests/public-api.test.ts`, `tests/docs-contract.test.ts`, and `tests/types/**`
-- **Jsdom**: DOM-backed helpers and internal contract checks like `tests/components/icon/**`, `tests/components/consistency-reset/**`, and `tests/components/data-table/state.test.tsx`
-- **Browser**: public component `behavior`, `a11y`, and `determinism` suites, plus browser coverage for `data-table`
+- **Node**: `tests/unit/public-api.test.ts`, `tests/unit/docs-contract.test.ts`, and `tests/unit/types/**`
+- **Jsdom**: DOM-backed helpers and internal contract checks like `tests/jsdom/components/icon/**`, `tests/jsdom/components/consistency-reset/**`, and `tests/jsdom/components/data-table/state.test.tsx`
+- **Browser**: public component `behavior`, `a11y`, and `determinism` suites under `tests/browser/components/**`, plus browser coverage for `data-table`
 
 Browser suites run with a shared zero-noise console policy. Public flows must stay silent across `warn`, `error`, `log`, `info`, and `debug`.
 
@@ -170,19 +170,19 @@ If a browser test intentionally expects console output, use the local allowance 
 
 Use `tests/warnings.ts` only for targeted node/jsdom warning assertions that are outside the browser public-flow gate.
 
-**Behavior tests** (`tests/components/my-component/behavior.test.tsx`):
+**Behavior tests** (`tests/browser/components/my-component/behavior.test.tsx`):
 
 - Mount and verify core state transitions
 - Test keyboard interaction (if applicable)
 - Test prop handling (controlled/uncontrolled)
 - Test `asChild` behavior if supported
 
-**Accessibility tests** (`tests/components/my-component/a11y.test.tsx`):
+**Accessibility tests** (`tests/browser/components/my-component/a11y.test.tsx`):
 
 - Run `axe` on rendered component
 - Verify ARIA attributes and semantics
 
-**Determinism tests** (`tests/components/my-component/determinism.test.tsx`):
+**Determinism tests** (`tests/browser/components/my-component/determinism.test.tsx`):
 
 - Run with fake timers and verify stable IDs
 - Verify rerenders don't drift markup

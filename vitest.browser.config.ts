@@ -8,7 +8,7 @@ export default defineConfig({
     ...sharedVitestConfig.test,
     setupFiles: [
       ...(sharedVitestConfig.test?.setupFiles ?? []),
-      './tests/browser-console.setup.ts',
+      './tests/browser/browser-console.setup.ts',
     ],
     browser: {
       enabled: true,
@@ -21,13 +21,9 @@ export default defineConfig({
       },
     },
     include: [
-      'tests/components/*/behavior.test.tsx',
-      'tests/components/*/a11y.test.tsx',
-      'tests/components/*/determinism.test.tsx',
-    ],
-    exclude: [
-      'tests/components/icon/**',
-      'tests/components/nav-link/behavior.test.tsx',
+      'tests/browser/components/*/behavior.test.tsx',
+      'tests/browser/components/*/a11y.test.tsx',
+      'tests/browser/components/*/determinism.test.tsx',
     ],
   },
 });

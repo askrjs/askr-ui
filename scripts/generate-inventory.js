@@ -11,6 +11,7 @@ const benchDirs = [
   path.join(rootDir, 'benches/tier1'),
   path.join(rootDir, 'benches/tier2'),
   path.join(rootDir, 'benches/tier3'),
+  path.join(rootDir, 'benches/tier4'),
 ];
 const docsDir = path.join(rootDir, 'docs');
 const readmePath = path.join(rootDir, 'README.md');
@@ -467,7 +468,7 @@ function renderSummary(summary) {
   return [
     '# Repository Inventory',
     '',
-    'Generated from `src/components/index.ts`, source component directories, `tests/components`, `benches/tier1`, `benches/tier2`, `benches/tier3`, and markdown docs.',
+    'Generated from `src/components/index.ts`, source component directories, `tests/components`, `benches/tier1`, `benches/tier2`, `benches/tier3`, `benches/tier4`, and markdown docs.',
     '',
     `- Public component families: ${summary.totalFamilies}`,
     `- Source component directories: ${summary.totalSourceFamilies}`,
