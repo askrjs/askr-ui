@@ -23,6 +23,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DismissableLayer,
+  DebouncedInput,
   Dropdown,
   DropdownContent,
   DropdownGroup,
@@ -32,6 +33,7 @@ import {
   DropdownSeparator,
   DropdownTrigger,
   FocusScope,
+  Input,
   Menu,
   MenuContent,
   MenuGroup,
@@ -90,12 +92,16 @@ import {
   type DialogTriggerProps,
   type DismissableLayerAsChildProps,
   type DismissableLayerProps,
+  type DebouncedInputProps,
   type DropdownContentAsChildProps,
   type DropdownContentProps,
   type DropdownItemAsChildProps,
   type DropdownItemProps,
   type FocusScopeAsChildProps,
   type FocusScopeProps,
+  type InputAsChildProps,
+  type InputInputProps,
+  type InputProps,
   type MenuContentAsChildProps,
   type MenuContentProps,
   type MenuItemAsChildProps,
@@ -137,7 +143,9 @@ import { Checkbox as CheckboxSubpath } from '@askrjs/ui';
 import { Collapsible as CollapsibleSubpath } from '@askrjs/ui';
 import { Dialog as DialogSubpath } from '@askrjs/ui';
 import { Dropdown as DropdownSubpath } from '@askrjs/ui';
+import { DebouncedInput as DebouncedInputSubpath } from '@askrjs/ui';
 import { FocusScope as FocusScopeSubpath } from '@askrjs/ui';
+import { Input as InputSubpath } from '@askrjs/ui';
 import { Menu as MenuSubpath } from '@askrjs/ui';
 import { Popover as PopoverSubpath } from '@askrjs/ui';
 import { Select as SelectSubpath } from '@askrjs/ui';
@@ -150,7 +158,9 @@ const slotChild = {} as JSXElement;
 const buttonFromSubpath: typeof Button = ButtonSubpath;
 const checkboxFromSubpath: typeof Checkbox = CheckboxSubpath;
 const collapsibleFromSubpath: typeof Collapsible = CollapsibleSubpath;
+const debouncedInputFromSubpath: typeof DebouncedInput = DebouncedInputSubpath;
 const focusScopeFromSubpath: typeof FocusScope = FocusScopeSubpath;
+const inputFromSubpath: typeof Input = InputSubpath;
 const dialogFromSubpath: typeof Dialog = DialogSubpath;
 const alertDialogFromSubpath: typeof AlertDialog = AlertDialogSubpath;
 const popoverFromSubpath: typeof Popover = PopoverSubpath;
@@ -167,6 +177,18 @@ const focusScopeProps: FocusScopeProps = { trapped: true, loop: true };
 const focusScopeAsChildProps: FocusScopeAsChildProps = {
   asChild: true,
   children: slotChild,
+};
+
+const inputProps: InputProps = { 'aria-label': 'Search' };
+const inputInputProps: InputInputProps = { placeholder: 'Search' };
+const inputAsChildProps: InputAsChildProps = {
+  asChild: true,
+  children: slotChild,
+};
+const debouncedInputProps: DebouncedInputProps = {
+  'aria-label': 'Search',
+  debounceMs: 200,
+  onDebouncedInput: (value: string) => value,
 };
 
 const dismissableLayerProps: DismissableLayerProps = {
@@ -429,7 +451,9 @@ void [
   buttonFromSubpath,
   checkboxFromSubpath,
   collapsibleFromSubpath,
+  debouncedInputFromSubpath,
   focusScopeFromSubpath,
+  inputFromSubpath,
   dialogFromSubpath,
   alertDialogFromSubpath,
   popoverFromSubpath,
@@ -493,6 +517,10 @@ void [
   TooltipTrigger,
   focusScopeProps,
   focusScopeAsChildProps,
+  inputProps,
+  inputInputProps,
+  inputAsChildProps,
+  debouncedInputProps,
   dismissableLayerProps,
   dismissableLayerAsChildProps,
   buttonProps,
