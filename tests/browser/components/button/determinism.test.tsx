@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vite-plus/test';
 import { Button } from '../../../../src/components/button/button';
-import { createIsland } from '@askrjs/askr';
+import { createIsland } from '@askrjs/askr/boot';
 import { expectDeterministicRender } from '../../determinism';
 
 function mount(element: JSX.Element): HTMLElement {
@@ -86,4 +86,3 @@ describe('Button - Determinism', () => {
     }
   });
 });
-

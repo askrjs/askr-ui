@@ -1,12 +1,7 @@
 import { state } from '@askrjs/askr';
-import {
-  Presence,
-  Slot,
-  composeRefs,
-  mergeProps,
-  pressable,
-  rovingFocus,
-} from '@askrjs/askr/foundations';
+import { Presence, Slot } from '@askrjs/askr/foundations/structures';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
 import { focusSelectedCollectionItem } from '../_internal/focus';
 import {
   disabledIndexes,

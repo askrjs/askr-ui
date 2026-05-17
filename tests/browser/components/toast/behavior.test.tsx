@@ -169,4 +169,3 @@ describe('Toast - Behavior', () => {
     expect(container.querySelector('[data-toast="true"]')).toBeNull();
   });
 });
-

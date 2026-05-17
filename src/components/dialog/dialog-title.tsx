@@ -1,4 +1,5 @@
-import { composeRefs, Slot, mergeProps } from '@askrjs/askr/foundations';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { Slot } from '@askrjs/askr/foundations/structures';
 import { readDialogRootContext } from './dialog.shared';
 import type { DialogTitleAsChildProps, DialogTitleProps } from './dialog.types';
 

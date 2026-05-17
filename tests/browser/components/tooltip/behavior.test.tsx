@@ -119,4 +119,3 @@ describe('Tooltip - Behavior', () => {
     expect(getComputedStyle(content as Element).top).toBe('90px');
   });
 });
-

@@ -74,4 +74,3 @@ describe('ScrollArea - Behavior', () => {
     ).toThrowError(/called during component render/);
   });
 });
-

@@ -1,10 +1,6 @@
-import {
-  Slot,
-  composeRefs,
-  hoverable,
-  mergeProps,
-  pressable,
-} from '@askrjs/askr/foundations';
+import { Slot } from '@askrjs/askr/foundations/structures';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { hoverable, pressable } from '@askrjs/askr/foundations/interactions';
 import { readHoverCardRootContext } from './hover-card.shared';
 import type {
   HoverCardTriggerAsChildProps,

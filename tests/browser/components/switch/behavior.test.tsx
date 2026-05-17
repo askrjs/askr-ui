@@ -188,4 +188,3 @@ describe('Switch - Behavior', () => {
     expect(childRef).toBe(host);
   });
 });
-

@@ -6,7 +6,7 @@ import {
   getPersistentPortal,
   syncOverlayPosition,
 } from '../_internal/overlay';
-import { controllableState } from '@askrjs/askr/foundations';
+import { controllableState } from '@askrjs/askr/foundations/state';
 import {
   DialogRootContext,
   resolveDialogPositionOptions,

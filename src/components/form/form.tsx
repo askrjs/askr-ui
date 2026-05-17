@@ -1,4 +1,4 @@
-import { Slot } from '@askrjs/askr/foundations';
+import { Slot } from '@askrjs/askr/foundations/structures';
 import type { FormAsChildProps, FormProps } from './form.types';
 
 export function Form(props: FormProps): JSX.Element;

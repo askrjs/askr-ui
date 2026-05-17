@@ -302,4 +302,3 @@ describe('RadioGroup - Behavior', () => {
     ).toBe('false');
   });
 });
-

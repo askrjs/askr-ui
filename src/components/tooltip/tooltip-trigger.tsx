@@ -1,9 +1,6 @@
-import {
-  Slot,
-  composeRefs,
-  hoverable,
-  mergeProps,
-} from '@askrjs/askr/foundations';
+import { Slot } from '@askrjs/askr/foundations/structures';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { hoverable } from '@askrjs/askr/foundations/interactions';
 import { readTooltipRootContext } from './tooltip.shared';
 import type {
   TooltipTriggerAsChildProps,

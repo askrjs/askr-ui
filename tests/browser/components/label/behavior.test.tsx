@@ -35,4 +35,3 @@ describe('Label - Behavior', () => {
     expect(span?.getAttribute('data-slot')).toBe('label');
   });
 });
-

@@ -209,4 +209,3 @@ describe('Popover - Behavior', () => {
     ).not.toBeNull();
   });
 });
-

@@ -11,6 +11,8 @@ export * from './select';
 export * from './slider';
 export * from './switch';
 export * from './table';
+export * from './virtual-list';
+export * from './virtual-table';
 export * from './textarea';
 export * from './toggle';
 export * from './toggle-group';

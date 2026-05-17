@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vite-plus/test';
 import { Button } from '../../../../src/components/button/button';
-import { createIsland } from '@askrjs/askr';
+import { createIsland } from '@askrjs/askr/boot';
 import { expectNoAxeViolations } from '../../accessibility';
 import { BUTTON_A11Y_CONTRACT } from '../../../../src/components/button/button.a11y';
 
@@ -100,4 +100,3 @@ describe('Button - Accessibility', () => {
     });
   });
 });
-

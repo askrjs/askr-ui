@@ -16,9 +16,12 @@ export const sharedVitestConfig = defineConfig({
       "import { jsx, jsxs, Fragment } from '@askrjs/askr/jsx-runtime';",
   },
   resolve: {
-    alias: {
-      '@askrjs/askr/for': '@askrjs/askr/control',
-    },
+    alias: [
+      {
+        find: '@askrjs/askr/for',
+        replacement: '@askrjs/askr/control',
+      },
+    ],
     preserveSymlinks: true,
   },
 });

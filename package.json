@@ -100,6 +100,16 @@
       "import": "./dist/components/table/index.js",
       "require": "./dist/components/table/index.cjs"
     },
+    "./virtual-list": {
+      "types": "./dist/components/virtual-list/index.d.ts",
+      "import": "./dist/components/virtual-list/index.js",
+      "require": "./dist/components/virtual-list/index.cjs"
+    },
+    "./virtual-table": {
+      "types": "./dist/components/virtual-table/index.d.ts",
+      "import": "./dist/components/virtual-table/index.js",
+      "require": "./dist/components/virtual-table/index.cjs"
+    },
     "./textarea": {
       "types": "./dist/components/textarea/index.d.ts",
       "import": "./dist/components/textarea/index.js",
@@ -200,23 +210,23 @@
     "clean": "npx rimraf dist node_modules",
     "dev": "vp pack --watch",
     "bench": "npm run bench:tier1 && npm run bench:tier2 && npm run bench:tier3 && npm run bench:tier4",
-    "bench:tier1": "cross-env NODE_ENV=production vp test bench --run --reporter=default --config vitest.tier1.bench.config.ts",
-    "bench:tier2": "cross-env NODE_ENV=production vp test bench --run --reporter=default --config vitest.tier2.bench.config.ts",
-    "bench:tier3": "cross-env NODE_ENV=production vp test bench --run --reporter=default --config vitest.tier3.bench.config.ts",
-    "bench:tier4": "cross-env NODE_ENV=production vp test bench --run --reporter=default --config vitest.tier4.bench.config.ts",
+    "bench:tier1": "cross-env NODE_ENV=production vp test bench --run --reporter=default --config vitest.bench.tier1.config.ts",
+    "bench:tier2": "cross-env NODE_ENV=production vp test bench --run --reporter=default --config vitest.bench.tier2.config.ts",
+    "bench:tier3": "cross-env NODE_ENV=production vp test bench --run --reporter=default --config vitest.bench.tier3.config.ts",
+    "bench:tier4": "cross-env NODE_ENV=production vp test bench --run --reporter=default --config vitest.bench.tier4.config.ts",
     "fmt": "vp fmt .",
     "lint": "vp lint .",
     "test": "npm run test:unit && npm run test:jsdom && npm run test:browser",
-    "test:browser": "vp test run --config vitest.browser.config.ts",
+    "test:browser": "vp test run --config vitest.test.browser.config.ts",
     "test:component": "npm run test:browser",
-    "test:jsdom": "npm run build && vp test run --config vitest.jsdom.config.ts",
+    "test:jsdom": "npm run build && vp test run --config vitest.test.jsdom.config.ts",
     "test:types": "tsc -p tsconfig.type-tests.json --noEmit",
-    "test:unit": "npm run test:types && vp test run --config vitest.unit.config.ts",
+    "test:unit": "npm run test:types && vp test run --config vitest.test.unit.config.ts",
     "plan:slices": "node scripts/generate-slice-queue.js",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "@askrjs/askr": "^0.0.36",
+    "@askrjs/askr": "^0.0.37",
     "@askrjs/vite": ">=0.0.2 <0.1.0",
     "@types/node": "^25.8.0",
     "axe-core": "^4.11.4",
@@ -236,4 +246,3 @@
     "node": ">=18"
   }
 }
-

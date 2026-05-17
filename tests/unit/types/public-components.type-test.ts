@@ -1,4 +1,4 @@
-import type { JSXElement } from '@askrjs/askr/foundations';
+import type { JSXElement } from '@askrjs/askr/foundations/structures';
 import * as askrUi from '@askrjs/ui';
 import {
   Accordion,

@@ -25,4 +25,3 @@ describe('Menubar - Determinism', () => {
     ));
   });
 });
-

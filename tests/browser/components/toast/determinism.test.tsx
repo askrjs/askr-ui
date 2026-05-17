@@ -19,4 +19,3 @@ describe('Toast - Determinism', () => {
     ));
   });
 });
-

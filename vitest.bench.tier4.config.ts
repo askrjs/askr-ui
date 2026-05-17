@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite-plus';
-import browserConfig from './vitest.browser.config';
+import browserConfig from './vitest.test.browser.config';
 
 export default defineConfig({
   ...browserConfig,

@@ -1,4 +1,4 @@
-import { controllableState } from '@askrjs/askr/foundations';
+import { controllableState } from '@askrjs/askr/foundations/state';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import {
   clearOverlayPosition,

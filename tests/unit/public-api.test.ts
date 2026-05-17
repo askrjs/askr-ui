@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test';
-import * as askrUi from '../src';
+import * as askrUi from '../../src';
 import {
   componentSurface,
   publicValueExports,

@@ -1,4 +1,6 @@
-import { Slot, focusable, mergeProps } from '@askrjs/askr/foundations';
+import { Slot } from '@askrjs/askr/foundations/structures';
+import { focusable } from '@askrjs/askr/foundations/interactions';
+import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import { hasJsxIntrinsicType } from '../_internal/jsx';
 import type {
   TextareaAsChildProps,

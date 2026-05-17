@@ -178,4 +178,3 @@ describe('Slider - Behavior', () => {
     expect(input.disabled).toBe(true);
   });
 });
-

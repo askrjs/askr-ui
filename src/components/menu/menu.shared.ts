@@ -1,5 +1,5 @@
 import { defineContext, readContext } from '@askrjs/askr';
-import type { RovingFocusResult } from '@askrjs/askr/foundations';
+import type { RovingFocusResult } from '@askrjs/askr/foundations/interactions';
 import {
   firstEnabledIndex,
   getMenuCollection,

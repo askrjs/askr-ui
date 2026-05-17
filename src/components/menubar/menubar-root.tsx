@@ -1,5 +1,6 @@
 import { state } from '@askrjs/askr';
-import { mergeProps, rovingFocus } from '@askrjs/askr/foundations';
+import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { rovingFocus } from '@askrjs/askr/foundations/interactions';
 import { focusSelectedCollectionItem } from '../_internal/focus';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import { getCompositeCollection } from '../_internal/composite';

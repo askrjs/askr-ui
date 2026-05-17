@@ -112,4 +112,3 @@ describe('Dropdown - Behavior', () => {
     ).toBe(true);
   });
 });
-

@@ -77,4 +77,3 @@ describe('Textarea - Accessibility', () => {
     });
   });
 });
-

@@ -1,4 +1,5 @@
-import type { JSXElement, Ref } from '@askrjs/askr/foundations';
+import type { JSXElement } from '@askrjs/askr/foundations/structures';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
 
 type TableBaseProps = {
   children?: unknown;

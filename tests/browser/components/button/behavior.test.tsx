@@ -143,4 +143,3 @@ describe('Button - Behavior', () => {
     expect(button?.querySelector('svg')?.getAttribute('data-icon')).toBe('sun');
   });
 });
-

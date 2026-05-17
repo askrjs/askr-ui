@@ -96,4 +96,3 @@ describe('Dialog - Behavior', () => {
     ).not.toBeNull();
   });
 });
-

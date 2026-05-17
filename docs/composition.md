@@ -14,7 +14,7 @@ headless, and focused on behavior; build larger experiences by combining them.
 - `asChild` is used when a part should preserve caller markup
 - Visual styling stays outside the primitive layer
 - Complex interactions are expressed by combining primitives, not by adding
-prop branches
+  prop branches
 
 ## Common patterns
 
@@ -60,6 +60,44 @@ const [pressed, setPressed] = useState(false);
   Mute
 </Toggle>;
 ```
+
+### Virtualization pattern
+
+```tsx
+import {
+  VirtualList,
+  VirtualTable,
+} from '@askrjs/ui';
+import { VirtualList as VirtualListSubpath } from '@askrjs/ui/virtual-list';
+import { VirtualTable as VirtualTableSubpath } from '@askrjs/ui/virtual-table';
+
+const columns = [
+  {
+    id: 'name',
+    header: 'Name',
+    cellComponent: ({ row }) => row.name,
+  },
+];
+
+<VirtualList
+  items={[{ id: '1', name: 'Ada' }]}
+  rowHeight={32}
+  getKey={(item) => item.id}
+  rowComponent={({ item }) => item.name}
+/>
+
+<VirtualTable
+  rows={[{ id: '1', name: 'Ada' }]}
+  rowHeight={32}
+  headerHeight={32}
+  getKey={(row) => row.id}
+  columns={columns}
+/>
+```
+
+Use the direct subpaths when you want a narrower family import surface; use
+the root export when you are already importing other askr-ui primitives in the
+same module.
 
 ## See also
 

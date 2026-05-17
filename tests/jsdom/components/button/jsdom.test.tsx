@@ -76,4 +76,3 @@ describe('Button - jsdom regression', () => {
     await expectSingleIconAcrossToggles(DistButton);
   });
 });
-

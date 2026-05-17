@@ -102,4 +102,3 @@ describe('Textarea - Behavior', () => {
     ).toThrow('Textarea `asChild` requires a native <textarea> host.');
   });
 });
-

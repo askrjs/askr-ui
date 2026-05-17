@@ -130,4 +130,3 @@ describe('RadioGroup - Accessibility', () => {
     });
   });
 });
-

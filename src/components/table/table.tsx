@@ -1,4 +1,6 @@
-import { Slot, mergeProps, type JSXElement } from '@askrjs/askr/foundations';
+import { Slot } from '@askrjs/askr/foundations/structures';
+import type { JSXElement } from '@askrjs/askr/foundations/structures';
+import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import { TABLE_DATA_ATTRIBUTES, TABLE_SLOTS } from './table.shared';
 import type {
   TableAsChildProps,

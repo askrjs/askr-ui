@@ -363,4 +363,3 @@ describe('ToggleGroup - Behavior', () => {
     ).toBe('false');
   });
 });
-

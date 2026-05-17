@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test';
-import { createIsland } from '@askrjs/askr';
+import { createIsland } from '@askrjs/askr/boot';
 import { VisuallyHidden } from '../../../../src/components/visually-hidden/visually-hidden';
 
 function mount(element: JSX.Element): HTMLElement {
@@ -44,4 +44,3 @@ describe('VisuallyHidden — Behavior', () => {
     expect(strong?.getAttribute('data-askr-visually-hidden')).toBe('true');
   });
 });
-

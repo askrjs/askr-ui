@@ -1,4 +1,4 @@
-import { definePortal } from '@askrjs/askr/foundations';
+import { definePortal } from '@askrjs/askr/foundations/structures';
 import {
   dynamicAttributeSelector,
   removeDynamicStyleRule,

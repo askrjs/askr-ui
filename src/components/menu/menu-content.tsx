@@ -1,4 +1,5 @@
-import { Slot, mergeProps } from '@askrjs/askr/foundations';
+import { Slot } from '@askrjs/askr/foundations/structures';
+import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import { readMenuRootContext } from './menu.shared';
 import type { MenuContentAsChildProps, MenuContentProps } from './menu.types';
 

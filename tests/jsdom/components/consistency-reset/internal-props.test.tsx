@@ -73,4 +73,3 @@ describe('Consistency Reset - Internal Props', () => {
     expect(collectInternalAttributes(document.body)).toEqual([]);
   });
 });
-
