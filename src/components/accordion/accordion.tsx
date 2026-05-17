@@ -15,7 +15,6 @@ import {
   toggleDisclosureValue,
 } from '../_internal/disclosure';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
-import { isJsxElement, toChildArray } from '../_internal/jsx';
 import type {
   AccordionContentAsChildProps,
   AccordionContentProps,
@@ -178,21 +177,11 @@ export function Accordion(props: AccordionProps) {
     'data-accordion': 'true',
     'data-orientation': orientation,
   });
-  const keyedChildren = toChildArray(children).map((child, index) => {
-    if (!isJsxElement(child) || child.key != null) {
-      return child;
-    }
-
-    return {
-      ...child,
-      key: `accordion-root-${index}`,
-    };
-  });
 
   return (
     <AccordionRootContext.Scope value={rootContext}>
       <AccordionRenderContext.Scope value={renderContext}>
-        <div {...finalProps}>{keyedChildren}</div>
+        <div {...finalProps}>{children}</div>
       </AccordionRenderContext.Scope>
     </AccordionRootContext.Scope>
   );
@@ -225,20 +214,10 @@ export function AccordionItem(props: AccordionItemProps): JSX.Element {
     'data-disabled': itemDisabled ? 'true' : undefined,
     'data-orientation': root.orientation,
   });
-  const keyedChildren = toChildArray(children).map((child, index) => {
-    if (!isJsxElement(child) || child.key != null) {
-      return child;
-    }
-
-    return {
-      ...child,
-      key: `accordion-item-${index}`,
-    };
-  });
 
   return (
     <AccordionItemContext.Scope value={itemContext}>
-      <div {...finalProps}>{keyedChildren}</div>
+      <div {...finalProps}>{children}</div>
     </AccordionItemContext.Scope>
   );
 }
