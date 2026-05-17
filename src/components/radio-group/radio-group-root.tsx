@@ -10,7 +10,6 @@ import {
   getCompositeCollectionItems,
 } from '../_internal/composite';
 import { resolveCompoundId } from '../_internal/id';
-import { isJsxElement, toChildArray } from '../_internal/jsx';
 import {
   createRadioGroupRenderContext,
   readRadioGroupRootContext,
@@ -48,31 +47,15 @@ function RadioGroupRootView(props: {
     },
   });
   const finalProps = nav.container;
-  const keyedChildren = toChildArray(props.children).map((child, index) => {
-    if (!isJsxElement(child) || child.key != null) {
-      return child;
-    }
 
-    return {
-      ...child,
-      key: `radio-group-root-${index}`,
-    };
-  });
-  const renderedChildren = [...keyedChildren];
-
-  if (name) {
-    renderedChildren.push(
-      <input
-        key="radio-group-hidden-input"
-        type="hidden"
-        name={name}
-        value={value}
-        disabled={disabled}
-      />
-    );
-  }
-
-  return <div {...finalProps}>{renderedChildren}</div>;
+  return (
+    <div {...finalProps}>
+      {props.children}
+      {name ? (
+        <input type="hidden" name={name} value={value} disabled={disabled} />
+      ) : null}
+    </div>
+  );
 }
 
 export function RadioGroup(props: RadioGroupProps) {
@@ -158,22 +141,12 @@ export function RadioGroup(props: RadioGroupProps) {
     'data-orientation': orientation,
     'aria-orientation': orientation === 'both' ? undefined : orientation,
   });
-  const keyedChildren = toChildArray(children).map((child, index) => {
-    if (!isJsxElement(child) || child.key != null) {
-      return child;
-    }
-
-    return {
-      ...child,
-      key: `radio-group-${index}`,
-    };
-  });
 
   return (
     <RadioGroupRootContext.Scope value={rootContext}>
       <RadioGroupRenderContext.Scope value={renderContext}>
         <RadioGroupRootView
-          children={<div {...finalProps}>{keyedChildren}</div>}
+          children={<div {...finalProps}>{children}</div>}
           name={name}
           disabled={disabled}
           value={currentValue}

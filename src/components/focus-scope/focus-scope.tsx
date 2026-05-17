@@ -6,7 +6,6 @@ import {
   markKeyboardModality,
 } from '../_internal/focus';
 import { resolveCompoundId } from '../_internal/id';
-import { isJsxElement, toChildArray } from '../_internal/jsx';
 import type {
   FocusScopeAsChildProps,
   FocusScopeProps,
@@ -169,26 +168,10 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
     onKeyDown: handleKeyDown,
     onFocusOut: handleFocusOut,
   });
-  const keyedChildren = toChildArray(children).map((child, index) => {
-    if (!isJsxElement(child) || child.key != null) {
-      return child;
-    }
-
-    return {
-      ...child,
-      key: `focus-scope-${index}`,
-    };
-  });
 
   if (asChild) {
-    return (
-      <Slot
-        asChild
-        {...finalProps}
-        children={keyedChildren as unknown as JSX.Element}
-      />
-    );
+    return <Slot asChild {...finalProps} children={children as JSX.Element} />;
   }
 
-  return <div {...finalProps}>{keyedChildren}</div>;
+  return <div {...finalProps}>{children}</div>;
 }
