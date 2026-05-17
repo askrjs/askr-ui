@@ -110,4 +110,3 @@ describe('Menubar - Behavior', () => {
     expect(document.body.textContent).not.toContain('New');
   });
 });
-

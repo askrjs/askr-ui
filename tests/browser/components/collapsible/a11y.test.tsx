@@ -5,7 +5,7 @@ import {
   CollapsibleContent,
 } from '../../../../src/components/collapsible/collapsible';
 import { COLLAPSIBLE_A11Y_CONTRACT } from '../../../../src/components/collapsible/collapsible.a11y';
-import { createIsland } from '@askrjs/askr';
+import { createIsland } from '@askrjs/askr/boot';
 import { expectNoAxeViolations } from '../../accessibility';
 
 function mount(element: JSX.Element): HTMLElement {
@@ -306,4 +306,3 @@ describe('Collapsible — Accessibility', () => {
     });
   });
 });
-

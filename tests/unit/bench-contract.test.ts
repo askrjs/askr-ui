@@ -11,7 +11,7 @@ function toPascalCase(componentName: string): string {
 }
 
 function readBenchFiles() {
-  return ['tier1', 'tier2']
+  return ['tier1', 'tier2', 'tier3']
     .flatMap((tier) =>
       readdirSync(join(process.cwd(), 'benches', tier), {
         withFileTypes: true,
@@ -31,11 +31,19 @@ function readBenchFiles() {
 describe('Bench contract', () => {
   it('covers the public component surface with benchmark entries', () => {
     const benchFiles = readBenchFiles();
+    const tier3BenchFiles = readdirSync(
+      join(process.cwd(), 'benches', 'tier3'),
+      {
+        withFileTypes: true,
+      }
+    ).filter((entry) => entry.isFile() && entry.name.endsWith('.bench.tsx'));
     const contents = benchFiles.map(({ contents }) => contents).join('\n');
     const componentNames = [
       ...componentSurface.map(({ name }) => toPascalCase(name)),
       'DebouncedInput',
     ];
+
+    expect(tier3BenchFiles.length).toBeGreaterThan(0);
 
     for (const componentName of componentNames) {
       expect(

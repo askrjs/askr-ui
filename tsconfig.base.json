@@ -12,7 +12,6 @@
     "ignoreDeprecations": "6.0",
     "forceConsistentCasingInFileNames": true,
     "composite": true,
-    "moduleResolution": "bundler",
-    "paths": {}
+    "moduleResolution": "bundler"
   }
 }

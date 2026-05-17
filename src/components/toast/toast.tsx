@@ -18,14 +18,10 @@
  * </ToastProvider>
  * ```
  */
-import {
-  Presence,
-  Slot,
-  composeRefs,
-  controllableState,
-  mergeProps,
-  pressable,
-} from '@askrjs/askr/foundations';
+import { Presence, Slot } from '@askrjs/askr/foundations/structures';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { controllableState } from '@askrjs/askr/foundations/state';
+import { pressable } from '@askrjs/askr/foundations/interactions';
 import { state } from '@askrjs/askr';
 import { resource } from '@askrjs/askr/resources';
 import { DismissableLayer } from '../dismissable-layer';

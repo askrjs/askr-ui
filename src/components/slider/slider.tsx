@@ -1,9 +1,6 @@
-import {
-  Slot,
-  composeRefs,
-  controllableState,
-  mergeProps,
-} from '@askrjs/askr/foundations';
+import { Slot } from '@askrjs/askr/foundations/structures';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { controllableState } from '@askrjs/askr/foundations/state';
 import {
   dynamicAttributeSelector,
   removeDynamicStyleRule,

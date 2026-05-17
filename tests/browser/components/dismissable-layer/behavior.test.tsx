@@ -72,4 +72,3 @@ describe('DismissableLayer - Behavior', () => {
     expect(onDismiss).toHaveBeenCalledTimes(0);
   });
 });
-

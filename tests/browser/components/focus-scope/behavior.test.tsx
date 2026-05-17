@@ -76,4 +76,3 @@ describe('FocusScope - Behavior', () => {
     expect(document.activeElement).toBe(inside);
   });
 });
-

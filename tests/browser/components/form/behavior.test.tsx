@@ -39,4 +39,3 @@ describe('Form - Behavior', () => {
     expect(section?.getAttribute('data-slot')).toBe('form');
   });
 });
-

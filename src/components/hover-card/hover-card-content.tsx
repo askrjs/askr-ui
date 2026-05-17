@@ -1,9 +1,5 @@
-import {
-  Presence,
-  Slot,
-  composeRefs,
-  mergeProps,
-} from '@askrjs/askr/foundations';
+import { Presence, Slot } from '@askrjs/askr/foundations/structures';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { DismissableLayer } from '../dismissable-layer';
 import { FocusScope } from '../focus-scope';
 import {

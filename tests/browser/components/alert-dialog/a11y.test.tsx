@@ -24,4 +24,3 @@ describe('AlertDialog - Accessibility', () => {
     );
   });
 });
-

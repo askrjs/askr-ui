@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite-plus';
-import { sharedVitestConfig } from './vitest.base.config';
+import { sharedVitestConfig } from './vitest.test.shared';
 
 export default defineConfig({
   ...sharedVitestConfig,

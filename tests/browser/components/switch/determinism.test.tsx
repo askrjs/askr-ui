@@ -58,4 +58,3 @@ describe('Switch - Determinism', () => {
     }
   });
 });
-

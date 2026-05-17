@@ -53,4 +53,3 @@ describe('Menu - Behavior', () => {
     expect(items[1].getAttribute('tabindex')).toBe('-1');
   });
 });
-

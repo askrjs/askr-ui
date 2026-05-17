@@ -18,7 +18,6 @@ export default defineConfig({
     jsxImportSource: '@askrjs/askr',
   },
   resolve: {
-    alias: {},
     preserveSymlinks: true,
   },
   pack: {

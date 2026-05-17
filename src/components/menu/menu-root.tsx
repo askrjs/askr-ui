@@ -1,5 +1,5 @@
 import { state } from '@askrjs/askr';
-import { rovingFocus } from '@askrjs/askr/foundations';
+import { rovingFocus } from '@askrjs/askr/foundations/interactions';
 import { resolveCompoundId } from '../_internal/id';
 import { focusSelectedCollectionItem } from '../_internal/focus';
 import { getMenuCollection } from '../_internal/menu';

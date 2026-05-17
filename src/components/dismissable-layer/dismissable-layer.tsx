@@ -1,9 +1,5 @@
-import {
-  Slot,
-  composeRefs,
-  createLayer,
-  mergeProps,
-} from '@askrjs/askr/foundations';
+import { Slot, createLayer } from '@askrjs/askr/foundations/structures';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { resolveCompoundId } from '../_internal/id';
 import type {
   DismissableLayerAsChildProps,

@@ -1,12 +1,8 @@
 import { defineContext, readContext } from '@askrjs/askr';
-import {
-  Slot,
-  Presence,
-  controllableState,
-  composeRefs,
-  mergeProps,
-  pressable,
-} from '@askrjs/askr/foundations';
+import { Slot, Presence } from '@askrjs/askr/foundations/structures';
+import { controllableState } from '@askrjs/askr/foundations/state';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { pressable } from '@askrjs/askr/foundations/interactions';
 import { resolveCompoundId } from '../_internal/id';
 import type {
   CollapsibleContentAsChildProps,

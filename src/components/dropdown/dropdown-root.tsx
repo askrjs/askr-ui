@@ -1,5 +1,5 @@
 import { state } from '@askrjs/askr';
-import { controllableState } from '@askrjs/askr/foundations';
+import { controllableState } from '@askrjs/askr/foundations/state';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import { getPersistentPortal } from '../_internal/overlay';
 import {

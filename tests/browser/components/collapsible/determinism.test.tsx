@@ -4,7 +4,7 @@ import {
   CollapsibleTrigger,
   CollapsibleContent,
 } from '../../../../src/components/collapsible/collapsible';
-import { createIsland } from '@askrjs/askr';
+import { createIsland } from '@askrjs/askr/boot';
 
 function mount(element: JSX.Element): HTMLElement {
   const container = document.createElement('div');
@@ -286,4 +286,3 @@ describe('Collapsible — Determinism', () => {
     });
   });
 });
-

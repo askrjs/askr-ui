@@ -1,5 +1,6 @@
 import { defineContext, readContext } from '@askrjs/askr';
-import { Slot, composeRefs, mergeProps } from '@askrjs/askr/foundations';
+import { Slot } from '@askrjs/askr/foundations/structures';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import {
   dynamicAttributeSelector,
   removeDynamicStyleRule,

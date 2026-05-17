@@ -15,4 +15,3 @@ describe('Label - Determinism', () => {
     ));
   });
 });
-

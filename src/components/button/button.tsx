@@ -1,4 +1,6 @@
-import { Slot, pressable, mergeProps } from '@askrjs/askr/foundations';
+import { Slot } from '@askrjs/askr/foundations/structures';
+import { pressable } from '@askrjs/askr/foundations/interactions';
+import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import type { ButtonNativeProps, ButtonAsChildProps } from './button.types';
 
 /**

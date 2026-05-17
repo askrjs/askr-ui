@@ -50,4 +50,3 @@ describe('ProgressCircle - Behavior', () => {
     }
   });
 });
-

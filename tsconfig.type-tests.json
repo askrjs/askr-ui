@@ -6,6 +6,8 @@
     "jsxImportSource": "@askrjs/askr",
     "paths": {
       "@askrjs/ui": ["./src/index.ts"],
+      "@askrjs/ui/virtual-list": ["./src/components/virtual-list/index.ts"],
+      "@askrjs/ui/virtual-table": ["./src/components/virtual-table/index.ts"],
       "@askrjs/ui/button": ["./src/components/button/index.ts"],
       "@askrjs/ui/dialog": ["./src/components/dialog/index.ts"]
     }
@@ -17,4 +19,3 @@
     "types/**/*.d.ts"
   ]
 }
-

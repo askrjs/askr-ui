@@ -43,4 +43,3 @@ describe('Menubar - Accessibility', () => {
     await expectNoAxeViolations(container);
   });
 });
-

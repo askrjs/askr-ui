@@ -100,4 +100,3 @@ describe('Consistency Reset - Portal Contract', () => {
     expect(text.indexOf('Choose one')).toBeLessThan(text.lastIndexOf('Askr'));
   });
 });
-

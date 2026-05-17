@@ -86,4 +86,3 @@ describe('HoverCard - Behavior', () => {
     expect(contentRef.current).toBe(content);
   });
 });
-

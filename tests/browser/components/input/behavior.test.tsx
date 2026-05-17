@@ -201,4 +201,3 @@ describe('Input - Behavior', () => {
     expect(committedValues).toEqual([]);
   });
 });
-

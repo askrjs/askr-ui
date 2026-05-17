@@ -1,5 +1,5 @@
-import { cleanupApp, createIsland } from '@askrjs/askr';
-import { DefaultPortal } from '@askrjs/askr/foundations';
+import { cleanupApp, createIsland } from '@askrjs/askr/boot';
+import { DefaultPortal } from '@askrjs/askr/foundations/structures';
 import type { Options as BenchOptions } from 'tinybench';
 
 function resetBrowserBenchState() {

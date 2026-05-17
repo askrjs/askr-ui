@@ -14,4 +14,3 @@ describe('Menu - Determinism', () => {
     ));
   });
 });
-

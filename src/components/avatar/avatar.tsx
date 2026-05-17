@@ -1,10 +1,6 @@
 import { state } from '@askrjs/askr';
-import {
-  Presence,
-  Slot,
-  composeRefs,
-  mergeProps,
-} from '@askrjs/askr/foundations';
+import { Presence, Slot } from '@askrjs/askr/foundations/structures';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { resource } from '@askrjs/askr/resources';
 import { resolveCompoundId } from '../_internal/id';
 import type {

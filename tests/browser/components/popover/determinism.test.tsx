@@ -16,4 +16,3 @@ describe('Popover - Determinism', () => {
     ));
   });
 });
-

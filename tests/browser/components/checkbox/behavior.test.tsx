@@ -101,4 +101,3 @@ describe('Checkbox - Behavior', () => {
     expect(refNode).toBe(div);
   });
 });
-

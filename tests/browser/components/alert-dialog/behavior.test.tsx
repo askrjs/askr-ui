@@ -73,4 +73,3 @@ describe('AlertDialog - Behavior', () => {
     ).toBeNull();
   });
 });
-

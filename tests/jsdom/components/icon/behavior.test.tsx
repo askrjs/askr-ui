@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test';
-import { IconBase } from '@askrjs/askr/foundations';
+import { IconBase } from '@askrjs/askr/foundations/icon';
 import { mount, unmount } from '../../test-utils';
 
 describe('IconBase', () => {
@@ -74,4 +74,3 @@ describe('IconBase', () => {
     expect(svg.style.flexShrink).toBe('0');
   });
 });
-

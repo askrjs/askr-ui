@@ -1,9 +1,6 @@
-import {
-  Slot,
-  composeRefs,
-  mergeProps,
-  pressable,
-} from '@askrjs/askr/foundations';
+import { Slot } from '@askrjs/askr/foundations/structures';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { pressable } from '@askrjs/askr/foundations/interactions';
 import { getOverlayNodes } from '../_internal/overlay';
 import { readSelectRootContext } from './select.shared';
 import type {

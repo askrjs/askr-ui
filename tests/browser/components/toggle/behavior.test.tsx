@@ -156,4 +156,3 @@ describe('Toggle - Behavior', () => {
     expect(childRef).toBe(host);
   });
 });
-

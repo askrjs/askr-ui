@@ -109,4 +109,3 @@ describe('Table - Behavior', () => {
     ).toBe('true');
   });
 });
-

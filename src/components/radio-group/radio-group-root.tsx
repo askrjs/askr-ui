@@ -1,9 +1,7 @@
 import { state } from '@askrjs/askr';
-import {
-  controllableState,
-  mergeProps,
-  rovingFocus,
-} from '@askrjs/askr/foundations';
+import { controllableState } from '@askrjs/askr/foundations/state';
+import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { rovingFocus } from '@askrjs/askr/foundations/interactions';
 import { focusSelectedCollectionItem } from '../_internal/focus';
 import {
   disabledIndexes,

@@ -119,4 +119,3 @@ describe('Accordion - Behavior', () => {
     expect(multiOpen).toHaveLength(2);
   });
 });
-

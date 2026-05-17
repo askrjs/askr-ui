@@ -41,4 +41,3 @@ describe('Label - Accessibility', () => {
     });
   });
 });
-

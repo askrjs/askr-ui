@@ -52,6 +52,26 @@ describe('Package exports', () => {
       'dialog export'
     );
 
+    expectExportTarget(
+      packageJson.exports['./virtual-list'],
+      {
+        types: './dist/components/virtual-list/index.d.ts',
+        import: './dist/components/virtual-list/index.js',
+        require: './dist/components/virtual-list/index.cjs',
+      },
+      'virtual-list export'
+    );
+
+    expectExportTarget(
+      packageJson.exports['./virtual-table'],
+      {
+        types: './dist/components/virtual-table/index.d.ts',
+        import: './dist/components/virtual-table/index.js',
+        require: './dist/components/virtual-table/index.cjs',
+      },
+      'virtual-table export'
+    );
+
     expect(packageJson.exports['./package.json']).toBe('./package.json');
 
     const exportKeys = Object.keys(packageJson.exports);

@@ -9,7 +9,9 @@ describe('Browser bench contract', () => {
       {
         withFileTypes: true,
       }
-    ).filter((entry) => entry.isFile() && entry.name.endsWith('.browser.bench.tsx'));
+    ).filter(
+      (entry) => entry.isFile() && entry.name.endsWith('.browser.bench.tsx')
+    );
 
     expect(tier3BrowserBenchFiles).toEqual([]);
 
