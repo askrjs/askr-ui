@@ -31,7 +31,7 @@ export function Switch(props: SwitchButtonProps | SwitchAsChildProps) {
 
   const interactionProps = pressable({
     disabled,
-    onPress: () => checkedState.set(!checkedState()),
+    onPress: () => checkedState.set(!currentChecked),
     isNativeButton: !asChild,
   });
 

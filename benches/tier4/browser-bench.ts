@@ -161,17 +161,39 @@ export async function settleBrowserBenchEnvironment() {
   await settleBrowserBenchCycle();
 }
 
-export function createTier4BenchOptions(): BenchOptions {
+function createTier4BenchLifecycleHooks(): Pick<
+  BenchOptions,
+  'setup' | 'teardown'
+> {
   return {
-    time: 750,
-    warmupTime: 250,
-    warmupIterations: 10,
     setup: async () => {
       await settleBrowserBenchEnvironment();
     },
     teardown: async () => {
       await settleBrowserBenchEnvironment();
     },
+  };
+}
+
+export function createTier4BenchOptions(
+  overrides: Omit<Partial<BenchOptions>, 'setup' | 'teardown'> = {}
+): BenchOptions {
+  return {
+    time: 750,
+    warmupTime: 250,
+    warmupIterations: 10,
+    ...overrides,
+    ...createTier4BenchLifecycleHooks(),
+  };
+}
+
+export function createTier4SmokeBenchOptions(): BenchOptions {
+  return {
+    time: 0,
+    iterations: 1,
+    warmupTime: 0,
+    warmupIterations: 0,
+    ...createTier4BenchLifecycleHooks(),
   };
 }
 

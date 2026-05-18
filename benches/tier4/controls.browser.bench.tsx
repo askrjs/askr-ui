@@ -1,4 +1,5 @@
 import { state } from '@askrjs/askr';
+import { For } from '@askrjs/askr/control';
 import { bench, describe } from 'vite-plus/test';
 import {
   Button,
@@ -18,77 +19,112 @@ const benchCount = 1000;
 const indices = Array.from({ length: benchCount }, (_, index) => index);
 const ignoreEvent = () => {};
 const tier4BenchOptions = createTier4BenchOptions();
+// These control cases need a wider sampling window to smooth out host-merging
+// and dispatch noise without changing the benchmark semantics.
+const noisyControlBenchOptions = createTier4BenchOptions({
+  time: 3000,
+  warmupTime: 750,
+  warmupIterations: 30,
+});
+// Checkbox and toggle interaction paths still show long-tail variance, so
+// they get a longer sampling window than the other short control benches.
+const checkboxToggleNoiseBenchOptions = createTier4BenchOptions({
+  time: 6000,
+  warmupTime: 1500,
+  warmupIterations: 60,
+});
+// Native checkbox dispatch still shows long-tail outliers, so it gets a
+// longer window than the rest of the control interaction benches.
+const checkboxDispatchNoiseBenchOptions = createTier4BenchOptions({
+  time: 12000,
+  warmupTime: 3000,
+  warmupIterations: 120,
+});
+const inputDispatchNoiseBenchOptions = createTier4BenchOptions({
+  time: 6000,
+  warmupTime: 1500,
+  warmupIterations: 60,
+});
 
 function renderButtons(asChild: boolean) {
-  return indices.map((index) =>
-    asChild ? (
-      <Button asChild key={index} onPress={ignoreEvent}>
-        <span>Button {index}</span>
-      </Button>
-    ) : (
-      <Button key={index} onPress={ignoreEvent}>
-        Button {index}
-      </Button>
-    )
+  return (
+    <For each={indices} by={(index) => index}>
+      {(index) =>
+        asChild ? (
+          <Button asChild onPress={ignoreEvent}>
+            <span>Button {index}</span>
+          </Button>
+        ) : (
+          <Button onPress={ignoreEvent}>Button {index}</Button>
+        )
+      }
+    </For>
   );
 }
 
 function renderInputs(asChild: boolean) {
-  return indices.map((index) =>
-    asChild ? (
-      <Input asChild key={index} onInput={ignoreEvent}>
-        <input aria-label={`Input ${index}`} defaultValue={`Input ${index}`} />
-      </Input>
-    ) : (
-      <Input
-        key={index}
-        aria-label={`Input ${index}`}
-        defaultValue={`Input ${index}`}
-        onInput={ignoreEvent}
-      />
-    )
+  return (
+    <For each={indices} by={(index) => index}>
+      {(index) =>
+        asChild ? (
+          <Input asChild onInput={ignoreEvent}>
+            <input
+              aria-label={`Input ${index}`}
+              defaultValue={`Input ${index}`}
+            />
+          </Input>
+        ) : (
+          <Input
+            aria-label={`Input ${index}`}
+            defaultValue={`Input ${index}`}
+            onInput={ignoreEvent}
+          />
+        )
+      }
+    </For>
   );
 }
 
 function renderTextareas(asChild: boolean) {
-  return indices.map((index) =>
-    asChild ? (
-      <Textarea asChild key={index} onInput={ignoreEvent}>
-        <textarea
-          aria-label={`Textarea ${index}`}
-          defaultValue={`Textarea ${index}`}
-        />
-      </Textarea>
-    ) : (
-      <Textarea
-        key={index}
-        aria-label={`Textarea ${index}`}
-        defaultValue={`Textarea ${index}`}
-        onInput={ignoreEvent}
-      />
-    )
+  return (
+    <For each={indices} by={(index) => index}>
+      {(index) =>
+        asChild ? (
+          <Textarea asChild onInput={ignoreEvent}>
+            <textarea
+              aria-label={`Textarea ${index}`}
+              defaultValue={`Textarea ${index}`}
+            />
+          </Textarea>
+        ) : (
+          <Textarea
+            aria-label={`Textarea ${index}`}
+            defaultValue={`Textarea ${index}`}
+            onInput={ignoreEvent}
+          />
+        )
+      }
+    </For>
   );
 }
 
 function renderCheckboxes(asChild: boolean, checked: boolean) {
-  return indices.map((index) =>
-    asChild ? (
-      <Checkbox
-        asChild
-        key={index}
-        checked={checked}
-        onCheckedChange={ignoreEvent}
-      >
-        <div>Checkbox {index}</div>
-      </Checkbox>
-    ) : (
-      <Checkbox
-        key={index}
-        aria-label={`Checkbox ${index}`}
-        checked={checked}
-        onCheckedChange={ignoreEvent}
-      />
-    )
+  return (
+    <For each={indices} by={(index) => index}>
+      {(index) =>
+        asChild ? (
+          <Checkbox asChild checked={checked} onCheckedChange={ignoreEvent}>
+            <div>Checkbox {index}</div>
+          </Checkbox>
+        ) : (
+          <Checkbox
+            aria-label={`Checkbox ${index}`}
+            checked={checked}
+            onCheckedChange={ignoreEvent}
+          />
+        )
+      }
+    </For>
   );
 }
 
@@ -124,7 +160,9 @@ function SwitchUpdateFixture() {
   );
 }
 
-describe('Button benches', () => {
+// Keep each benchmark in its own describe so the summary prints absolute
+// measurements instead of invalid cross-bench ratios.
+describe('Button native mount bench', () => {
   bench(
     'mount 1k native buttons',
     () => {
@@ -132,15 +170,19 @@ describe('Button benches', () => {
     },
     tier4BenchOptions
   );
+});
 
+describe('Button asChild mount bench', () => {
   bench(
     'mount 1k asChild buttons',
     () => {
       return runBrowserBench(<div>{renderButtons(true)}</div>, () => {});
     },
-    tier4BenchOptions
+    noisyControlBenchOptions
   );
+});
 
+describe('Button native dispatch bench', () => {
   bench(
     'dispatch 1k clicks on native buttons',
     async () => {
@@ -157,9 +199,11 @@ describe('Button benches', () => {
         }
       );
     },
-    tier4BenchOptions
+    noisyControlBenchOptions
   );
+});
 
+describe('Button asChild dispatch bench', () => {
   bench(
     'dispatch 1k clicks on asChild buttons',
     async () => {
@@ -178,11 +222,11 @@ describe('Button benches', () => {
         }
       );
     },
-    tier4BenchOptions
+    noisyControlBenchOptions
   );
 });
 
-describe('Input benches', () => {
+describe('Input native mount bench', () => {
   bench(
     'mount 1k native inputs',
     () => {
@@ -190,7 +234,9 @@ describe('Input benches', () => {
     },
     tier4BenchOptions
   );
+});
 
+describe('Input asChild mount bench', () => {
   bench(
     'mount 1k asChild inputs',
     () => {
@@ -198,7 +244,9 @@ describe('Input benches', () => {
     },
     tier4BenchOptions
   );
+});
 
+describe('Input native dispatch bench', () => {
   bench(
     'dispatch 1k change events on native inputs',
     async () => {
@@ -221,7 +269,9 @@ describe('Input benches', () => {
     },
     tier4BenchOptions
   );
+});
 
+describe('Input asChild dispatch bench', () => {
   bench(
     'dispatch 1k change events on asChild inputs',
     async () => {
@@ -242,11 +292,11 @@ describe('Input benches', () => {
         }
       );
     },
-    tier4BenchOptions
+    inputDispatchNoiseBenchOptions
   );
 });
 
-describe('Textarea benches', () => {
+describe('Textarea native mount bench', () => {
   bench(
     'mount 1k native textareas',
     () => {
@@ -254,15 +304,19 @@ describe('Textarea benches', () => {
     },
     tier4BenchOptions
   );
+});
 
+describe('Textarea asChild mount bench', () => {
   bench(
     'mount 1k asChild textareas',
     () => {
       return runBrowserBench(<div>{renderTextareas(true)}</div>, () => {});
     },
-    tier4BenchOptions
+    noisyControlBenchOptions
   );
+});
 
+describe('Textarea native dispatch bench', () => {
   bench(
     'dispatch 1k change events on native textareas',
     async () => {
@@ -285,7 +339,9 @@ describe('Textarea benches', () => {
     },
     tier4BenchOptions
   );
+});
 
+describe('Textarea asChild dispatch bench', () => {
   bench(
     'dispatch 1k change events on asChild textareas',
     async () => {
@@ -310,7 +366,7 @@ describe('Textarea benches', () => {
   );
 });
 
-describe('Checkbox benches', () => {
+describe('Checkbox native mount bench', () => {
   bench(
     'mount 1k native checkboxes',
     () => {
@@ -321,7 +377,9 @@ describe('Checkbox benches', () => {
     },
     tier4BenchOptions
   );
+});
 
+describe('Checkbox asChild mount bench', () => {
   bench(
     'mount 1k asChild checkboxes',
     () => {
@@ -330,9 +388,11 @@ describe('Checkbox benches', () => {
         () => {}
       );
     },
-    tier4BenchOptions
+    checkboxToggleNoiseBenchOptions
   );
+});
 
+describe('Checkbox native dispatch bench', () => {
   bench(
     'dispatch 1k clicks on native checkboxes',
     async () => {
@@ -351,9 +411,11 @@ describe('Checkbox benches', () => {
         }
       );
     },
-    tier4BenchOptions
+    checkboxDispatchNoiseBenchOptions
   );
+});
 
+describe('Checkbox asChild dispatch bench', () => {
   bench(
     'dispatch 1k clicks on asChild checkboxes',
     async () => {
@@ -372,9 +434,11 @@ describe('Checkbox benches', () => {
         }
       );
     },
-    tier4BenchOptions
+    checkboxToggleNoiseBenchOptions
   );
+});
 
+describe('Checkbox native update bench', () => {
   bench(
     'update 1k native checkbox checked states',
     async () => {
@@ -390,7 +454,7 @@ describe('Checkbox benches', () => {
         }
       );
     },
-    tier4BenchOptions
+    checkboxDispatchNoiseBenchOptions
   );
 });
 
@@ -407,7 +471,7 @@ describe('Toggle benches', () => {
         await flushBrowserBenchUpdates();
       });
     },
-    tier4BenchOptions
+    checkboxToggleNoiseBenchOptions
   );
 });
 
@@ -424,6 +488,6 @@ describe('Switch benches', () => {
         await flushBrowserBenchUpdates();
       });
     },
-    tier4BenchOptions
+    noisyControlBenchOptions
   );
 });
