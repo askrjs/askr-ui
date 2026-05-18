@@ -38,6 +38,7 @@ describe('Browser bench contract', () => {
     const contents = benchFiles.map(({ contents }) => contents).join('\n');
 
     expect(contents).toContain('mount 1k native buttons');
+    expect(contents).toContain('createTier4SmokeBenchOptions()');
     expect(contents).toContain(
       'cycle 100 dialog open/close with listener cleanup'
     );

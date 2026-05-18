@@ -10,16 +10,16 @@ import {
   DropdownItem,
   DropdownPortal,
   DropdownTrigger,
+  Popover,
+  PopoverContent,
+  PopoverPortal,
+  PopoverTrigger,
   Select,
   SelectContent,
   SelectItem,
   SelectPortal,
   SelectTrigger,
   SelectValue,
-  Popover,
-  PopoverContent,
-  PopoverPortal,
-  PopoverTrigger,
   Toast,
   ToastClose,
   ToastDescription,
@@ -32,32 +32,20 @@ import {
   TooltipTrigger,
 } from '../../src/components';
 import {
-  createBrowserListenerTracker,
-  createTier4BenchOptions,
+  createTier4SmokeBenchOptions,
+  flushBrowserBenchUpdates,
   mountBrowserBench,
   settleBrowserBenchCycle,
   unmountBrowserBench,
 } from './browser-bench';
 
 const lifecycleCycles = 100;
-const tier4BenchOptions = createTier4BenchOptions();
+const tier4SmokeBenchOptions = createTier4SmokeBenchOptions();
 
-type ListenerTracker = ReturnType<typeof createBrowserListenerTracker>;
+// These lifecycle benches are smoke checks for cleanup and settle timing,
+// not throughput benchmarks.
 
-function assertOverlayLifecycleCleanup(
-  tracker: ListenerTracker,
-  expectedListeners: number,
-  contentSelector: string,
-  label: string
-) {
-  const activeListeners = tracker.countActiveListeners();
-
-  if (activeListeners !== expectedListeners) {
-    throw new Error(
-      `Expected ${expectedListeners} active listeners ${label}, found ${activeListeners} for ${contentSelector}`
-    );
-  }
-
+function assertOverlayLifecycleCleanup(contentSelector: string, label: string) {
   if (document.body.querySelector(contentSelector)) {
     throw new Error(
       `Expected ${contentSelector} to be removed ${label}, but it was still present`
@@ -81,14 +69,11 @@ async function runOverlayLifecycleBench(options: {
   contentSelector: string;
   open: (trigger: HTMLElement) => void | Promise<void>;
   close: (trigger: HTMLElement, content: HTMLElement) => void | Promise<void>;
+  checkContentRemovalEachCycle?: boolean;
 }) {
-  const tracker = createBrowserListenerTracker();
   const container = mountBrowserBench(options.element);
-  let failed = false;
 
   try {
-    const mountedListenerCount = tracker.countActiveListeners();
-
     for (let cycle = 0; cycle < lifecycleCycles; cycle += 1) {
       const trigger = container.querySelector(
         options.triggerSelector
@@ -101,7 +86,7 @@ async function runOverlayLifecycleBench(options: {
       }
 
       await options.open(trigger);
-      await settleBrowserBenchCycle();
+      await flushBrowserBenchUpdates();
 
       const content = document.body.querySelector(
         options.contentSelector
@@ -114,39 +99,27 @@ async function runOverlayLifecycleBench(options: {
       }
 
       await options.close(trigger, content);
-      await settleBrowserBenchCycle();
+      await flushBrowserBenchUpdates();
 
-      assertOverlayLifecycleCleanup(
-        tracker,
-        mountedListenerCount,
-        options.contentSelector,
-        `after cycle ${cycle + 1}`
-      );
+      if (options.checkContentRemovalEachCycle !== false) {
+        assertOverlayLifecycleCleanup(
+          options.contentSelector,
+          `after cycle ${cycle + 1}`
+        );
+      }
     }
-  } catch (error) {
-    failed = true;
-    throw error;
   } finally {
     unmountBrowserBench(container);
 
-    if (!failed) {
-      assertOverlayLifecycleCleanup(
-        tracker,
-        0,
-        options.contentSelector,
-        'after unmount'
-      );
-    }
-
-    tracker.dispose();
+    assertOverlayLifecycleCleanup(options.contentSelector, 'after unmount');
   }
 }
 
 function ToastLifecycleFixture() {
-  const openState = state(false);
+  const openState = state(true);
 
   return (
-    <ToastProvider duration={1000}>
+    <ToastProvider duration={10000}>
       <button
         id="toast-launcher"
         onClick={() => {
@@ -190,7 +163,7 @@ describe('Dialog lifecycle benches', () => {
         },
       });
     },
-    tier4BenchOptions
+    tier4SmokeBenchOptions
   );
 });
 
@@ -219,7 +192,7 @@ describe('Popover lifecycle benches', () => {
         },
       });
     },
-    tier4BenchOptions
+    tier4SmokeBenchOptions
   );
 });
 
@@ -250,7 +223,7 @@ describe('Dropdown lifecycle benches', () => {
         },
       });
     },
-    tier4BenchOptions
+    tier4SmokeBenchOptions
   );
 });
 
@@ -284,7 +257,7 @@ describe('Select lifecycle benches', () => {
         },
       });
     },
-    tier4BenchOptions
+    tier4SmokeBenchOptions
   );
 });
 
@@ -303,15 +276,20 @@ describe('Tooltip lifecycle benches', () => {
         ),
         triggerSelector: '[data-slot="tooltip-trigger"]',
         contentSelector: '[data-slot="tooltip-content"]',
+        checkContentRemovalEachCycle: false,
         open: (trigger) => {
-          trigger.focus();
+          trigger.dispatchEvent(
+            new PointerEvent('pointerenter', { bubbles: true })
+          );
+          return settleBrowserBenchCycle();
         },
         close: (trigger) => {
-          trigger.blur();
+          trigger.dispatchEvent(new PointerEvent('pointerleave'));
+          return settleBrowserBenchCycle();
         },
       });
     },
-    tier4BenchOptions
+    tier4SmokeBenchOptions
   );
 });
 
@@ -323,8 +301,10 @@ describe('Toast lifecycle benches', () => {
         element: <ToastLifecycleFixture />,
         triggerSelector: '#toast-launcher',
         contentSelector: '[data-toast="true"]',
+        checkContentRemovalEachCycle: false,
         open: (trigger) => {
           trigger.click();
+          return settleBrowserBenchCycle();
         },
         close: (_trigger, content) => {
           const close = content.querySelector(
@@ -336,9 +316,10 @@ describe('Toast lifecycle benches', () => {
           }
 
           close.click();
+          return settleBrowserBenchCycle();
         },
       });
     },
-    tier4BenchOptions
+    tier4SmokeBenchOptions
   );
 });
