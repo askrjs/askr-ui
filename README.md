@@ -11,19 +11,22 @@ or supply your own CSS.
 
 ```bash
 npm install @askrjs/ui @askrjs/askr
+npm install @askrjs/themes
 ```
 
 ## Use
+
+Import the root package when you want the full composition surface:
 
 ```tsx
 import { Button, Dialog, DialogTrigger, DialogContent } from '@askrjs/ui';
 ```
 
-For narrower imports, use the direct component paths:
+Use per-component subpaths when you want smaller bundles or direct entrypoints:
 
 ```tsx
-import { Button, Checkbox, Input, Label } from '@askrjs/ui';
-import { Dialog, Popover, Tooltip } from '@askrjs/ui';
+import { Button } from '@askrjs/ui/button';
+import { Dialog } from '@askrjs/ui/dialog';
 ```
 
 ## Docs
@@ -49,9 +52,7 @@ The package exports components directly from the root and per-component subpaths
   `TableRow`, `TableHeaderCell`, `TableCell`
 - Navigation: `Menubar`
 
-Prefer the per-component subpaths when you want a smaller surface area:
-
-The per-component subpaths stay available for direct imports such as
-`@askrjs/ui/button` and `@askrjs/ui/dialog`.
+Prefer the per-component subpaths when you want a smaller surface area.
 
 For the full surface and composition examples, start with the docs above.
+
