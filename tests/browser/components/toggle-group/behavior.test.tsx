@@ -26,7 +26,7 @@ describe('ToggleGroup - Behavior', () => {
     container = undefined;
   });
 
-  it('mounts single and multiple toggle groups without render-time state errors', () => {
+  it('should mounts single and multiple toggle groups without render-time state errors', () => {
     expect(() => {
       container = mount(
         <div>
@@ -45,7 +45,7 @@ describe('ToggleGroup - Behavior', () => {
     ).toHaveLength(2);
   });
 
-  it('renders the group container and pressed hooks for single selection', () => {
+  it('should renders the group container and pressed hooks for single selection', () => {
     container = mount(
       <ToggleGroup defaultValue="left" orientation="vertical">
         <ToggleGroupItem value="left">Left</ToggleGroupItem>
@@ -67,7 +67,7 @@ describe('ToggleGroup - Behavior', () => {
     expect(right.getAttribute('data-state')).toBe('off');
   });
 
-  it('updates uncontrolled single selection and allows collapsing the active item', async () => {
+  it('should updates uncontrolled single selection and allows collapsing the active item', async () => {
     container = mount(
       <ToggleGroup defaultValue="left">
         <ToggleGroupItem value="left">Left</ToggleGroupItem>
@@ -96,7 +96,7 @@ describe('ToggleGroup - Behavior', () => {
     expect(right.getAttribute('aria-pressed')).toBe('false');
   });
 
-  it('updates uncontrolled multiple selection independently', async () => {
+  it('should updates uncontrolled multiple selection independently', async () => {
     container = mount(
       <ToggleGroup type="multiple" defaultValue={['left']}>
         <ToggleGroupItem value="left">Left</ToggleGroupItem>
@@ -125,7 +125,7 @@ describe('ToggleGroup - Behavior', () => {
     expect(right.getAttribute('aria-pressed')).toBe('true');
   });
 
-  it('supports nested toggle items without relying on direct child injection', async () => {
+  it('should supports nested toggle items without relying on direct child injection', async () => {
     container = mount(
       <ToggleGroup defaultValue="left">
         <div>
@@ -148,7 +148,7 @@ describe('ToggleGroup - Behavior', () => {
     ).toBe('true');
   });
 
-  it('emits normalized values for single and multiple groups', async () => {
+  it('should emits normalized values for single and multiple groups', async () => {
     const onSingleValueChange = vi.fn();
     const onMultipleValueChange = vi.fn();
 
@@ -186,7 +186,7 @@ describe('ToggleGroup - Behavior', () => {
     ]);
   });
 
-  it('blocks interaction when the group or item is disabled', async () => {
+  it('should blocks interaction when the group or item is disabled', async () => {
     const onGroupValueChange = vi.fn();
     const onItemValueChange = vi.fn();
 
@@ -230,7 +230,7 @@ describe('ToggleGroup - Behavior', () => {
     expect(itemRight.getAttribute('aria-pressed')).toBe('true');
   });
 
-  it('supports asChild item composition and merges host props', () => {
+  it('should supports asChild item composition and merges host props', () => {
     container = mount(
       <ToggleGroup defaultValue="left">
         <ToggleGroupItem
@@ -255,7 +255,7 @@ describe('ToggleGroup - Behavior', () => {
     expect(host.getAttribute('data-state')).toBe('on');
   });
 
-  it('forwards refs to the group container and item hosts', () => {
+  it('should forwards refs to the group container and item hosts', () => {
     let groupRef: HTMLDivElement | null = null;
     let nativeItemRef: HTMLButtonElement | null = null;
     let childItemRef: HTMLElement | null = null;
@@ -292,7 +292,7 @@ describe('ToggleGroup - Behavior', () => {
     expect(childItemRef).toBe(childHost);
   });
 
-  it('treats value as controlled state when provided', async () => {
+  it('should treats value as controlled state when provided', async () => {
     const onValueChange = vi.fn();
 
     container = mount(
@@ -313,7 +313,7 @@ describe('ToggleGroup - Behavior', () => {
     ).toBe('false');
   });
 
-  it('does not wrap roving focus at boundaries when loop is false', async () => {
+  it('should does not wrap roving focus at boundaries when loop is false', async () => {
     container = mount(
       <ToggleGroup defaultValue="left" orientation="horizontal" loop={false}>
         <ToggleGroupItem value="left">Left</ToggleGroupItem>
@@ -331,7 +331,7 @@ describe('ToggleGroup - Behavior', () => {
     expect(document.activeElement).toBe(getToggleByText(container, 'Left'));
   });
 
-  it('does not activate disabled items during roving keyboard navigation attempts', async () => {
+  it('should does not activate disabled items during roving keyboard navigation attempts', async () => {
     container = mount(
       <ToggleGroup defaultValue="left" orientation="vertical">
         <ToggleGroupItem value="left">Left</ToggleGroupItem>

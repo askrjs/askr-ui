@@ -11,7 +11,7 @@ describe('Button - Behavior', () => {
     container = undefined;
   });
 
-  it('renders a native button with the default button type', () => {
+  it('should renders a native button with the default button type', () => {
     container = mount(<Button>Save</Button>);
 
     const button = container.querySelector(
@@ -23,7 +23,7 @@ describe('Button - Behavior', () => {
     expect(button?.getAttribute('data-slot')).toBe('button');
   });
 
-  it('invokes onPress and merges host props for native buttons', () => {
+  it('should invokes onPress and merges host props for native buttons', () => {
     const onPress = vi.fn();
 
     container = mount(
@@ -44,7 +44,7 @@ describe('Button - Behavior', () => {
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it('prevents native interaction when disabled', () => {
+  it('should prevents native interaction when disabled', () => {
     const onPress = vi.fn();
 
     container = mount(
@@ -65,7 +65,7 @@ describe('Button - Behavior', () => {
     expect(onPress).not.toHaveBeenCalled();
   });
 
-  it('supports asChild hosts with composed props and disabled semantics', () => {
+  it('should supports asChild hosts with composed props and disabled semantics', () => {
     const onPress = vi.fn();
 
     container = mount(
@@ -89,7 +89,7 @@ describe('Button - Behavior', () => {
     expect(onPress).not.toHaveBeenCalled();
   });
 
-  it('replaces stateful icon children instead of accumulating them', async () => {
+  it('should replaces stateful icon children instead of accumulating them', async () => {
     const onPress = vi.fn();
 
     const ThemeLikeButton = () => {

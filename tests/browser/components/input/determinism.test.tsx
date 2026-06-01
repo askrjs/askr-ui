@@ -4,13 +4,13 @@ import { expectDeterministicRender } from '../../determinism';
 import { mount, unmount } from '../../test-utils';
 
 describe('Input - Determinism', () => {
-  it('renders deterministic native input markup', () => {
+  it('should renders deterministic native input markup', () => {
     expectDeterministicRender(() => (
       <Input type="email" placeholder="Email" disabled />
     ));
   });
 
-  it('renders deterministic asChild and debounced input markup', () => {
+  it('should renders deterministic asChild and debounced input markup', () => {
     expectDeterministicRender(() => (
       <Input asChild>
         <input aria-label="Email" />
@@ -21,7 +21,7 @@ describe('Input - Determinism', () => {
     ));
   });
 
-  it('does not schedule timers during debounced input render', () => {
+  it('should does not schedule timers during debounced input render', () => {
     const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
     const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
     const container = mount(

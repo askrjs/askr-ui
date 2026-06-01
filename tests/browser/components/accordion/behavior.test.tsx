@@ -31,7 +31,7 @@ describe('Accordion - Behavior', () => {
     unmount(container);
   });
 
-  it('mounts single and multiple accordions without render-time state errors', () => {
+  it('should mounts single and multiple accordions without render-time state errors', () => {
     expect(() => {
       container = mount(
         <div>

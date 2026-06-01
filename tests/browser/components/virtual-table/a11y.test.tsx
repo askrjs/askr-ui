@@ -28,7 +28,7 @@ const columns = [
 ] as const;
 
 describe('VirtualTable - Accessibility', () => {
-  it('has no automated axe violations for a semantic virtual table', async () => {
+  it('should has no automated axe violations for a semantic virtual table', async () => {
     await expectNoAxeViolations(
       <VirtualTable
         aria-label="Users"

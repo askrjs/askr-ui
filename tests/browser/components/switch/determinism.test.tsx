@@ -4,7 +4,7 @@ import { expectDeterministicRender } from '../../determinism';
 import { mount, unmount } from '../../test-utils';
 
 describe('Switch - Determinism', () => {
-  it('renders deterministic native switch markup', () => {
+  it('should renders deterministic native switch markup', () => {
     expectDeterministicRender(() => (
       <Switch defaultChecked>Airplane mode</Switch>
     ));
@@ -15,7 +15,7 @@ describe('Switch - Determinism', () => {
     ));
   });
 
-  it('renders deterministic asChild switch markup', () => {
+  it('should renders deterministic asChild switch markup', () => {
     expectDeterministicRender(() => (
       <Switch asChild disabled>
         <div>Power</div>
@@ -23,7 +23,7 @@ describe('Switch - Determinism', () => {
     ));
   });
 
-  it('keeps checked state props-driven across remounts', () => {
+  it('should keeps checked state props-driven across remounts', () => {
     let container = mount(<Switch checked={false}>Power</Switch>);
 
     try {
@@ -43,7 +43,7 @@ describe('Switch - Determinism', () => {
     }
   });
 
-  it('does not schedule timers during render', () => {
+  it('should does not schedule timers during render', () => {
     const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
     const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
     const container = mount(<Switch>Power</Switch>);

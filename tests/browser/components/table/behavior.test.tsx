@@ -19,7 +19,7 @@ describe('Table - Behavior', () => {
     container = undefined;
   });
 
-  it('renders semantic table elements by default', async () => {
+  it('should renders semantic table elements by default', async () => {
     container = mount(
       <Table aria-label="Users">
         <TableCaption>Users</TableCaption>
@@ -55,7 +55,7 @@ describe('Table - Behavior', () => {
     expect(container.querySelectorAll('td').length).toBe(3);
   });
 
-  it('supports asChild composition on the root and cells', async () => {
+  it('should supports asChild composition on the root and cells', async () => {
     container = mount(
       <Table asChild aria-label="Users">
         <table>
@@ -85,7 +85,7 @@ describe('Table - Behavior', () => {
     expect(cell?.textContent).toBe('Alice');
   });
 
-  it('preserves caption and header data attributes for theming', async () => {
+  it('should preserves caption and header data attributes for theming', async () => {
     container = mount(
       <Table aria-label="Users">
         <TableCaption>Users</TableCaption>

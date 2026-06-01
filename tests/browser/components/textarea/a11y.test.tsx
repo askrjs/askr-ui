@@ -5,11 +5,11 @@ import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';
 
 describe('Textarea - Accessibility', () => {
-  it('has no automated axe violations for a labelled native textarea', async () => {
+  it('should has no automated axe violations for a labelled native textarea', async () => {
     await expectNoAxeViolations(<Textarea aria-label="Notes" rows={3} />);
   });
 
-  it('has no automated axe violations for a labelled asChild textarea', async () => {
+  it('should has no automated axe violations for a labelled asChild textarea', async () => {
     await expectNoAxeViolations(
       <Textarea asChild>
         <textarea aria-label="Notes" rows={3} />
@@ -17,7 +17,7 @@ describe('Textarea - Accessibility', () => {
     );
   });
 
-  it('uses native disabled semantics for the default host', () => {
+  it('should uses native disabled semantics for the default host', () => {
     const container = mount(<Textarea aria-label="Notes" disabled />);
 
     try {
@@ -36,7 +36,7 @@ describe('Textarea - Accessibility', () => {
     }
   });
 
-  it('uses native disabled semantics for disabled asChild textarea hosts', () => {
+  it('should uses native disabled semantics for disabled asChild textarea hosts', () => {
     const container = mount(
       <Textarea asChild disabled>
         <textarea aria-label="Notes" />
@@ -57,7 +57,7 @@ describe('Textarea - Accessibility', () => {
     }
   });
 
-  it('matches the documented textarea accessibility contract', () => {
+  it('should matches the documented textarea accessibility contract', () => {
     expect(TEXTAREA_A11Y_CONTRACT.HOST_ELEMENT).toBe('textarea');
     expect(TEXTAREA_A11Y_CONTRACT.DISABLED_ATTRIBUTES).toEqual({
       native: 'disabled',

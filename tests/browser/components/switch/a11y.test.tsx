@@ -5,11 +5,11 @@ import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';
 
 describe('Switch - Accessibility', () => {
-  it('has no automated axe violations for the native switch path', async () => {
+  it('should has no automated axe violations for the native switch path', async () => {
     await expectNoAxeViolations(<Switch>Airplane mode</Switch>);
   });
 
-  it('has no automated axe violations for labelled asChild composition', async () => {
+  it('should has no automated axe violations for labelled asChild composition', async () => {
     await expectNoAxeViolations(
       <Switch asChild>
         <div aria-label="Power">Power</div>
@@ -17,7 +17,7 @@ describe('Switch - Accessibility', () => {
     );
   });
 
-  it('exposes switch semantics when composed with asChild', () => {
+  it('should exposes switch semantics when composed with asChild', () => {
     const container = mount(
       <Switch asChild defaultChecked>
         <div>Power</div>
@@ -37,7 +37,7 @@ describe('Switch - Accessibility', () => {
     }
   });
 
-  it('uses native disabled semantics and hidden form integration when named', () => {
+  it('should uses native disabled semantics and hidden form integration when named', () => {
     const container = mount(
       <Switch disabled name="power" value="enabled">
         Power
@@ -60,7 +60,7 @@ describe('Switch - Accessibility', () => {
     }
   });
 
-  it('matches the documented switch accessibility contract', () => {
+  it('should matches the documented switch accessibility contract', () => {
     expect(SWITCH_A11Y_CONTRACT.ROLE).toBe('switch');
     expect(SWITCH_A11Y_CONTRACT.CHECKED_ATTRIBUTE).toBe('aria-checked');
     expect(SWITCH_A11Y_CONTRACT.KEYBOARD_ACTIVATION).toEqual([

@@ -216,17 +216,18 @@
     "bench:tier4": "cross-env NODE_ENV=production vp test bench --run --reporter=default --config vitest.bench.tier4.config.ts",
     "fmt": "vp fmt .",
     "lint": "vp lint .",
-    "test": "npm run test:unit && npm run test:jsdom && npm run test:browser",
+    "test": "npm run test:unit && npm run test:checks && npm run test:jsdom && npm run test:browser",
     "test:browser": "vp test run --config vitest.test.browser.config.ts",
     "test:component": "npm run test:browser",
     "test:jsdom": "npm run build && vp test run --config vitest.test.jsdom.config.ts",
     "test:types": "tsc -p tsconfig.type-tests.json --noEmit",
     "test:unit": "npm run test:types && vp test run --config vitest.test.unit.config.ts",
     "plan:slices": "node scripts/generate-slice-queue.js",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "test:checks": "vp test run -c vitest.test.checks.config.ts"
   },
   "devDependencies": {
-    "@askrjs/askr": "^0.0.37",
+    "@askrjs/askr": "^0.0.40",
     "@askrjs/vite": ">=0.0.2 <0.1.0",
     "@types/node": "^25.8.0",
     "axe-core": "^4.11.4",

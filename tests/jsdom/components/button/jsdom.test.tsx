@@ -68,11 +68,11 @@ describe('Button - jsdom regression', () => {
     expect(button?.querySelector('svg')?.getAttribute('data-icon')).toBe('sun');
   }
 
-  it('replaces a stateful icon child instead of accumulating icons in source', async () => {
+  it('should replaces a stateful icon child instead of accumulating icons in source', async () => {
     await expectSingleIconAcrossToggles(Button);
   });
 
-  it('replaces a stateful icon child instead of accumulating icons in dist', async () => {
+  it('should replaces a stateful icon child instead of accumulating icons in dist', async () => {
     await expectSingleIconAcrossToggles(DistButton);
   });
 });

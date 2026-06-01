@@ -11,7 +11,7 @@ function isPublicValueExport(name: string) {
 }
 
 describe('Public API', () => {
-  it('matches the manifest-driven surface from the root entrypoint', () => {
+  it('should matches the manifest-driven surface from the root entrypoint', () => {
     expect('createAskRComponent' in askrUi).toBe(false);
     expect('AskRComponent' in askrUi).toBe(false);
 

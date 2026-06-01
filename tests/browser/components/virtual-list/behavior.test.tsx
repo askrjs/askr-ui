@@ -26,7 +26,7 @@ describe('VirtualList - Behavior', () => {
     container = undefined;
   });
 
-  it('renders a virtual window, scrolls by index, and follows the bottom', async () => {
+  it('should renders a virtual window, scrolls by index, and follows the bottom', async () => {
     let api: VirtualListApi<Item> | null = null;
     let appendItem: (() => void) | undefined;
 
@@ -98,7 +98,7 @@ describe('VirtualList - Behavior', () => {
     expect(container.querySelector('[data-key="item-8"]')).toBeTruthy();
   });
 
-  it('supports asChild composition with semantic list items', async () => {
+  it('should supports asChild composition with semantic list items', async () => {
     container = mount(
       <VirtualList
         asChild

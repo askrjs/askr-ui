@@ -13,7 +13,7 @@ function readComponentDirectories() {
 }
 
 describe('Source layout', () => {
-  it('keeps the component tree flat and one folder per public component', () => {
+  it('should keeps the component tree flat and one folder per public component', () => {
     const expectedDirectories = [
       ...componentSurface.map((entry) => entry.name),
       '_internal',

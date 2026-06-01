@@ -5,7 +5,7 @@ import { mount, unmount } from '../../test-utils';
 import { CHECKBOX_A11Y_CONTRACT } from '../../../../src/components/checkbox/checkbox.a11y';
 
 describe('Checkbox - Accessibility', () => {
-  it('has no automated axe violations for a labelled native checkbox', async () => {
+  it('should has no automated axe violations for a labelled native checkbox', async () => {
     await expectNoAxeViolations(
       <label>
         Accept terms
@@ -14,7 +14,7 @@ describe('Checkbox - Accessibility', () => {
     );
   });
 
-  it('has no automated axe violations for a labelled asChild checkbox', async () => {
+  it('should has no automated axe violations for a labelled asChild checkbox', async () => {
     await expectNoAxeViolations(
       <Checkbox asChild>
         <div role="checkbox" aria-label="Accept terms">
@@ -24,7 +24,7 @@ describe('Checkbox - Accessibility', () => {
     );
   });
 
-  it('uses implicit native checkbox semantics for the default host', () => {
+  it('should uses implicit native checkbox semantics for the default host', () => {
     const container = mount(<Checkbox checked={false} />);
 
     try {
@@ -37,7 +37,7 @@ describe('Checkbox - Accessibility', () => {
     }
   });
 
-  it('uses mixed aria state for indeterminate asChild hosts', () => {
+  it('should uses mixed aria state for indeterminate asChild hosts', () => {
     const container = mount(
       <Checkbox asChild indeterminate>
         <div role="checkbox">Select all</div>
@@ -56,7 +56,7 @@ describe('Checkbox - Accessibility', () => {
     }
   });
 
-  it('keeps native indeterminate checkboxes in the indeterminate state contract', () => {
+  it('should keeps native indeterminate checkboxes in the indeterminate state contract', () => {
     const container = mount(<Checkbox indeterminate />);
 
     try {
@@ -69,7 +69,7 @@ describe('Checkbox - Accessibility', () => {
     }
   });
 
-  it('uses aria-disabled and removes disabled asChild hosts from tab order', () => {
+  it('should uses aria-disabled and removes disabled asChild hosts from tab order', () => {
     const container = mount(
       <Checkbox asChild disabled>
         <div role="checkbox">Disabled</div>
@@ -86,7 +86,7 @@ describe('Checkbox - Accessibility', () => {
     }
   });
 
-  it('matches the documented checkbox accessibility contract', () => {
+  it('should matches the documented checkbox accessibility contract', () => {
     expect(CHECKBOX_A11Y_CONTRACT.ROLE).toBe('checkbox');
     expect(CHECKBOX_A11Y_CONTRACT.KEYBOARD_ACTIVATION).toEqual([
       'Enter',

@@ -10,7 +10,7 @@ describe('Textarea - Behavior', () => {
     container = undefined;
   });
 
-  it('renders a native textarea by default', () => {
+  it('should renders a native textarea by default', () => {
     container = mount(<Textarea rows={4}>Notes</Textarea>);
 
     const textarea = container.querySelector(
@@ -22,7 +22,7 @@ describe('Textarea - Behavior', () => {
     expect(textarea?.getAttribute('data-slot')).toBe('textarea');
   });
 
-  it('applies disabled semantics to native textarea', () => {
+  it('should applies disabled semantics to native textarea', () => {
     container = mount(<Textarea disabled />);
 
     const textarea = container.querySelector(
@@ -34,7 +34,7 @@ describe('Textarea - Behavior', () => {
     expect(textarea?.getAttribute('data-disabled')).toBe('true');
   });
 
-  it('preserves readonly semantics on native textareas', () => {
+  it('should preserves readonly semantics on native textareas', () => {
     container = mount(<Textarea readOnly>Locked notes</Textarea>);
 
     const textarea = container.querySelector(
@@ -45,7 +45,7 @@ describe('Textarea - Behavior', () => {
     expect(textarea?.hasAttribute('readonly')).toBe(true);
   });
 
-  it('supports asChild composition and merges host props', () => {
+  it('should supports asChild composition and merges host props', () => {
     container = mount(
       <Textarea asChild data-testid="custom-textarea" data-from-textarea="yes">
         <textarea aria-label="Notes" data-from-child="yes" />
@@ -62,7 +62,7 @@ describe('Textarea - Behavior', () => {
     expect(textarea?.getAttribute('data-slot')).toBe('textarea');
   });
 
-  it('applies native disabled semantics to asChild textarea hosts', () => {
+  it('should applies native disabled semantics to asChild textarea hosts', () => {
     container = mount(
       <Textarea asChild disabled>
         <textarea aria-label="Notes" />
@@ -77,7 +77,7 @@ describe('Textarea - Behavior', () => {
     expect(host?.getAttribute('data-disabled')).toBe('true');
   });
 
-  it('preserves readonly semantics on asChild textarea hosts', () => {
+  it('should preserves readonly semantics on asChild textarea hosts', () => {
     container = mount(
       <Textarea asChild readOnly>
         <textarea aria-label="Notes" />
@@ -92,7 +92,7 @@ describe('Textarea - Behavior', () => {
     expect(host?.hasAttribute('readonly')).toBe(true);
   });
 
-  it('fails loudly when asChild does not receive a native textarea host', () => {
+  it('should fails loudly when asChild does not receive a native textarea host', () => {
     expect(() =>
       mount(
         <Textarea asChild>

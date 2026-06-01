@@ -29,7 +29,7 @@ function readBenchFiles() {
 }
 
 describe('Bench contract', () => {
-  it('covers the public component surface with benchmark entries', () => {
+  it('should covers the public component surface with benchmark entries', () => {
     const benchFiles = readBenchFiles();
     const tier3BenchFiles = readdirSync(
       join(process.cwd(), 'benches', 'tier3'),

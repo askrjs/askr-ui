@@ -28,7 +28,7 @@ const columns = [
 ] as const;
 
 describe('VirtualTable - Determinism', () => {
-  it('renders deterministic virtual table markup', () => {
+  it('should renders deterministic virtual table markup', () => {
     vi.useFakeTimers();
 
     try {

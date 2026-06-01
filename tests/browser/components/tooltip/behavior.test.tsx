@@ -15,7 +15,7 @@ describe('Tooltip - Behavior', () => {
     unmount(container);
   });
 
-  it('updates trigger state around focus events', async () => {
+  it('should updates trigger state around focus events', async () => {
     container = mount(
       <Tooltip>
         <TooltipTrigger>Hover me</TooltipTrigger>
@@ -39,7 +39,7 @@ describe('Tooltip - Behavior', () => {
     expect(trigger.getAttribute('data-state')).toBe('closed');
   });
 
-  it('keeps custom content positioning through the post-open portal sync', async () => {
+  it('should keeps custom content positioning through the post-open portal sync', async () => {
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
       (callback: FrameRequestCallback) => {
         callback(0);

@@ -8,7 +8,7 @@ import { mount, unmount } from '../../test-utils';
 import { TOGGLE_GROUP_A11Y_CONTRACT } from '../../../../src/components/toggle-group/toggle-group.a11y';
 
 describe('ToggleGroup - Accessibility', () => {
-  it('has no automated axe violations for native toggle group items', async () => {
+  it('should has no automated axe violations for native toggle group items', async () => {
     await expectNoAxeViolations(
       <ToggleGroup defaultValue="left">
         <ToggleGroupItem value="left">Left</ToggleGroupItem>
@@ -17,7 +17,7 @@ describe('ToggleGroup - Accessibility', () => {
     );
   });
 
-  it('has no automated axe violations for labelled asChild items', async () => {
+  it('should has no automated axe violations for labelled asChild items', async () => {
     await expectNoAxeViolations(
       <ToggleGroup aria-label="Text alignment" defaultValue="left">
         <ToggleGroupItem asChild value="left">
@@ -30,7 +30,7 @@ describe('ToggleGroup - Accessibility', () => {
     );
   });
 
-  it('uses group semantics and pressed state for native items', () => {
+  it('should uses group semantics and pressed state for native items', () => {
     const container = mount(
       <ToggleGroup aria-label="Text alignment" defaultValue="left">
         <ToggleGroupItem value="left">Left</ToggleGroupItem>
@@ -57,7 +57,7 @@ describe('ToggleGroup - Accessibility', () => {
     }
   });
 
-  it('uses button semantics for asChild items', () => {
+  it('should uses button semantics for asChild items', () => {
     const container = mount(
       <ToggleGroup defaultValue="left">
         <ToggleGroupItem asChild value="left">
@@ -78,7 +78,7 @@ describe('ToggleGroup - Accessibility', () => {
     }
   });
 
-  it('uses disabled semantics for asChild items without native button support', () => {
+  it('should uses disabled semantics for asChild items without native button support', () => {
     const container = mount(
       <ToggleGroup defaultValue="left">
         <ToggleGroupItem asChild value="left" disabled>
@@ -97,7 +97,7 @@ describe('ToggleGroup - Accessibility', () => {
     }
   });
 
-  it('matches the documented toggle group accessibility contract', () => {
+  it('should matches the documented toggle group accessibility contract', () => {
     expect(TOGGLE_GROUP_A11Y_CONTRACT).toEqual({
       GROUP_ROLE: 'group',
       ITEM_ROLE: 'button',

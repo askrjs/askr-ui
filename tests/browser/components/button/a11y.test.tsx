@@ -21,11 +21,11 @@ function unmount(container: HTMLElement) {
 }
 
 describe('Button - Accessibility', () => {
-  it('has no automated axe violations for the native button path', async () => {
+  it('should has no automated axe violations for the native button path', async () => {
     await expectNoAxeViolations(<Button>Save</Button>);
   });
 
-  it('has no automated axe violations for labelled asChild composition', async () => {
+  it('should has no automated axe violations for labelled asChild composition', async () => {
     await expectNoAxeViolations(
       <Button asChild>
         <a href="/docs" aria-label="Read documentation">
@@ -35,7 +35,7 @@ describe('Button - Accessibility', () => {
     );
   });
 
-  it('uses native disabled semantics for the default host', () => {
+  it('should uses native disabled semantics for the default host', () => {
     const container = mount(<Button disabled>Save</Button>);
 
     try {
@@ -50,7 +50,7 @@ describe('Button - Accessibility', () => {
     }
   });
 
-  it('uses aria-disabled and removes disabled asChild hosts from tab order', () => {
+  it('should uses aria-disabled and removes disabled asChild hosts from tab order', () => {
     const container = mount(
       <Button asChild disabled>
         <a href="/docs">Docs</a>
@@ -67,7 +67,7 @@ describe('Button - Accessibility', () => {
     }
   });
 
-  it('preserves accessible naming props from the host', () => {
+  it('should preserves accessible naming props from the host', () => {
     const container = mount(
       <div>
         <span key="button-label" id="button-label">
@@ -88,7 +88,7 @@ describe('Button - Accessibility', () => {
     }
   });
 
-  it('matches the documented button accessibility contract', () => {
+  it('should matches the documented button accessibility contract', () => {
     expect(BUTTON_A11Y_CONTRACT.ROLE).toBe('button');
     expect(BUTTON_A11Y_CONTRACT.KEYBOARD_ACTIVATION).toEqual([
       'Enter',

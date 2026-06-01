@@ -15,7 +15,7 @@ describe('HoverCard - Behavior', () => {
     container = undefined;
   });
 
-  it('opens and closes from hover and focus state changes', async () => {
+  it('should opens and closes from hover and focus state changes', async () => {
     vi.useFakeTimers();
 
     container = mount(
@@ -58,7 +58,7 @@ describe('HoverCard - Behavior', () => {
     ).toBeNull();
   });
 
-  it('supports asChild composition and ref forwarding', async () => {
+  it('should supports asChild composition and ref forwarding', async () => {
     const triggerRef = { current: null as HTMLAnchorElement | null };
     const contentRef = { current: null as HTMLElement | null };
 

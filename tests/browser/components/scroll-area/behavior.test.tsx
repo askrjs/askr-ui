@@ -16,7 +16,7 @@ describe('ScrollArea - Behavior', () => {
     container = undefined;
   });
 
-  it('exposes canonical viewport and scrollbar hooks', async () => {
+  it('should exposes canonical viewport and scrollbar hooks', async () => {
     container = mount(
       <ScrollArea>
         <ScrollAreaViewport>
@@ -45,7 +45,7 @@ describe('ScrollArea - Behavior', () => {
     ).toBeTruthy();
   });
 
-  it('does not emit inline viewport styles and rejects orphan parts', async () => {
+  it('should does not emit inline viewport styles and rejects orphan parts', async () => {
     container = mount(
       <ScrollArea>
         <ScrollAreaViewport

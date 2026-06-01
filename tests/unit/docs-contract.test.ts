@@ -40,7 +40,7 @@ function extractDocumentedImports(docs: string) {
 }
 
 describe('Docs contract', () => {
-  it('only references import paths that are published by package exports', () => {
+  it('should only references import paths that are published by package exports', () => {
     const packageJson = JSON.parse(
       readFileSync(join(process.cwd(), 'package.json'), 'utf8')
     ) as { exports: PackageExports };
@@ -78,7 +78,7 @@ describe('Docs contract', () => {
     }
   });
 
-  it('keeps the documented component names aligned with the published surface', () => {
+  it('should keeps the documented component names aligned with the published surface', () => {
     const docs = [
       'README.md',
       'askr-ui.md',

@@ -8,7 +8,7 @@ import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';
 
 describe('RadioGroup - Accessibility', () => {
-  it('has no automated axe violations for labelled native radio items', async () => {
+  it('should has no automated axe violations for labelled native radio items', async () => {
     await expectNoAxeViolations(
       <RadioGroup aria-label="Size" defaultValue="m">
         <RadioGroupItem value="s">Small</RadioGroupItem>
@@ -17,7 +17,7 @@ describe('RadioGroup - Accessibility', () => {
     );
   });
 
-  it('has no automated axe violations for labelled asChild radio items', async () => {
+  it('should has no automated axe violations for labelled asChild radio items', async () => {
     await expectNoAxeViolations(
       <RadioGroup aria-label="Alignment" defaultValue="center">
         <RadioGroupItem asChild value="left">
@@ -30,7 +30,7 @@ describe('RadioGroup - Accessibility', () => {
     );
   });
 
-  it('exposes radiogroup, orientation, and checked semantics', () => {
+  it('should exposes radiogroup, orientation, and checked semantics', () => {
     const container = mount(
       <RadioGroup aria-label="Size" defaultValue="m" orientation="horizontal">
         <RadioGroupItem value="s">Small</RadioGroupItem>
@@ -66,7 +66,7 @@ describe('RadioGroup - Accessibility', () => {
     }
   });
 
-  it('omits aria-orientation when orientation is both', () => {
+  it('should omits aria-orientation when orientation is both', () => {
     const container = mount(
       <RadioGroup
         aria-label="Two dimensional"
@@ -88,7 +88,7 @@ describe('RadioGroup - Accessibility', () => {
     }
   });
 
-  it('uses disabled semantics for asChild radio items without native button support', () => {
+  it('should uses disabled semantics for asChild radio items without native button support', () => {
     const container = mount(
       <RadioGroup aria-label="Alignment" defaultValue="left">
         <RadioGroupItem asChild value="left" disabled>
@@ -107,7 +107,7 @@ describe('RadioGroup - Accessibility', () => {
     }
   });
 
-  it('matches the documented radio group accessibility contract', () => {
+  it('should matches the documented radio group accessibility contract', () => {
     expect(RADIO_GROUP_A11Y_CONTRACT).toEqual({
       GROUP_ROLE: 'radiogroup',
       ITEM_ROLE: 'radio',

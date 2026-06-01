@@ -4,14 +4,14 @@ import { expectDeterministicRender } from '../../determinism';
 import { mount, unmount } from '../../test-utils';
 
 describe('Checkbox - Determinism', () => {
-  it('renders deterministic native checkbox markup', () => {
+  it('should renders deterministic native checkbox markup', () => {
     expectDeterministicRender(() => <Checkbox />);
     expectDeterministicRender(() => (
       <Checkbox checked disabled name="terms" value="accepted" />
     ));
   });
 
-  it('renders deterministic indeterminate and asChild checkbox markup', () => {
+  it('should renders deterministic indeterminate and asChild checkbox markup', () => {
     expectDeterministicRender(() => <Checkbox checked indeterminate />);
     expectDeterministicRender(() => (
       <Checkbox asChild checked>
@@ -20,7 +20,7 @@ describe('Checkbox - Determinism', () => {
     ));
   });
 
-  it('preserves checkbox state signaling across remounts', () => {
+  it('should preserves checkbox state signaling across remounts', () => {
     let container = mount(<Checkbox checked={false} />);
 
     try {
@@ -44,7 +44,7 @@ describe('Checkbox - Determinism', () => {
     }
   });
 
-  it('does not schedule timers during render', () => {
+  it('should does not schedule timers during render', () => {
     const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
     const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
     const container = mount(<Checkbox checked />);

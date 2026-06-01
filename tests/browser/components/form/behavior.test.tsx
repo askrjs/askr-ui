@@ -10,7 +10,7 @@ describe('Form - Behavior', () => {
     container = undefined;
   });
 
-  it('renders a canonical form surface by default', async () => {
+  it('should renders a canonical form surface by default', async () => {
     container = mount(
       <Form method="post">
         <button type="submit">Save</button>
@@ -25,7 +25,7 @@ describe('Form - Behavior', () => {
     expect(form?.getAttribute('method')).toBe('post');
   });
 
-  it('supports asChild composition for non-form hosts', async () => {
+  it('should supports asChild composition for non-form hosts', async () => {
     container = mount(
       <Form asChild>
         <section>Fields</section>
