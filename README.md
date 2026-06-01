@@ -55,4 +55,3 @@ The package exports components directly from the root and per-component subpaths
 Prefer the per-component subpaths when you want a smaller surface area.
 
 For the full surface and composition examples, start with the docs above.
-
