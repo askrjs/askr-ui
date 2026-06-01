@@ -10,7 +10,7 @@ describe('Label - Behavior', () => {
     container = undefined;
   });
 
-  it('renders a native label by default', () => {
+  it('should renders a native label by default', () => {
     container = mount(<Label htmlFor="email">Email</Label>);
     const label = container.querySelector('label') as HTMLLabelElement | null;
 
@@ -20,7 +20,7 @@ describe('Label - Behavior', () => {
     expect(label?.getAttribute('data-slot')).toBe('label');
   });
 
-  it('supports asChild composition and merges host props', () => {
+  it('should supports asChild composition and merges host props', () => {
     container = mount(
       <Label asChild data-testid="email-label" data-from-label="yes">
         <span data-from-child="yes">Email</span>

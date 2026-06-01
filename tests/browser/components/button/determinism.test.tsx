@@ -20,7 +20,7 @@ function unmount(container: HTMLElement) {
 }
 
 describe('Button - Determinism', () => {
-  it('renders deterministic native button markup', () => {
+  it('should renders deterministic native button markup', () => {
     expectDeterministicRender(() => <Button>Save</Button>);
     expectDeterministicRender(() => (
       <Button variant="ghost" size="lg">
@@ -34,7 +34,7 @@ describe('Button - Determinism', () => {
     ));
   });
 
-  it('renders deterministic asChild markup', () => {
+  it('should renders deterministic asChild markup', () => {
     expectDeterministicRender(() => (
       <Button asChild data-testid="docs-link">
         <a href="/docs">Docs</a>
@@ -42,7 +42,7 @@ describe('Button - Determinism', () => {
     ));
   });
 
-  it('keeps behavior props-driven across remounts', () => {
+  it('should keeps behavior props-driven across remounts', () => {
     const firstPress = vi.fn();
     const secondPress = vi.fn();
 
@@ -71,7 +71,7 @@ describe('Button - Determinism', () => {
     }
   });
 
-  it('does not schedule timers during render', () => {
+  it('should does not schedule timers during render', () => {
     const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
     const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
     const container = mount(<Button>Save</Button>);

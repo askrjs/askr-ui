@@ -10,7 +10,7 @@ describe('Toggle - Behavior', () => {
     container = undefined;
   });
 
-  it('renders a native toggle button by default', () => {
+  it('should renders a native toggle button by default', () => {
     container = mount(<Toggle>Mute</Toggle>);
     const button = container.querySelector(
       'button'
@@ -24,7 +24,7 @@ describe('Toggle - Behavior', () => {
     expect(button?.getAttribute('data-state')).toBe('off');
   });
 
-  it('preserves an explicit native button type and pressed hooks', () => {
+  it('should preserves an explicit native button type and pressed hooks', () => {
     container = mount(
       <Toggle type="submit" pressed>
         Save
@@ -39,7 +39,7 @@ describe('Toggle - Behavior', () => {
     expect(button?.getAttribute('data-state')).toBe('on');
   });
 
-  it('invokes onPress exactly once per native click', () => {
+  it('should invokes onPress exactly once per native click', () => {
     const onPress = vi.fn();
 
     container = mount(<Toggle onPress={onPress}>Mute</Toggle>);
@@ -52,7 +52,7 @@ describe('Toggle - Behavior', () => {
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it('blocks native interaction when disabled', () => {
+  it('should blocks native interaction when disabled', () => {
     const onPress = vi.fn();
 
     container = mount(
@@ -72,7 +72,7 @@ describe('Toggle - Behavior', () => {
     expect(onPress).not.toHaveBeenCalled();
   });
 
-  it('supports asChild composition and merges host props', () => {
+  it('should supports asChild composition and merges host props', () => {
     container = mount(
       <Toggle
         asChild
@@ -94,7 +94,7 @@ describe('Toggle - Behavior', () => {
     expect(host?.getAttribute('data-slot')).toBe('toggle');
   });
 
-  it('routes interaction through the asChild host element', () => {
+  it('should routes interaction through the asChild host element', () => {
     const onPress = vi.fn();
 
     container = mount(
@@ -111,7 +111,7 @@ describe('Toggle - Behavior', () => {
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it('applies disabled semantics to asChild hosts', () => {
+  it('should applies disabled semantics to asChild hosts', () => {
     const onPress = vi.fn();
 
     container = mount(
@@ -132,7 +132,7 @@ describe('Toggle - Behavior', () => {
     expect(onPress).not.toHaveBeenCalled();
   });
 
-  it('forwards refs to native and asChild hosts', () => {
+  it('should forwards refs to native and asChild hosts', () => {
     let nativeRef: HTMLButtonElement | null = null;
     let childRef: HTMLElement | null = null;
 

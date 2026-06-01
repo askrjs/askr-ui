@@ -38,7 +38,7 @@ describe('Menubar - Behavior', () => {
     unmount(container);
   });
 
-  it('opens top-level triggers and nested submenus', async () => {
+  it('should opens top-level triggers and nested submenus', async () => {
     container = mount(
       <Menubar>
         <MenubarMenu value="file">
@@ -78,7 +78,7 @@ describe('Menubar - Behavior', () => {
     expect(document.body.textContent).toContain('Email');
   });
 
-  it('supports keyboard opening and escape dismissal', async () => {
+  it('should supports keyboard opening and escape dismissal', async () => {
     container = mount(
       <Menubar>
         <MenubarMenu value="file">

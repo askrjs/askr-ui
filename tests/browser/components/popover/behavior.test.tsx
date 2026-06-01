@@ -21,7 +21,7 @@ describe('Popover - Behavior', () => {
     unmount(container);
   });
 
-  it('toggles trigger expansion state through the trigger', async () => {
+  it('should toggles trigger expansion state through the trigger', async () => {
     container = mount(
       <Popover>
         <PopoverTrigger>Open popover</PopoverTrigger>
@@ -47,7 +47,7 @@ describe('Popover - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('applies trigger-based dialog labeling by default', async () => {
+  it('should applies trigger-based dialog labeling by default', async () => {
     container = mount(
       <Popover defaultOpen>
         <PopoverTrigger>Open popover</PopoverTrigger>
@@ -68,7 +68,7 @@ describe('Popover - Behavior', () => {
     expect(content?.getAttribute('aria-labelledby')).toBe(trigger?.id);
   });
 
-  it('preserves explicit aria-label over automatic trigger labeling', async () => {
+  it('should preserves explicit aria-label over automatic trigger labeling', async () => {
     container = mount(
       <Popover defaultOpen>
         <PopoverTrigger>Open popover</PopoverTrigger>
@@ -87,7 +87,7 @@ describe('Popover - Behavior', () => {
     expect(content?.hasAttribute('aria-labelledby')).toBe(false);
   });
 
-  it('keeps custom content positioning through the post-open portal sync', async () => {
+  it('should keeps custom content positioning through the post-open portal sync', async () => {
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
       (callback: FrameRequestCallback) => {
         callback(0);
@@ -169,7 +169,7 @@ describe('Popover - Behavior', () => {
     expect(getComputedStyle(content as Element).top).toBe('90px');
   });
 
-  it('closes nested popover without closing parent dialog on Escape', async () => {
+  it('should closes nested popover without closing parent dialog on Escape', async () => {
     container = mount(
       <Dialog defaultOpen>
         <DialogTrigger>Open dialog</DialogTrigger>

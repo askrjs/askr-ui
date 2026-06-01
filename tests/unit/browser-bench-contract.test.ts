@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 
 describe('Browser bench contract', () => {
-  it('keeps the tier4 browser benchmark files aligned with the browser bench contract', () => {
+  it('should keeps the tier4 browser benchmark files aligned with the browser bench contract', () => {
     const tier3BrowserBenchFiles = readdirSync(
       join(process.cwd(), 'benches', 'tier3'),
       {

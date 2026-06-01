@@ -19,7 +19,7 @@ describe('Select - Behavior', () => {
     unmount(container);
   });
 
-  it('wires the hidden input and trigger expansion state', async () => {
+  it('should wires the hidden input and trigger expansion state', async () => {
     container = mount(
       <Select name="framework" defaultValue="askr">
         <SelectTrigger>
@@ -52,7 +52,7 @@ describe('Select - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
   });
 
-  it('applies root disabled semantics to the trigger and hidden input', async () => {
+  it('should applies root disabled semantics to the trigger and hidden input', async () => {
     container = mount(
       <Select disabled name="framework" defaultValue="askr">
         <SelectTrigger>
@@ -84,7 +84,7 @@ describe('Select - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('uses explicit item text values for trigger rendering', () => {
+  it('should uses explicit item text values for trigger rendering', () => {
     container = mount(
       <Select defaultValue="askr">
         <SelectTrigger>
@@ -111,7 +111,7 @@ describe('Select - Behavior', () => {
     expect(trigger.textContent).toBe('Askr');
   });
 
-  it('labels select groups through nested SelectLabel parts', async () => {
+  it('should labels select groups through nested SelectLabel parts', async () => {
     container = mount(
       <Select defaultOpen defaultValue="askr">
         <SelectTrigger aria-label="Framework">
@@ -143,7 +143,7 @@ describe('Select - Behavior', () => {
     expect(group.getAttribute('aria-labelledby')).toBe(label.id);
   });
 
-  it('updates hidden input and closes content when an enabled item is selected', async () => {
+  it('should updates hidden input and closes content when an enabled item is selected', async () => {
     container = mount(
       <Select name="framework" defaultValue="askr">
         <SelectTrigger>
@@ -183,7 +183,7 @@ describe('Select - Behavior', () => {
     expect(nextTrigger.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('does not change value when clicking a disabled item', async () => {
+  it('should does not change value when clicking a disabled item', async () => {
     container = mount(
       <Select name="framework" defaultValue="askr">
         <SelectTrigger>
@@ -225,7 +225,7 @@ describe('Select - Behavior', () => {
     expect(nextTrigger.textContent).toContain('Askr');
   });
 
-  it('keeps all disabled select items unfocusable when navigation is attempted', async () => {
+  it('should keeps all disabled select items unfocusable when navigation is attempted', async () => {
     container = mount(
       <Select defaultOpen defaultValue="askr">
         <SelectTrigger>

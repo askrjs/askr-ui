@@ -14,7 +14,7 @@ describe('Dialog - Behavior', () => {
     unmount(container);
   });
 
-  it('toggles trigger expansion state when activated', async () => {
+  it('should toggles trigger expansion state when activated', async () => {
     container = mount(
       <Dialog>
         <DialogTrigger>Open dialog</DialogTrigger>
@@ -42,7 +42,7 @@ describe('Dialog - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('omits generated title and description references when those parts are absent', async () => {
+  it('should omits generated title and description references when those parts are absent', async () => {
     container = mount(
       <Dialog defaultOpen>
         <DialogTrigger>Open dialog</DialogTrigger>
@@ -63,7 +63,7 @@ describe('Dialog - Behavior', () => {
     expect(content.getAttribute('aria-describedby')).toBeNull();
   });
 
-  it('keeps dialog open when DialogContent onDismiss is provided and handles Escape', async () => {
+  it('should keeps dialog open when DialogContent onDismiss is provided and handles Escape', async () => {
     const onDismiss = vi.fn();
 
     container = mount(

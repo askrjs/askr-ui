@@ -14,7 +14,7 @@ const items: Item[] = [
 ];
 
 describe('VirtualList - Accessibility', () => {
-  it('has no automated axe violations for a semantic virtual list', async () => {
+  it('should has no automated axe violations for a semantic virtual list', async () => {
     await expectNoAxeViolations(
       <VirtualList
         aria-label="Items"

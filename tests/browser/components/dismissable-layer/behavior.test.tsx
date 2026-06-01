@@ -9,7 +9,7 @@ describe('DismissableLayer - Behavior', () => {
     unmount(container);
   });
 
-  it('dismisses on Escape for the mounted layer', () => {
+  it('should dismisses on Escape for the mounted layer', () => {
     const onDismiss = vi.fn();
 
     container = mount(
@@ -26,7 +26,7 @@ describe('DismissableLayer - Behavior', () => {
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
-  it('dismisses only the top layer when layers are stacked', () => {
+  it('should dismisses only the top layer when layers are stacked', () => {
     const outerDismiss = vi.fn();
     const innerDismiss = vi.fn();
 
@@ -53,7 +53,7 @@ describe('DismissableLayer - Behavior', () => {
     expect(outerDismiss).toHaveBeenCalledTimes(0);
   });
 
-  it('does not dismiss when layer is disabled', () => {
+  it('should does not dismiss when layer is disabled', () => {
     const onDismiss = vi.fn();
 
     container = mount(

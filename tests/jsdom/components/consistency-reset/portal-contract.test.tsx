@@ -41,7 +41,7 @@ describe('Consistency Reset - Portal Contract', () => {
     unmount(container);
   });
 
-  it('renders retained portal content at the root sink instead of inline', async () => {
+  it('should renders retained portal content at the root sink instead of inline', async () => {
     container = mount(
       <div>
         <Dialog key="dialog" defaultOpen>

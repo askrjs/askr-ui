@@ -41,7 +41,7 @@ describe('VirtualTable - Behavior', () => {
     container = undefined;
   });
 
-  it('renders a sticky-headed virtual table and supports keyboard selection', async () => {
+  it('should renders a sticky-headed virtual table and supports keyboard selection', async () => {
     const onRowClick = vi.fn();
     let api: VirtualTableApi<Row> | null = null;
 
@@ -102,7 +102,7 @@ describe('VirtualTable - Behavior', () => {
     expect(container.querySelector('[data-row-key="row-9"]')).toBeTruthy();
   });
 
-  it('supports asChild composition on the wrapper host', async () => {
+  it('should supports asChild composition on the wrapper host', async () => {
     container = mount(
       <VirtualTable
         asChild

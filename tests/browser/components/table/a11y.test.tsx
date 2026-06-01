@@ -11,7 +11,7 @@ import {
 } from '../../../../src/components/table';
 
 describe('Table - Accessibility', () => {
-  it('has no automated axe violations for a semantic table', async () => {
+  it('should has no automated axe violations for a semantic table', async () => {
     await expectNoAxeViolations(
       <Table aria-label="Users">
         <TableCaption>Users</TableCaption>

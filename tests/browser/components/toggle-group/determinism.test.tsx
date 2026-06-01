@@ -7,7 +7,7 @@ import { expectDeterministicRender } from '../../determinism';
 import { mount, unmount } from '../../test-utils';
 
 describe('ToggleGroup - Determinism', () => {
-  it('renders deterministic single and multiple toggle group markup', () => {
+  it('should renders deterministic single and multiple toggle group markup', () => {
     expectDeterministicRender(() => (
       <ToggleGroup defaultValue="left">
         <ToggleGroupItem value="left">Left</ToggleGroupItem>
@@ -22,7 +22,7 @@ describe('ToggleGroup - Determinism', () => {
     ));
   });
 
-  it('renders deterministic asChild item markup', () => {
+  it('should renders deterministic asChild item markup', () => {
     expectDeterministicRender(() => (
       <ToggleGroup defaultValue="left">
         <ToggleGroupItem asChild value="left">
@@ -32,7 +32,7 @@ describe('ToggleGroup - Determinism', () => {
     ));
   });
 
-  it('keeps selection props-driven across remounts', () => {
+  it('should keeps selection props-driven across remounts', () => {
     let container = mount(
       <ToggleGroup defaultValue="left">
         <ToggleGroupItem value="left">Left</ToggleGroupItem>
@@ -74,7 +74,7 @@ describe('ToggleGroup - Determinism', () => {
     }
   });
 
-  it('does not schedule timers during render', () => {
+  it('should does not schedule timers during render', () => {
     const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
     const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
     const container = mount(

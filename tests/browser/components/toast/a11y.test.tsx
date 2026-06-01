@@ -10,7 +10,7 @@ import {
 import { expectNoAxeViolations } from '../../accessibility';
 
 describe('Toast - Accessibility', () => {
-  it('has no toast accessibility regressions', async () => {
+  it('should has no toast accessibility regressions', async () => {
     await expectNoAxeViolations(
       <ToastProvider>
         <ToastViewport />

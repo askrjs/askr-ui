@@ -17,7 +17,7 @@ function expectExportTarget(
 }
 
 describe('Package exports', () => {
-  it('publishes the curated root and direct component entrypoints only', () => {
+  it('should publishes the curated root and direct component entrypoints only', () => {
     const packageJson = JSON.parse(
       readFileSync(join(process.cwd(), 'package.json'), 'utf8')
     ) as { exports: Record<string, unknown> };

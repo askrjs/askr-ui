@@ -10,7 +10,7 @@ describe('Checkbox - Behavior', () => {
     container = undefined;
   });
 
-  it('renders a native checkbox input by default', () => {
+  it('should renders a native checkbox input by default', () => {
     container = mount(<Checkbox />);
     const input = container.querySelector(
       'input[type="checkbox"]'
@@ -22,7 +22,7 @@ describe('Checkbox - Behavior', () => {
     expect(input?.getAttribute('aria-checked')).toBe('false');
   });
 
-  it('invokes onPress exactly once per native click', () => {
+  it('should invokes onPress exactly once per native click', () => {
     const onPress = vi.fn();
 
     container = mount(<Checkbox onPress={onPress} />);
@@ -33,7 +33,7 @@ describe('Checkbox - Behavior', () => {
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it('emits uncontrolled state changes through onCheckedChange', async () => {
+  it('should emits uncontrolled state changes through onCheckedChange', async () => {
     const onCheckedChange = vi.fn();
 
     container = mount(
@@ -51,7 +51,7 @@ describe('Checkbox - Behavior', () => {
     expect(input?.getAttribute('data-state')).toBe('checked');
   });
 
-  it('calls onCheckedChange in controlled mode', () => {
+  it('should calls onCheckedChange in controlled mode', () => {
     const onCheckedChange = vi.fn();
 
     container = mount(
@@ -64,7 +64,7 @@ describe('Checkbox - Behavior', () => {
     expect(onCheckedChange).toHaveBeenCalledWith(true);
   });
 
-  it('blocks native interaction when disabled', () => {
+  it('should blocks native interaction when disabled', () => {
     const onPress = vi.fn();
 
     container = mount(<Checkbox disabled onPress={onPress} />);
@@ -78,7 +78,7 @@ describe('Checkbox - Behavior', () => {
     expect(onPress).not.toHaveBeenCalled();
   });
 
-  it('applies checked and indeterminate state hooks to the native host', () => {
+  it('should applies checked and indeterminate state hooks to the native host', () => {
     container = mount(<Checkbox checked indeterminate />);
     const input = container.querySelector('input') as HTMLInputElement | null;
 
@@ -87,7 +87,7 @@ describe('Checkbox - Behavior', () => {
     expect(input?.getAttribute('data-state')).toBe('indeterminate');
   });
 
-  it('forwards refs to the asChild host', () => {
+  it('should forwards refs to the asChild host', () => {
     let refNode: HTMLElement | null = null;
 
     container = mount(

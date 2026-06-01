@@ -10,7 +10,7 @@ describe('FocusScope - Behavior', () => {
     document.body.innerHTML = '';
   });
 
-  it('supports manual focus inside the scope without breaking the focus target', () => {
+  it('should supports manual focus inside the scope without breaking the focus target', () => {
     const trigger = document.createElement('button');
     trigger.textContent = 'Before';
     document.body.appendChild(trigger);
@@ -30,7 +30,7 @@ describe('FocusScope - Behavior', () => {
     expect(document.activeElement).not.toBe(trigger);
   });
 
-  it('wraps keyboard focus when loop is enabled', () => {
+  it('should wraps keyboard focus when loop is enabled', () => {
     container = mount(
       <FocusScope loop>
         <button type="button">First</button>
@@ -52,7 +52,7 @@ describe('FocusScope - Behavior', () => {
     expect(document.activeElement).toBe(first);
   });
 
-  it('keeps focus trapped within scope on focus-out when trapped is enabled', () => {
+  it('should keeps focus trapped within scope on focus-out when trapped is enabled', () => {
     const outside = document.createElement('button');
     outside.textContent = 'Outside';
     document.body.appendChild(outside);

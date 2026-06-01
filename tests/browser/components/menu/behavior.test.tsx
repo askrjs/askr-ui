@@ -15,7 +15,7 @@ describe('Menu - Behavior', () => {
     unmount(container);
   });
 
-  it('renders menu semantics with a single tab stop', () => {
+  it('should renders menu semantics with a single tab stop', () => {
     container = mount(
       <Menu>
         <MenuContent>
@@ -33,7 +33,7 @@ describe('Menu - Behavior', () => {
     expect(items[1].getAttribute('tabindex')).toBe('-1');
   });
 
-  it('supports nested menu item composition without direct child injection', () => {
+  it('should supports nested menu item composition without direct child injection', () => {
     container = mount(
       <Menu>
         <MenuContent>

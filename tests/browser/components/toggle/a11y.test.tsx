@@ -5,11 +5,11 @@ import { mount, unmount } from '../../test-utils';
 import { TOGGLE_A11Y_CONTRACT } from '../../../../src/components/toggle/toggle.a11y';
 
 describe('Toggle - Accessibility', () => {
-  it('has no automated axe violations for the native toggle path', async () => {
+  it('should has no automated axe violations for the native toggle path', async () => {
     await expectNoAxeViolations(<Toggle>Mute</Toggle>);
   });
 
-  it('has no automated axe violations for labelled asChild composition', async () => {
+  it('should has no automated axe violations for labelled asChild composition', async () => {
     await expectNoAxeViolations(
       <Toggle asChild>
         <span>Mute</span>
@@ -17,7 +17,7 @@ describe('Toggle - Accessibility', () => {
     );
   });
 
-  it('uses implicit native button semantics for the default host', () => {
+  it('should uses implicit native button semantics for the default host', () => {
     const container = mount(<Toggle pressed={false}>Mute</Toggle>);
 
     try {
@@ -30,7 +30,7 @@ describe('Toggle - Accessibility', () => {
     }
   });
 
-  it('uses button semantics when composed with asChild', () => {
+  it('should uses button semantics when composed with asChild', () => {
     const container = mount(
       <Toggle asChild pressed>
         <span>Mute</span>
@@ -49,7 +49,7 @@ describe('Toggle - Accessibility', () => {
     }
   });
 
-  it('uses native disabled semantics for the default host', () => {
+  it('should uses native disabled semantics for the default host', () => {
     const container = mount(<Toggle disabled>Mute</Toggle>);
 
     try {
@@ -62,7 +62,7 @@ describe('Toggle - Accessibility', () => {
     }
   });
 
-  it('uses aria-disabled and removes disabled asChild hosts from tab order', () => {
+  it('should uses aria-disabled and removes disabled asChild hosts from tab order', () => {
     const container = mount(
       <Toggle asChild disabled>
         <span>Mute</span>
@@ -79,7 +79,7 @@ describe('Toggle - Accessibility', () => {
     }
   });
 
-  it('preserves accessible naming props from the host', () => {
+  it('should preserves accessible naming props from the host', () => {
     const container = mount(
       <div>
         <span id="toggle-label">Mute audio</span>
@@ -96,7 +96,7 @@ describe('Toggle - Accessibility', () => {
     }
   });
 
-  it('matches the documented toggle accessibility contract', () => {
+  it('should matches the documented toggle accessibility contract', () => {
     expect(TOGGLE_A11Y_CONTRACT.ROLE).toBe('button');
     expect(TOGGLE_A11Y_CONTRACT.KEYBOARD_ACTIVATION).toEqual([
       'Enter',

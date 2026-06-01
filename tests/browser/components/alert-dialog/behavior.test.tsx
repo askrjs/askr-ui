@@ -14,7 +14,7 @@ describe('AlertDialog - Behavior', () => {
     unmount(container);
   });
 
-  it('keeps trigger expansion state open after re-activation', async () => {
+  it('should keeps trigger expansion state open after re-activation', async () => {
     container = mount(
       <AlertDialog>
         <AlertDialogTrigger>Open alert</AlertDialogTrigger>
@@ -41,7 +41,7 @@ describe('AlertDialog - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
   });
 
-  it('forwards dismiss callbacks from alert dialog content', async () => {
+  it('should forwards dismiss callbacks from alert dialog content', async () => {
     const onDismiss = vi.fn();
 
     container = mount(

@@ -15,7 +15,7 @@ describe('Dropdown - Behavior', () => {
     unmount(container);
   });
 
-  it('toggles trigger expansion state when activated', async () => {
+  it('should toggles trigger expansion state when activated', async () => {
     container = mount(
       <Dropdown>
         <DropdownTrigger>Open dropdown</DropdownTrigger>
@@ -44,7 +44,7 @@ describe('Dropdown - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('supports nested dropdown item composition without direct child injection', async () => {
+  it('should supports nested dropdown item composition without direct child injection', async () => {
     container = mount(
       <Dropdown defaultOpen>
         <DropdownTrigger>Open dropdown</DropdownTrigger>
@@ -73,7 +73,7 @@ describe('Dropdown - Behavior', () => {
     expect(items[1]?.getAttribute('tabindex')).toBe('-1');
   });
 
-  it('keeps dropdown open when all items are disabled and arrow navigation is attempted', async () => {
+  it('should keeps dropdown open when all items are disabled and arrow navigation is attempted', async () => {
     container = mount(
       <Dropdown defaultOpen>
         <DropdownTrigger>Open dropdown</DropdownTrigger>

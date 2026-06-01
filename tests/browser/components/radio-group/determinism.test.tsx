@@ -7,7 +7,7 @@ import { expectDeterministicRender } from '../../determinism';
 import { mount, unmount } from '../../test-utils';
 
 describe('RadioGroup - Determinism', () => {
-  it('renders deterministic radio group markup for named and unnamed groups', () => {
+  it('should renders deterministic radio group markup for named and unnamed groups', () => {
     expectDeterministicRender(() => (
       <RadioGroup defaultValue="m" name="size">
         <RadioGroupItem value="s">Small</RadioGroupItem>
@@ -22,7 +22,7 @@ describe('RadioGroup - Determinism', () => {
     ));
   });
 
-  it('renders deterministic asChild radio item markup', () => {
+  it('should renders deterministic asChild radio item markup', () => {
     expectDeterministicRender(() => (
       <RadioGroup defaultValue="left">
         <RadioGroupItem asChild value="left">
@@ -32,7 +32,7 @@ describe('RadioGroup - Determinism', () => {
     ));
   });
 
-  it('keeps checked state props-driven across remounts', () => {
+  it('should keeps checked state props-driven across remounts', () => {
     let container = mount(
       <RadioGroup defaultValue="small" name="size">
         <RadioGroupItem value="small">Small</RadioGroupItem>
@@ -80,7 +80,7 @@ describe('RadioGroup - Determinism', () => {
     }
   });
 
-  it('does not schedule timers during render', () => {
+  it('should does not schedule timers during render', () => {
     const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
     const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
     const container = mount(

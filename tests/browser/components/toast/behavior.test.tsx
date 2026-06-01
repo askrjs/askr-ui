@@ -44,7 +44,7 @@ describe('Toast - Behavior', () => {
     unmount(container);
   });
 
-  it('renders toast content inside the viewport in declaration order', async () => {
+  it('should renders toast content inside the viewport in declaration order', async () => {
     container = mount(
       <ToastProvider>
         <ToastViewport />
@@ -65,7 +65,7 @@ describe('Toast - Behavior', () => {
     expect(titles).toEqual(['First', 'Second']);
   });
 
-  it('dismisses toasts on their configured timer', async () => {
+  it('should dismisses toasts on their configured timer', async () => {
     vi.useFakeTimers();
     container = mount(
       <ToastProvider duration={50}>
@@ -86,7 +86,7 @@ describe('Toast - Behavior', () => {
     expect(container.querySelector('[data-toast="true"]')).toBeNull();
   });
 
-  it('dismisses multiple open toasts when timers expire at the same time', async () => {
+  it('should dismisses multiple open toasts when timers expire at the same time', async () => {
     vi.useFakeTimers();
     container = mount(
       <ToastProvider duration={40}>
@@ -109,7 +109,7 @@ describe('Toast - Behavior', () => {
     expect(container.querySelectorAll('[data-toast="true"]').length).toBe(0);
   });
 
-  it('restores focus after closing a controlled toast', async () => {
+  it('should restores focus after closing a controlled toast', async () => {
     container = mount(<ControlledToastFixture />);
 
     const launcher = container.querySelector('#launcher') as HTMLButtonElement;
@@ -129,7 +129,7 @@ describe('Toast - Behavior', () => {
     expect(document.activeElement).toBe(launcher);
   });
 
-  it('dismisses on escape and action press', async () => {
+  it('should dismisses on escape and action press', async () => {
     container = mount(
       <ToastProvider>
         <ToastViewport />
