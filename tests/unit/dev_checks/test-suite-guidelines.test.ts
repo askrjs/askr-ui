@@ -1,11 +1,11 @@
 // @vitest-environment node
 
-import { describe, expect, it } from "vite-plus/test";
-import fs from "node:fs";
-import path from "node:path";
+import { describe, expect, it } from 'vite-plus/test';
+import fs from 'node:fs';
+import path from 'node:path';
 
 function readAllTestFiles(dir: string): string[] {
-  if (dir.includes(path.join("tests", "unit", "dev_checks"))) return [];
+  if (dir.includes(path.join('tests', 'unit', 'dev_checks'))) return [];
 
   const results: string[] = [];
   const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -46,7 +46,8 @@ describe('Test suite guidelines', () => {
             line: index + 1,
             snippet: line.trim(),
             rule: 'TODO comments',
-            message: 'TODO comments should be converted into issues or concrete tests',
+            message:
+              'TODO comments should be converted into issues or concrete tests',
           });
         }
         if (/\b(it|test)\.todo\b/.test(line)) {
@@ -82,13 +83,16 @@ describe('Test suite guidelines', () => {
             line: index + 1,
             snippet: line.trim(),
             rule: 'un-awaited rejects',
-            message: 'Use await expect(...).rejects to ensure assertion is awaited',
+            message:
+              'Use await expect(...).rejects to ensure assertion is awaited',
           });
         }
       }
     }
 
-    for (const file of files.filter((candidate) => /\.test\.(ts|tsx)$/.test(candidate))) {
+    for (const file of files.filter((candidate) =>
+      /\.test\.(ts|tsx)$/.test(candidate)
+    )) {
       const content = fs.readFileSync(file, 'utf-8');
       const regex = /\b(it|test)\s*\(\s*(['"`])([^'"\n\r]+)\2/gi;
       let match: RegExpExecArray | null;
@@ -108,7 +112,9 @@ describe('Test suite guidelines', () => {
       }
     }
 
-    for (const file of files.filter((candidate) => /\.test\.(ts|tsx)$/.test(candidate))) {
+    for (const file of files.filter((candidate) =>
+      /\.test\.(ts|tsx)$/.test(candidate)
+    )) {
       const base = path.basename(file);
       if (!/^[a-z0-9_-]+\.test\.(ts|tsx)$/.test(base)) {
         failures.push({
@@ -116,7 +122,8 @@ describe('Test suite guidelines', () => {
           line: 1,
           snippet: path.relative(process.cwd(), file),
           rule: 'test filename convention',
-          message: 'Test filenames must be lowercase and end with .test.ts or .test.tsx',
+          message:
+            'Test filenames must be lowercase and end with .test.ts or .test.tsx',
         });
       }
     }
@@ -125,7 +132,7 @@ describe('Test suite guidelines', () => {
       const summary = failures
         .map(
           (failure) =>
-            `${path.relative(process.cwd(), failure.file)}:${failure.line} [${failure.rule}] ${failure.snippet}  -- ${failure.message}`,
+            `${path.relative(process.cwd(), failure.file)}:${failure.line} [${failure.rule}] ${failure.snippet}  -- ${failure.message}`
         )
         .join('\n');
       throw new Error('Test suite guideline violations found:\n' + summary);
