@@ -46,7 +46,7 @@ export function Menu(props: MenuProps) {
   return (
     <MenuRootContext.Scope value={rootContext}>
       <MenuRenderContext.Scope value={renderContext}>
-        {children}
+        {children as JSX.Element}
       </MenuRenderContext.Scope>
     </MenuRootContext.Scope>
   );

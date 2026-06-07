@@ -54,7 +54,7 @@ export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
 
   return (
     <ScrollAreaRootContext.Scope value={rootContext}>
-      {children}
+      {children as JSX.Element}
     </ScrollAreaRootContext.Scope>
   );
 }
