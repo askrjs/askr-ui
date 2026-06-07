@@ -2,8 +2,29 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { defineConfig } from 'vite-plus';
+import packageJson from './package.json' with { type: 'json' };
 
 const srcRoot = fileURLToPath(new URL('./src', import.meta.url));
+
+function createPackageEntries() {
+  return Object.fromEntries(
+    Object.keys(packageJson.exports)
+      .filter((subpath) => subpath !== './package.json')
+      .map((subpath) => {
+        if (subpath === '.') {
+          return ['index', resolve(srcRoot, 'index.ts')];
+        }
+
+        const componentName = subpath.slice(2);
+        return [
+          `components/${componentName}/index`,
+          resolve(srcRoot, 'components', componentName, 'index.ts'),
+        ];
+      })
+  );
+}
+
+const packageEntries = createPackageEntries();
 
 export default defineConfig({
   fmt: {
@@ -21,9 +42,7 @@ export default defineConfig({
     preserveSymlinks: true,
   },
   pack: {
-    entry: {
-      index: resolve(srcRoot, 'index.ts'),
-    },
+    entry: packageEntries,
     format: ['esm', 'cjs'],
     outDir: 'dist',
     platform: 'neutral',
@@ -40,9 +59,7 @@ export default defineConfig({
     minify: false,
     sourcemap: true,
     lib: {
-      entry: {
-        index: resolve(srcRoot, 'index.ts'),
-      },
+      entry: packageEntries,
     },
     rollupOptions: {
       external: (id) => /^@askrjs\/askr(?:\/.*)?$/.test(id),

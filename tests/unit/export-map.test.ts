@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
@@ -8,6 +9,10 @@ type ExportTarget = {
   require: string;
 };
 
+type PackageJson = {
+  exports: Record<string, ExportTarget | string>;
+};
+
 function expectExportTarget(
   actual: unknown,
   expected: ExportTarget,
@@ -16,11 +21,15 @@ function expectExportTarget(
   expect(actual, `${label} is missing`).toEqual(expected);
 }
 
+function readPackageJson(): PackageJson {
+  return JSON.parse(
+    readFileSync(join(process.cwd(), 'package.json'), 'utf8')
+  ) as PackageJson;
+}
+
 describe('Package exports', () => {
   it('should publishes the curated root and direct component entrypoints only', () => {
-    const packageJson = JSON.parse(
-      readFileSync(join(process.cwd(), 'package.json'), 'utf8')
-    ) as { exports: Record<string, unknown> };
+    const packageJson = readPackageJson();
 
     expectExportTarget(
       packageJson.exports['.'],
@@ -85,5 +94,59 @@ describe('Package exports', () => {
       false
     );
     expect(exportKeys.some((key) => key.startsWith('./_internal'))).toBe(false);
+  });
+
+  it('should emit ESM runtime exports for every public subpath entry', async () => {
+    const packageJson = readPackageJson();
+    const targets = Object.entries(packageJson.exports)
+      .filter(
+        (entry): entry is [string, ExportTarget] =>
+          entry[0] !== './package.json' && typeof entry[1] !== 'string'
+      )
+      .map(([subpath, target]) => ({
+        subpath,
+        esmPath: join(process.cwd(), target.import),
+      }));
+
+    const output = execFileSync(
+      process.execPath,
+      [
+        '-e',
+        `
+const { pathToFileURL } = require('node:url');
+const targets = JSON.parse(process.argv[1]);
+
+(async () => {
+  const results = [];
+  for (const target of targets) {
+    const esmModule = await import(pathToFileURL(target.esmPath).href);
+    const esmExports = Object.keys(esmModule).filter((key) => key !== 'default').sort();
+
+    results.push({
+      subpath: target.subpath,
+      esmExports,
+    });
+  }
+
+  process.stdout.write(JSON.stringify(results));
+})().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
+        `,
+        JSON.stringify(targets),
+      ],
+      { cwd: process.cwd(), encoding: 'utf8' }
+    );
+    const results = JSON.parse(output) as Array<{
+      subpath: string;
+      esmExports: string[];
+    }>;
+
+    for (const result of results) {
+      expect(result.esmExports, `${result.subpath} ESM exports`).not.toHaveLength(
+        0
+      );
+    }
   });
 });

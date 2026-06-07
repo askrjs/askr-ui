@@ -272,30 +272,36 @@ function getVirtualTableEntry<Row>(
       return;
     }
 
-    // Read the live container height once on mount so the initial render can
-    // clamp the body window before the first scroll interaction.
-    const nextViewportHeight =
-      node.clientHeight || Number.parseFloat(node.style.height || '') || 0;
-    viewportHeightState.set(nextViewportHeight);
-    scrollTopState.set(node.scrollTop);
+    queueMicrotask(() => {
+      if (entry.wrapperNode !== node) {
+        return;
+      }
 
-    node.addEventListener('scroll', handleScroll, { passive: true });
+      // Read the live container height once on mount so the initial render can
+      // clamp the body window before the first scroll interaction.
+      const nextViewportHeight =
+        node.clientHeight || Number.parseFloat(node.style.height || '') || 0;
+      viewportHeightState.set(nextViewportHeight);
+      scrollTopState.set(node.scrollTop);
 
-    if (typeof ResizeObserver !== 'undefined') {
-      entry.resizeObserver = new ResizeObserver(() => {
-        handleResize();
-      });
-      entry.resizeObserver.observe(node);
-    } else {
-      entry.windowResizeHandler = handleResize;
-      window.addEventListener('resize', handleResize);
-    }
+      node.addEventListener('scroll', handleScroll, { passive: true });
 
-    handleScroll();
-    handleResize();
-    schedulePendingScrollTop();
+      if (typeof ResizeObserver !== 'undefined') {
+        entry.resizeObserver = new ResizeObserver(() => {
+          handleResize();
+        });
+        entry.resizeObserver.observe(node);
+      } else {
+        entry.windowResizeHandler = handleResize;
+        window.addEventListener('resize', handleResize);
+      }
 
-    setRefValue(entry.apiRef, entry.api as VirtualTableApi<Row>);
+      handleScroll();
+      handleResize();
+      schedulePendingScrollTop();
+
+      setRefValue(entry.apiRef, entry.api as VirtualTableApi<Row>);
+    });
   };
 
   const tableRef = (node: HTMLTableElement | null) => {

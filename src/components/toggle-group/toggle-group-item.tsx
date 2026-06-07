@@ -54,16 +54,21 @@ export function ToggleGroupItem(
       focusSelectedCollectionItem(collection, index);
     },
   });
-  const pressed = isDisclosureValueOpen(root.type, root.value, value);
+  const currentValue = root.getValue();
+  const pressed = isDisclosureValueOpen(root.type, currentValue, value);
   const interactionProps = pressable({
     disabled: isDisabled,
     onPress: (event) => {
       onPress?.(event);
 
       if (!event.defaultPrevented) {
-        root.setValue(
-          toggleDisclosureValue(root.type, root.value, value, true)
+        const nextValue = toggleDisclosureValue(
+          root.type,
+          root.getValue(),
+          value,
+          true
         );
+        root.setValue(nextValue);
         root.setCurrentIndex(itemIndex);
       }
     },
