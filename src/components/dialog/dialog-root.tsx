@@ -1,4 +1,3 @@
-import { state } from '@askrjs/askr';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import {
   clearOverlayPosition,
@@ -17,6 +16,28 @@ import type { DialogProps } from './dialog.types';
 
 function scheduleDialogPortalSync(callback: () => void) {
   queueMicrotask(callback);
+}
+
+function syncDialogLabelAttributes(
+  content: HTMLElement | null,
+  titleId: string,
+  titleNode: HTMLElement | null | undefined,
+  descriptionId: string,
+  descriptionNode: HTMLElement | null | undefined
+) {
+  if (!content) return;
+
+  if (titleNode?.isConnected) {
+    content.setAttribute('aria-labelledby', titleId);
+  } else if (content.getAttribute('aria-labelledby') === titleId) {
+    content.removeAttribute('aria-labelledby');
+  }
+
+  if (descriptionNode?.isConnected) {
+    content.setAttribute('aria-describedby', descriptionId);
+  } else if (content.getAttribute('aria-describedby') === descriptionId) {
+    content.removeAttribute('aria-describedby');
+  }
 }
 
 export function Dialog(props: DialogProps) {
@@ -40,9 +61,20 @@ export function Dialog(props: DialogProps) {
   const portal = getPersistentPortal(dialogId);
   const overlayNodes = getOverlayNodes(dialogId);
   const position: DialogPositionOptions = resolveDialogPositionOptions();
-  const hasTitleState = state(false);
-  const hasDescriptionState = state(false);
   const PortalHost = portal;
+  const syncLabelAttributes = () => {
+    syncDialogLabelAttributes(
+      overlayNodes.content,
+      titleId,
+      overlayNodes.title,
+      descriptionId,
+      overlayNodes.description
+    );
+  };
+  const syncLabelAttributesSoon = () => {
+    syncLabelAttributes();
+    scheduleDialogPortalSync(syncLabelAttributes);
+  };
 
   const rootContext: DialogRootContextValue = {
     dialogId,
@@ -65,24 +97,23 @@ export function Dialog(props: DialogProps) {
     contentId,
     titleId,
     descriptionId,
-    hasTitle: hasTitleState(),
-    hasDescription: hasDescriptionState(),
+    hasTitle: Boolean(overlayNodes.title?.isConnected),
+    hasDescription: Boolean(overlayNodes.description?.isConnected),
     portal,
     setTitleNode: (node: HTMLElement | null) => {
-      if (node && !hasTitleState()) {
-        hasTitleState.set(true);
-      }
+      overlayNodes.title = node;
+      syncLabelAttributesSoon();
     },
     setDescriptionNode: (node: HTMLElement | null) => {
-      if (node && !hasDescriptionState()) {
-        hasDescriptionState.set(true);
-      }
+      overlayNodes.description = node;
+      syncLabelAttributesSoon();
     },
     setTriggerNode: (node: HTMLElement | null) => {
       overlayNodes.trigger = node;
     },
     setContentNode: (node: HTMLElement | null) => {
       overlayNodes.content = node;
+      syncLabelAttributesSoon();
     },
     syncPosition: () => {
       if (overlayNodes.content) {
