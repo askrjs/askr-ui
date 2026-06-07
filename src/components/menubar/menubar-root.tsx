@@ -76,11 +76,15 @@ export function Menubar(props: MenubarProps) {
     <MenubarRootContext.Scope value={rootContext}>
       <MenubarRootRenderContext.Scope value={runtimeRenderContext}>
         <div {...finalProps}>{children}</div>
-        {(portalIds.map((portalId) => {
-          const PortalHost = getPersistentPortal(portalId);
+        {
+          portalIds.map((portalId) => {
+            const PortalHost = getPersistentPortal(portalId);
 
-          return <PortalHost key={`${portalId}-${rootContext.portalEpoch}`} />;
-        }) as unknown) as JSX.Element}
+            return (
+              <PortalHost key={`${portalId}-${rootContext.portalEpoch}`} />
+            );
+          }) as unknown as JSX.Element
+        }
       </MenubarRootRenderContext.Scope>
     </MenubarRootContext.Scope>
   );

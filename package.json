@@ -227,7 +227,7 @@
     "test:checks": "vp test run -c vitest.test.checks.config.ts"
   },
   "devDependencies": {
-    "@askrjs/askr": "^0.0.41",
+    "@askrjs/askr": ">=0.0.30 <0.1.0",
     "@askrjs/vite": ">=0.0.2 <0.1.0",
     "@types/node": "^25.9.2",
     "axe-core": "^4.12.0",

@@ -144,9 +144,10 @@ const targets = JSON.parse(process.argv[1]);
     }>;
 
     for (const result of results) {
-      expect(result.esmExports, `${result.subpath} ESM exports`).not.toHaveLength(
-        0
-      );
+      expect(
+        result.esmExports,
+        `${result.subpath} ESM exports`
+      ).not.toHaveLength(0);
     }
   });
 });

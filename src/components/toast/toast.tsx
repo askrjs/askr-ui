@@ -142,7 +142,8 @@ function ToastRegistrationView(props: {
     onChange: onOpenChange,
   });
   const hasTitleState = state(
-    collectJsxElements(children, (element) => element.type === ToastTitle).length > 0
+    collectJsxElements(children, (element) => element.type === ToastTitle)
+      .length > 0
   );
   const hasDescriptionState = state(
     collectJsxElements(children, (element) => element.type === ToastDescription)
