@@ -74,7 +74,7 @@ export function Collapsible(props: CollapsibleProps) {
 
   return (
     <CollapsibleRootContext.Scope value={rootContext}>
-      {children}
+      {children as JSX.Element}
     </CollapsibleRootContext.Scope>
   );
 }

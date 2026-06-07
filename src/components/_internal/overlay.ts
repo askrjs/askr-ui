@@ -51,7 +51,7 @@ type OverlayPositionOptions = {
 type OverlayPositionDeclarations = Record<string, number | string | undefined>;
 
 function createOverlayPortal(): OverlayPortal {
-  return definePortal<unknown>() as OverlayPortal;
+  return definePortal() as OverlayPortal;
 }
 
 export function getPersistentPortal(id: string) {
