@@ -2,9 +2,18 @@ import { afterEach, describe, expect, it } from 'vite-plus/test';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogPortal,
+  DialogTitle,
   DialogTrigger,
 } from '../../../../src/components/dialog';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogPortal,
+  AlertDialogTitle,
+} from '../../../../src/components/alert-dialog';
 import {
   Popover,
   PopoverContent,
@@ -98,5 +107,40 @@ describe('Consistency Reset - Portal Contract', () => {
       text.indexOf('Tooltip body')
     );
     expect(text.indexOf('Choose one')).toBeLessThan(text.lastIndexOf('Askr'));
+  });
+
+  it('should registers dialog titles and descriptions without render-time state writes', async () => {
+    container = mount(
+      <div>
+        <Dialog key="dialog" defaultOpen>
+          <DialogPortal>
+            <DialogContent>
+              <DialogTitle>Dialog title</DialogTitle>
+              <DialogDescription>Dialog description</DialogDescription>
+            </DialogContent>
+          </DialogPortal>
+        </Dialog>
+        <AlertDialog key="alert-dialog" defaultOpen>
+          <AlertDialogPortal>
+            <AlertDialogContent>
+              <AlertDialogTitle>Alert title</AlertDialogTitle>
+              <AlertDialogDescription>Alert description</AlertDialogDescription>
+            </AlertDialogContent>
+          </AlertDialogPortal>
+        </AlertDialog>
+      </div>
+    );
+
+    await flushUpdates();
+
+    const dialogs = Array.from(
+      container.querySelectorAll('[data-slot="dialog-content"]')
+    );
+
+    expect(dialogs).toHaveLength(2);
+    for (const dialog of dialogs) {
+      expect(dialog.getAttribute('aria-labelledby')).toBeTruthy();
+      expect(dialog.getAttribute('aria-describedby')).toBeTruthy();
+    }
   });
 });

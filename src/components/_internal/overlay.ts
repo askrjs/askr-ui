@@ -28,6 +28,8 @@ export type OverlayZIndex =
 type OverlayNodes = {
   trigger: HTMLElement | null;
   content: HTMLElement | null;
+  title?: HTMLElement | null;
+  description?: HTMLElement | null;
   cleanup?: () => void;
 };
 
