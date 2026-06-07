@@ -284,31 +284,37 @@ function getVirtualListEntry<Item>(key: symbol): VirtualListEntry<Item> {
       return;
     }
 
-    // Read the live container height once on mount so the initial render can
-    // clamp the window before the first scroll interaction.
-    const nextViewportHeight =
-      node.clientHeight || Number.parseFloat(node.style.height || '') || 0;
-    setViewportHeight(nextViewportHeight);
-    setScrollTop(node.scrollTop);
-    bumpRenderVersion();
+    queueMicrotask(() => {
+      if (entry.node !== node) {
+        return;
+      }
 
-    node.addEventListener('scroll', handleScroll, { passive: true });
+      // Read the live container height once on mount so the initial render can
+      // clamp the window before the first scroll interaction.
+      const nextViewportHeight =
+        node.clientHeight || Number.parseFloat(node.style.height || '') || 0;
+      setViewportHeight(nextViewportHeight);
+      setScrollTop(node.scrollTop);
+      bumpRenderVersion();
 
-    if (typeof ResizeObserver !== 'undefined') {
-      entry.resizeObserver = new ResizeObserver(() => {
-        handleResize();
-      });
-      entry.resizeObserver.observe(node);
-    } else {
-      entry.windowResizeHandler = handleResize;
-      window.addEventListener('resize', handleResize);
-    }
+      node.addEventListener('scroll', handleScroll, { passive: true });
 
-    handleScroll();
-    handleResize();
-    schedulePendingScrollTop();
+      if (typeof ResizeObserver !== 'undefined') {
+        entry.resizeObserver = new ResizeObserver(() => {
+          handleResize();
+        });
+        entry.resizeObserver.observe(node);
+      } else {
+        entry.windowResizeHandler = handleResize;
+        window.addEventListener('resize', handleResize);
+      }
 
-    setRefValue(entry.apiRef, entry.api as VirtualListApi<Item>);
+      handleScroll();
+      handleResize();
+      schedulePendingScrollTop();
+
+      setRefValue(entry.apiRef, entry.api as VirtualListApi<Item>);
+    });
   };
 
   const api: VirtualListApi<Item> = {

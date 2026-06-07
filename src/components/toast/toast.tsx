@@ -59,7 +59,6 @@ type ToastLifecycleEntry = {
 
 const toastEntries = new Map<string, ToastLifecycleEntry>();
 const toastProviderContexts = new Map<string, ToastProviderContextValue>();
-const toastRootContexts = new Map<string, ToastRootContextValue>();
 
 function getToastEntry(toastId: string) {
   const existing = toastEntries.get(toastId);
@@ -120,30 +119,6 @@ function getToastProviderContext(
   return created;
 }
 
-function getToastRootContext(toastId: string): ToastRootContextValue {
-  const existing = toastRootContexts.get(toastId);
-
-  if (existing) {
-    return existing;
-  }
-
-  const created: ToastRootContextValue = {
-    providerId: '',
-    toastId,
-    open: false,
-    setOpen: () => {},
-    titleId: resolvePartId(toastId, 'title'),
-    descriptionId: resolvePartId(toastId, 'description'),
-    hasTitle: false,
-    hasDescription: false,
-    setHasTitle: () => {},
-    setHasDescription: () => {},
-    setNode: () => {},
-  };
-  toastRootContexts.set(toastId, created);
-  return created;
-}
-
 function ToastRegistrationView(props: {
   key?: string;
   registration: ToastRegistration;
@@ -167,35 +142,41 @@ function ToastRegistrationView(props: {
     onChange: onOpenChange,
   });
   const hasTitleState = state(
-    collectJsxElements(children, (element) => element.type === ToastTitle)
-      .length > 0
+    collectJsxElements(children, (element) => element.type === ToastTitle).length > 0
   );
   const hasDescriptionState = state(
     collectJsxElements(children, (element) => element.type === ToastDescription)
       .length > 0
   );
+  const hasTitle = hasTitleState();
+  const hasDescription = hasDescriptionState();
   const entry = getToastEntry(toastId);
   const resolvedDuration = duration ?? props.provider.duration;
-  const rootContext = getToastRootContext(toastId);
-  rootContext.providerId = props.provider.providerId;
-  rootContext.toastId = toastId;
-  rootContext.open = openState();
-  rootContext.setOpen = (nextOpen: boolean) => {
+  const setOpen = (nextOpen: boolean) => {
     openState.set(nextOpen);
   };
-  rootContext.titleId = resolvePartId(toastId, 'title');
-  rootContext.descriptionId = resolvePartId(toastId, 'description');
-  rootContext.variant = variant;
-  rootContext.hasTitle = hasTitleState();
-  rootContext.hasDescription = hasDescriptionState();
-  rootContext.setHasTitle = (present: boolean) => {
+  const setHasTitle = (present: boolean) => {
     hasTitleState.set(present);
   };
-  rootContext.setHasDescription = (present: boolean) => {
+  const setHasDescription = (present: boolean) => {
     hasDescriptionState.set(present);
   };
-  rootContext.setNode = (node: HTMLElement | null) => {
+  const setNode = (node: HTMLElement | null) => {
     entry.node = node;
+  };
+  const rootContext: ToastRootContextValue = {
+    providerId: props.provider.providerId,
+    toastId,
+    open: openState(),
+    setOpen,
+    titleId: resolvePartId(toastId, 'title'),
+    descriptionId: resolvePartId(toastId, 'description'),
+    variant,
+    hasTitle,
+    hasDescription,
+    setHasTitle,
+    setHasDescription,
+    setNode,
   };
 
   resource(
@@ -257,7 +238,6 @@ function ToastRegistrationView(props: {
           restoreToastFocus(entry);
           entry.node = null;
           toastEntries.delete(toastId);
-          toastRootContexts.delete(toastId);
         },
         { once: true }
       );
@@ -450,6 +430,11 @@ export function ToastTitle(props: ToastTitleAsChildProps): JSX.Element;
 export function ToastTitle(props: ToastTitleProps | ToastTitleAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const root = readToastRootContext();
+  const deferHasTitle = (present: boolean) => {
+    queueMicrotask(() => {
+      root.setHasTitle(present);
+    });
+  };
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
       ref as
@@ -458,7 +443,7 @@ export function ToastTitle(props: ToastTitleProps | ToastTitleAsChildProps) {
         | null
         | undefined,
       (node: HTMLElement | null) => {
-        root.setHasTitle(Boolean(node));
+        deferHasTitle(Boolean(node));
       }
     ),
     id: root.titleId,
@@ -485,6 +470,11 @@ export function ToastDescription(
 ) {
   const { asChild, children, ref, ...rest } = props;
   const root = readToastRootContext();
+  const deferHasDescription = (present: boolean) => {
+    queueMicrotask(() => {
+      root.setHasDescription(present);
+    });
+  };
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
       ref as
@@ -493,7 +483,7 @@ export function ToastDescription(
         | null
         | undefined,
       (node: HTMLElement | null) => {
-        root.setHasDescription(Boolean(node));
+        deferHasDescription(Boolean(node));
       }
     ),
     id: root.descriptionId,

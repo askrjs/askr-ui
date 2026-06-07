@@ -87,6 +87,45 @@ describe('Test suite guidelines', () => {
               'Use await expect(...).rejects to ensure assertion is awaited',
           });
         }
+        if (/expect\(\s*true\s*\)\.toBe\(\s*true\s*\)/.test(line)) {
+          failures.push({
+            file,
+            line: index + 1,
+            snippet: line.trim(),
+            rule: 'placeholder true assertion',
+            message:
+              'Replace placeholder assertions with observable behavior checks',
+          });
+        }
+        if (/\bexpect\s*\([^)]*\|\|\s*true\b/.test(line)) {
+          failures.push({
+            file,
+            line: index + 1,
+            snippet: line.trim(),
+            rule: 'truthy assertion fallback',
+            message:
+              'Assertions must not use `|| true`; assert the specific behavior instead',
+          });
+        }
+        if (
+          /behavior\.test\.(ts|tsx)$/.test(file) &&
+          /\b(setTimeout|sleep)\s*\(/.test(line)
+        ) {
+          const usesFakeTimers =
+            /\bvi\.(useFakeTimers|advanceTimers|runAllTimers|runOnlyPendingTimers)/.test(
+              content
+            );
+          if (!usesFakeTimers) {
+            failures.push({
+              file,
+              line: index + 1,
+              snippet: line.trim(),
+              rule: 'fixed sleeps in behavior tests',
+              message:
+                'Behavior tests should use deterministic flushing or fake timers instead of fixed sleeps',
+            });
+          }
+        }
       }
     }
 
@@ -139,5 +178,28 @@ describe('Test suite guidelines', () => {
     }
 
     expect(failures.length).toBe(0);
+  });
+
+  it('should keep browser tests on public component behavior', () => {
+    const browserDir = path.join(testsDir, 'browser');
+    const files = readAllTestFiles(browserDir).filter((file) =>
+      /\.test\.(ts|tsx)$/.test(file)
+    );
+    const failures: string[] = [];
+    const privateImportPattern =
+      /from\s+['"][^'"]*\/src\/components\/(?:_internal|[^'"]+\.(?:shared|types))['"]/;
+
+    for (const file of files) {
+      const relative = path.relative(rootDir, file).replace(/\\/g, '/');
+      const content = fs.readFileSync(file, 'utf-8');
+
+      if (privateImportPattern.test(content)) {
+        failures.push(
+          `${relative}: browser tests should exercise public component behavior, not private internals`
+        );
+      }
+    }
+
+    expect(failures).toEqual([]);
   });
 });

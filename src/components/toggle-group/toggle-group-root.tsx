@@ -104,6 +104,7 @@ export function ToggleGroup(props: ToggleGroupProps) {
     groupId,
     type,
     value: currentValue,
+    getValue: valueState,
     setValue,
     notifyItemsChanged,
     scheduleItemsSync,

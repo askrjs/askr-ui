@@ -57,24 +57,23 @@ export function Avatar(props: AvatarProps | AvatarAsChildProps) {
   const { asChild, children, id, ref, ...rest } = props;
   const avatarId = resolveCompoundId('avatar', id, children);
   const entry = getAvatarEntry(avatarId);
-  const statusVersion = state(0);
-
-  statusVersion();
+  const statusState = state<AvatarLoadingStatus>(entry.status);
+  const status = statusState();
 
   const finalProps = mergeProps(rest, {
     ref,
     'data-slot': 'avatar',
     'data-avatar': 'true',
-    'data-state': entry.status,
+    'data-state': status,
   });
   const context = {
     avatarId,
     get status() {
-      return entry.status;
+      return statusState();
     },
     setStatus: (status: AvatarLoadingStatus) => {
       entry.status = status;
-      statusVersion.set(statusVersion() + 1);
+      statusState.set(status);
     },
   };
 
@@ -89,7 +88,7 @@ export function Avatar(props: AvatarProps | AvatarAsChildProps) {
 
 export function AvatarImage(props: AvatarImageProps): JSX.Element {
   const { alt, onLoadingStatusChange, ref, src, ...rest } = props;
-  const { avatarId, setStatus } = readAvatarContext();
+  const { avatarId, status, setStatus } = readAvatarContext();
   const entry = getAvatarEntry(avatarId);
   const normalizedSrc = typeof src === 'string' && src ? src : null;
   const sourceChanged = entry.src !== normalizedSrc;
@@ -105,8 +104,6 @@ export function AvatarImage(props: AvatarImageProps): JSX.Element {
     }
     return null;
   }, [avatarId, normalizedSrc, sourceChanged]);
-
-  const status = entry.status;
 
   const updateStatus = (nextStatus: AvatarLoadingStatus) => {
     setStatus(nextStatus);

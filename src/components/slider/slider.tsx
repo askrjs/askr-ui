@@ -117,15 +117,15 @@ function updateSliderValueFromPointer(
   entry.thumb?.focus?.();
 }
 
-function beginSliderDrag(root: SliderRootContextValue) {
-  const entry = getSliderEntry(root.sliderId);
+function beginSliderDrag(sliderId: string) {
+  const entry = getSliderEntry(sliderId);
 
   if (entry.dragMove || entry.dragEnd) {
     return;
   }
 
   entry.dragMove = (event: PointerEvent) => {
-    updateSliderValueFromPointer(event, root);
+    updateSliderValueFromPointer(event, getSliderRootContext(sliderId));
   };
   entry.dragEnd = () => {
     if (entry.dragMove) {
@@ -141,6 +141,10 @@ function beginSliderDrag(root: SliderRootContextValue) {
   };
   window.addEventListener('pointermove', entry.dragMove);
   window.addEventListener('pointerup', entry.dragEnd);
+}
+
+function resolveLiveSliderRoot(sliderId: string) {
+  return getSliderRootContext(sliderId);
 }
 
 export function Slider(props: SliderProps) {
@@ -206,21 +210,26 @@ export function Slider(props: SliderProps) {
     'data-orientation': orientation,
     'data-disabled': disabled ? 'true' : undefined,
   });
+  const scopeChildren = (
+    <>
+      {children}
+      {name ? (
+        <input
+          type="hidden"
+          name={name}
+          value={String(normalizedValue)}
+          disabled={disabled}
+        />
+      ) : null}
+    </>
+  ) as unknown as JSX.Element;
 
   return (
-    <SliderRootContext.Scope value={rootContext}>
-      <div {...finalProps}>
-        {children}
-        {name ? (
-          <input
-            type="hidden"
-            name={name}
-            value={String(normalizedValue)}
-            disabled={disabled}
-          />
-        ) : null}
-      </div>
-    </SliderRootContext.Scope>
+    <div {...finalProps}>
+      <SliderRootContext.Scope value={rootContext}>
+        {scopeChildren}
+      </SliderRootContext.Scope>
+    </div>
   );
 }
 
@@ -252,8 +261,14 @@ export function SliderTrack(props: SliderTrackProps | SliderTrackAsChildProps) {
         return;
       }
 
-      updateSliderValueFromPointer(event, root);
-      beginSliderDrag(root);
+      const liveRoot = resolveLiveSliderRoot(root.sliderId);
+
+      if (liveRoot.disabled) {
+        return;
+      }
+
+      updateSliderValueFromPointer(event, liveRoot);
+      beginSliderDrag(liveRoot.sliderId);
     },
   });
 
@@ -321,33 +336,41 @@ export function SliderThumb(props: SliderThumbProps | SliderThumbAsChildProps) {
       }
 
       event.preventDefault();
-      beginSliderDrag(root);
+      beginSliderDrag(root.sliderId);
     },
     onKeyDown: (event: KeyboardEvent) => {
       if (root.disabled) {
         return;
       }
 
+      const liveRoot = resolveLiveSliderRoot(root.sliderId);
+
+      if (liveRoot.disabled) {
+        return;
+      }
+
       const nextValue =
         event.key === 'ArrowRight' || event.key === 'ArrowUp'
-          ? root.value + root.step
+          ? liveRoot.value + liveRoot.step
           : event.key === 'ArrowLeft' || event.key === 'ArrowDown'
-            ? root.value - root.step
+            ? liveRoot.value - liveRoot.step
             : event.key === 'Home'
-              ? root.min
+              ? liveRoot.min
               : event.key === 'End'
-                ? root.max
+                ? liveRoot.max
                 : event.key === 'PageUp'
-                  ? root.value + root.step * 10
+                  ? liveRoot.value + liveRoot.step * 10
                   : event.key === 'PageDown'
-                    ? root.value - root.step * 10
+                    ? liveRoot.value - liveRoot.step * 10
                     : null;
 
       if (nextValue === null) {
         return;
       }
       event.preventDefault();
-      root.setValue(snapRangeValue(nextValue, root.min, root.max, root.step));
+      liveRoot.setValue(
+        snapRangeValue(nextValue, liveRoot.min, liveRoot.max, liveRoot.step)
+      );
     },
   });
 
