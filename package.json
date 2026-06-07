@@ -1,6 +1,6 @@
 {
   "name": "@askrjs/ui",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Headless askr components",
   "keywords": [
     "accessible",
@@ -227,7 +227,7 @@
     "test:checks": "vp test run -c vitest.test.checks.config.ts"
   },
   "devDependencies": {
-    "@askrjs/askr": "^0.0.40",
+    "@askrjs/askr": "^0.0.41",
     "@askrjs/vite": ">=0.0.2 <0.1.0",
     "@types/node": "^25.9.2",
     "axe-core": "^4.12.0",
