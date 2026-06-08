@@ -233,6 +233,8 @@ function applyCenteredPosition(
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
   const contentRect = content.getBoundingClientRect();
+  const maxWidth = Math.max(0, viewportWidth - options.viewportPadding * 2);
+  const maxHeight = Math.max(0, viewportHeight - options.viewportPadding * 2);
   const maxLeft = Math.max(
     options.viewportPadding,
     viewportWidth - contentRect.width - options.viewportPadding
@@ -246,6 +248,8 @@ function applyCenteredPosition(
     position: 'fixed',
     inset: 'auto',
     margin: '0',
+    'max-width': `${Math.round(maxWidth)}px`,
+    'max-height': `${Math.round(maxHeight)}px`,
     left: `${Math.round(
       clamp(
         (viewportWidth - contentRect.width) / 2,
