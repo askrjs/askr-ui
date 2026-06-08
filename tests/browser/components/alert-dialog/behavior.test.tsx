@@ -11,6 +11,7 @@ describe('AlertDialog - Behavior', () => {
   let container: HTMLElement;
 
   afterEach(() => {
+    vi.restoreAllMocks();
     unmount(container);
   });
 
@@ -71,5 +72,73 @@ describe('AlertDialog - Behavior', () => {
     expect(
       document.body.querySelector('[data-slot="dialog-content"]')
     ).toBeNull();
+  });
+
+  it('should keeps centered alert dialog content within viewport padding on narrow viewports', async () => {
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
+      (callback: FrameRequestCallback) => {
+        callback(0);
+        return 0;
+      }
+    );
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
+    vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(390);
+    vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(844);
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(
+      function getBoundingClientRect(this: HTMLElement): DOMRect {
+        const slot = this.getAttribute('data-slot');
+
+        if (slot === 'dialog-content') {
+          return {
+            x: 0,
+            y: 0,
+            width: 374,
+            height: 824,
+            top: 0,
+            right: 374,
+            bottom: 824,
+            left: 0,
+            toJSON: () => ({}),
+          } as DOMRect;
+        }
+
+        return {
+          x: 0,
+          y: 0,
+          width: 0,
+          height: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          toJSON: () => ({}),
+        } as DOMRect;
+      }
+    );
+
+    container = mount(
+      <AlertDialog>
+        <AlertDialogTrigger>Open alert</AlertDialogTrigger>
+        <AlertDialogPortal>
+          <AlertDialogContent>Confirm action</AlertDialogContent>
+        </AlertDialogPortal>
+      </AlertDialog>
+    );
+
+    const trigger = container.querySelector(
+      '[aria-haspopup="dialog"]'
+    ) as HTMLButtonElement;
+    trigger.click();
+    await flushUpdates();
+
+    const content = document.body.querySelector(
+      '[data-slot="dialog-content"]'
+    ) as HTMLElement;
+    const style = getComputedStyle(content);
+
+    expect(style.left).toBe('20px');
+    expect(style.top).toBe('20px');
+    expect(style.maxWidth).toBe('350px');
+    expect(style.maxHeight).toBe('804px');
   });
 });
