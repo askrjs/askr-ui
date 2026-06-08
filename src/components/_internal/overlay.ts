@@ -233,15 +233,25 @@ function applyCenteredPosition(
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
   const contentRect = content.getBoundingClientRect();
+  const contentTransform = window.getComputedStyle(content).transform;
+  const measureFromLayoutBox = contentTransform !== 'none';
+  const contentWidth =
+    measureFromLayoutBox && content.offsetWidth
+      ? content.offsetWidth
+      : contentRect.width;
+  const contentHeight =
+    measureFromLayoutBox && content.offsetHeight
+      ? content.offsetHeight
+      : contentRect.height;
   const maxWidth = Math.max(0, viewportWidth - options.viewportPadding * 2);
   const maxHeight = Math.max(0, viewportHeight - options.viewportPadding * 2);
   const maxLeft = Math.max(
     options.viewportPadding,
-    viewportWidth - contentRect.width - options.viewportPadding
+    viewportWidth - contentWidth - options.viewportPadding
   );
   const maxTop = Math.max(
     options.viewportPadding,
-    viewportHeight - contentRect.height - options.viewportPadding
+    viewportHeight - contentHeight - options.viewportPadding
   );
 
   return {
@@ -252,14 +262,14 @@ function applyCenteredPosition(
     'max-height': `${Math.round(maxHeight)}px`,
     left: `${Math.round(
       clamp(
-        (viewportWidth - contentRect.width) / 2,
+        (viewportWidth - contentWidth) / 2,
         options.viewportPadding,
         maxLeft
       )
     )}px`,
     top: `${Math.round(
       clamp(
-        (viewportHeight - contentRect.height) / 2,
+        (viewportHeight - contentHeight) / 2,
         options.viewportPadding,
         maxTop
       )
