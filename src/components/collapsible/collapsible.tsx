@@ -123,6 +123,7 @@ export function CollapsibleTrigger(
       restoreFocusRef
     ),
     'data-slot': 'collapsible-trigger',
+    'data-collapsible-trigger': 'true',
     'aria-expanded': root.open ? 'true' : 'false',
     'aria-controls': root.contentId,
     'data-state': root.open ? 'open' : 'closed',

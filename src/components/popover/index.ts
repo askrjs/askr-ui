@@ -16,6 +16,7 @@ export type {
   PopoverContentOwnProps,
   PopoverContentProps,
   PopoverContentAsChildProps,
+  PopoverContentWidth,
   PopoverCloseProps,
   PopoverCloseAsChildProps,
 } from './popover.types';

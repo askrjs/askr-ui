@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vite-plus/test';
+import { Button } from '../../../../src/components/button';
 import {
   Collapsible,
   CollapsibleTrigger,
@@ -144,6 +145,28 @@ describe('Collapsible — Behavior', () => {
       const span = container.querySelector('span');
       expect(span).toBeDefined();
       expect(span?.textContent).toBe('Custom Trigger');
+    });
+
+    it('should preserves button styling props when trigger composes as child', () => {
+      container = mount(
+        <Collapsible>
+          <Button asChild variant="ghost" size="sm">
+            <CollapsibleTrigger>Advanced policy</CollapsibleTrigger>
+          </Button>
+          <CollapsibleContent>Policy detail</CollapsibleContent>
+        </Collapsible>
+      );
+
+      const trigger = container.querySelector('button')!;
+
+      expect(trigger.getAttribute('data-slot')).toBe('button');
+      expect(trigger.getAttribute('data-collapsible-trigger')).toBe('true');
+      expect(trigger.getAttribute('data-variant')).toBe('ghost');
+      expect(trigger.getAttribute('data-size')).toBe('sm');
+
+      trigger.click();
+
+      expect(container.textContent).toContain('Policy detail');
     });
   });
 

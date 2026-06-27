@@ -815,7 +815,9 @@ export function VirtualTable<Row>(
     rowHeight: rowHeightProp,
     rows,
     selectedRowKey,
+    tableWidth,
     tabIndex,
+    viewport,
     'aria-describedby': ariaDescribedBy,
     'aria-label': ariaLabel,
     'aria-labelledby': ariaLabelledBy,
@@ -824,7 +826,9 @@ export function VirtualTable<Row>(
     onKeyDown,
     onScroll,
     ...wrapperRest
-  } = props;
+  } = props as (VirtualTableProps<Row> | VirtualTableAsChildProps<Row>) & {
+    onScroll?: (event: Event) => void;
+  };
 
   const rowHeight = assertPositiveVirtualHeight(rowHeightProp, 'rowHeight');
   const headerHeight = assertPositiveVirtualHeight(
@@ -923,6 +927,8 @@ export function VirtualTable<Row>(
     ref: entry.rootRef,
     'data-slot': 'virtual-table',
     'data-virtual-table': 'true',
+    'data-viewport': viewport,
+    'data-table-width': tableWidth,
   });
 
   const tableProps = mergeProps(

@@ -26,6 +26,7 @@ export function PopoverContent(
     side = 'bottom',
     align = 'center',
     sideOffset = 0,
+    width,
     ...rest
   } = props;
   const root = readPopoverRootContext();
@@ -75,6 +76,7 @@ export function PopoverContent(
     'data-side': position.side,
     'data-align': position.align,
     'data-side-offset': String(position.sideOffset),
+    'data-width': width,
   });
   const contentNode = asChild ? (
     <Slot asChild {...finalProps} children={children} />

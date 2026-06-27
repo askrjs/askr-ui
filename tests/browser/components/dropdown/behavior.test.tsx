@@ -44,6 +44,38 @@ describe('Dropdown - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
 
+  it('should renders typed trigger and item variants for themed menus', async () => {
+    container = mount(
+      <Dropdown defaultOpen>
+        <DropdownTrigger variant="ghost" size="icon" aria-label="Open menu">
+          Menu
+        </DropdownTrigger>
+        <DropdownPortal>
+          <DropdownContent>
+            <DropdownItem variant="destructive" asChild>
+              <a href="/logout">Sign out</a>
+            </DropdownItem>
+          </DropdownContent>
+        </DropdownPortal>
+      </Dropdown>
+    );
+
+    await flushUpdates();
+
+    const trigger = container.querySelector(
+      '[aria-haspopup="menu"]'
+    ) as HTMLButtonElement;
+    const item = document.body.querySelector(
+      '[role="menuitem"]'
+    ) as HTMLElement;
+
+    expect(trigger.getAttribute('data-variant')).toBe('ghost');
+    expect(trigger.getAttribute('data-size')).toBe('icon');
+    expect(item.tagName).toBe('A');
+    expect(item.getAttribute('data-slot')).toBe('dropdown-item');
+    expect(item.getAttribute('data-variant')).toBe('destructive');
+  });
+
   it('should supports nested dropdown item composition without direct child injection', async () => {
     container = mount(
       <Dropdown defaultOpen>

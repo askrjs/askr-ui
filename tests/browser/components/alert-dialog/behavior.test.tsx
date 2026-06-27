@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { Button } from '../../../../src/components/button';
 import {
   AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogPortal,
   AlertDialogTrigger,
@@ -40,6 +43,55 @@ describe('AlertDialog - Behavior', () => {
       '[aria-haspopup="dialog"]'
     ) as HTMLButtonElement;
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('should preserves button styling props when composed controls are children', async () => {
+    container = mount(
+      <AlertDialog>
+        <Button asChild variant="destructive">
+          <AlertDialogTrigger>Reset links</AlertDialogTrigger>
+        </Button>
+        <AlertDialogPortal>
+          <AlertDialogContent>
+            Confirm action
+            <Button asChild variant="outline">
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+            </Button>
+            <Button asChild variant="destructive">
+              <AlertDialogAction>Reset links</AlertDialogAction>
+            </Button>
+          </AlertDialogContent>
+        </AlertDialogPortal>
+      </AlertDialog>
+    );
+
+    const trigger = container.querySelector(
+      '[aria-haspopup="dialog"]'
+    ) as HTMLButtonElement;
+
+    expect(trigger.getAttribute('data-slot')).toBe('button');
+    expect(trigger.getAttribute('data-variant')).toBe('destructive');
+
+    trigger.click();
+    await flushUpdates();
+
+    const controls = Array.from(
+      document.body.querySelectorAll('[data-dialog-close="true"]')
+    ) as HTMLButtonElement[];
+
+    expect(
+      controls.map((control) => control.getAttribute('data-slot'))
+    ).toEqual(['button', 'button']);
+    expect(
+      controls.map((control) => control.getAttribute('data-variant'))
+    ).toEqual(['outline', 'destructive']);
+
+    controls[0]?.click();
+    await flushUpdates();
+
+    expect(
+      document.body.querySelector('[data-slot="dialog-content"]')
+    ).toBeNull();
   });
 
   it('should forwards dismiss callbacks from alert dialog content', async () => {

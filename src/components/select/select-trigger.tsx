@@ -24,6 +24,7 @@ export function SelectTrigger(
     disabled = false,
     onPress,
     ref,
+    size,
     type,
     ...rest
   } = props;
@@ -57,6 +58,7 @@ export function SelectTrigger(
     'aria-controls': root.contentId,
     'data-slot': 'select-trigger',
     'data-disabled': isDisabled ? 'true' : undefined,
+    'data-size': size && size !== 'md' ? size : undefined,
     'data-state': root.open ? 'open' : 'closed',
   });
 

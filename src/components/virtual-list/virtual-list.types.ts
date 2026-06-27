@@ -8,7 +8,7 @@ import type {
 
 type VirtualListRootProps = Omit<
   JSX.IntrinsicElements['div'],
-  'children' | 'ref'
+  'children' | 'onScroll' | 'ref'
 >;
 
 export type VirtualListRowComponentProps<Item> = {
@@ -18,9 +18,13 @@ export type VirtualListRowComponentProps<Item> = {
   isVisible: boolean;
 };
 
+export type VirtualListRowElement = JSXElement | JSX.Element;
+
 export type VirtualListRowComponent<Item> = (
   props: VirtualListRowComponentProps<Item>
-) => JSXElement;
+) => VirtualListRowElement | null;
+
+export type VirtualListViewport = 'lg';
 
 export type VirtualListState = {
   count: number;
@@ -56,6 +60,8 @@ export type VirtualListProps<Item> = VirtualListRootProps & {
   getKey: (item: Item, index: number) => string | number;
   rowComponent: VirtualListRowComponent<Item>;
   followBottom?: boolean | { threshold?: number };
+  onScroll?: (event: Event) => void;
+  viewport?: VirtualListViewport;
   apiRef?: Ref<VirtualListApi<Item> | null>;
   ref?: Ref<HTMLElement>;
   asChild?: false;
@@ -71,6 +77,8 @@ export type VirtualListAsChildProps<Item> = Omit<
   getKey: (item: Item, index: number) => string | number;
   rowComponent: VirtualListRowComponent<Item>;
   followBottom?: boolean | { threshold?: number };
+  onScroll?: (event: Event) => void;
+  viewport?: VirtualListViewport;
   apiRef?: Ref<VirtualListApi<Item> | null>;
   ref?: Ref<HTMLElement>;
   asChild: true;

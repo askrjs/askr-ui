@@ -68,6 +68,23 @@ describe('Popover - Behavior', () => {
     expect(content?.getAttribute('aria-labelledby')).toBe(trigger?.id);
   });
 
+  it('should maps typed width affordance to a stable data attribute', async () => {
+    container = mount(
+      <Popover defaultOpen>
+        <PopoverTrigger>Open popover</PopoverTrigger>
+        <PopoverContent width="md">Details</PopoverContent>
+      </Popover>
+    );
+
+    await flushUpdates();
+
+    const content = document.body.querySelector(
+      '[data-slot="popover-content"]'
+    ) as HTMLElement | null;
+
+    expect(content?.getAttribute('data-width')).toBe('md');
+  });
+
   it('should preserves explicit aria-label over automatic trigger labeling', async () => {
     container = mount(
       <Popover defaultOpen>

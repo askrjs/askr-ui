@@ -23,11 +23,14 @@ export type PopoverPortalProps = {
   children?: unknown;
 };
 
+export type PopoverContentWidth = 'sm' | 'md' | 'lg';
+
 export type PopoverContentOwnProps = {
   forceMount?: boolean;
   side?: OverlaySide;
   align?: OverlayAlign;
   sideOffset?: number;
+  width?: PopoverContentWidth;
 };
 
 export type PopoverContentProps = BoxProps<'div', HTMLDivElement> &

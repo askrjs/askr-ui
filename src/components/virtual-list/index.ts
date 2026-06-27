@@ -4,6 +4,8 @@ export type {
   VirtualListAsChildProps,
   VirtualListProps,
   VirtualListRowComponent,
+  VirtualListRowElement,
   VirtualListRowComponentProps,
   VirtualListState,
+  VirtualListViewport,
 } from './virtual-list.types';

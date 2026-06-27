@@ -670,8 +670,11 @@ export function VirtualList<Item>(
     rowComponent: RowComponent,
     rowHeight: rowHeightProp,
     onScroll,
+    viewport,
     ...rest
-  } = props;
+  } = props as (VirtualListProps<Item> | VirtualListAsChildProps<Item>) & {
+    onScroll?: (event: Event) => void;
+  };
 
   const rowHeight = assertPositiveVirtualHeight(rowHeightProp, 'rowHeight');
   const instanceState = state(
@@ -732,6 +735,7 @@ export function VirtualList<Item>(
     role: useSemanticListItems ? undefined : 'list',
     'data-slot': 'virtual-list',
     'data-virtual-list': 'true',
+    'data-viewport': viewport,
   });
 
   const content = (

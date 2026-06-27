@@ -31,6 +31,7 @@ export function DropdownItem(
     onSelect,
     ref,
     type: typeProp,
+    variant,
     ...rest
   } = props;
   const root = readDropdownRootContext();
@@ -96,6 +97,7 @@ export function DropdownItem(
     'aria-disabled': disabled ? 'true' : undefined,
     'data-slot': 'dropdown-item',
     'data-disabled': disabled ? 'true' : undefined,
+    'data-variant': variant && variant !== 'default' ? variant : undefined,
   });
 
   if (asChild) {

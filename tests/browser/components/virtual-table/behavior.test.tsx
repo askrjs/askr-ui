@@ -102,6 +102,28 @@ describe('VirtualTable - Behavior', () => {
     expect(container.querySelector('[data-row-key="row-9"]')).toBeTruthy();
   });
 
+  it('should maps typed viewport and table width affordances to stable data attributes', async () => {
+    container = mount(
+      <VirtualTable
+        aria-label="Users"
+        viewport="lg"
+        tableWidth="compact"
+        style={{ height: '120px', overflowY: 'auto' }}
+        rows={createRows(4)}
+        rowHeight={24}
+        headerHeight={24}
+        getKey={(row) => row.id}
+        columns={columns}
+      />
+    );
+    await flushUpdates();
+
+    const table = container.querySelector('[data-slot="virtual-table"]');
+
+    expect(table?.getAttribute('data-viewport')).toBe('lg');
+    expect(table?.getAttribute('data-table-width')).toBe('compact');
+  });
+
   it('should supports asChild composition on the wrapper host', async () => {
     container = mount(
       <VirtualTable

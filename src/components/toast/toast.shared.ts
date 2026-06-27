@@ -10,6 +10,7 @@ export type ToastProviderContextValue = {
   providerId: string;
   duration: number;
   toasts: ToastRegistration[];
+  getToasts: () => ToastRegistration[];
   registerToast: (registration: ToastRegistration) => void;
   unregisterToast: (toastId: string) => void;
 };

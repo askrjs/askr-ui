@@ -17,8 +17,21 @@ export type DropdownOwnProps = {
 
 export type DropdownProps = DropdownOwnProps;
 
-export type DropdownTriggerProps = ButtonLikeProps<'button', HTMLButtonElement>;
-export type DropdownTriggerAsChildProps = ButtonLikeAsChildProps;
+export type DropdownTriggerVariant = 'default' | 'ghost';
+export type DropdownTriggerSize = 'md' | 'icon';
+
+export type DropdownTriggerOwnProps = {
+  variant?: DropdownTriggerVariant;
+  size?: DropdownTriggerSize;
+};
+
+export type DropdownTriggerProps = ButtonLikeProps<
+  'button',
+  HTMLButtonElement
+> &
+  DropdownTriggerOwnProps;
+export type DropdownTriggerAsChildProps = ButtonLikeAsChildProps &
+  DropdownTriggerOwnProps;
 
 export type DropdownPortalProps = {
   children?: unknown;
@@ -40,8 +53,11 @@ export type DropdownContentAsChildProps = BoxAsChildProps &
 export type DropdownItemOwnProps = {
   children?: unknown;
   disabled?: boolean;
+  variant?: DropdownItemVariant;
   onSelect?: (event: PressEvent) => void;
 };
+
+export type DropdownItemVariant = 'default' | 'destructive';
 
 export type DropdownItemProps = Omit<
   ButtonLikeProps<'button', HTMLButtonElement>,

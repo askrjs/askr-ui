@@ -30,36 +30,6 @@ import type {
   MenubarSubContentProps,
 } from './menubar.types';
 
-function MenubarContentRuntimeNodeView(props: { node: JSX.Element }) {
-  return props.node;
-}
-
-function MenubarContentRuntimeRenderScopeView(props: {
-  renderContext: ReturnType<typeof createMenubarContentRenderContext>;
-  node: JSX.Element;
-}) {
-  return (
-    <MenubarContentRenderContext.Scope value={props.renderContext}>
-      <MenubarContentRuntimeNodeView node={props.node} />
-    </MenubarContentRenderContext.Scope>
-  );
-}
-
-function MenubarContentRuntimeScopeView(props: {
-  contentContext: MenubarContentContextValue;
-  renderContext: ReturnType<typeof createMenubarContentRenderContext>;
-  node: JSX.Element;
-}) {
-  return (
-    <MenubarContentContext.Scope value={props.contentContext}>
-      <MenubarContentRuntimeRenderScopeView
-        renderContext={props.renderContext}
-        node={props.node}
-      />
-    </MenubarContentContext.Scope>
-  );
-}
-
 function renderMenubarSurfaceContent(
   props:
     | MenubarContentProps
@@ -167,30 +137,29 @@ function renderMenubarSurfaceContent(
       }
     },
   });
-  const contentNode = asChild ? (
-    <Slot asChild {...finalProps} children={children as JSX.Element} />
-  ) : (
-    <div {...finalProps}>{children}</div>
-  );
-  const scopedContentNode = (
-    <MenubarContentRuntimeScopeView
-      contentContext={contentContext}
-      renderContext={runtimeRenderContext}
-      node={contentNode}
-    />
-  );
-
   return (
     <Presence present={forceMount || open}>
-      <FocusScope restoreFocus>
-        <DismissableLayer
-          onDismiss={() => {
-            root.setOpenPath(contentContext.path.slice(0, -1));
-          }}
-        >
-          {scopedContentNode}
-        </DismissableLayer>
-      </FocusScope>
+      <MenubarContentContext.Scope value={contentContext}>
+        <MenubarContentRenderContext.Scope value={runtimeRenderContext}>
+          <FocusScope restoreFocus>
+            <DismissableLayer
+              onDismiss={() => {
+                root.setOpenPath(contentContext.path.slice(0, -1));
+              }}
+            >
+              {asChild ? (
+                <Slot
+                  asChild
+                  {...finalProps}
+                  children={children as JSX.Element}
+                />
+              ) : (
+                <div {...finalProps}>{children}</div>
+              )}
+            </DismissableLayer>
+          </FocusScope>
+        </MenubarContentRenderContext.Scope>
+      </MenubarContentContext.Scope>
     </Presence>
   );
 }

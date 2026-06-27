@@ -52,6 +52,27 @@ describe('Select - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
   });
 
+  it('should renders typed trigger size for themed select controls', () => {
+    container = mount(
+      <Select defaultValue="askr">
+        <SelectTrigger size="sm">
+          <SelectValue placeholder="Choose one" />
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectContent>
+            <SelectItem value="askr">Askr</SelectItem>
+          </SelectContent>
+        </SelectPortal>
+      </Select>
+    );
+
+    const trigger = container.querySelector(
+      '[aria-haspopup="listbox"]'
+    ) as HTMLButtonElement;
+
+    expect(trigger.getAttribute('data-size')).toBe('sm');
+  });
+
   it('should applies root disabled semantics to the trigger and hidden input', async () => {
     container = mount(
       <Select disabled name="framework" defaultValue="askr">

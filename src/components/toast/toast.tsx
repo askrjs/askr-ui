@@ -26,7 +26,7 @@ import { state } from '@askrjs/askr';
 import { resource } from '@askrjs/askr/resources';
 import { DismissableLayer } from '../dismissable-layer';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
-import { collectJsxElements } from '../_internal/jsx';
+import { collectJsxElements, serializeForId } from '../_internal/jsx';
 import type {
   ToastActionAsChildProps,
   ToastActionProps,
@@ -112,6 +112,7 @@ function getToastProviderContext(
     providerId,
     duration: 0,
     toasts: [],
+    getToasts: () => [],
     registerToast: () => {},
     unregisterToast: () => {},
   };
@@ -294,7 +295,13 @@ function ToastRegistrationView(props: {
  */
 export function ToastProvider(props: ToastProviderProps) {
   const { children, duration = 5000, id, ref, ...rest } = props;
-  const providerId = resolveCompoundId('toast-provider', id, children);
+  const generatedProviderId = state(
+    resolveCompoundId('toast-provider', id, children)
+  );
+  const providerId =
+    id === undefined
+      ? generatedProviderId()
+      : resolveCompoundId('toast-provider', id, children);
   const toastRegistrationsState = state<ToastRegistration[]>([]);
   const providerContext = getToastProviderContext(providerId);
   const registerToast = (registration: ToastRegistration) => {
@@ -314,7 +321,9 @@ export function ToastProvider(props: ToastProviderProps) {
   };
   providerContext.providerId = providerId;
   providerContext.duration = duration;
-  providerContext.toasts = toastRegistrationsState();
+  const toastRegistrations = toastRegistrationsState();
+  providerContext.toasts = toastRegistrations;
+  providerContext.getToasts = toastRegistrationsState;
   providerContext.registerToast = registerToast;
   providerContext.unregisterToast = unregisterToast;
   const finalProps = mergeProps(rest, {
@@ -355,9 +364,10 @@ export function ToastViewport(
 ) {
   const { asChild, children, ref, ...rest } = props;
   const provider = readToastProviderContext();
+  const toastRegistrations = provider.getToasts();
   const content = (
     <>
-      {provider.toasts.map((registration) => (
+      {toastRegistrations.map((registration) => (
         <ToastRegistrationView
           key={registration.toastId}
           registration={registration}
@@ -390,6 +400,7 @@ export function ToastViewport(
 export function Toast(props: ToastProps): JSX.Element | null {
   const provider = readToastProviderContext();
   const toastId = resolveCompoundId('toast', props.id, props.children);
+  const childrenSignature = serializeForId(props.children);
 
   resource(
     ({ signal }) => {
@@ -411,10 +422,9 @@ export function Toast(props: ToastProps): JSX.Element | null {
     [
       provider.providerId,
       toastId,
-      props.children,
+      childrenSignature,
       props.defaultOpen,
       props.duration,
-      props.onOpenChange,
       props.open,
       props.variant,
     ]

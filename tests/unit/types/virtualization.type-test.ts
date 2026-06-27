@@ -44,6 +44,9 @@ const virtualListRowComponentProps: VirtualListRowComponentProps<Item> = {
 const virtualListRowComponent: VirtualListRowComponent<Item> = ({
   item: _item,
 }) => slotChild;
+const virtualListNullableRowComponent: VirtualListRowComponent<Item> = ({
+  isVisible,
+}): JSX.Element | null => (isVisible ? slotChild : null);
 const virtualListApiRef = {} as Ref<VirtualListApi<Item> | null>;
 const virtualListState: VirtualListState = {
   count: 1,
@@ -79,6 +82,7 @@ const virtualListProps: VirtualListProps<Item> = {
   rowComponent: virtualListRowComponent,
   apiRef: virtualListApiRef,
   followBottom: false,
+  viewport: 'lg',
 };
 const virtualListAsChildProps: VirtualListAsChildProps<Item> = {
   asChild: true,
@@ -104,6 +108,9 @@ const virtualTableCellComponentProps: VirtualTableCellComponentProps<Row> = {
 const virtualTableCellComponent: VirtualTableCellComponent<Row> = ({
   row: _row,
 }) => slotChild;
+const virtualTableNullableCellComponent: VirtualTableCellComponent<Row> = ({
+  selected,
+}): JSX.Element | null => (selected ? slotChild : null);
 const virtualTableApiRef = {} as Ref<VirtualTableApi<Row> | null>;
 const virtualTableColumns: readonly VirtualTableColumn<Row>[] = [
   {
@@ -148,6 +155,8 @@ const virtualTableProps: VirtualTableProps<Row> = {
   getKey: (row) => row.id,
   columns: virtualTableColumns,
   apiRef: virtualTableApiRef,
+  viewport: 'lg',
+  tableWidth: 'compact',
 };
 const virtualTableAsChildProps: VirtualTableAsChildProps<Row> = {
   asChild: true,
@@ -167,11 +176,13 @@ void [
   VirtualTable,
   virtualListRowComponentProps,
   virtualListRowComponent,
+  virtualListNullableRowComponent,
   virtualListState,
   virtualListProps,
   virtualListAsChildProps,
   virtualTableCellComponentProps,
   virtualTableCellComponent,
+  virtualTableNullableCellComponent,
   virtualTableState,
   virtualTableProps,
   virtualTableAsChildProps,

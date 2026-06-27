@@ -51,6 +51,7 @@ export function Button(props: ButtonNativeProps | ButtonAsChildProps) {
     disabled = false,
     variant,
     size,
+    width,
     ref,
     ...rest
   } = props;
@@ -69,6 +70,7 @@ export function Button(props: ButtonNativeProps | ButtonAsChildProps) {
     'data-disabled': disabled ? 'true' : undefined,
     'data-variant': variant && variant !== 'default' ? variant : undefined,
     'data-size': size && size !== 'md' ? size : undefined,
+    'data-width': width && width !== 'auto' ? width : undefined,
     ref,
   });
 

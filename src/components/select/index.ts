@@ -9,6 +9,8 @@ export type {
   SelectProps,
   SelectTriggerProps,
   SelectTriggerAsChildProps,
+  SelectTriggerOwnProps,
+  SelectTriggerSize,
   SelectValueOwnProps,
   SelectValueProps,
   SelectValueAsChildProps,
