@@ -1,5 +1,5 @@
 import { state } from '@askrjs/askr';
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import {
   VirtualList,
   type VirtualListApi,
@@ -121,5 +121,37 @@ describe('VirtualList - Behavior', () => {
     expect(host?.getAttribute('role')).toBeNull();
     expect(firstRow?.getAttribute('data-slot')).toBe('virtual-list-row');
     expect(firstRow?.getAttribute('role')).toBeNull();
+  });
+
+  it('should forward user scroll handlers from the virtual viewport', async () => {
+    const onScroll = vi.fn();
+
+    container = mount(
+      <VirtualList
+        aria-label="Messages"
+        style={{ height: '60px', overflowY: 'auto' }}
+        items={createItems(10)}
+        rowHeight={20}
+        overscan={2}
+        getKey={(item) => item.id}
+        rowComponent={({ item }) => <span>{item.label}</span>}
+        onScroll={onScroll}
+      />
+    );
+    await flushUpdates();
+
+    const host = container.querySelector(
+      '[data-slot="virtual-list"]'
+    ) as HTMLElement | null;
+
+    expect(onScroll).not.toHaveBeenCalled();
+
+    if (host) {
+      host.scrollTop = 40;
+      host.dispatchEvent(new Event('scroll', { bubbles: true }));
+    }
+    await flushUpdates();
+
+    expect(onScroll).toHaveBeenCalledTimes(1);
   });
 });

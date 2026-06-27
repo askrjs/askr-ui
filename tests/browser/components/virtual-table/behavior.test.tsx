@@ -126,4 +126,42 @@ describe('VirtualTable - Behavior', () => {
     expect(table?.getAttribute('data-slot')).toBe('virtual-table-table');
     expect(table?.querySelectorAll('tr')).toHaveLength(5);
   });
+
+  it('should forward user scroll handlers from the virtual wrapper', async () => {
+    const onScroll = vi.fn();
+    let api: VirtualTableApi<Row> | null = null;
+
+    container = mount(
+      <VirtualTable
+        aria-label="Users"
+        style={{ height: '120px', overflowY: 'auto' }}
+        rows={createRows(10)}
+        rowHeight={24}
+        headerHeight={24}
+        overscan={0}
+        getKey={(row) => row.id}
+        columns={columns}
+        onScroll={onScroll}
+        apiRef={(next) => {
+          api = next;
+        }}
+      />
+    );
+    await flushUpdates();
+
+    const wrapper = container.querySelector(
+      '[data-slot="virtual-table"]'
+    ) as HTMLElement | null;
+
+    expect(onScroll).not.toHaveBeenCalled();
+
+    if (wrapper) {
+      wrapper.scrollTop = 72;
+      wrapper.dispatchEvent(new Event('scroll', { bubbles: true }));
+    }
+    await flushUpdates();
+
+    expect(onScroll).toHaveBeenCalledTimes(1);
+    expect(api?.getScrollTop()).toBe(72);
+  });
 });
