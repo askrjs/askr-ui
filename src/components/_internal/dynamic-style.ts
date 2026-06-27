@@ -109,3 +109,20 @@ export function removeDynamicStyleRule(key: string) {
 
   syncDynamicStyleElement();
 }
+
+export function removeDynamicStyleRuleWhenUnused(
+  key: string,
+  selector: string
+) {
+  const removeIfUnused = () => {
+    if (typeof document === 'undefined' || !document.querySelector(selector)) {
+      removeDynamicStyleRule(key);
+    }
+  };
+
+  if (typeof queueMicrotask === 'function') {
+    queueMicrotask(removeIfUnused);
+  } else {
+    setTimeout(removeIfUnused, 0);
+  }
+}

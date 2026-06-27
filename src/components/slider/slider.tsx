@@ -3,7 +3,7 @@ import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import {
   dynamicAttributeSelector,
-  removeDynamicStyleRule,
+  removeDynamicStyleRuleWhenUnused,
   setDynamicStyleRule,
 } from '../_internal/dynamic-style';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
@@ -184,13 +184,13 @@ export function Slider(props: SliderProps) {
   rootContext.trackId = resolvePartId(sliderId, 'track');
   rootContext.thumbId = resolvePartId(sliderId, 'thumb');
   const sliderRuleKey = `slider:${sliderId}`;
-  setDynamicStyleRule(
-    sliderRuleKey,
-    dynamicAttributeSelector('data-askr-slider-id', sliderId),
-    {
-      '--ak-slider-percentage': `${percentage}%`,
-    }
+  const sliderSelector = dynamicAttributeSelector(
+    'data-askr-slider-id',
+    sliderId
   );
+  setDynamicStyleRule(sliderRuleKey, sliderSelector, {
+    '--ak-slider-percentage': `${percentage}%`,
+  });
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
       ref as
@@ -200,7 +200,7 @@ export function Slider(props: SliderProps) {
         | undefined,
       (node: HTMLElement | null) => {
         if (!node) {
-          removeDynamicStyleRule(sliderRuleKey);
+          removeDynamicStyleRuleWhenUnused(sliderRuleKey, sliderSelector);
         }
       }
     ),
