@@ -3,7 +3,7 @@ import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import {
   dynamicAttributeSelector,
-  removeDynamicStyleRule,
+  removeDynamicStyleRuleWhenUnused,
   setDynamicStyleRule,
 } from '../_internal/dynamic-style';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
@@ -61,15 +61,15 @@ export function ProgressCircle(props: ProgressCircleProps) {
     defaultProgressValueLabel(normalizedValue, normalizedMax);
   const percentage = progressPercentage(normalizedValue, normalizedMax);
   const progressCircleRuleKey = `progress-circle:${progressCircleId}`;
+  const progressCircleSelector = dynamicAttributeSelector(
+    'id',
+    progressCircleId
+  );
   const progressCirclePercentageValue =
     percentage === null ? '25%' : `${percentage}%`;
-  setDynamicStyleRule(
-    progressCircleRuleKey,
-    dynamicAttributeSelector('id', progressCircleId),
-    {
-      '--ak-progress-percentage': progressCirclePercentageValue,
-    }
-  );
+  setDynamicStyleRule(progressCircleRuleKey, progressCircleSelector, {
+    '--ak-progress-percentage': progressCirclePercentageValue,
+  });
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
       ref as
@@ -79,7 +79,10 @@ export function ProgressCircle(props: ProgressCircleProps) {
         | undefined,
       (node: HTMLElement | null) => {
         if (!node) {
-          removeDynamicStyleRule(progressCircleRuleKey);
+          removeDynamicStyleRuleWhenUnused(
+            progressCircleRuleKey,
+            progressCircleSelector
+          );
         }
       }
     ),

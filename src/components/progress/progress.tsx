@@ -3,7 +3,7 @@ import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import {
   dynamicAttributeSelector,
-  removeDynamicStyleRule,
+  removeDynamicStyleRuleWhenUnused,
   setDynamicStyleRule,
 } from '../_internal/dynamic-style';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
@@ -60,15 +60,12 @@ export function Progress(props: ProgressProps) {
     defaultProgressValueLabel(normalizedValue, normalizedMax);
   const percentage = progressPercentage(normalizedValue, normalizedMax);
   const progressRuleKey = `progress:${progressId}`;
+  const progressSelector = dynamicAttributeSelector('id', progressId);
   const progressPercentageValue =
     percentage === null ? '100%' : `${percentage}%`;
-  setDynamicStyleRule(
-    progressRuleKey,
-    dynamicAttributeSelector('id', progressId),
-    {
-      '--ak-progress-percentage': progressPercentageValue,
-    }
-  );
+  setDynamicStyleRule(progressRuleKey, progressSelector, {
+    '--ak-progress-percentage': progressPercentageValue,
+  });
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
       ref as
@@ -78,7 +75,7 @@ export function Progress(props: ProgressProps) {
         | undefined,
       (node: HTMLElement | null) => {
         if (!node) {
-          removeDynamicStyleRule(progressRuleKey);
+          removeDynamicStyleRuleWhenUnused(progressRuleKey, progressSelector);
         }
       }
     ),
