@@ -63,6 +63,7 @@ type VirtualTableEntry<Row> = {
     | ((row: Row, rowIndex: number, rowKey: string, event: MouseEvent) => void)
     | undefined;
   getKey: ((row: Row, index: number) => string | number) | null;
+  onScroll: ((event: Event) => void) | undefined;
 };
 
 const virtualTableEntries = new Map<symbol, VirtualTableEntry<unknown>>();
@@ -133,7 +134,7 @@ function getVirtualTableEntry<Row>(
     });
   };
 
-  const handleScroll = () => {
+  const handleScroll = (event?: Event) => {
     const node = entry.wrapperNode;
 
     if (!node) {
@@ -146,6 +147,10 @@ function getVirtualTableEntry<Row>(
 
     if (scrollTopState() !== nextScrollTop) {
       scrollTopState.set(nextScrollTop);
+    }
+
+    if (event) {
+      entry.onScroll?.(event);
     }
   };
 
@@ -817,6 +822,7 @@ export function VirtualTable<Row>(
     onBlur,
     onFocus,
     onKeyDown,
+    onScroll,
     ...wrapperRest
   } = props;
 
@@ -879,6 +885,7 @@ export function VirtualTable<Row>(
   entry.selectedKeyState = selectedKeyState;
   entry.onRowClick = onRowClick;
   entry.getKey = getKey;
+  entry.onScroll = onScroll;
 
   setRefValue(entry.userRef, entry.wrapperNode);
   setRefValue(entry.apiRef, entry.api as VirtualTableApi<Row>);

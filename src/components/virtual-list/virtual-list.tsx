@@ -60,6 +60,7 @@ type VirtualListEntry<Item> = {
   schedulePendingScrollTop: () => void;
   api: VirtualListApi<Item>;
   visibleRange: VirtualRange;
+  onScroll: ((event: Event) => void) | undefined;
 };
 
 function cloneJsxElement(
@@ -165,7 +166,7 @@ function getVirtualListEntry<Item>(key: symbol): VirtualListEntry<Item> {
     });
   };
 
-  const handleScroll = () => {
+  const handleScroll = (event?: Event) => {
     const node = entry.node;
 
     if (!node) {
@@ -202,6 +203,10 @@ function getVirtualListEntry<Item>(key: symbol): VirtualListEntry<Item> {
 
     updateVisibleRange(nextScrollTop, viewportHeight);
     bumpRenderVersion();
+
+    if (event) {
+      entry.onScroll?.(event);
+    }
   };
 
   const handleResize = () => {
@@ -664,6 +669,7 @@ export function VirtualList<Item>(
     ref,
     rowComponent: RowComponent,
     rowHeight: rowHeightProp,
+    onScroll,
     ...rest
   } = props;
 
@@ -687,6 +693,7 @@ export function VirtualList<Item>(
   entry.viewportHeightHint = viewportHeightHint;
   entry.overscan = overscan;
   entry.rowComponent = RowComponent;
+  entry.onScroll = onScroll;
   entry.followBottomEnabled = Boolean(followBottom);
   entry.followBottomThreshold =
     typeof followBottom === 'boolean'
