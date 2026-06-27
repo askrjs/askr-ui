@@ -31,6 +31,16 @@ async function flushPortalUpdates() {
   await flushUpdates();
 }
 
+async function flushOverlayPosition() {
+  await flushPortalUpdates();
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => resolve());
+  });
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => resolve());
+  });
+}
+
 describe('Menubar - Behavior', () => {
   let container: HTMLElement;
 
@@ -108,5 +118,39 @@ describe('Menubar - Behavior', () => {
     );
     await flushPortalUpdates();
     expect(document.body.textContent).not.toContain('New');
+  });
+
+  it('should position open content without shifting document flow', async () => {
+    container = mount(
+      <div>
+        <Menubar>
+          <MenubarMenu value="file">
+            <MenubarTrigger>File</MenubarTrigger>
+            <MenubarPortal>
+              <MenubarContent side="bottom" align="start" sideOffset={8}>
+                <MenubarItem>New</MenubarItem>
+                <MenubarItem>Open recent</MenubarItem>
+              </MenubarContent>
+            </MenubarPortal>
+          </MenubarMenu>
+        </Menubar>
+        <div style={{ height: '32px' }}>Following content</div>
+      </div>
+    );
+
+    const beforeHeight = document.body.scrollHeight;
+    const fileTrigger = getButtonByText('File');
+
+    fileTrigger.click();
+    await flushOverlayPosition();
+
+    const content = document.body.querySelector(
+      '[data-slot="menubar-content"]'
+    ) as HTMLElement | null;
+
+    expect(content).not.toBeNull();
+    expect(content?.getAttribute('data-askr-overlay-id')).toBe(fileTrigger.id);
+    expect(getComputedStyle(content!).position).toBe('fixed');
+    expect(document.body.scrollHeight).toBe(beforeHeight);
   });
 });

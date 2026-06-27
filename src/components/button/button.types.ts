@@ -22,7 +22,19 @@ export type ButtonVariant =
   | 'destructive'
   | 'link';
 
-export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
+export type ButtonSize =
+  | 'xs'
+  | 'sm'
+  | 'md'
+  | 'lg'
+  | 'icon'
+  | 'icon-xs'
+  | 'icon-sm'
+  | 'icon-lg';
+
+export type ButtonWidth = 'auto' | 'full';
+
+export type ButtonAsChildElement = JSXElement | JSX.Element;
 
 /**
  * Core Button props shared across all variants
@@ -33,6 +45,7 @@ export type ButtonOwnProps = {
   disabled?: boolean;
   variant?: ButtonVariant;
   size?: ButtonSize;
+  width?: ButtonWidth;
 };
 
 /**
@@ -53,7 +66,7 @@ export type ButtonNativeProps = Omit<
  */
 export type ButtonAsChildProps = ButtonOwnProps & {
   asChild: true;
-  children: JSXElement;
+  children: ButtonAsChildElement;
   ref?: Ref<unknown>;
   type?: never;
 };

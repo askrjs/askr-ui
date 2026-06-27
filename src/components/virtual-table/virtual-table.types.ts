@@ -8,7 +8,7 @@ import type {
 
 type VirtualTableRootProps = Omit<
   JSX.IntrinsicElements['div'],
-  'children' | 'ref'
+  'children' | 'onScroll' | 'ref'
 >;
 
 export type VirtualTableCellComponentProps<Row> = {
@@ -19,9 +19,15 @@ export type VirtualTableCellComponentProps<Row> = {
   selected: boolean;
 };
 
+export type VirtualTableCellElement = JSXElement | JSX.Element;
+
 export type VirtualTableCellComponent<Row> = (
   props: VirtualTableCellComponentProps<Row>
-) => JSXElement;
+) => VirtualTableCellElement | null;
+
+export type VirtualTableViewport = 'lg';
+
+export type VirtualTableWidth = 'compact';
 
 export type VirtualTableColumn<Row> = {
   id: string;
@@ -77,6 +83,9 @@ export type VirtualTableProps<Row> = VirtualTableRootProps & {
     rowKey: string,
     event: MouseEvent
   ) => void;
+  onScroll?: (event: Event) => void;
+  viewport?: VirtualTableViewport;
+  tableWidth?: VirtualTableWidth;
   apiRef?: Ref<VirtualTableApi<Row> | null>;
   ref?: Ref<HTMLElement>;
   asChild?: false;
@@ -101,6 +110,9 @@ export type VirtualTableAsChildProps<Row> = Omit<
     rowKey: string,
     event: MouseEvent
   ) => void;
+  onScroll?: (event: Event) => void;
+  viewport?: VirtualTableViewport;
+  tableWidth?: VirtualTableWidth;
   apiRef?: Ref<VirtualTableApi<Row> | null>;
   ref?: Ref<HTMLElement>;
   asChild: true;

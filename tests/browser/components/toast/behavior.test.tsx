@@ -1,5 +1,7 @@
 import { state } from '@askrjs/askr';
+import { Link } from '@askrjs/askr/router';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { Button } from '../../../../src/components/button';
 import {
   Toast,
   ToastAction,
@@ -34,6 +36,106 @@ function ControlledToastFixture() {
       </ToastProvider>
     </div>
   );
+}
+
+function ControlledToastOpenerFixture() {
+  const openState = state(false);
+
+  return (
+    <ToastProvider duration={1000}>
+      <button
+        id="open-toast"
+        onClick={() => {
+          openState.set(true);
+        }}
+      >
+        Open toast
+      </button>
+      <ToastViewport />
+      <Toast
+        open={openState()}
+        onOpenChange={(open) => openState.set(open)}
+        variant="success"
+      >
+        <ToastTitle>Message queued</ToastTitle>
+        <ToastDescription>The note is ready for review.</ToastDescription>
+        <ToastAction asChild>
+          <a href="/logs">Review logs</a>
+        </ToastAction>
+        <ToastClose>Dismiss</ToastClose>
+      </Toast>
+    </ToastProvider>
+  );
+}
+
+function ControlledToastLinkActionFixture() {
+  const openState = state(false);
+
+  return (
+    <ToastProvider duration={1000}>
+      <button
+        id="open-link-toast"
+        onClick={() => {
+          openState.set(true);
+        }}
+      >
+        Open link toast
+      </button>
+      <ToastViewport />
+      <Toast
+        open={openState()}
+        onOpenChange={(open) => openState.set(open)}
+        variant="success"
+      >
+        <span data-slot="toast-icon" aria-hidden="true">
+          Icon
+        </span>
+        <ToastTitle>Message queued</ToastTitle>
+        <ToastDescription>The note is ready for review.</ToastDescription>
+        <ToastAction asChild>
+          <Link href="/logs">Review logs</Link>
+        </ToastAction>
+        <ToastClose>Dismiss</ToastClose>
+      </Toast>
+    </ToastProvider>
+  );
+}
+
+function ControlledToastPressButtonFixture() {
+  const openState = state(false);
+
+  return (
+    <ToastProvider duration={1000}>
+      <Button
+        id="open-press-toast"
+        type="button"
+        onPress={() => {
+          openState.set(true);
+        }}
+      >
+        Open press toast
+      </Button>
+      <ToastViewport />
+      <Toast
+        open={openState()}
+        onOpenChange={(open) => openState.set(open)}
+        variant="success"
+      >
+        <ToastTitle>Message queued</ToastTitle>
+        <ToastDescription>The note is ready for review.</ToastDescription>
+        <ToastAction asChild>
+          <Link href="/logs">Review logs</Link>
+        </ToastAction>
+        <ToastClose>Dismiss</ToastClose>
+      </Toast>
+    </ToastProvider>
+  );
+}
+
+function waitForScheduler(): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 20);
+  });
 }
 
 describe('Toast - Behavior', () => {
@@ -129,6 +231,68 @@ describe('Toast - Behavior', () => {
     expect(document.activeElement).toBe(launcher);
   });
 
+  it('should opens a controlled toast from a user action without locking the page', async () => {
+    container = mount(<ControlledToastOpenerFixture />);
+    await flushUpdates();
+
+    const launcher = container.querySelector(
+      '#open-toast'
+    ) as HTMLButtonElement;
+    launcher.click();
+    await flushUpdates();
+    await waitForScheduler();
+    await flushUpdates();
+    await waitForScheduler();
+    await flushUpdates();
+
+    const toast = container.querySelector('[data-toast="true"]');
+    const action = container.querySelector(
+      '[data-toast-action="true"]'
+    ) as HTMLAnchorElement;
+
+    expect(toast).not.toBeNull();
+    expect(action.tagName).toBe('A');
+    expect(action.getAttribute('href')).toBe('/logs');
+  });
+
+  it('should opens a controlled toast with a link action without locking the page', async () => {
+    container = mount(<ControlledToastLinkActionFixture />);
+    await flushUpdates();
+
+    const launcher = container.querySelector(
+      '#open-link-toast'
+    ) as HTMLButtonElement;
+    launcher.click();
+    await flushUpdates();
+    await waitForScheduler();
+    await flushUpdates();
+
+    const toast = container.querySelector('[data-toast="true"]');
+    const action = container.querySelector(
+      '[data-toast-action="true"]'
+    ) as HTMLAnchorElement;
+
+    expect(toast).not.toBeNull();
+    expect(action.tagName).toBe('A');
+    expect(action.getAttribute('href')).toBe('/logs');
+  });
+
+  it('should opens a controlled toast from a press button without locking the page', async () => {
+    container = mount(<ControlledToastPressButtonFixture />);
+    await flushUpdates();
+
+    const launcher = container.querySelector(
+      '#open-press-toast'
+    ) as HTMLButtonElement;
+    launcher.focus();
+    launcher.click();
+    await flushUpdates();
+    await waitForScheduler();
+    await flushUpdates();
+
+    expect(container.querySelector('[data-toast="true"]')).not.toBeNull();
+  });
+
   it('should dismisses on escape and action press', async () => {
     container = mount(
       <ToastProvider>
@@ -167,5 +331,28 @@ describe('Toast - Behavior', () => {
     action.click();
     await flushUpdates();
     expect(container.querySelector('[data-toast="true"]')).toBeNull();
+  });
+
+  it('should preserves action styling and href when composed with a link child', async () => {
+    container = mount(
+      <ToastProvider>
+        <ToastViewport />
+        <Toast defaultOpen={true}>
+          <ToastTitle>Queued</ToastTitle>
+          <ToastAction asChild>
+            <a href="/logs">View logs</a>
+          </ToastAction>
+        </Toast>
+      </ToastProvider>
+    );
+    await flushUpdates();
+
+    const action = container.querySelector(
+      '[data-toast-action="true"]'
+    ) as HTMLAnchorElement;
+
+    expect(action.tagName).toBe('A');
+    expect(action.getAttribute('data-slot')).toBe('toast-action');
+    expect(action.getAttribute('href')).toBe('/logs');
   });
 });

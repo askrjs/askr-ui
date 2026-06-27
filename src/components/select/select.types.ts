@@ -21,8 +21,16 @@ export type SelectOwnProps = {
 
 export type SelectProps = SelectOwnProps;
 
-export type SelectTriggerProps = ButtonLikeProps<'button', HTMLButtonElement>;
-export type SelectTriggerAsChildProps = ButtonLikeAsChildProps;
+export type SelectTriggerSize = 'sm' | 'md' | 'lg';
+
+export type SelectTriggerOwnProps = {
+  size?: SelectTriggerSize;
+};
+
+export type SelectTriggerProps = ButtonLikeProps<'button', HTMLButtonElement> &
+  SelectTriggerOwnProps;
+export type SelectTriggerAsChildProps = ButtonLikeAsChildProps &
+  SelectTriggerOwnProps;
 
 export type SelectValueOwnProps = {
   placeholder?: string;

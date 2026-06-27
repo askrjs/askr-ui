@@ -98,6 +98,27 @@ describe('VirtualList - Behavior', () => {
     expect(container.querySelector('[data-key="item-8"]')).toBeTruthy();
   });
 
+  it('should maps typed viewport affordance to a stable data attribute', async () => {
+    container = mount(
+      <VirtualList
+        aria-label="Messages"
+        viewport="lg"
+        style={{ height: '60px', overflowY: 'auto' }}
+        items={createItems(4)}
+        rowHeight={20}
+        getKey={(item) => item.id}
+        rowComponent={({ item }) => <span>{item.label}</span>}
+      />
+    );
+    await flushUpdates();
+
+    expect(
+      container
+        .querySelector('[data-slot="virtual-list"]')
+        ?.getAttribute('data-viewport')
+    ).toBe('lg');
+  });
+
   it('should supports asChild composition with semantic list items', async () => {
     container = mount(
       <VirtualList

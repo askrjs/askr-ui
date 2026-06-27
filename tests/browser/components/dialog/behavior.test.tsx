@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { Button } from '../../../../src/components/button';
 import {
   Dialog,
+  DialogClose,
   DialogPortal,
   DialogContent,
   DialogTrigger,
@@ -41,6 +43,49 @@ describe('Dialog - Behavior', () => {
       '[aria-haspopup="dialog"]'
     ) as HTMLButtonElement;
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('should preserves button styling props when trigger and close compose as children', async () => {
+    container = mount(
+      <Dialog>
+        <Button asChild variant="outline">
+          <DialogTrigger>Open dialog</DialogTrigger>
+        </Button>
+        <DialogPortal>
+          <DialogContent>
+            Body
+            <Button asChild variant="outline">
+              <DialogClose>Close dialog</DialogClose>
+            </Button>
+          </DialogContent>
+        </DialogPortal>
+      </Dialog>
+    );
+
+    const trigger = container.querySelector(
+      '[aria-haspopup="dialog"]'
+    ) as HTMLButtonElement;
+
+    expect(trigger.getAttribute('data-slot')).toBe('button');
+    expect(trigger.getAttribute('data-dialog-trigger')).toBe('true');
+    expect(trigger.getAttribute('data-variant')).toBe('outline');
+
+    trigger.click();
+    await flushUpdates();
+
+    const close = document.body.querySelector(
+      '[data-dialog-close="true"]'
+    ) as HTMLButtonElement;
+
+    expect(close.getAttribute('data-slot')).toBe('button');
+    expect(close.getAttribute('data-variant')).toBe('outline');
+
+    close.click();
+    await flushUpdates();
+
+    expect(
+      document.body.querySelector('[data-slot="dialog-content"]')
+    ).toBeNull();
   });
 
   it('should omits generated title and description references when those parts are absent', async () => {

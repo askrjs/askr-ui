@@ -97,6 +97,11 @@ import {
   type DropdownContentProps,
   type DropdownItemAsChildProps,
   type DropdownItemProps,
+  type DropdownItemVariant,
+  type DropdownTriggerAsChildProps,
+  type DropdownTriggerProps,
+  type DropdownTriggerSize,
+  type DropdownTriggerVariant,
   type FocusScopeAsChildProps,
   type FocusScopeProps,
   type InputAsChildProps,
@@ -123,6 +128,7 @@ import {
   type SelectProps,
   type SelectTriggerAsChildProps,
   type SelectTriggerProps,
+  type SelectTriggerSize,
   type SelectValueAsChildProps,
   type SelectValueProps,
   type SwitchAsChildProps,
@@ -205,9 +211,15 @@ const buttonNativeProps: ButtonNativeProps = {
   type: 'submit',
   children: 'Submit',
 };
+const buttonTypedAffordanceProps: ButtonNativeProps = {
+  children: 'Open',
+  size: 'icon-xs',
+  width: 'full',
+};
 const buttonAsChildProps: ButtonAsChildProps = {
   asChild: true,
   children: slotChild,
+  width: 'full',
 };
 
 const checkboxControlledProps: CheckboxProps = {
@@ -330,6 +342,11 @@ const popoverTriggerAsChildProps: PopoverTriggerAsChildProps = {
   children: slotChild,
 };
 const popoverContentProps: PopoverContentProps = { side: 'bottom' };
+const popoverContentTypedAffordanceProps: PopoverContentProps = {
+  side: 'bottom',
+  width: 'md',
+  children: 'Details',
+};
 const popoverContentAsChildProps: PopoverContentAsChildProps = {
   asChild: true,
   children: slotChild,
@@ -368,20 +385,43 @@ const dropdownContentAsChildProps: DropdownContentAsChildProps = {
   asChild: true,
   children: slotChild,
 };
-const dropdownItemProps: DropdownItemProps = { children: 'Action' };
+const dropdownTriggerVariant: DropdownTriggerVariant = 'ghost';
+const dropdownTriggerSize: DropdownTriggerSize = 'icon';
+const dropdownTriggerProps: DropdownTriggerProps = {
+  children: 'Open menu',
+  variant: dropdownTriggerVariant,
+  size: dropdownTriggerSize,
+};
+const dropdownTriggerAsChildProps: DropdownTriggerAsChildProps = {
+  asChild: true,
+  children: slotChild,
+  variant: 'ghost',
+  size: 'icon',
+};
+const dropdownItemVariant: DropdownItemVariant = 'destructive';
+const dropdownItemProps: DropdownItemProps = {
+  children: 'Action',
+  variant: dropdownItemVariant,
+};
 const dropdownItemAsChildProps: DropdownItemAsChildProps = {
   asChild: true,
   children: slotChild,
+  variant: 'destructive',
 };
 
 const selectProps: SelectProps = {
   value: 'one',
   onValueChange: (next) => next,
 };
-const selectTriggerProps: SelectTriggerProps = { children: 'Trigger' };
+const selectTriggerSize: SelectTriggerSize = 'sm';
+const selectTriggerProps: SelectTriggerProps = {
+  children: 'Trigger',
+  size: selectTriggerSize,
+};
 const selectTriggerAsChildProps: SelectTriggerAsChildProps = {
   asChild: true,
   children: slotChild,
+  size: 'lg',
 };
 const selectValueProps: SelectValueProps = { placeholder: 'Choose one' };
 const selectValueAsChildProps: SelectValueAsChildProps = {
@@ -525,6 +565,7 @@ void [
   dismissableLayerAsChildProps,
   buttonProps,
   buttonNativeProps,
+  buttonTypedAffordanceProps,
   buttonAsChildProps,
   checkboxControlledProps,
   checkboxUncontrolledProps,
@@ -566,6 +607,7 @@ void [
   popoverTriggerProps,
   popoverTriggerAsChildProps,
   popoverContentProps,
+  popoverContentTypedAffordanceProps,
   popoverContentAsChildProps,
   popoverCloseProps,
   popoverCloseAsChildProps,
@@ -578,11 +620,17 @@ void [
   menuContentAsChildProps,
   menuItemProps,
   menuItemAsChildProps,
+  dropdownTriggerVariant,
+  dropdownTriggerSize,
+  dropdownTriggerProps,
+  dropdownTriggerAsChildProps,
+  dropdownItemVariant,
   dropdownContentProps,
   dropdownContentAsChildProps,
   dropdownItemProps,
   dropdownItemAsChildProps,
   selectProps,
+  selectTriggerSize,
   selectTriggerProps,
   selectTriggerAsChildProps,
   selectValueProps,

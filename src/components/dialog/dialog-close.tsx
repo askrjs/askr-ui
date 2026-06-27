@@ -32,6 +32,7 @@ export function DialogClose(props: DialogCloseProps | DialogCloseAsChildProps) {
     ...interactionProps,
     ref,
     'data-slot': 'dialog-close',
+    'data-dialog-close': 'true',
     'data-disabled': disabled ? 'true' : undefined,
     'data-state': root.open ? 'open' : 'closed',
   });

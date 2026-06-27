@@ -24,7 +24,9 @@ export function DropdownTrigger(
     disabled = false,
     onPress,
     ref,
+    size,
     type: typeProp,
+    variant,
     ...rest
   } = props;
   const root = readDropdownRootContext();
@@ -60,7 +62,9 @@ export function DropdownTrigger(
     'aria-controls': root.contentId,
     'data-slot': 'dropdown-trigger',
     'data-disabled': disabled ? 'true' : undefined,
+    'data-size': size && size !== 'md' ? size : undefined,
     'data-state': root.open ? 'open' : 'closed',
+    'data-variant': variant && variant !== 'default' ? variant : undefined,
   });
 
   if (asChild) {

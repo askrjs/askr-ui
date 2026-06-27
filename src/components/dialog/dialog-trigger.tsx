@@ -53,6 +53,7 @@ export function DialogTrigger(
     'aria-expanded': root.open ? 'true' : 'false',
     'aria-controls': root.contentId,
     'data-slot': 'dialog-trigger',
+    'data-dialog-trigger': 'true',
     'data-disabled': disabled ? 'true' : undefined,
     'data-state': root.open ? 'open' : 'closed',
   });

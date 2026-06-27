@@ -34,6 +34,25 @@ describe('Button - Determinism', () => {
     ));
   });
 
+  it('should maps typed size and width affordances to stable data attributes', () => {
+    const container = mount(
+      <Button size="icon-xs" width="full">
+        Open
+      </Button>
+    );
+
+    try {
+      const button = container.querySelector(
+        '[data-slot="button"]'
+      ) as HTMLButtonElement | null;
+
+      expect(button?.getAttribute('data-size')).toBe('icon-xs');
+      expect(button?.getAttribute('data-width')).toBe('full');
+    } finally {
+      unmount(container);
+    }
+  });
+
   it('should renders deterministic asChild markup', () => {
     expectDeterministicRender(() => (
       <Button asChild data-testid="docs-link">
