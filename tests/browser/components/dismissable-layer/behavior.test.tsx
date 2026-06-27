@@ -26,6 +26,57 @@ describe('DismissableLayer - Behavior', () => {
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
+  it('should dismisses on document Escape for the top layer', () => {
+    const onDismiss = vi.fn();
+
+    container = mount(
+      <DismissableLayer onDismiss={onDismiss}>
+        <div>Layer</div>
+      </DismissableLayer>
+    );
+
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' })
+    );
+
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('should dismisses on outside pointer down', () => {
+    const onDismiss = vi.fn();
+
+    container = mount(
+      <DismissableLayer onDismiss={onDismiss}>
+        <div>Layer</div>
+      </DismissableLayer>
+    );
+
+    document.body.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, cancelable: true })
+    );
+
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('should honors prevented outside pointer dismissals', () => {
+    const onDismiss = vi.fn();
+
+    container = mount(
+      <DismissableLayer
+        onPointerDownOutside={(event) => event.preventDefault()}
+        onDismiss={onDismiss}
+      >
+        <div>Layer</div>
+      </DismissableLayer>
+    );
+
+    document.body.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, cancelable: true })
+    );
+
+    expect(onDismiss).toHaveBeenCalledTimes(0);
+  });
+
   it('should dismisses only the top layer when layers are stacked', () => {
     const outerDismiss = vi.fn();
     const innerDismiss = vi.fn();

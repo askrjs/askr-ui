@@ -9,6 +9,7 @@ import type {
 type LayerEntry = {
   node: HTMLElement | null;
   unregister: (() => void) | null;
+  unregisterDocumentListeners: (() => void) | null;
   isTop: (() => boolean) | null;
   setNode: (node: HTMLElement | null) => void;
   handleKeyDown: (event: KeyboardEvent) => void;
@@ -52,8 +53,34 @@ function getLayerEntry(layerId: string): LayerEntry {
       const layer = layerManager.register({
         node,
       });
+      const ownerDocument = node.ownerDocument;
+      const handleDocumentKeyDown = (event: KeyboardEvent) => {
+        created.handleKeyDown(event);
+      };
+      const handleDocumentPointerDown = (event: PointerEvent) => {
+        created.handlePointerDownCapture(event);
+      };
+
+      ownerDocument.addEventListener('keydown', handleDocumentKeyDown, true);
+      ownerDocument.addEventListener(
+        'pointerdown',
+        handleDocumentPointerDown,
+        true
+      );
       created.unregister = () => {
         layer.unregister();
+      };
+      created.unregisterDocumentListeners = () => {
+        ownerDocument.removeEventListener(
+          'keydown',
+          handleDocumentKeyDown,
+          true
+        );
+        ownerDocument.removeEventListener(
+          'pointerdown',
+          handleDocumentPointerDown,
+          true
+        );
       };
       created.isTop = () => layer.isTop();
     },
@@ -67,7 +94,6 @@ function getLayerEntry(layerId: string): LayerEntry {
       }
 
       created.lastEscapeEvent = event;
-      event.preventDefault?.();
       event.stopPropagation?.();
       runDismissCallbacks(layerId, 'escape');
     },
@@ -89,6 +115,7 @@ function getLayerEntry(layerId: string): LayerEntry {
     },
     lastEscapeEvent: null,
     lastOutsidePointerEvent: null,
+    unregisterDocumentListeners: null,
     disabled: false,
     disableOutsidePointerEvents: false,
   };
@@ -105,7 +132,9 @@ function unregisterLayer(layerId: string) {
   }
 
   entry.unregister();
+  entry.unregisterDocumentListeners?.();
   entry.unregister = null;
+  entry.unregisterDocumentListeners = null;
   entry.isTop = null;
   entry.node = null;
 }
@@ -118,24 +147,42 @@ function runDismissCallbacks(layerId: string, trigger: 'escape' | 'outside') {
   }
 
   if (trigger === 'escape') {
-    entry.onEscapeKeyDown?.(
-      entry.lastEscapeEvent ?? new KeyboardEvent('keydown', { key: 'Escape' })
-    );
+    const escapeEvent =
+      entry.lastEscapeEvent ??
+      new KeyboardEvent('keydown', { cancelable: true, key: 'Escape' });
+
+    entry.onEscapeKeyDown?.(escapeEvent);
+
+    if (escapeEvent.defaultPrevented) {
+      return;
+    }
+
+    escapeEvent.preventDefault?.();
     entry.onDismiss?.();
     return;
   }
 
   const pointerEvent =
     entry.lastOutsidePointerEvent ??
-    new PointerEvent('pointerdown', { bubbles: true });
+    new PointerEvent('pointerdown', { bubbles: true, cancelable: true });
+
+  entry.onPointerDownOutside?.(pointerEvent);
+
+  if (pointerEvent.defaultPrevented) {
+    return;
+  }
+
+  entry.onInteractOutside?.(pointerEvent);
+
+  if (pointerEvent.defaultPrevented) {
+    return;
+  }
 
   if (entry.disableOutsidePointerEvents) {
     pointerEvent.preventDefault?.();
     pointerEvent.stopPropagation?.();
   }
 
-  entry.onPointerDownOutside?.(pointerEvent);
-  entry.onInteractOutside?.(pointerEvent);
   entry.onDismiss?.();
 }
 
