@@ -3,7 +3,7 @@ import {
   Toast,
   ToastAction,
   ToastDescription,
-  ToastProvider,
+  ToastHost,
   ToastTitle,
   ToastViewport,
 } from '../../../../src/components/toast';
@@ -12,14 +12,14 @@ import { expectNoAxeViolations } from '../../accessibility';
 describe('Toast - Accessibility', () => {
   it('should has no toast accessibility regressions', async () => {
     await expectNoAxeViolations(
-      <ToastProvider>
+      <ToastHost>
         <ToastViewport />
         <Toast defaultOpen={true}>
           <ToastTitle>Saved</ToastTitle>
           <ToastDescription>Changes stored</ToastDescription>
           <ToastAction>Undo</ToastAction>
         </Toast>
-      </ToastProvider>
+      </ToastHost>
     );
   });
 });

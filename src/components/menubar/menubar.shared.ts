@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 import {
   disabledIndexes,
   firstEnabledCompositeIndex,
@@ -80,24 +80,24 @@ export type MenubarContentResolvedState = {
   disabledItemIndexes: number[];
 };
 
-export const MenubarRootContext = defineContext<MenubarRootContextValue | null>(
+export const MenubarRootContext = defineScope<MenubarRootContextValue | null>(
   null
 );
 export const MenubarRootRenderContext =
-  defineContext<MenubarRootRenderContextValue | null>(null);
-export const MenubarMenuContext = defineContext<MenubarMenuContextValue | null>(
+  defineScope<MenubarRootRenderContextValue | null>(null);
+export const MenubarMenuContext = defineScope<MenubarMenuContextValue | null>(
   null
 );
 export const MenubarContentContext =
-  defineContext<MenubarContentContextValue | null>(null);
+  defineScope<MenubarContentContextValue | null>(null);
 export const MenubarContentRenderContext =
-  defineContext<MenubarContentRenderContextValue | null>(null);
-export const MenubarSubContext = defineContext<MenubarSubContextValue | null>(
+  defineScope<MenubarContentRenderContextValue | null>(null);
+export const MenubarSubContext = defineScope<MenubarSubContextValue | null>(
   null
 );
 
 export function readMenubarRootContext(): MenubarRootContextValue {
-  const context = readContext(MenubarRootContext);
+  const context = readScope(MenubarRootContext);
 
   if (!context) {
     throw new Error('Menubar components must be used within <Menubar>');
@@ -107,11 +107,11 @@ export function readMenubarRootContext(): MenubarRootContextValue {
 }
 
 export function readOptionalMenubarRootContext(): MenubarRootContextValue | null {
-  return readContext(MenubarRootContext);
+  return readScope(MenubarRootContext);
 }
 
 export function readMenubarRootRenderContext(): MenubarRootRenderContextValue {
-  const context = readContext(MenubarRootRenderContext);
+  const context = readScope(MenubarRootRenderContext);
 
   if (!context) {
     throw new Error('MenubarMenu must be used within <Menubar>');
@@ -121,7 +121,7 @@ export function readMenubarRootRenderContext(): MenubarRootRenderContextValue {
 }
 
 export function readMenubarMenuContext(): MenubarMenuContextValue {
-  const context = readContext(MenubarMenuContext);
+  const context = readScope(MenubarMenuContext);
 
   if (!context) {
     throw new Error('Menubar menu parts must be used within <MenubarMenu>');
@@ -131,7 +131,7 @@ export function readMenubarMenuContext(): MenubarMenuContextValue {
 }
 
 export function readMenubarContentContext(): MenubarContentContextValue {
-  const context = readContext(MenubarContentContext);
+  const context = readScope(MenubarContentContext);
 
   if (!context) {
     throw new Error('Menubar items must be used within content');
@@ -141,7 +141,7 @@ export function readMenubarContentContext(): MenubarContentContextValue {
 }
 
 export function readMenubarContentRenderContext(): MenubarContentRenderContextValue {
-  const context = readContext(MenubarContentRenderContext);
+  const context = readScope(MenubarContentRenderContext);
 
   if (!context) {
     throw new Error('Menubar items must be used within content');
@@ -151,7 +151,7 @@ export function readMenubarContentRenderContext(): MenubarContentRenderContextVa
 }
 
 export function readMenubarSubContext(): MenubarSubContextValue {
-  const context = readContext(MenubarSubContext);
+  const context = readScope(MenubarSubContext);
 
   if (!context) {
     throw new Error(
@@ -239,7 +239,7 @@ export function resolveMenubarContentOwner(): {
   overlayId: string;
   path: string[];
 } {
-  const subContext = readContext(MenubarSubContext);
+  const subContext = readScope(MenubarSubContext);
 
   if (subContext) {
     return {
@@ -250,7 +250,7 @@ export function resolveMenubarContentOwner(): {
     };
   }
 
-  const menuContext = readContext(MenubarMenuContext);
+  const menuContext = readScope(MenubarMenuContext);
 
   if (menuContext) {
     return {

@@ -2,20 +2,20 @@
  * Toast is the stacked notification family.
  *
  * Responsibilities:
- * - ToastProvider owns the notification registry and default timing.
+ * - ToastHost owns the notification registry and default timing.
  * - ToastViewport renders the current stack in declaration order.
  * - Toast declares a notification entry; it does not render DOM by itself.
  *
  * @example
  * ```tsx
- * <ToastProvider duration={5000}>
+ * <ToastHost duration={5000}>
  *   <ToastViewport />
  *   <Toast defaultOpen>
  *     <ToastTitle>Saved</ToastTitle>
  *     <ToastDescription>Changes stored</ToastDescription>
  *     <ToastClose>Dismiss</ToastClose>
  *   </Toast>
- * </ToastProvider>
+ * </ToastHost>
  * ```
  */
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
@@ -35,19 +35,19 @@ import type {
   ToastDescriptionAsChildProps,
   ToastDescriptionProps,
   ToastProps,
-  ToastProviderProps,
+  ToastHostProps,
   ToastTitleAsChildProps,
   ToastTitleProps,
   ToastViewportAsChildProps,
   ToastViewportProps,
 } from './toast.types';
 import {
-  ToastProviderContext,
+  ToastHostContext,
   ToastRootContext,
-  readToastProviderContext,
+  readToastHostContext,
   readToastRootContext,
   type ToastRegistration,
-  type ToastProviderContextValue,
+  type ToastHostContextValue,
   type ToastRootContextValue,
 } from './toast.shared';
 
@@ -58,7 +58,7 @@ type ToastLifecycleEntry = {
 };
 
 const toastEntries = new Map<string, ToastLifecycleEntry>();
-const toastProviderContexts = new Map<string, ToastProviderContextValue>();
+const toastHostContexts = new Map<string, ToastHostContextValue>();
 
 function getToastEntry(toastId: string) {
   const existing = toastEntries.get(toastId);
@@ -99,31 +99,31 @@ function restoreToastFocus(entry: ToastLifecycleEntry) {
   }
 }
 
-function getToastProviderContext(
-  providerId: string
-): ToastProviderContextValue {
-  const existing = toastProviderContexts.get(providerId);
+function getToastHostContext(
+  hostId: string
+): ToastHostContextValue {
+  const existing = toastHostContexts.get(hostId);
 
   if (existing) {
     return existing;
   }
 
-  const created: ToastProviderContextValue = {
-    providerId,
+  const created: ToastHostContextValue = {
+    hostId,
     duration: 0,
     toasts: [],
     getToasts: () => [],
     registerToast: () => {},
     unregisterToast: () => {},
   };
-  toastProviderContexts.set(providerId, created);
+  toastHostContexts.set(hostId, created);
   return created;
 }
 
 function ToastRegistrationView(props: {
   key?: string;
   registration: ToastRegistration;
-  provider: ToastProviderContextValue;
+  host: ToastHostContextValue;
 }) {
   const toastProps = props.registration.props;
   const {
@@ -142,32 +142,22 @@ function ToastRegistrationView(props: {
     defaultValue: defaultOpen,
     onChange: onOpenChange,
   });
-  const hasTitleState = state(
+  const hasTitle =
     collectJsxElements(children, (element) => element.type === ToastTitle)
-      .length > 0
-  );
-  const hasDescriptionState = state(
+      .length > 0;
+  const hasDescription =
     collectJsxElements(children, (element) => element.type === ToastDescription)
-      .length > 0
-  );
-  const hasTitle = hasTitleState();
-  const hasDescription = hasDescriptionState();
+      .length > 0;
   const entry = getToastEntry(toastId);
-  const resolvedDuration = duration ?? props.provider.duration;
+  const resolvedDuration = duration ?? props.host.duration;
   const setOpen = (nextOpen: boolean) => {
     openState.set(nextOpen);
-  };
-  const setHasTitle = (present: boolean) => {
-    hasTitleState.set(present);
-  };
-  const setHasDescription = (present: boolean) => {
-    hasDescriptionState.set(present);
   };
   const setNode = (node: HTMLElement | null) => {
     entry.node = node;
   };
   const rootContext: ToastRootContextValue = {
-    providerId: props.provider.providerId,
+    hostId: props.host.hostId,
     toastId,
     open: openState(),
     setOpen,
@@ -176,8 +166,6 @@ function ToastRegistrationView(props: {
     variant,
     hasTitle,
     hasDescription,
-    setHasTitle,
-    setHasDescription,
     setNode,
   };
 
@@ -272,7 +260,7 @@ function ToastRegistrationView(props: {
   });
 
   return (
-    <ToastRootContext.Scope value={rootContext}>
+    <ToastRootContext value={rootContext}>
       <Presence present={rootContext.open}>
         <DismissableLayer
           onEscapeKeyDown={() => {
@@ -285,51 +273,79 @@ function ToastRegistrationView(props: {
           <div {...finalProps}>{children}</div>
         </DismissableLayer>
       </Presence>
-    </ToastRootContext.Scope>
+    </ToastRootContext>
   );
 }
 
 /**
- * ToastProvider owns the registry of active toast entries and the default
+ * ToastHost owns the registry of active toast entries and the default
  * display duration for the family.
  */
-export function ToastProvider(props: ToastProviderProps) {
+export function ToastHost(props: ToastHostProps) {
   const { children, duration = 5000, id, ref, ...rest } = props;
-  const generatedProviderId = state(
-    resolveCompoundId('toast-provider', id, children)
+  const generatedHostId = state(
+    resolveCompoundId('toast-host', id, children)
   );
-  const providerId =
+  const hostId =
     id === undefined
-      ? generatedProviderId()
-      : resolveCompoundId('toast-provider', id, children);
-  const toastRegistrationsState = state<ToastRegistration[]>([]);
-  const providerContext = getToastProviderContext(providerId);
+      ? generatedHostId()
+      : resolveCompoundId('toast-host', id, children);
+  const hostContext = getToastHostContext(hostId);
+  const toastRegistrationsState = state<ToastRegistration[]>(
+    hostContext.toasts
+  );
   const registerToast = (registration: ToastRegistration) => {
-    const nextRegistrations = toastRegistrationsState().filter(
+    const currentRegistrations = toastRegistrationsState();
+    const currentRegistration = currentRegistrations.find(
+      (entry) => entry.toastId === registration.toastId
+    );
+
+    if (currentRegistration?.signature === registration.signature) {
+      const registrationIndex = currentRegistrations.indexOf(currentRegistration);
+      currentRegistrations[registrationIndex] = registration;
+      hostContext.toasts = currentRegistrations;
+      return;
+    }
+
+    const nextRegistrations = currentRegistrations.filter(
       (entry) => entry.toastId !== registration.toastId
     );
     nextRegistrations.push(registration);
     toastRegistrationsState.set(nextRegistrations);
-    providerContext.toasts = nextRegistrations;
+    hostContext.toasts = nextRegistrations;
   };
-  const unregisterToast = (toastId: string) => {
-    const nextRegistrations = toastRegistrationsState().filter(
-      (entry) => entry.toastId !== toastId
-    );
-    toastRegistrationsState.set(nextRegistrations);
-    providerContext.toasts = nextRegistrations;
+  const unregisterToast = (
+    toastId: string,
+    registration: ToastRegistration
+  ) => {
+    queueMicrotask(() => {
+      const currentRegistrations = toastRegistrationsState();
+
+      if (
+        currentRegistrations.find((entry) => entry.toastId === toastId) !==
+        registration
+      ) {
+        return;
+      }
+
+      const nextRegistrations = currentRegistrations.filter(
+        (entry) => entry.toastId !== toastId
+      );
+      toastRegistrationsState.set(nextRegistrations);
+      hostContext.toasts = nextRegistrations;
+    });
   };
-  providerContext.providerId = providerId;
-  providerContext.duration = duration;
+  hostContext.hostId = hostId;
+  hostContext.duration = duration;
   const toastRegistrations = toastRegistrationsState();
-  providerContext.toasts = toastRegistrations;
-  providerContext.getToasts = toastRegistrationsState;
-  providerContext.registerToast = registerToast;
-  providerContext.unregisterToast = unregisterToast;
+  hostContext.toasts = toastRegistrations;
+  hostContext.getToasts = toastRegistrationsState;
+  hostContext.registerToast = registerToast;
+  hostContext.unregisterToast = unregisterToast;
   const finalProps = mergeProps(rest, {
     ref,
-    'data-slot': 'toast-provider',
-    'data-toast-provider': 'true',
+    'data-slot': 'toast-host',
+    'data-toast-host': 'true',
   });
 
   resource(
@@ -337,20 +353,20 @@ export function ToastProvider(props: ToastProviderProps) {
       signal.addEventListener(
         'abort',
         () => {
-          toastProviderContexts.delete(providerId);
+          toastHostContexts.delete(hostId);
         },
         { once: true }
       );
 
       return null;
     },
-    [providerId]
+    [hostId]
   );
 
   return (
-    <ToastProviderContext.Scope value={providerContext}>
+    <ToastHostContext value={hostContext}>
       <div {...finalProps}>{children}</div>
-    </ToastProviderContext.Scope>
+    </ToastHostContext>
   );
 }
 
@@ -363,15 +379,15 @@ export function ToastViewport(
   props: ToastViewportProps | ToastViewportAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
-  const provider = readToastProviderContext();
-  const toastRegistrations = provider.getToasts();
+  const host = readToastHostContext();
+  const toastRegistrations = host.getToasts();
   const content = (
     <>
       {toastRegistrations.map((registration) => (
         <ToastRegistrationView
           key={registration.toastId}
           registration={registration}
-          provider={provider}
+          host={host}
         />
       ))}
       {children}
@@ -394,25 +410,33 @@ export function ToastViewport(
 }
 
 /**
- * Toast registers a notification entry with the provider and returns no DOM on
+ * Toast registers a notification entry with the host and returns no DOM on
  * its own.
  */
 export function Toast(props: ToastProps): JSX.Element | null {
-  const provider = readToastProviderContext();
+  const host = readToastHostContext();
   const toastId = resolveCompoundId('toast', props.id, props.children);
   const childrenSignature = serializeForId(props.children);
+  const registration: ToastRegistration = {
+    toastId,
+    signature: [
+      childrenSignature,
+      String(props.defaultOpen),
+      String(props.duration),
+      String(props.open),
+      String(props.variant),
+    ].join('|'),
+    props,
+  };
 
   resource(
     ({ signal }) => {
-      provider.registerToast({
-        toastId,
-        props,
-      });
+      host.registerToast(registration);
 
       signal.addEventListener(
         'abort',
         () => {
-          provider.unregisterToast(toastId);
+          host.unregisterToast(toastId, registration);
         },
         { once: true }
       );
@@ -420,7 +444,7 @@ export function Toast(props: ToastProps): JSX.Element | null {
       return null;
     },
     [
-      provider.providerId,
+      host.hostId,
       toastId,
       childrenSignature,
       props.defaultOpen,
@@ -441,22 +465,8 @@ export function ToastTitle(props: ToastTitleAsChildProps): JSX.Element;
 export function ToastTitle(props: ToastTitleProps | ToastTitleAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const root = readToastRootContext();
-  const deferHasTitle = (present: boolean) => {
-    queueMicrotask(() => {
-      root.setHasTitle(present);
-    });
-  };
   const finalProps = mergeProps(rest, {
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      (node: HTMLElement | null) => {
-        deferHasTitle(Boolean(node));
-      }
-    ),
+    ref,
     id: root.titleId,
     'data-slot': 'toast-title',
     'data-toast-title': 'true',
@@ -481,22 +491,8 @@ export function ToastDescription(
 ) {
   const { asChild, children, ref, ...rest } = props;
   const root = readToastRootContext();
-  const deferHasDescription = (present: boolean) => {
-    queueMicrotask(() => {
-      root.setHasDescription(present);
-    });
-  };
   const finalProps = mergeProps(rest, {
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      (node: HTMLElement | null) => {
-        deferHasDescription(Boolean(node));
-      }
-    ),
+    ref,
     id: root.descriptionId,
     'data-slot': 'toast-description',
     'data-toast-description': 'true',

@@ -38,11 +38,11 @@ export function Dropdown(props: DropdownProps) {
   const PortalHost = rootContext.portal;
 
   return (
-    <DropdownRootContext.Scope value={rootContext}>
-      <DropdownRenderContext.Scope value={runtimeRenderContext}>
+    <DropdownRootContext value={rootContext}>
+      <DropdownRenderContext value={runtimeRenderContext}>
         {children as JSX.Element}
         {PortalHost ? <PortalHost key="dropdown-root-portal" /> : null}
-      </DropdownRenderContext.Scope>
-    </DropdownRootContext.Scope>
+      </DropdownRenderContext>
+    </DropdownRootContext>
   );
 }

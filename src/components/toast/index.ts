@@ -1,5 +1,5 @@
 export {
-  ToastProvider,
+  ToastHost,
   ToastViewport,
   Toast,
   ToastTitle,
@@ -9,8 +9,8 @@ export {
 } from './toast';
 export { TOAST_A11Y_CONTRACT, type ToastA11yContract } from './toast.a11y';
 export type {
-  ToastProviderOwnProps,
-  ToastProviderProps,
+  ToastHostOwnProps,
+  ToastHostProps,
   ToastViewportProps,
   ToastViewportAsChildProps,
   ToastOwnProps,

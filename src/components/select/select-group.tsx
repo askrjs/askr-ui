@@ -56,13 +56,13 @@ export function SelectGroup(props: SelectGroupProps | SelectGroupAsChildProps) {
   });
 
   return (
-    <SelectGroupContext.Scope value={{ groupId, labelId }}>
+    <SelectGroupContext value={{ groupId, labelId }}>
       <SelectGroupScopeView
         asChild={asChild}
         finalProps={finalProps as Record<string, unknown>}
         children={children}
       />
-    </SelectGroupContext.Scope>
+    </SelectGroupContext>
   );
 }
 

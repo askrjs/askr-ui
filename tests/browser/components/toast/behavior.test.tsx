@@ -7,7 +7,7 @@ import {
   ToastAction,
   ToastClose,
   ToastDescription,
-  ToastProvider,
+  ToastHost,
   ToastTitle,
   ToastViewport,
 } from '../../../../src/components/toast';
@@ -26,14 +26,14 @@ function ControlledToastFixture() {
       >
         Show toast
       </button>
-      <ToastProvider duration={1000}>
+      <ToastHost duration={1000}>
         <ToastViewport />
         <Toast open={openState()} onOpenChange={(open) => openState.set(open)}>
           <ToastTitle>Saved</ToastTitle>
           <ToastDescription>Changes stored</ToastDescription>
           <ToastClose>Dismiss</ToastClose>
         </Toast>
-      </ToastProvider>
+      </ToastHost>
     </div>
   );
 }
@@ -42,7 +42,7 @@ function ControlledToastOpenerFixture() {
   const openState = state(false);
 
   return (
-    <ToastProvider duration={1000}>
+    <ToastHost duration={1000}>
       <button
         id="open-toast"
         onClick={() => {
@@ -64,7 +64,7 @@ function ControlledToastOpenerFixture() {
         </ToastAction>
         <ToastClose>Dismiss</ToastClose>
       </Toast>
-    </ToastProvider>
+    </ToastHost>
   );
 }
 
@@ -72,7 +72,7 @@ function ControlledToastLinkActionFixture() {
   const openState = state(false);
 
   return (
-    <ToastProvider duration={1000}>
+    <ToastHost duration={1000}>
       <button
         id="open-link-toast"
         onClick={() => {
@@ -97,7 +97,7 @@ function ControlledToastLinkActionFixture() {
         </ToastAction>
         <ToastClose>Dismiss</ToastClose>
       </Toast>
-    </ToastProvider>
+    </ToastHost>
   );
 }
 
@@ -105,7 +105,7 @@ function ControlledToastPressButtonFixture() {
   const openState = state(false);
 
   return (
-    <ToastProvider duration={1000}>
+    <ToastHost duration={1000}>
       <Button
         id="open-press-toast"
         type="button"
@@ -128,7 +128,7 @@ function ControlledToastPressButtonFixture() {
         </ToastAction>
         <ToastClose>Dismiss</ToastClose>
       </Toast>
-    </ToastProvider>
+    </ToastHost>
   );
 }
 
@@ -148,7 +148,7 @@ describe('Toast - Behavior', () => {
 
   it('should renders toast content inside the viewport in declaration order', async () => {
     container = mount(
-      <ToastProvider>
+      <ToastHost>
         <ToastViewport />
         <Toast defaultOpen={true}>
           <ToastTitle>First</ToastTitle>
@@ -156,7 +156,7 @@ describe('Toast - Behavior', () => {
         <Toast defaultOpen={true}>
           <ToastTitle>Second</ToastTitle>
         </Toast>
-      </ToastProvider>
+      </ToastHost>
     );
     await flushUpdates();
 
@@ -170,12 +170,12 @@ describe('Toast - Behavior', () => {
   it('should dismisses toasts on their configured timer', async () => {
     vi.useFakeTimers();
     container = mount(
-      <ToastProvider duration={50}>
+      <ToastHost duration={50}>
         <ToastViewport />
         <Toast defaultOpen={true}>
           <ToastTitle>Timed</ToastTitle>
         </Toast>
-      </ToastProvider>
+      </ToastHost>
     );
     await flushUpdates();
 
@@ -191,7 +191,7 @@ describe('Toast - Behavior', () => {
   it('should dismisses multiple open toasts when timers expire at the same time', async () => {
     vi.useFakeTimers();
     container = mount(
-      <ToastProvider duration={40}>
+      <ToastHost duration={40}>
         <ToastViewport />
         <Toast id="first" defaultOpen={true}>
           <ToastTitle>First timed</ToastTitle>
@@ -199,7 +199,7 @@ describe('Toast - Behavior', () => {
         <Toast id="second" defaultOpen={true}>
           <ToastTitle>Second timed</ToastTitle>
         </Toast>
-      </ToastProvider>
+      </ToastHost>
     );
     await flushUpdates();
 
@@ -295,13 +295,13 @@ describe('Toast - Behavior', () => {
 
   it('should dismisses on escape and action press', async () => {
     container = mount(
-      <ToastProvider>
+      <ToastHost>
         <ToastViewport />
         <Toast defaultOpen={true}>
           <ToastTitle>Undoable</ToastTitle>
           <ToastAction>Undo</ToastAction>
         </Toast>
-      </ToastProvider>
+      </ToastHost>
     );
     await flushUpdates();
 
@@ -315,13 +315,13 @@ describe('Toast - Behavior', () => {
     expect(container.querySelector('[data-toast="true"]')).toBeNull();
 
     container = mount(
-      <ToastProvider>
+      <ToastHost>
         <ToastViewport />
         <Toast defaultOpen={true}>
           <ToastTitle>Undoable</ToastTitle>
           <ToastAction>Undo</ToastAction>
         </Toast>
-      </ToastProvider>
+      </ToastHost>
     );
     await flushUpdates();
 
@@ -335,7 +335,7 @@ describe('Toast - Behavior', () => {
 
   it('should preserves action styling and href when composed with a link child', async () => {
     container = mount(
-      <ToastProvider>
+      <ToastHost>
         <ToastViewport />
         <Toast defaultOpen={true}>
           <ToastTitle>Queued</ToastTitle>
@@ -343,7 +343,7 @@ describe('Toast - Behavior', () => {
             <a href="/logs">View logs</a>
           </ToastAction>
         </Toast>
-      </ToastProvider>
+      </ToastHost>
     );
     await flushUpdates();
 

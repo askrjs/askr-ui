@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 import { OVERLAY_Z_INDEX, type OverlayPortal } from '../_internal/overlay';
 
 export type DialogPositionOptions = {
@@ -26,12 +26,12 @@ export type DialogRootContextValue = {
   clearPosition: () => void;
 };
 
-export const DialogRootContext = defineContext<DialogRootContextValue | null>(
+export const DialogRootContext = defineScope<DialogRootContextValue | null>(
   null
 );
 
 export function readDialogRootContext(): DialogRootContextValue {
-  const context = readContext(DialogRootContext);
+  const context = readScope(DialogRootContext);
 
   if (!context) {
     throw new Error('Dialog components must be used within <Dialog>');

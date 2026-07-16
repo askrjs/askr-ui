@@ -9,13 +9,18 @@ type ExportTarget = {
   require: string;
 };
 
+type ConditionalExportTarget = {
+  import: { types: string; default: string };
+  require: { types: string; default: string };
+};
+
 type PackageJson = {
-  exports: Record<string, ExportTarget | string>;
+  exports: Record<string, ExportTarget | ConditionalExportTarget | string>;
 };
 
 function expectExportTarget(
   actual: unknown,
-  expected: ExportTarget,
+  expected: ExportTarget | ConditionalExportTarget,
   label: string
 ) {
   expect(actual, `${label} is missing`).toEqual(expected);
@@ -34,9 +39,14 @@ describe('Package exports', () => {
     expectExportTarget(
       packageJson.exports['.'],
       {
-        types: './dist/index.d.ts',
-        import: './dist/index.js',
-        require: './dist/index.cjs',
+        import: {
+          types: './dist/index.d.ts',
+          default: './dist/index.js',
+        },
+        require: {
+          types: './dist/index.d.cts',
+          default: './dist/index.cjs',
+        },
       },
       'root export'
     );
@@ -100,12 +110,19 @@ describe('Package exports', () => {
     const packageJson = readPackageJson();
     const targets = Object.entries(packageJson.exports)
       .filter(
-        (entry): entry is [string, ExportTarget] =>
+        (
+          entry
+        ): entry is [string, ExportTarget | ConditionalExportTarget] =>
           entry[0] !== './package.json' && typeof entry[1] !== 'string'
       )
       .map(([subpath, target]) => ({
         subpath,
-        esmPath: join(process.cwd(), target.import),
+        esmPath: join(
+          process.cwd(),
+          typeof target.import === 'string'
+            ? target.import
+            : target.import.default
+        ),
       }));
 
     const output = execFileSync(

@@ -12,6 +12,7 @@ export default defineConfig({
       'tests/unit/foundations-contract.test.ts',
       'tests/unit/source-layout.test.ts',
       'tests/unit/public-api.test.ts',
+      'tests/unit/react-free-public-surface.test.ts',
       'tests/unit/export-map.test.ts',
       'tests/unit/docs-contract.test.ts',
     ],

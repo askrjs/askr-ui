@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 import {
   firstEnabledIndex,
   getMenuCollection,
@@ -34,12 +34,12 @@ export type DropdownResolvedState = {
 };
 
 export const DropdownRootContext =
-  defineContext<DropdownRootContextValue | null>(null);
+  defineScope<DropdownRootContextValue | null>(null);
 export const DropdownRenderContext =
-  defineContext<DropdownRenderContextValue | null>(null);
+  defineScope<DropdownRenderContextValue | null>(null);
 
 export function readDropdownRootContext(): DropdownRootContextValue {
-  const context = readContext(DropdownRootContext);
+  const context = readScope(DropdownRootContext);
 
   if (!context) {
     throw new Error('Dropdown components must be used within <Dropdown>');
@@ -49,7 +49,7 @@ export function readDropdownRootContext(): DropdownRootContextValue {
 }
 
 export function readDropdownRenderContext(): DropdownRenderContextValue {
-  const context = readContext(DropdownRenderContext);
+  const context = readScope(DropdownRenderContext);
 
   if (!context) {
     throw new Error('DropdownItem must be used within <Dropdown>');

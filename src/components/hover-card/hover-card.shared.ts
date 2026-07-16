@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 import {
   OVERLAY_Z_INDEX,
   type OverlayPortal,
@@ -32,10 +32,10 @@ export type HoverCardRootContextValue = {
 };
 
 export const HoverCardRootContext =
-  defineContext<HoverCardRootContextValue | null>(null);
+  defineScope<HoverCardRootContextValue | null>(null);
 
 export function readHoverCardRootContext(): HoverCardRootContextValue {
-  const context = readContext(HoverCardRootContext);
+  const context = readScope(HoverCardRootContext);
 
   if (!context) {
     throw new Error('HoverCard components must be used within <HoverCard>');

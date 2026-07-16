@@ -51,12 +51,12 @@ import { Checkbox, Input, Label } from '@askrjs/ui';
 ### Controlled state pattern
 
 ```tsx
-import { useState } from 'react';
+import { state } from '@askrjs/askr';
 import { Toggle } from '@askrjs/ui';
 
-const [pressed, setPressed] = useState(false);
+const pressed = state(false);
 
-<Toggle pressed={pressed} onPress={() => setPressed(!pressed)}>
+<Toggle pressed={pressed()} onPress={() => pressed.set(!pressed())}>
   Mute
 </Toggle>;
 ```

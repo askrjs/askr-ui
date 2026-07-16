@@ -33,7 +33,7 @@ import {
   ToastAction,
   ToastClose,
   ToastDescription,
-  ToastProvider,
+  ToastHost,
   ToastTitle,
   ToastViewport,
   ToggleGroup,
@@ -92,7 +92,7 @@ import { Progress as ProgressSubpath } from '@askrjs/ui';
 import { ProgressCircle as ProgressCircleSubpath } from '@askrjs/ui';
 import { Slider as SliderSubpath } from '@askrjs/ui';
 import { Table as TableSubpath } from '@askrjs/ui';
-import { ToastProvider as ToastSubpath } from '@askrjs/ui';
+import { ToastHost as ToastSubpath } from '@askrjs/ui';
 import { ToggleGroup as ToggleGroupSubpath } from '@askrjs/ui';
 
 const slotChild = {} as JSXElement;
@@ -107,7 +107,7 @@ const progressFromSubpath: typeof Progress = ProgressSubpath;
 const progressCircleFromSubpath: typeof ProgressCircle = ProgressCircleSubpath;
 const sliderFromSubpath: typeof Slider = SliderSubpath;
 const tableFromSubpath: typeof Table = TableSubpath;
-const toastFromSubpath: typeof ToastProvider = ToastSubpath;
+const toastFromSubpath: typeof ToastHost = ToastSubpath;
 const toggleGroupFromSubpath: typeof ToggleGroup = ToggleGroupSubpath;
 const menubarFromRoot: typeof Menubar = askrUi.Menubar;
 
@@ -262,7 +262,7 @@ void [
   AccordionTrigger,
   AccordionContent,
   ToggleGroupItem,
-  ToastProvider,
+  ToastHost,
   ToastViewport,
   Toast,
   ToastTitle,

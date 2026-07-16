@@ -29,8 +29,8 @@ import type {
  *
  * @example Native checkbox input
  * ```tsx
- * const [checked, setChecked] = useState(false);
- * <Checkbox checked={checked} onPress={() => setChecked(!checked)} />
+ * const checked = state(false);
+ * <Checkbox checked={checked()} onPress={() => checked.set(!checked())} />
  * ```
  *
  * @example Polymorphic rendering (asChild)

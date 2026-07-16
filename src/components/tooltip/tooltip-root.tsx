@@ -71,11 +71,11 @@ export function Tooltip(props: TooltipProps) {
   const PortalHost = portal;
 
   return (
-    <TooltipRootContext.Scope value={rootContext}>
+    <TooltipRootContext value={rootContext}>
       <>
         {children}
         {PortalHost ? <PortalHost key="tooltip-root-portal" /> : null}
       </>
-    </TooltipRootContext.Scope>
+    </TooltipRootContext>
   );
 }

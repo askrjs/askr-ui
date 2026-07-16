@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 import type { ToggleGroupOrientation } from './toggle-group.types';
 
 export type ToggleGroupRootItem = {
@@ -28,13 +28,13 @@ export type ToggleGroupRenderContextValue = {
 };
 
 export const ToggleGroupRootContext =
-  defineContext<ToggleGroupRootContextValue | null>(null);
+  defineScope<ToggleGroupRootContextValue | null>(null);
 
 export const ToggleGroupRenderContext =
-  defineContext<ToggleGroupRenderContextValue | null>(null);
+  defineScope<ToggleGroupRenderContextValue | null>(null);
 
 export function readToggleGroupRootContext(): ToggleGroupRootContextValue {
-  const context = readContext(ToggleGroupRootContext);
+  const context = readScope(ToggleGroupRootContext);
 
   if (!context) {
     throw new Error('ToggleGroup components must be used within <ToggleGroup>');
@@ -44,7 +44,7 @@ export function readToggleGroupRootContext(): ToggleGroupRootContextValue {
 }
 
 export function readToggleGroupRenderContext(): ToggleGroupRenderContextValue {
-  const context = readContext(ToggleGroupRenderContext);
+  const context = readScope(ToggleGroupRenderContext);
 
   if (!context) {
     throw new Error('ToggleGroupItem must be used within <ToggleGroup>');

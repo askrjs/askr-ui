@@ -12,9 +12,6 @@ function isPublicValueExport(name: string) {
 
 describe('Public API', () => {
   it('should matches the manifest-driven surface from the root entrypoint', () => {
-    expect('createAskRComponent' in askrUi).toBe(false);
-    expect('AskRComponent' in askrUi).toBe(false);
-
     const sourceExportNames = Array.from(
       new Set(
         componentSurface.flatMap((entry) =>
@@ -24,6 +21,9 @@ describe('Public API', () => {
     ).sort();
 
     expect(publicValueExports).toEqual(sourceExportNames);
+    expect(Object.keys(askrUi).filter(isPublicValueExport).sort()).toEqual(
+      publicValueExports
+    );
 
     for (const entry of componentSurface) {
       for (const exportName of Object.keys(entry.module).filter(

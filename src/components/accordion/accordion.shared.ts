@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 import type { getCompositeCollection } from '../_internal/composite';
 import type { AccordionOrientation } from './accordion.types';
 
@@ -32,14 +32,14 @@ export type AccordionItemContextValue = {
 };
 
 export const AccordionRootContext =
-  defineContext<AccordionRootContextValue | null>(null);
+  defineScope<AccordionRootContextValue | null>(null);
 export const AccordionRenderContext =
-  defineContext<AccordionRenderContextValue | null>(null);
+  defineScope<AccordionRenderContextValue | null>(null);
 export const AccordionItemContext =
-  defineContext<AccordionItemContextValue | null>(null);
+  defineScope<AccordionItemContextValue | null>(null);
 
 export function readAccordionRootContext(): AccordionRootContextValue {
-  const context = readContext(AccordionRootContext);
+  const context = readScope(AccordionRootContext);
 
   if (!context) {
     throw new Error('Accordion components must be used within <Accordion>');
@@ -49,7 +49,7 @@ export function readAccordionRootContext(): AccordionRootContextValue {
 }
 
 export function readAccordionRenderContext(): AccordionRenderContextValue {
-  const context = readContext(AccordionRenderContext);
+  const context = readScope(AccordionRenderContext);
 
   if (!context) {
     throw new Error('AccordionItem must be used within <Accordion>');
@@ -59,7 +59,7 @@ export function readAccordionRenderContext(): AccordionRenderContextValue {
 }
 
 export function readAccordionItemContext(): AccordionItemContextValue {
-  const context = readContext(AccordionItemContext);
+  const context = readScope(AccordionItemContext);
 
   if (!context) {
     throw new Error('Accordion parts must be used within <AccordionItem>');

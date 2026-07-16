@@ -1,22 +1,23 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 import type { ToastVariant, ToastProps } from './toast.types';
 
 export type ToastRegistration = {
   toastId: string;
+  signature: string;
   props: ToastProps;
 };
 
-export type ToastProviderContextValue = {
-  providerId: string;
+export type ToastHostContextValue = {
+  hostId: string;
   duration: number;
   toasts: ToastRegistration[];
   getToasts: () => ToastRegistration[];
   registerToast: (registration: ToastRegistration) => void;
-  unregisterToast: (toastId: string) => void;
+  unregisterToast: (toastId: string, registration: ToastRegistration) => void;
 };
 
 export type ToastRootContextValue = {
-  providerId: string;
+  hostId: string;
   toastId: string;
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -25,29 +26,27 @@ export type ToastRootContextValue = {
   variant?: ToastVariant;
   hasTitle: boolean;
   hasDescription: boolean;
-  setHasTitle: (present: boolean) => void;
-  setHasDescription: (present: boolean) => void;
   setNode: (node: HTMLElement | null) => void;
 };
 
-export const ToastProviderContext =
-  defineContext<ToastProviderContextValue | null>(null);
-export const ToastRootContext = defineContext<ToastRootContextValue | null>(
+export const ToastHostContext =
+  defineScope<ToastHostContextValue | null>(null);
+export const ToastRootContext = defineScope<ToastRootContextValue | null>(
   null
 );
 
-export function readToastProviderContext(): ToastProviderContextValue {
-  const context = readContext(ToastProviderContext);
+export function readToastHostContext(): ToastHostContextValue {
+  const context = readScope(ToastHostContext);
 
   if (!context) {
-    throw new Error('Toast components must be used within <ToastProvider>');
+    throw new Error('Toast components must be used within <ToastHost>');
   }
 
   return context;
 }
 
 export function readToastRootContext(): ToastRootContextValue {
-  const context = readContext(ToastRootContext);
+  const context = readScope(ToastRootContext);
 
   if (!context) {
     throw new Error('Toast parts must be used within <Toast>');

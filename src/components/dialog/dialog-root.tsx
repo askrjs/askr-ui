@@ -126,9 +126,9 @@ export function Dialog(props: DialogProps) {
   };
 
   return (
-    <DialogRootContext.Scope value={rootContext}>
+    <DialogRootContext value={rootContext}>
       {children as JSX.Element}
       {PortalHost ? <PortalHost key="dialog-root-portal" /> : null}
-    </DialogRootContext.Scope>
+    </DialogRootContext>
   );
 }

@@ -78,11 +78,11 @@ export function Avatar(props: AvatarProps | AvatarAsChildProps) {
   };
 
   return (
-    <AvatarContext.Scope value={context}>
+    <AvatarContext value={context}>
       <AvatarView asChild={asChild === true} finalProps={finalProps}>
         {children}
       </AvatarView>
-    </AvatarContext.Scope>
+    </AvatarContext>
   );
 }
 

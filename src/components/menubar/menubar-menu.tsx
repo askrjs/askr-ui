@@ -40,9 +40,9 @@ function MenubarPortalMenuScopeView(props: {
   menuContext: MenubarMenuContextValue;
 }) {
   return (
-    <MenubarMenuContext.Scope value={props.menuContext}>
+    <MenubarMenuContext value={props.menuContext}>
       <MenubarMenuScopeView>{props.children}</MenubarMenuScopeView>
-    </MenubarMenuContext.Scope>
+    </MenubarMenuContext>
   );
 }
 
@@ -52,11 +52,11 @@ function MenubarPortalRuntimeView(props: {
   rootContext: MenubarRootContextValue;
 }) {
   return (
-    <MenubarRootContext.Scope value={props.rootContext}>
+    <MenubarRootContext value={props.rootContext}>
       <MenubarPortalMenuScopeView menuContext={props.menuContext}>
         {props.children}
       </MenubarPortalMenuScopeView>
-    </MenubarRootContext.Scope>
+    </MenubarRootContext>
   );
 }
 
@@ -75,9 +75,9 @@ export function MenubarMenu(props: MenubarMenuProps) {
   };
 
   return (
-    <MenubarMenuContext.Scope value={menuContext}>
+    <MenubarMenuContext value={menuContext}>
       <MenubarMenuScopeView>{props.children}</MenubarMenuScopeView>
-    </MenubarMenuContext.Scope>
+    </MenubarMenuContext>
   );
 }
 

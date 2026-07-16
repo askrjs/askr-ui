@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 import { OVERLAY_Z_INDEX, type OverlayPortal } from '../_internal/overlay';
 import type { TooltipContentOwnProps } from './tooltip.types';
 
@@ -22,12 +22,12 @@ export type TooltipRootContextValue = {
   clearPosition: () => void;
 };
 
-export const TooltipRootContext = defineContext<TooltipRootContextValue | null>(
+export const TooltipRootContext = defineScope<TooltipRootContextValue | null>(
   null
 );
 
 export function readTooltipRootContext(): TooltipRootContextValue {
-  const context = readContext(TooltipRootContext);
+  const context = readScope(TooltipRootContext);
 
   if (!context) {
     throw new Error('Tooltip components must be used within <Tooltip>');

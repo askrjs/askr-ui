@@ -23,7 +23,7 @@ import {
   Toast,
   ToastClose,
   ToastDescription,
-  ToastProvider,
+  ToastHost,
   ToastTitle,
   ToastViewport,
   Tooltip,
@@ -119,7 +119,7 @@ function ToastLifecycleFixture() {
   const openState = state(true);
 
   return (
-    <ToastProvider duration={10000}>
+    <ToastHost duration={10000}>
       <button
         id="toast-launcher"
         onClick={() => {
@@ -134,7 +134,7 @@ function ToastLifecycleFixture() {
         <ToastDescription>Changes stored</ToastDescription>
         <ToastClose>Dismiss</ToastClose>
       </Toast>
-    </ToastProvider>
+    </ToastHost>
   );
 }
 

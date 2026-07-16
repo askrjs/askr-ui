@@ -27,8 +27,8 @@ import type { ToggleButtonProps, ToggleAsChildProps } from './toggle.types';
  *
  * @example Native toggle button
  * ```tsx
- * const [pressed, setPressed] = useState(false);
- * <Toggle pressed={pressed} onPress={() => setPressed(!pressed)}>
+ * const pressed = state(false);
+ * <Toggle pressed={pressed()} onPress={() => pressed.set(!pressed())}>
  *   Mute
  * </Toggle>
  * ```

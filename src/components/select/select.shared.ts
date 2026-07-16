@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 import {
   firstEnabledIndex,
   getMenuCollection,
@@ -52,17 +52,17 @@ export type SelectResolvedState = {
   disabledIndexes: number[];
 };
 
-export const SelectRootContext = defineContext<SelectRootContextValue | null>(
+export const SelectRootContext = defineScope<SelectRootContextValue | null>(
   null
 );
 export const SelectRenderContext =
-  defineContext<SelectRenderContextValue | null>(null);
-export const SelectGroupContext = defineContext<SelectGroupContextValue | null>(
+  defineScope<SelectRenderContextValue | null>(null);
+export const SelectGroupContext = defineScope<SelectGroupContextValue | null>(
   null
 );
 
 export function readSelectRootContext(): SelectRootContextValue {
-  const context = readContext(SelectRootContext);
+  const context = readScope(SelectRootContext);
 
   if (!context) {
     throw new Error('Select components must be used within <Select>');
@@ -72,7 +72,7 @@ export function readSelectRootContext(): SelectRootContextValue {
 }
 
 export function readSelectRenderContext(): SelectRenderContextValue {
-  const context = readContext(SelectRenderContext);
+  const context = readScope(SelectRenderContext);
 
   if (!context) {
     throw new Error('Select items and groups must be used within <Select>');
@@ -82,7 +82,7 @@ export function readSelectRenderContext(): SelectRenderContextValue {
 }
 
 export function readSelectGroupContext(): SelectGroupContextValue | null {
-  return readContext(SelectGroupContext);
+  return readScope(SelectGroupContext);
 }
 
 export function createSelectRenderContext(): SelectRenderContextValue {

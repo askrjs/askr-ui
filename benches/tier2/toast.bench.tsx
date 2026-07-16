@@ -1,14 +1,14 @@
 import { bench, describe } from 'vite-plus/test';
 import {
   Toast,
-  ToastProvider,
+  ToastHost,
   ToastTitle,
   ToastViewport,
 } from '../../src/components';
 
 describe('Toast benches', () => {
   bench('create toast stack', () => {
-    ToastProvider({
+    ToastHost({
       children: [
         ToastViewport({}),
         Toast({
