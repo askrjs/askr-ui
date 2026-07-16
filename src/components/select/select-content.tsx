@@ -99,11 +99,11 @@ export function SelectContent(
     <div {...finalProps}>{children}</div>
   );
   const scopedContentNode = (
-    <SelectRootContext.Scope value={root}>
-      <SelectRenderContext.Scope value={renderContext}>
+    <SelectRootContext value={root}>
+      <SelectRenderContext value={renderContext}>
         {contentNode}
-      </SelectRenderContext.Scope>
-    </SelectRootContext.Scope>
+      </SelectRenderContext>
+    </SelectRootContext>
   );
 
   return (

@@ -78,8 +78,8 @@ export function Select(props: SelectProps) {
   PortalHost.render({ children: null });
 
   return (
-    <SelectRootContext.Scope value={rootContext}>
-      <SelectRenderContext.Scope value={runtimeRenderContext}>
+    <SelectRootContext value={rootContext}>
+      <SelectRenderContext value={runtimeRenderContext}>
         <>
           {children}
           {PortalHost ? <PortalHost key="select-root-portal" /> : null}
@@ -92,7 +92,7 @@ export function Select(props: SelectProps) {
             />
           ) : null}
         </>
-      </SelectRenderContext.Scope>
-    </SelectRootContext.Scope>
+      </SelectRenderContext>
+    </SelectRootContext>
   );
 }

@@ -498,7 +498,7 @@ function renderVirtualListRows<Item>(
   items: readonly Item[],
   getKey: (item: Item, index: number) => string | number,
   visibleRange: VirtualRange,
-  useSemanticListItems: boolean
+  rendersSemanticListItems: boolean
 ) {
   const rows: JSXElement[] = [];
 
@@ -506,7 +506,7 @@ function renderVirtualListRows<Item>(
     return rows;
   }
 
-  const RowHost = useSemanticListItems ? 'li' : 'div';
+  const RowHost = rendersSemanticListItems ? 'li' : 'div';
 
   for (
     let index = visibleRange.renderStartIndex;
@@ -523,7 +523,7 @@ function renderVirtualListRows<Item>(
     rows.push(
       <RowHost
         key={rowKey}
-        role={useSemanticListItems ? undefined : 'listitem'}
+        role={rendersSemanticListItems ? undefined : 'listitem'}
         aria-posinset={index + 1}
         aria-setsize={entry.keys.length}
         data-slot="virtual-list-row"
@@ -726,13 +726,13 @@ export function VirtualList<Item>(
   entry.visibleRange = visibleRange;
 
   const semanticHost = asChild && isJsxElement(children) ? children : null;
-  const useSemanticListItems =
+  const rendersSemanticListItems =
     getListHostElementName(semanticHost) === 'ul' ||
     getListHostElementName(semanticHost) === 'ol';
 
   const finalProps = mergeProps(rest, {
     ref: entry.rootRef,
-    role: useSemanticListItems ? undefined : 'list',
+    role: rendersSemanticListItems ? undefined : 'list',
     'data-slot': 'virtual-list',
     'data-virtual-list': 'true',
     'data-viewport': viewport,
@@ -745,7 +745,7 @@ export function VirtualList<Item>(
         items,
         getKey,
         visibleRange,
-        useSemanticListItems
+        rendersSemanticListItems
       )}
     </>
   );

@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import {
@@ -27,12 +27,12 @@ type ProgressRootContextValue = {
   percentage: number | null;
 };
 
-const ProgressRootContext = defineContext<ProgressRootContextValue | null>(
+const ProgressRootContext = defineScope<ProgressRootContextValue | null>(
   null
 );
 
 function readProgressRootContext(): ProgressRootContextValue {
-  const context = readContext(ProgressRootContext);
+  const context = readScope(ProgressRootContext);
 
   if (!context) {
     throw new Error('ProgressIndicator must be used within <Progress>');
@@ -99,9 +99,9 @@ export function Progress(props: ProgressProps) {
   };
 
   return (
-    <ProgressRootContext.Scope value={rootContext}>
+    <ProgressRootContext value={rootContext}>
       <div {...(finalProps as Record<string, unknown>)}>{children}</div>
-    </ProgressRootContext.Scope>
+    </ProgressRootContext>
   );
 }
 

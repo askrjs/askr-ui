@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import {
@@ -28,10 +28,10 @@ type ProgressCircleRootContextValue = {
 };
 
 const ProgressCircleRootContext =
-  defineContext<ProgressCircleRootContextValue | null>(null);
+  defineScope<ProgressCircleRootContextValue | null>(null);
 
 function readProgressCircleRootContext(): ProgressCircleRootContextValue {
-  const context = readContext(ProgressCircleRootContext);
+  const context = readScope(ProgressCircleRootContext);
 
   if (!context) {
     throw new Error(
@@ -106,9 +106,9 @@ export function ProgressCircle(props: ProgressCircleProps) {
   };
 
   return (
-    <ProgressCircleRootContext.Scope value={rootContext}>
+    <ProgressCircleRootContext value={rootContext}>
       <div {...(finalProps as Record<string, unknown>)}>{children}</div>
-    </ProgressCircleRootContext.Scope>
+    </ProgressCircleRootContext>
   );
 }
 

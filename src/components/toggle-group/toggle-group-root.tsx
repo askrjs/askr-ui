@@ -70,7 +70,21 @@ export function ToggleGroup(props: ToggleGroupProps) {
     itemsSyncQueued = true;
     queueMicrotask(() => {
       itemsSyncQueued = false;
-      notifyItemsChanged();
+      const nextItems = getCompositeCollectionItems(collection).map((item) => ({
+        value: item.value as string,
+        disabled: item.disabled,
+      }));
+      const changed =
+        nextItems.length !== items.length ||
+        nextItems.some(
+          (item, index) =>
+            item.value !== items[index]?.value ||
+            item.disabled !== items[index]?.disabled
+        );
+
+      if (changed) {
+        notifyItemsChanged();
+      }
     });
   };
   const setValue = (nextValue: string | string[]) => {
@@ -139,10 +153,10 @@ export function ToggleGroup(props: ToggleGroupProps) {
   const mergedProps = mergeProps(finalProps, nav.container);
 
   return (
-    <ToggleGroupRootContext.Scope value={rootContext}>
-      <ToggleGroupRenderContext.Scope value={renderContext}>
+    <ToggleGroupRootContext value={rootContext}>
+      <ToggleGroupRenderContext value={renderContext}>
         <div {...mergedProps}>{children}</div>
-      </ToggleGroupRenderContext.Scope>
-    </ToggleGroupRootContext.Scope>
+      </ToggleGroupRenderContext>
+    </ToggleGroupRootContext>
   );
 }

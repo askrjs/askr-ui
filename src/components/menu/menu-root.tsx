@@ -44,10 +44,10 @@ export function Menu(props: MenuProps) {
   const renderContext = createMenuRenderContext();
 
   return (
-    <MenuRootContext.Scope value={rootContext}>
-      <MenuRenderContext.Scope value={renderContext}>
+    <MenuRootContext value={rootContext}>
+      <MenuRenderContext value={renderContext}>
         {children as JSX.Element}
-      </MenuRenderContext.Scope>
-    </MenuRootContext.Scope>
+      </MenuRenderContext>
+    </MenuRootContext>
   );
 }

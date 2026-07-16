@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 import { Slot, Presence } from '@askrjs/askr/foundations/structures';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
@@ -20,7 +20,7 @@ type CollapsibleRootContextValue = {
 };
 
 const CollapsibleRootContext =
-  defineContext<CollapsibleRootContextValue | null>(null);
+  defineScope<CollapsibleRootContextValue | null>(null);
 
 let pendingFocusRestoreId: string | null = null;
 
@@ -33,7 +33,7 @@ function resolveCollapsibleContentId(props: CollapsibleProps): string {
 }
 
 function readCollapsibleRootContext(): CollapsibleRootContextValue {
-  const context = readContext(CollapsibleRootContext);
+  const context = readScope(CollapsibleRootContext);
 
   if (!context) {
     throw new Error('Collapsible components must be used within <Collapsible>');
@@ -73,9 +73,9 @@ export function Collapsible(props: CollapsibleProps) {
   };
 
   return (
-    <CollapsibleRootContext.Scope value={rootContext}>
+    <CollapsibleRootContext value={rootContext}>
       {children as JSX.Element}
-    </CollapsibleRootContext.Scope>
+    </CollapsibleRootContext>
   );
 }
 

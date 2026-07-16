@@ -120,11 +120,11 @@ export function HoverCard(props: HoverCardProps) {
   const PortalHost = portal;
 
   return (
-    <HoverCardRootContext.Scope value={rootContext}>
+    <HoverCardRootContext value={rootContext}>
       <>
         {children}
         {PortalHost ? <PortalHost key="hover-card-root-portal" /> : null}
       </>
-    </HoverCardRootContext.Scope>
+    </HoverCardRootContext>
   );
 }

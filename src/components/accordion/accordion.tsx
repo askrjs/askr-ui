@@ -179,11 +179,11 @@ export function Accordion(props: AccordionProps) {
   });
 
   return (
-    <AccordionRootContext.Scope value={rootContext}>
-      <AccordionRenderContext.Scope value={renderContext}>
+    <AccordionRootContext value={rootContext}>
+      <AccordionRenderContext value={renderContext}>
         <div {...finalProps}>{children}</div>
-      </AccordionRenderContext.Scope>
-    </AccordionRootContext.Scope>
+      </AccordionRenderContext>
+    </AccordionRootContext>
   );
 }
 
@@ -216,9 +216,9 @@ export function AccordionItem(props: AccordionItemProps): JSX.Element {
   });
 
   return (
-    <AccordionItemContext.Scope value={itemContext}>
+    <AccordionItemContext value={itemContext}>
       <div {...finalProps}>{children}</div>
-    </AccordionItemContext.Scope>
+    </AccordionItemContext>
   );
 }
 

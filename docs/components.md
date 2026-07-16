@@ -43,7 +43,7 @@ These are documentation groupings only.
 - AlertDialog is a Dialog specialization for blocking confirmations. Its action
   and cancel parts intentionally alias the same close behavior for
   compatibility.
-- Toast is a stacked notification family. `ToastProvider` owns the registry,
+- Toast is a stacked notification family. `ToastHost` owns the registry,
   `ToastViewport` renders the stack, and `Toast` registers entries rather than
   rendering standalone DOM.
 - Select uses `SelectItemText` as the text slot used by `SelectItem` for

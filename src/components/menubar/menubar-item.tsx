@@ -136,9 +136,9 @@ export function MenubarSub(props: MenubarSubProps) {
   };
 
   return (
-    <MenubarSubContext.Scope value={subContext}>
+    <MenubarSubContext value={subContext}>
       <MenubarSubScopeView>{props.children}</MenubarSubScopeView>
-    </MenubarSubContext.Scope>
+    </MenubarSubContext>
   );
 }
 

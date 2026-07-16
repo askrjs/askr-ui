@@ -102,7 +102,21 @@ export function RadioGroup(props: RadioGroupProps) {
     itemsSyncQueued = true;
     queueMicrotask(() => {
       itemsSyncQueued = false;
-      notifyItemsChanged();
+      const nextItems = getCompositeCollectionItems(collection).map((item) => ({
+        value: String(item.value ?? ''),
+        disabled: item.disabled,
+      }));
+      const changed =
+        nextItems.length !== items.length ||
+        nextItems.some(
+          (item, index) =>
+            item.value !== items[index]?.value ||
+            item.disabled !== items[index]?.disabled
+        );
+
+      if (changed) {
+        notifyItemsChanged();
+      }
     });
   };
   const selectedIndex = items.findIndex((item) => item.value === currentValue);
@@ -143,15 +157,15 @@ export function RadioGroup(props: RadioGroupProps) {
   });
 
   return (
-    <RadioGroupRootContext.Scope value={rootContext}>
-      <RadioGroupRenderContext.Scope value={renderContext}>
+    <RadioGroupRootContext value={rootContext}>
+      <RadioGroupRenderContext value={renderContext}>
         <RadioGroupRootView
           children={<div {...finalProps}>{children}</div>}
           name={name}
           disabled={disabled}
           value={currentValue}
         />
-      </RadioGroupRenderContext.Scope>
-    </RadioGroupRootContext.Scope>
+      </RadioGroupRenderContext>
+    </RadioGroupRootContext>
   );
 }

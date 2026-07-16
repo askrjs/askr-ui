@@ -73,8 +73,8 @@ export function Menubar(props: MenubarProps) {
   });
 
   return (
-    <MenubarRootContext.Scope value={rootContext}>
-      <MenubarRootRenderContext.Scope value={runtimeRenderContext}>
+    <MenubarRootContext value={rootContext}>
+      <MenubarRootRenderContext value={runtimeRenderContext}>
         <div {...finalProps}>{children}</div>
         {
           portalIds.map((portalId) => {
@@ -85,7 +85,7 @@ export function Menubar(props: MenubarProps) {
             );
           }) as unknown as JSX.Element
         }
-      </MenubarRootRenderContext.Scope>
-    </MenubarRootContext.Scope>
+      </MenubarRootRenderContext>
+    </MenubarRootContext>
   );
 }

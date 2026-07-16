@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 
 export type RadioGroupItemMetadata = {
   value: string;
@@ -24,12 +24,12 @@ export type RadioGroupRenderContextValue = {
 };
 
 export const RadioGroupRootContext =
-  defineContext<RadioGroupRootContextValue | null>(null);
+  defineScope<RadioGroupRootContextValue | null>(null);
 export const RadioGroupRenderContext =
-  defineContext<RadioGroupRenderContextValue | null>(null);
+  defineScope<RadioGroupRenderContextValue | null>(null);
 
 export function readRadioGroupRootContext(): RadioGroupRootContextValue {
-  const context = readContext(RadioGroupRootContext);
+  const context = readScope(RadioGroupRootContext);
 
   if (!context) {
     throw new Error('RadioGroupItem must be used within <RadioGroup>');
@@ -39,7 +39,7 @@ export function readRadioGroupRootContext(): RadioGroupRootContextValue {
 }
 
 export function readRadioGroupRenderContext(): RadioGroupRenderContextValue {
-  const context = readContext(RadioGroupRenderContext);
+  const context = readScope(RadioGroupRenderContext);
 
   if (!context) {
     throw new Error('RadioGroupItem must be used within <RadioGroup>');

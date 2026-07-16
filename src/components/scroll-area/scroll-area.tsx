@@ -1,7 +1,7 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
-import { readContext, defineContext } from '@askrjs/askr';
+import { readScope, defineScope } from '@askrjs/askr';
 import type {
   ScrollAreaAsChildProps,
   ScrollAreaCornerProps,
@@ -20,12 +20,12 @@ type ScrollAreaRootContextValue = {
   cornerId: string;
 };
 
-const ScrollAreaRootContext = defineContext<ScrollAreaRootContextValue | null>(
+const ScrollAreaRootContext = defineScope<ScrollAreaRootContextValue | null>(
   null
 );
 
 function readScrollAreaRootContext(): ScrollAreaRootContextValue {
-  const context = readContext(ScrollAreaRootContext);
+  const context = readScope(ScrollAreaRootContext);
 
   if (!context) {
     throw new Error('ScrollArea components must be used within <ScrollArea>');
@@ -53,9 +53,9 @@ export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
   };
 
   return (
-    <ScrollAreaRootContext.Scope value={rootContext}>
+    <ScrollAreaRootContext value={rootContext}>
       {children as JSX.Element}
-    </ScrollAreaRootContext.Scope>
+    </ScrollAreaRootContext>
   );
 }
 

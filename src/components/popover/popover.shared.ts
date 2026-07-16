@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 import { OVERLAY_Z_INDEX, type OverlayPortal } from '../_internal/overlay';
 import type { PopoverContentOwnProps } from './popover.types';
 
@@ -23,12 +23,12 @@ export type PopoverRootContextValue = {
   clearPosition: () => void;
 };
 
-export const PopoverRootContext = defineContext<PopoverRootContextValue | null>(
+export const PopoverRootContext = defineScope<PopoverRootContextValue | null>(
   null
 );
 
 export function readPopoverRootContext(): PopoverRootContextValue {
-  const context = readContext(PopoverRootContext);
+  const context = readScope(PopoverRootContext);
 
   if (!context) {
     throw new Error('Popover components must be used within <Popover>');

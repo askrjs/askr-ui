@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 import type { SliderOrientation } from './slider.types';
 
 export type SliderRootContextValue = {
@@ -14,12 +14,12 @@ export type SliderRootContextValue = {
   thumbId: string;
 };
 
-export const SliderRootContext = defineContext<SliderRootContextValue | null>(
+export const SliderRootContext = defineScope<SliderRootContextValue | null>(
   null
 );
 
 export function readSliderRootContext(): SliderRootContextValue {
-  const context = readContext(SliderRootContext);
+  const context = readScope(SliderRootContext);
 
   if (!context) {
     throw new Error('Slider parts must be used within <Slider>');

@@ -125,6 +125,7 @@ function renderMenubarSurfaceContent(
     'data-side': side,
     'data-align': align,
     'data-side-offset': String(sideOffset),
+    'data-askr-overlay-id': open ? contentContext.overlayId : undefined,
     onKeyDown: (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -139,8 +140,8 @@ function renderMenubarSurfaceContent(
   });
   return (
     <Presence present={forceMount || open}>
-      <MenubarContentContext.Scope value={contentContext}>
-        <MenubarContentRenderContext.Scope value={runtimeRenderContext}>
+      <MenubarContentContext value={contentContext}>
+        <MenubarContentRenderContext value={runtimeRenderContext}>
           <FocusScope restoreFocus>
             <DismissableLayer
               onDismiss={() => {
@@ -158,8 +159,8 @@ function renderMenubarSurfaceContent(
               )}
             </DismissableLayer>
           </FocusScope>
-        </MenubarContentRenderContext.Scope>
-      </MenubarContentContext.Scope>
+        </MenubarContentRenderContext>
+      </MenubarContentContext>
     </Presence>
   );
 }

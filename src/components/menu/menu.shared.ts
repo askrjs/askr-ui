@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 import type { RovingFocusResult } from '@askrjs/askr/foundations/interactions';
 import {
   firstEnabledIndex,
@@ -33,13 +33,13 @@ export type MenuResolvedState = {
   disabledIndexes: number[];
 };
 
-export const MenuRootContext = defineContext<MenuRootContextValue | null>(null);
-export const MenuRenderContext = defineContext<MenuRenderContextValue | null>(
+export const MenuRootContext = defineScope<MenuRootContextValue | null>(null);
+export const MenuRenderContext = defineScope<MenuRenderContextValue | null>(
   null
 );
 
 export function readMenuRootContext(): MenuRootContextValue {
-  const context = readContext(MenuRootContext);
+  const context = readScope(MenuRootContext);
 
   if (!context) {
     throw new Error('Menu components must be used within <Menu>');
@@ -49,7 +49,7 @@ export function readMenuRootContext(): MenuRootContextValue {
 }
 
 export function readMenuRenderContext(): MenuRenderContextValue {
-  const context = readContext(MenuRenderContext);
+  const context = readScope(MenuRenderContext);
 
   if (!context) {
     throw new Error('MenuItem must be used within <Menu>');

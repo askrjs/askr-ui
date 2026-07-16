@@ -73,11 +73,11 @@ export function Popover(props: PopoverProps) {
   const PortalHost = portal;
 
   return (
-    <PopoverRootContext.Scope value={rootContext}>
+    <PopoverRootContext value={rootContext}>
       <>
         {children}
         {PortalHost ? <PortalHost key="popover-root-portal" /> : null}
       </>
-    </PopoverRootContext.Scope>
+    </PopoverRootContext>
   );
 }

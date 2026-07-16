@@ -1,5 +1,5 @@
 /**
- * Toast prop and helper types model the provider registry/viewport split used
+ * Toast prop and helper types model the host registry/viewport split used
  * by the stacked notification family.
  */
 import type {
@@ -10,16 +10,16 @@ import type {
 } from '../_internal/types';
 
 /**
- * Props for the provider that owns toast timing defaults and the registry.
+ * Props for the host that owns toast timing defaults and the registry.
  */
-export type ToastProviderOwnProps = {
+export type ToastHostOwnProps = {
   children?: unknown;
   id?: string;
   duration?: number;
 };
 
-export type ToastProviderProps = BoxProps<'div', HTMLDivElement> &
-  ToastProviderOwnProps;
+export type ToastHostProps = BoxProps<'div', HTMLDivElement> &
+  ToastHostOwnProps;
 
 export type ToastViewportProps = BoxProps<'div', HTMLDivElement>;
 export type ToastViewportAsChildProps = BoxAsChildProps;

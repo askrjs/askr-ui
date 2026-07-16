@@ -1,4 +1,4 @@
-import { defineContext, readContext } from '@askrjs/askr';
+import { defineScope, readScope } from '@askrjs/askr';
 import type { AvatarLoadingStatus } from './avatar.types';
 
 export type AvatarContextValue = {
@@ -7,10 +7,10 @@ export type AvatarContextValue = {
   setStatus: (status: AvatarLoadingStatus) => void;
 };
 
-export const AvatarContext = defineContext<AvatarContextValue | null>(null);
+export const AvatarContext = defineScope<AvatarContextValue | null>(null);
 
 export function readAvatarContext(): AvatarContextValue {
-  const context = readContext(AvatarContext);
+  const context = readScope(AvatarContext);
 
   if (!context) {
     throw new Error('Avatar parts must be used within <Avatar>');
