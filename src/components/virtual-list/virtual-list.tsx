@@ -77,9 +77,9 @@ function cloneJsxElement(
   } as JSXElement;
 }
 
-const virtualListEntries = new Map<symbol, VirtualListEntry<unknown>>();
+const virtualListEntries = new WeakMap<object, VirtualListEntry<unknown>>();
 
-function getVirtualListEntry<Item>(key: symbol): VirtualListEntry<Item> {
+function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
   const existing = virtualListEntries.get(key);
   if (existing) {
     return existing as VirtualListEntry<Item>;
@@ -677,9 +677,7 @@ export function VirtualList<Item>(
   };
 
   const rowHeight = assertPositiveVirtualHeight(rowHeightProp, 'rowHeight');
-  const instanceState = state(
-    Symbol('virtual-list-instance')
-  ) as StateCell<symbol>;
+  const instanceState = state({}) as StateCell<object>;
   const entry = getVirtualListEntry<Item>(instanceState());
   const scrollTopState = state(0) as StateCell<number>;
   const viewportHeightState = state(0) as StateCell<number>;
