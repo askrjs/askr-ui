@@ -55,8 +55,9 @@ export type SelectResolvedState = {
 export const SelectRootContext = defineScope<SelectRootContextValue | null>(
   null
 );
-export const SelectRenderContext =
-  defineScope<SelectRenderContextValue | null>(null);
+export const SelectRenderContext = defineScope<SelectRenderContextValue | null>(
+  null
+);
 export const SelectGroupContext = defineScope<SelectGroupContextValue | null>(
   null
 );

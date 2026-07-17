@@ -19,8 +19,9 @@ type CollapsibleRootContextValue = {
   contentId: string;
 };
 
-const CollapsibleRootContext =
-  defineScope<CollapsibleRootContextValue | null>(null);
+const CollapsibleRootContext = defineScope<CollapsibleRootContextValue | null>(
+  null
+);
 
 let pendingFocusRestoreId: string | null = null;
 

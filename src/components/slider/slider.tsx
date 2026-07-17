@@ -226,9 +226,7 @@ export function Slider(props: SliderProps) {
 
   return (
     <div {...finalProps}>
-      <SliderRootContext value={rootContext}>
-        {scopeChildren}
-      </SliderRootContext>
+      <SliderRootContext value={rootContext}>{scopeChildren}</SliderRootContext>
     </div>
   );
 }

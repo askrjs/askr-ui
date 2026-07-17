@@ -33,8 +33,9 @@ export type DropdownResolvedState = {
   disabledIndexes: number[];
 };
 
-export const DropdownRootContext =
-  defineScope<DropdownRootContextValue | null>(null);
+export const DropdownRootContext = defineScope<DropdownRootContextValue | null>(
+  null
+);
 export const DropdownRenderContext =
   defineScope<DropdownRenderContextValue | null>(null);
 
