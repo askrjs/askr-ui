@@ -66,7 +66,7 @@ type VirtualTableEntry<Row> = {
   onScroll: ((event: Event) => void) | undefined;
 };
 
-const virtualTableEntries = new Map<symbol, VirtualTableEntry<unknown>>();
+const virtualTableEntries = new WeakMap<object, VirtualTableEntry<unknown>>();
 
 function cloneJsxElement(
   element: JSXElement,
@@ -83,7 +83,7 @@ function cloneJsxElement(
 }
 
 function getVirtualTableEntry<Row>(
-  key: symbol,
+  key: object,
   scrollTopState: StateCell<number>,
   viewportHeightState: StateCell<number>
 ): VirtualTableEntry<Row> {
@@ -835,9 +835,7 @@ export function VirtualTable<Row>(
     headerHeightProp,
     'headerHeight'
   );
-  const instanceState = state(
-    Symbol('virtual-table-instance')
-  ) as StateCell<symbol>;
+  const instanceState = state({}) as StateCell<object>;
   const scrollTopState = state(0) as StateCell<number>;
   const viewportHeightState = state(0) as StateCell<number>;
   const entry = getVirtualTableEntry<Row>(
