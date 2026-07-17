@@ -27,9 +27,7 @@ type ProgressRootContextValue = {
   percentage: number | null;
 };
 
-const ProgressRootContext = defineScope<ProgressRootContextValue | null>(
-  null
-);
+const ProgressRootContext = defineScope<ProgressRootContextValue | null>(null);
 
 function readProgressRootContext(): ProgressRootContextValue {
   const context = readScope(ProgressRootContext);

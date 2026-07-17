@@ -29,11 +29,8 @@ export type ToastRootContextValue = {
   setNode: (node: HTMLElement | null) => void;
 };
 
-export const ToastHostContext =
-  defineScope<ToastHostContextValue | null>(null);
-export const ToastRootContext = defineScope<ToastRootContextValue | null>(
-  null
-);
+export const ToastHostContext = defineScope<ToastHostContextValue | null>(null);
+export const ToastRootContext = defineScope<ToastRootContextValue | null>(null);
 
 export function readToastHostContext(): ToastHostContextValue {
   const context = readScope(ToastHostContext);

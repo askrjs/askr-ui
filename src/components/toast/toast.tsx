@@ -99,9 +99,7 @@ function restoreToastFocus(entry: ToastLifecycleEntry) {
   }
 }
 
-function getToastHostContext(
-  hostId: string
-): ToastHostContextValue {
+function getToastHostContext(hostId: string): ToastHostContextValue {
   const existing = toastHostContexts.get(hostId);
 
   if (existing) {
@@ -283,9 +281,7 @@ function ToastRegistrationView(props: {
  */
 export function ToastHost(props: ToastHostProps) {
   const { children, duration = 5000, id, ref, ...rest } = props;
-  const generatedHostId = state(
-    resolveCompoundId('toast-host', id, children)
-  );
+  const generatedHostId = state(resolveCompoundId('toast-host', id, children));
   const hostId =
     id === undefined
       ? generatedHostId()
@@ -301,7 +297,8 @@ export function ToastHost(props: ToastHostProps) {
     );
 
     if (currentRegistration?.signature === registration.signature) {
-      const registrationIndex = currentRegistrations.indexOf(currentRegistration);
+      const registrationIndex =
+        currentRegistrations.indexOf(currentRegistration);
       currentRegistrations[registrationIndex] = registration;
       hostContext.toasts = currentRegistrations;
       return;

@@ -110,9 +110,7 @@ describe('Package exports', () => {
     const packageJson = readPackageJson();
     const targets = Object.entries(packageJson.exports)
       .filter(
-        (
-          entry
-        ): entry is [string, ExportTarget | ConditionalExportTarget] =>
+        (entry): entry is [string, ExportTarget | ConditionalExportTarget] =>
           entry[0] !== './package.json' && typeof entry[1] !== 'string'
       )
       .map(([subpath, target]) => ({
