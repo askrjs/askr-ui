@@ -38,9 +38,6 @@ export default defineConfig({
     jsx: 'automatic',
     jsxImportSource: '@askrjs/askr',
   },
-  resolve: {
-    preserveSymlinks: true,
-  },
   pack: {
     entry: packageEntries,
     format: ['esm', 'cjs'],

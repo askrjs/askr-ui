@@ -229,7 +229,6 @@
     "test:types": "tsc -p tsconfig.type-tests.json --noEmit",
     "test:unit": "npm run test:types && vp test run --config vitest.test.unit.config.ts",
     "test:publint": "publint",
-    "plan:slices": "node scripts/generate-slice-queue.js",
     "pack:check": "npm pack --ignore-scripts --dry-run --json",
     "check": "npm run build && npm run lint && npm run typecheck && npm test && npm run test:publint && npm run pack:check",
     "prepack": "npm run build",
@@ -243,14 +242,12 @@
     "@vitest/browser-playwright": "4.1.10",
     "axe-core": "^4.12.0",
     "cross-env": "^10.1.0",
-    "jiti": "^2.7.0",
     "jsdom": "^29.1.1",
     "playwright": "^1.60.0",
     "publint": "^0.3.21",
-    "tsd": "^0.33.0",
+    "tinybench": "^2.9.0",
     "typescript": "^6.0.3",
-    "vite-plus": "^0.2.4",
-    "vitest-axe": "^0.1.0"
+    "vite-plus": "^0.2.4"
   },
   "peerDependencies": {
     "@askrjs/askr": ">=0.0.52 <0.1.0"

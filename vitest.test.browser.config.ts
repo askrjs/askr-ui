@@ -17,7 +17,7 @@ export default defineConfig({
       instances: [{ browser: 'chromium' }],
       api: {
         host: '127.0.0.1',
-        port: 51234,
+        port: 0,
       },
     },
     include: [
