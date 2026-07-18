@@ -231,7 +231,7 @@
     "test:publint": "publint",
     "plan:slices": "node scripts/generate-slice-queue.js",
     "pack:check": "npm pack --ignore-scripts --dry-run --json",
-    "check": "npm run lint && npm run typecheck && npm test && npm run build && npm run test:publint && npm run pack:check",
+    "check": "npm run build && npm run lint && npm run typecheck && npm test && npm run test:publint && npm run pack:check",
     "prepack": "npm run build",
     "prepublishOnly": "npm run check",
     "test:checks": "vp test run -c vitest.test.checks.config.ts"
