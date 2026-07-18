@@ -10,7 +10,6 @@ surface.
 - [Foundations](./foundations.md) - shared runtime helpers used by askr-ui
 - [Components](./components.md) - public component families and export notes
 - [Composition](./composition.md) - common composition patterns and examples
-- [Gap analysis](./ownership-gap-analysis.md) - ownership boundaries and backlog
 - [Regression coverage](./regression-coverage.md) - permanent coverage matrix
 
 ## Package summary
