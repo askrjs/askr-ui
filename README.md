@@ -1,5 +1,8 @@
 # @askrjs/ui
 
+[![CI](https://github.com/askrjs/askr-ui/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/askrjs/askr-ui/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/%40askrjs%2Fui.svg)](https://www.npmjs.com/package/@askrjs/ui)
+
 Headless UI components for Askr applications.
 
 `@askrjs/ui` owns interaction behavior, accessibility wiring, and structural
