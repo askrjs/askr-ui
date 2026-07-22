@@ -1,11 +1,7 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { pressable } from '@askrjs/askr/foundations/interactions';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
-import type {
-  ButtonNativeProps,
-  ButtonAsChildProps,
-  PressEvent,
-} from './button.types';
+import { getButtonInteractionProps } from './button-interactions';
+import type { ButtonNativeProps, ButtonAsChildProps } from './button.types';
 
 /**
  * Headless Button component
@@ -60,45 +56,12 @@ export function Button(props: ButtonNativeProps | ButtonAsChildProps) {
     ...rest
   } = props;
 
-  const child =
-    asChild && children && typeof children === 'object'
-      ? (children as {
-          type?: unknown;
-          props?: Record<string, unknown>;
-        })
-      : null;
-  const isAnchorHost =
-    child?.type === 'a' ||
-    typeof child?.props?.href === 'string' ||
-    typeof child?.props?.to === 'string';
-  const isNativeButtonHost = !asChild || child?.type === 'button';
-
-  const interactionProps = isAnchorHost
-    ? {
-        onClick: (event: PressEvent) => {
-          if (disabled) {
-            event.preventDefault?.();
-            event.stopPropagation?.();
-            return;
-          }
-          onPress?.(event);
-        },
-        'aria-disabled': disabled ? 'true' : undefined,
-        tabIndex: disabled ? -1 : undefined,
-        onKeyDown: disabled
-          ? (event: KeyboardEvent) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                event.stopPropagation();
-              }
-            }
-          : undefined,
-      }
-    : pressable({
-        disabled,
-        onPress,
-        isNativeButton: isNativeButtonHost,
-      });
+  const interactionProps = getButtonInteractionProps({
+    asChild: Boolean(asChild),
+    children,
+    disabled,
+    onPress,
+  });
 
   // Prop composition: merge user props, interaction props, and ref
   const finalProps = mergeProps(rest, {
