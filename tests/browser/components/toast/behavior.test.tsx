@@ -160,9 +160,10 @@ describe('Toast - Behavior', () => {
       </ToastHost>
     );
     await flushUpdates();
+    await waitForScheduler();
 
     expect(document.body.textContent).toContain('Portaled content');
-    expect(container.querySelector('[data-toast-root="true"]')).toBeNull();
+    expect(container.querySelector('[data-toast="true"]')).toBeNull();
   });
 
   it('should renders toast content inside the viewport in declaration order', async () => {
