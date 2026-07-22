@@ -1,10 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { state } from '@askrjs/askr';
 import { Button } from '../../../../src/components/button';
+import { Input } from '../../../../src/components/input';
 import {
   Dialog,
   DialogClose,
-  DialogPortal,
   DialogContent,
+  DialogOverlay,
+  DialogPortal,
   DialogTrigger,
 } from '../../../../src/components/dialog';
 import { flushUpdates, mount, unmount } from '../../test-utils';
@@ -15,6 +18,51 @@ describe('Dialog - Behavior', () => {
   afterEach(() => {
     vi.restoreAllMocks();
     unmount(container);
+  });
+
+  it('should preserve the open portal subtree through controlled input updates', async () => {
+    function Fixture() {
+      const name = state('Ada');
+
+      return (
+        <Dialog defaultOpen>
+          <DialogPortal>
+            <DialogOverlay />
+            <DialogContent>
+              <Input
+                aria-label="Name"
+                value={name()}
+                onInput={(event) => name.set(event.target.value)}
+              />
+            </DialogContent>
+          </DialogPortal>
+        </Dialog>
+      );
+    }
+
+    container = mount(<Fixture />);
+    await flushUpdates();
+
+    const overlay = document.body.querySelector('[data-slot="dialog-overlay"]');
+    const dialog = document.body.querySelector('[data-slot="dialog-content"]');
+    const input = document.body.querySelector(
+      'input[aria-label="Name"]'
+    ) as HTMLInputElement;
+    const dialogId = dialog?.id;
+
+    input.value = 'Grace';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    await flushUpdates();
+
+    expect(document.body.querySelector('[data-slot="dialog-overlay"]')).toBe(
+      overlay
+    );
+    expect(document.body.querySelector('[data-slot="dialog-content"]')).toBe(
+      dialog
+    );
+    expect(document.body.querySelector('input[aria-label="Name"]')).toBe(input);
+    expect(input.value).toBe('Grace');
+    expect(dialog?.id).toBe(dialogId);
   });
 
   it('should toggles trigger expansion state when activated', async () => {
