@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
+import { Link } from '@askrjs/askr/router';
 import { Button } from '../../../../src/components/button';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
@@ -83,10 +84,93 @@ describe('Button - Behavior', () => {
     expect(link?.getAttribute('data-from-child')).toBe('yes');
     expect(link?.getAttribute('aria-disabled')).toBe('true');
     expect(link?.getAttribute('tabindex')).toBe('-1');
+    expect(link?.getAttribute('role')).toBeNull();
+
+    const enter = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      bubbles: true,
+      cancelable: true,
+    });
+    link?.dispatchEvent(enter);
+    expect(enter.defaultPrevented).toBe(true);
 
     link?.click();
 
     expect(onPress).not.toHaveBeenCalled();
+  });
+
+  it('should preserve native anchor semantics given an enabled asChild link', () => {
+    const onPress = vi.fn();
+    container = mount(
+      <Button asChild onPress={onPress}>
+        <a href="/docs">Docs</a>
+      </Button>
+    );
+    const link = container.querySelector('a')!;
+    const enter = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      bubbles: true,
+      cancelable: true,
+    });
+
+    link.dispatchEvent(enter);
+    expect(link.getAttribute('role')).toBeNull();
+    expect(link.getAttribute('tabindex')).toBeNull();
+    expect(enter.defaultPrevented).toBe(false);
+
+    link.addEventListener('click', (event) => event.preventDefault());
+    link.click();
+    expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  it('should preserve native anchor semantics given an Askr Link child', () => {
+    container = mount(
+      <Button asChild>
+        <Link href="/docs">Docs</Link>
+      </Button>
+    );
+    const link = container.querySelector('a')!;
+    const enter = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      bubbles: true,
+      cancelable: true,
+    });
+
+    link.dispatchEvent(enter);
+    expect(link.getAttribute('role')).toBeNull();
+    expect(enter.defaultPrevented).toBe(false);
+  });
+
+  it('should use native semantics given a button asChild host', () => {
+    const onPress = vi.fn();
+    container = mount(
+      <Button asChild onPress={onPress} disabled>
+        <button type="button">Save</button>
+      </Button>
+    );
+    const button = container.querySelector('button')!;
+
+    expect((button as HTMLButtonElement).disabled).toBe(true);
+    expect(button.getAttribute('role')).toBeNull();
+    button.click();
+    expect(onPress).not.toHaveBeenCalled();
+  });
+
+  it('should retain synthetic button semantics given a non-native asChild host', () => {
+    const onPress = vi.fn();
+    container = mount(
+      <Button asChild onPress={onPress}>
+        <span>Save</span>
+      </Button>
+    );
+    const host = container.querySelector('span')!;
+
+    expect(host.getAttribute('role')).toBe('button');
+    expect(host.getAttribute('tabindex')).toBe('0');
+    host.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+    );
+    expect(onPress).toHaveBeenCalledTimes(1);
   });
 
   it('should replaces stateful icon children instead of accumulating them', async () => {
