@@ -5,8 +5,9 @@ import { Input } from '../../../../src/components/input';
 import {
   Dialog,
   DialogClose,
-  DialogPortal,
   DialogContent,
+  DialogOverlay,
+  DialogPortal,
   DialogTrigger,
 } from '../../../../src/components/dialog';
 import { flushUpdates, mount, unmount } from '../../test-utils';
@@ -26,7 +27,7 @@ describe('Dialog - Behavior', () => {
       return (
         <Dialog defaultOpen>
           <DialogPortal>
-            <div data-testid="dialog-overlay" />
+            <DialogOverlay />
             <DialogContent>
               <Input
                 aria-label="Name"
@@ -42,9 +43,7 @@ describe('Dialog - Behavior', () => {
     container = mount(<Fixture />);
     await flushUpdates();
 
-    const overlay = document.body.querySelector(
-      '[data-testid="dialog-overlay"]'
-    );
+    const overlay = document.body.querySelector('[data-slot="dialog-overlay"]');
     const dialog = document.body.querySelector('[data-slot="dialog-content"]');
     const input = document.body.querySelector(
       'input[aria-label="Name"]'
@@ -55,7 +54,7 @@ describe('Dialog - Behavior', () => {
     input.dispatchEvent(new Event('input', { bubbles: true }));
     await flushUpdates();
 
-    expect(document.body.querySelector('[data-testid="dialog-overlay"]')).toBe(
+    expect(document.body.querySelector('[data-slot="dialog-overlay"]')).toBe(
       overlay
     );
     expect(document.body.querySelector('[data-slot="dialog-content"]')).toBe(
