@@ -5,6 +5,7 @@ import {
   getPersistentPortal,
   syncOverlayPosition,
 } from '../_internal/overlay';
+import { state } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import {
   DialogRootContext,
@@ -49,7 +50,10 @@ export function Dialog(props: DialogProps) {
     onOpenChange,
     modal = true,
   } = props;
-  const dialogId = resolveCompoundId('dialog', id, children);
+  const generatedDialogId = state(resolveCompoundId('dialog', id, children));
+  const autoDialogId = generatedDialogId();
+  const dialogId =
+    id === undefined ? autoDialogId : resolveCompoundId('dialog', id, children);
   const openState = controllableState({
     value: open,
     defaultValue: defaultOpen,
