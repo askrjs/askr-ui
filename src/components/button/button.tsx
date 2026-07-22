@@ -1,6 +1,6 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { pressable } from '@askrjs/askr/foundations/interactions';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { getButtonInteractionProps } from './button-interactions';
 import type { ButtonNativeProps, ButtonAsChildProps } from './button.types';
 
 /**
@@ -56,11 +56,11 @@ export function Button(props: ButtonNativeProps | ButtonAsChildProps) {
     ...rest
   } = props;
 
-  // Foundation delegation: ALL interaction behavior comes from pressable
-  const interactionProps = pressable({
+  const interactionProps = getButtonInteractionProps({
+    asChild: Boolean(asChild),
+    children,
     disabled,
     onPress,
-    isNativeButton: !asChild,
   });
 
   // Prop composition: merge user props, interaction props, and ref
