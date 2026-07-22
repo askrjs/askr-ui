@@ -1,4 +1,5 @@
 import { state } from '@askrjs/askr';
+import { Portal } from '@askrjs/askr/foundations';
 import { Link } from '@askrjs/askr/router';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { Button } from '../../../../src/components/button';
@@ -144,6 +145,24 @@ describe('Toast - Behavior', () => {
   afterEach(() => {
     vi.useRealTimers();
     unmount(container);
+  });
+
+  it('should coexist with a default Portal without scheduling an update loop', async () => {
+    container = mount(
+      <ToastHost>
+        <Portal>
+          <div>Portaled content</div>
+        </Portal>
+        <ToastViewport />
+        <Toast open={false}>
+          <ToastTitle>Closed notification</ToastTitle>
+        </Toast>
+      </ToastHost>
+    );
+    await flushUpdates();
+
+    expect(document.body.textContent).toContain('Portaled content');
+    expect(container.querySelector('[data-toast-root="true"]')).toBeNull();
   });
 
   it('should renders toast content inside the viewport in declaration order', async () => {
