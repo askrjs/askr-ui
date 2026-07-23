@@ -11,11 +11,10 @@ jobs:
 
   publish:
     needs: ci
-    uses: askrjs/actions/.github/workflows/publish-package.yml@main
+    uses: askrjs/actions/.github/workflows/publish-package.yml@614b9e344983ad2100563c5f36f94d774d3ba6bd
     with:
       install-playwright: true
     permissions:
       contents: write
       id-token: write
       packages: read
-    secrets: inherit

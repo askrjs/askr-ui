@@ -1,4 +1,4 @@
-import { defineScope, readScope } from '@askrjs/askr';
+import { cspNonce, defineScope, readScope } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import {
@@ -40,6 +40,7 @@ function readProgressRootContext(): ProgressRootContextValue {
 }
 
 export function Progress(props: ProgressProps) {
+  const nonce = cspNonce();
   const {
     children,
     getValueLabel,
@@ -61,9 +62,14 @@ export function Progress(props: ProgressProps) {
   const progressSelector = dynamicAttributeSelector('id', progressId);
   const progressPercentageValue =
     percentage === null ? '100%' : `${percentage}%`;
-  setDynamicStyleRule(progressRuleKey, progressSelector, {
-    '--ak-progress-percentage': progressPercentageValue,
-  });
+  setDynamicStyleRule(
+    progressRuleKey,
+    progressSelector,
+    {
+      '--ak-progress-percentage': progressPercentageValue,
+    },
+    nonce
+  );
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
       ref as

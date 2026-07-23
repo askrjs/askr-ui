@@ -1,7 +1,10 @@
 import { controllableState } from '@askrjs/askr/foundations/state';
+import { cspNonce, state } from '@askrjs/askr';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import {
+  captureOverlayNonce,
   clearOverlayPosition,
+  createOverlayIdentity,
   getOverlayNodes,
   getPersistentPortal,
   syncOverlayPosition,
@@ -26,9 +29,11 @@ export function Tooltip(props: TooltipProps) {
     onChange: onOpenChange,
   });
   const tooltipId = resolveCompoundId('tooltip', id, children);
+  const overlayIdentity = state(createOverlayIdentity())();
+  captureOverlayNonce(overlayIdentity, cspNonce());
   const contentId = resolvePartId(tooltipId, 'content');
-  const portal = getPersistentPortal(tooltipId);
-  const overlayNodes = getOverlayNodes(tooltipId);
+  const portal = getPersistentPortal(overlayIdentity);
+  const overlayNodes = getOverlayNodes(overlayIdentity);
   let contentPosition: TooltipPositionOptions = resolveTooltipPositionOptions();
 
   const rootContext: TooltipRootContextValue = {
@@ -38,13 +43,13 @@ export function Tooltip(props: TooltipProps) {
       openState.set(nextOpen);
 
       if (!nextOpen) {
-        clearOverlayPosition(tooltipId);
+        clearOverlayPosition(overlayIdentity);
         return;
       }
 
       scheduleTooltipPortalSync(() => {
         if (overlayNodes.content) {
-          syncOverlayPosition(tooltipId, contentPosition);
+          syncOverlayPosition(overlayIdentity, tooltipId, contentPosition);
         }
       });
     },
@@ -61,11 +66,11 @@ export function Tooltip(props: TooltipProps) {
     },
     syncPosition: () => {
       if (overlayNodes.content) {
-        syncOverlayPosition(tooltipId, contentPosition);
+        syncOverlayPosition(overlayIdentity, tooltipId, contentPosition);
       }
     },
     clearPosition: () => {
-      clearOverlayPosition(tooltipId);
+      clearOverlayPosition(overlayIdentity);
     },
   };
   const PortalHost = portal;

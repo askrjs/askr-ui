@@ -1,11 +1,13 @@
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import {
+  captureOverlayNonce,
   clearOverlayPosition,
+  createOverlayIdentity,
   getOverlayNodes,
   getPersistentPortal,
   syncOverlayPosition,
 } from '../_internal/overlay';
-import { state } from '@askrjs/askr';
+import { cspNonce, state } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import {
   DialogRootContext,
@@ -54,6 +56,8 @@ export function Dialog(props: DialogProps) {
   const autoDialogId = generatedDialogId();
   const dialogId =
     id === undefined ? autoDialogId : resolveCompoundId('dialog', id, children);
+  const overlayIdentity = state(createOverlayIdentity())();
+  captureOverlayNonce(overlayIdentity, cspNonce());
   const openState = controllableState({
     value: open,
     defaultValue: defaultOpen,
@@ -62,8 +66,8 @@ export function Dialog(props: DialogProps) {
   const contentId = resolvePartId(dialogId, 'content');
   const titleId = resolvePartId(dialogId, 'title');
   const descriptionId = resolvePartId(dialogId, 'description');
-  const portal = getPersistentPortal(dialogId);
-  const overlayNodes = getOverlayNodes(dialogId);
+  const portal = getPersistentPortal(overlayIdentity);
+  const overlayNodes = getOverlayNodes(overlayIdentity);
   const position: DialogPositionOptions = resolveDialogPositionOptions();
   const PortalHost = portal;
   const syncLabelAttributes = () => {
@@ -87,13 +91,13 @@ export function Dialog(props: DialogProps) {
       openState.set(nextOpen);
 
       if (!nextOpen) {
-        clearOverlayPosition(dialogId);
+        clearOverlayPosition(overlayIdentity);
         return;
       }
 
       scheduleDialogPortalSync(() => {
         if (overlayNodes.content) {
-          syncOverlayPosition(dialogId, position);
+          syncOverlayPosition(overlayIdentity, dialogId, position);
         }
       });
     },
@@ -121,11 +125,11 @@ export function Dialog(props: DialogProps) {
     },
     syncPosition: () => {
       if (overlayNodes.content) {
-        syncOverlayPosition(dialogId, position);
+        syncOverlayPosition(overlayIdentity, dialogId, position);
       }
     },
     clearPosition: () => {
-      clearOverlayPosition(dialogId);
+      clearOverlayPosition(overlayIdentity);
     },
   };
 

@@ -1,4 +1,5 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
+import { state } from '@askrjs/askr';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
 import { focusSelectedCollectionItem } from '../_internal/focus';
@@ -128,11 +129,13 @@ export function MenubarSub(props: MenubarSubProps) {
   const renderContext = readMenubarContentRenderContext();
   const surfaceIndex = renderContext.claimSurfaceIndex();
   const subKey = props.value ?? `sub-${surfaceIndex}`;
+  const overlayIdentity = state<object>({})();
   const subContext: MenubarSubContextValue = {
     surfaceIndex,
     triggerId: resolvePartId(content.contentId, `sub-trigger-${surfaceIndex}`),
     contentId: resolvePartId(content.contentId, `sub-content-${surfaceIndex}`),
     path: [...content.path, subKey],
+    overlayIdentity,
   };
 
   return (
@@ -198,7 +201,7 @@ export function MenubarSubTrigger(
     isNativeButton: !asChild,
   });
   const setNode = (node: HTMLElement | null) => {
-    getOverlayNodes(sub.triggerId).trigger = node;
+    getOverlayNodes(sub.overlayIdentity).trigger = node;
     registerCompositeNode(sub.triggerId, collection, node, {
       index: sub.surfaceIndex,
       disabled,

@@ -14,6 +14,7 @@ export type DropdownStateInput = {
 
 export type DropdownRootContextValue = {
   dropdownId: string;
+  overlayIdentity: object;
   open: boolean;
   setOpen: (open: boolean) => void;
   contentId: string;

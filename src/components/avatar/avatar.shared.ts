@@ -3,6 +3,7 @@ import type { AvatarLoadingStatus } from './avatar.types';
 
 export type AvatarContextValue = {
   avatarId: string;
+  identity: object;
   status: AvatarLoadingStatus;
   setStatus: (status: AvatarLoadingStatus) => void;
 };

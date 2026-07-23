@@ -30,7 +30,7 @@ export function DropdownTrigger(
     ...rest
   } = props;
   const root = readDropdownRootContext();
-  const overlayNodes = getOverlayNodes(root.dropdownId);
+  const overlayNodes = getOverlayNodes(root.overlayIdentity);
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {

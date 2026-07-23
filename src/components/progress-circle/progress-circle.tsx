@@ -1,4 +1,4 @@
-import { defineScope, readScope } from '@askrjs/askr';
+import { cspNonce, defineScope, readScope } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import {
@@ -43,6 +43,7 @@ function readProgressCircleRootContext(): ProgressCircleRootContextValue {
 }
 
 export function ProgressCircle(props: ProgressCircleProps) {
+  const nonce = cspNonce();
   const {
     children,
     getValueLabel,
@@ -67,9 +68,14 @@ export function ProgressCircle(props: ProgressCircleProps) {
   );
   const progressCirclePercentageValue =
     percentage === null ? '25%' : `${percentage}%`;
-  setDynamicStyleRule(progressCircleRuleKey, progressCircleSelector, {
-    '--ak-progress-percentage': progressCirclePercentageValue,
-  });
+  setDynamicStyleRule(
+    progressCircleRuleKey,
+    progressCircleSelector,
+    {
+      '--ak-progress-percentage': progressCirclePercentageValue,
+    },
+    nonce
+  );
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
       ref as

@@ -19,6 +19,7 @@ export type MenubarSurfaceMetadata = {
 
 export type MenubarRootContextValue = {
   menubarId: string;
+  portalIdentities: object[];
   openPath: string[];
   getOpenPath: () => string[];
   setOpenPath: (path: string[]) => void;
@@ -45,6 +46,7 @@ export type MenubarMenuContextValue = {
   triggerId: string;
   contentId: string;
   portalId: string;
+  overlayIdentity: object;
   path: string[];
 };
 
@@ -52,6 +54,7 @@ export type MenubarContentContextValue = {
   contentId: string;
   triggerId: string;
   overlayId: string;
+  overlayIdentity: object;
   path: string[];
   currentIndexCandidate: number;
   setCurrentIndex: (index: number) => void;
@@ -66,6 +69,7 @@ export type MenubarSubContextValue = {
   triggerId: string;
   contentId: string;
   path: string[];
+  overlayIdentity: object;
 };
 
 export type MenubarRootResolvedState = {
@@ -237,6 +241,7 @@ export function resolveMenubarContentOwner(): {
   contentId: string;
   triggerId: string;
   overlayId: string;
+  overlayIdentity: object;
   path: string[];
 } {
   const subContext = readScope(MenubarSubContext);
@@ -246,6 +251,7 @@ export function resolveMenubarContentOwner(): {
       contentId: subContext.contentId,
       triggerId: subContext.triggerId,
       overlayId: subContext.triggerId,
+      overlayIdentity: subContext.overlayIdentity,
       path: subContext.path,
     };
   }
@@ -257,6 +263,7 @@ export function resolveMenubarContentOwner(): {
       contentId: menuContext.contentId,
       triggerId: menuContext.triggerId,
       overlayId: menuContext.triggerId,
+      overlayIdentity: menuContext.overlayIdentity,
       path: menuContext.path,
     };
   }

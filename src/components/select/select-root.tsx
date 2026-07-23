@@ -1,8 +1,12 @@
-import { state } from '@askrjs/askr';
+import { cspNonce, state } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import { collectJsxElements } from '../_internal/jsx';
-import { getPersistentPortal } from '../_internal/overlay';
+import {
+  captureOverlayNonce,
+  createOverlayIdentity,
+  getPersistentPortal,
+} from '../_internal/overlay';
 import { resolveMenuItemText } from '../_internal/menu';
 import { SelectItem } from './select-item';
 import {
@@ -28,6 +32,8 @@ export function Select(props: SelectProps) {
     disabled = false,
   } = props;
   const selectId = resolveCompoundId('select', id, children);
+  const overlayIdentity = state(createOverlayIdentity())();
+  captureOverlayNonce(overlayIdentity, cspNonce());
   const valueState = controllableState({
     value,
     defaultValue,
@@ -55,6 +61,7 @@ export function Select(props: SelectProps) {
   }));
   const rootContextBase = {
     selectId,
+    overlayIdentity,
     value: valueState(),
     currentIndexCandidate: currentIndexState(),
     disabled,
@@ -66,7 +73,7 @@ export function Select(props: SelectProps) {
     open: openState(),
     setOpen: openState.set,
     contentId: resolvePartId(selectId, 'content'),
-    portal: getPersistentPortal(selectId),
+    portal: getPersistentPortal(overlayIdentity),
     setValue: valueState.set,
     setCurrentIndex: currentIndexState.set,
     resolvedState,

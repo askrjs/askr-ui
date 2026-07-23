@@ -1,7 +1,10 @@
 import { controllableState } from '@askrjs/askr/foundations/state';
+import { cspNonce, state } from '@askrjs/askr';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import {
+  captureOverlayNonce,
   clearOverlayPosition,
+  createOverlayIdentity,
   getOverlayNodes,
   getPersistentPortal,
   syncOverlayPosition,
@@ -34,10 +37,12 @@ export function HoverCard(props: HoverCardProps) {
     onChange: onOpenChange,
   });
   const hoverCardId = resolveCompoundId('hover-card', id, children);
+  const overlayIdentity = state(createOverlayIdentity())();
+  captureOverlayNonce(overlayIdentity, cspNonce());
   const triggerId = resolvePartId(hoverCardId, 'trigger');
   const contentId = resolvePartId(hoverCardId, 'content');
-  const portal = getPersistentPortal(hoverCardId);
-  const overlayNodes = getOverlayNodes(hoverCardId);
+  const portal = getPersistentPortal(overlayIdentity);
+  const overlayNodes = getOverlayNodes(overlayIdentity);
   let contentPosition: HoverCardPositionOptions =
     resolveHoverCardPositionOptions();
   let openTimer: ReturnType<typeof setTimeout> | undefined;
@@ -63,13 +68,13 @@ export function HoverCard(props: HoverCardProps) {
       openState.set(nextOpen);
 
       if (!nextOpen) {
-        clearOverlayPosition(hoverCardId);
+        clearOverlayPosition(overlayIdentity);
         return;
       }
 
       scheduleHoverCardPortalSync(() => {
         if (overlayNodes.content) {
-          syncOverlayPosition(hoverCardId, contentPosition);
+          syncOverlayPosition(overlayIdentity, hoverCardId, contentPosition);
         }
       });
     },
@@ -110,11 +115,11 @@ export function HoverCard(props: HoverCardProps) {
     },
     syncPosition: () => {
       if (overlayNodes.content) {
-        syncOverlayPosition(hoverCardId, contentPosition);
+        syncOverlayPosition(overlayIdentity, hoverCardId, contentPosition);
       }
     },
     clearPosition: () => {
-      clearOverlayPosition(hoverCardId);
+      clearOverlayPosition(overlayIdentity);
     },
   };
   const PortalHost = portal;

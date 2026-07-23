@@ -65,6 +65,47 @@ describe('Dialog - Behavior', () => {
     expect(dialog?.id).toBe(dialogId);
   });
 
+  it('should keep portals isolated when separate renders reuse the same public id', async () => {
+    function Fixture() {
+      return (
+        <div>
+          <Dialog id="shared" defaultOpen>
+            <DialogPortal>
+              <DialogContent>First dialog</DialogContent>
+            </DialogPortal>
+          </Dialog>
+          <Dialog id="shared" defaultOpen>
+            <DialogPortal>
+              <DialogContent>Second dialog</DialogContent>
+            </DialogPortal>
+          </Dialog>
+        </div>
+      );
+    }
+
+    container = mount(<Fixture />);
+    await flushUpdates();
+
+    const dialogs = Array.from(
+      document.body.querySelectorAll('[data-slot="dialog-content"]')
+    );
+
+    expect(dialogs).toHaveLength(2);
+    expect(dialogs[0]?.textContent).toBe('First dialog');
+    expect(dialogs[1]?.textContent).toBe('Second dialog');
+
+    unmount(container);
+    container = mount(<Fixture />);
+    await flushUpdates();
+
+    const rerenderedDialogs = Array.from(
+      document.body.querySelectorAll('[data-slot="dialog-content"]')
+    );
+
+    expect(rerenderedDialogs).toHaveLength(2);
+    expect(rerenderedDialogs[0]?.textContent).toBe('First dialog');
+    expect(rerenderedDialogs[1]?.textContent).toBe('Second dialog');
+  });
   it('should toggles trigger expansion state when activated', async () => {
     container = mount(
       <Dialog>

@@ -40,6 +40,7 @@ function renderMenubarSurfaceContent(
     contentId: string;
     triggerId: string;
     overlayId: string;
+    overlayIdentity: object;
     path: string[];
   }
 ) {
@@ -58,6 +59,7 @@ function renderMenubarSurfaceContent(
     contentId: owner.contentId,
     triggerId: owner.triggerId,
     overlayId: owner.overlayId,
+    overlayIdentity: owner.overlayIdentity,
     path: owner.path,
     currentIndexCandidate: currentIndexState(),
     setCurrentIndex: currentIndexState.set,
@@ -73,7 +75,7 @@ function renderMenubarSurfaceContent(
   const { items, currentIndex, disabledItemIndexes } =
     resolveMenubarContentState(contentContext);
   const open = pathIsOpen(root.openPath, contentContext.path);
-  const overlayNodes = getOverlayNodes(contentContext.overlayId);
+  const overlayNodes = getOverlayNodes(contentContext.overlayIdentity);
   const collection = getCompositeCollection(contentContext.contentId);
   const nav = rovingFocus({
     currentIndex,
@@ -90,14 +92,18 @@ function renderMenubarSurfaceContent(
     overlayNodes.content = node;
 
     if (node && open) {
-      syncOverlayPosition(contentContext.overlayId, {
-        side,
-        align,
-        sideOffset,
-        zIndex: OVERLAY_Z_INDEX.dropdown,
-      });
+      syncOverlayPosition(
+        contentContext.overlayIdentity,
+        contentContext.overlayId,
+        {
+          side,
+          align,
+          sideOffset,
+          zIndex: OVERLAY_Z_INDEX.dropdown,
+        }
+      );
     } else {
-      clearOverlayPosition(contentContext.overlayId);
+      clearOverlayPosition(contentContext.overlayIdentity);
     }
 
     if (node && open) {
@@ -189,6 +195,7 @@ export function MenubarSubContent(
     contentId: sub.contentId,
     triggerId: sub.triggerId,
     overlayId: sub.triggerId,
+    overlayIdentity: sub.overlayIdentity,
     path: sub.path,
   });
 }

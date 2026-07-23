@@ -41,7 +41,7 @@ export function DropdownContent(
   const hasEnabledItems = items.some(
     (_item, index) => !disabledIndexes.includes(index)
   );
-  const overlayNodes = getOverlayNodes(root.dropdownId);
+  const overlayNodes = getOverlayNodes(root.overlayIdentity);
   const collection = getMenuCollection(root.dropdownId);
   const nav = rovingFocus({
     currentIndex,
@@ -62,14 +62,14 @@ export function DropdownContent(
     overlayNodes.content = node;
 
     if (node && root.open) {
-      syncOverlayPosition(root.dropdownId, {
+      syncOverlayPosition(root.overlayIdentity, root.dropdownId, {
         side,
         align,
         sideOffset,
         zIndex: OVERLAY_Z_INDEX.dropdown,
       });
     } else {
-      clearOverlayPosition(root.dropdownId);
+      clearOverlayPosition(root.overlayIdentity);
     }
 
     if (node && root.open && hasEnabledItems) {

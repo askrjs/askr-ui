@@ -1,4 +1,5 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
+import { state } from '@askrjs/askr';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import {
   focusFirstDescendant,
@@ -16,10 +17,10 @@ type ScopeEntry = {
   previousFocused: HTMLElement | null;
 };
 
-const scopeEntries = new Map<string, ScopeEntry>();
+const scopeEntries = new WeakMap<object, ScopeEntry>();
 
-function getScopeEntry(scopeId: string): ScopeEntry {
-  const existing = scopeEntries.get(scopeId);
+function getScopeEntry(identity: object): ScopeEntry {
+  const existing = scopeEntries.get(identity);
 
   if (existing) {
     return existing;
@@ -29,7 +30,7 @@ function getScopeEntry(scopeId: string): ScopeEntry {
     node: null,
     previousFocused: null,
   };
-  scopeEntries.set(scopeId, created);
+  scopeEntries.set(identity, created);
   return created;
 }
 
@@ -49,7 +50,8 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
   } = props;
 
   const scopeId = resolveCompoundId('focus-scope', id, children);
-  const scopeEntry = getScopeEntry(scopeId);
+  const identity = state<object>({})();
+  const scopeEntry = getScopeEntry(identity);
 
   const setNode = (node: HTMLElement | null) => {
     if (node) {
@@ -162,6 +164,7 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
     : setNode;
 
   const finalProps = mergeProps(rest, {
+    id: scopeId,
     ref: refHandler,
     tabIndex: asChild ? tabIndex : (tabIndex ?? -1),
     'data-focus-scope': 'true',

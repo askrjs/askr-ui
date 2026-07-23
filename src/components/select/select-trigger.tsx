@@ -29,7 +29,7 @@ export function SelectTrigger(
     ...rest
   } = props;
   const root = readSelectRootContext();
-  const overlayNodes = getOverlayNodes(root.selectId);
+  const overlayNodes = getOverlayNodes(root.overlayIdentity);
   const isDisabled = root.disabled || disabled;
   const interactionProps = pressable({
     disabled: isDisabled,
