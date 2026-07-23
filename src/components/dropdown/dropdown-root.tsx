@@ -1,7 +1,11 @@
-import { state } from '@askrjs/askr';
+import { cspNonce, state } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
-import { getPersistentPortal } from '../_internal/overlay';
+import {
+  captureOverlayNonce,
+  createOverlayIdentity,
+  getPersistentPortal,
+} from '../_internal/overlay';
 import {
   createDropdownRenderContext,
   DropdownRenderContext,
@@ -19,9 +23,12 @@ export function Dropdown(props: DropdownProps) {
     onChange: onOpenChange,
   });
   const dropdownId = resolveCompoundId('dropdown', id, children);
+  const overlayIdentity = state(createOverlayIdentity())();
+  captureOverlayNonce(overlayIdentity, cspNonce());
   const currentIndexState = state(0);
   const rootContextBase = {
     dropdownId,
+    overlayIdentity,
     currentIndexCandidate: currentIndexState(),
   };
   const resolvedState = resolveDropdownState(rootContextBase);
@@ -30,7 +37,7 @@ export function Dropdown(props: DropdownProps) {
     open: openState(),
     setOpen: openState.set,
     contentId: resolvePartId(dropdownId, 'content'),
-    portal: getPersistentPortal(dropdownId),
+    portal: getPersistentPortal(overlayIdentity),
     setCurrentIndex: currentIndexState.set,
     resolvedState,
   };

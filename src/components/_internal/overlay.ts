@@ -11,6 +11,7 @@ export type OverlayPortal = {
   (): JSX.Element | null;
   render(props: { children?: unknown }): JSX.Element | null;
 };
+export type OverlayIdentity = object;
 
 export const OVERLAY_Z_INDEX = {
   dropdown: 'var(--ak-z-dropdown, 1000)',
@@ -33,8 +34,30 @@ type OverlayNodes = {
   cleanup?: () => void;
 };
 
-const overlayNodes = new Map<string, OverlayNodes>();
-const overlayPortals = new Map<string, OverlayPortal>();
+const overlayNodes = new WeakMap<OverlayIdentity, OverlayNodes>();
+const overlayNonces = new WeakMap<OverlayIdentity, string | undefined>();
+
+export function captureOverlayNonce(
+  identity: OverlayIdentity,
+  nonce: string | undefined
+) {
+  overlayNonces.set(identity, nonce);
+}
+const overlayPortals = new WeakMap<OverlayIdentity, OverlayPortal>();
+const overlayStyleKeys = new WeakMap<OverlayIdentity, string>();
+let nextOverlayStyleKey = 0;
+
+export function createOverlayIdentity(): OverlayIdentity {
+  return {};
+}
+
+function overlayStyleKey(identity: OverlayIdentity): string {
+  const existing = overlayStyleKeys.get(identity);
+  if (existing) return existing;
+  const created = `overlay:${nextOverlayStyleKey++}`;
+  overlayStyleKeys.set(identity, created);
+  return created;
+}
 
 type OverlayPositionMode = 'anchored' | 'centered';
 
@@ -54,20 +77,20 @@ function createOverlayPortal(): OverlayPortal {
   return definePortal() as OverlayPortal;
 }
 
-export function getPersistentPortal(id: string) {
-  const existing = overlayPortals.get(id);
+export function getPersistentPortal(identity: OverlayIdentity) {
+  const existing = overlayPortals.get(identity);
 
   if (existing) {
     return existing;
   }
 
   const created = createOverlayPortal();
-  overlayPortals.set(id, created);
+  overlayPortals.set(identity, created);
   return created;
 }
 
-export function getOverlayNodes(id: string): OverlayNodes {
-  const existing = overlayNodes.get(id);
+export function getOverlayNodes(identity: OverlayIdentity): OverlayNodes {
+  const existing = overlayNodes.get(identity);
 
   if (existing) {
     return existing;
@@ -78,7 +101,7 @@ export function getOverlayNodes(id: string): OverlayNodes {
     content: null,
   };
 
-  overlayNodes.set(id, created);
+  overlayNodes.set(identity, created);
   return created;
 }
 
@@ -277,8 +300,8 @@ function applyCenteredPosition(
   };
 }
 
-export function clearOverlayPosition(id: string) {
-  const nodes = overlayNodes.get(id);
+export function clearOverlayPosition(identity: OverlayIdentity) {
+  const nodes = overlayNodes.get(identity);
 
   if (!nodes?.cleanup) {
     return;
@@ -289,15 +312,16 @@ export function clearOverlayPosition(id: string) {
 }
 
 export function syncOverlayPosition(
-  id: string,
+  identity: OverlayIdentity,
+  domId: string,
   options: OverlayPositionOptions = {}
 ) {
   if (typeof window === 'undefined') {
     return;
   }
 
-  const nodes = getOverlayNodes(id);
-  clearOverlayPosition(id);
+  const nodes = getOverlayNodes(identity);
+  clearOverlayPosition(identity);
 
   if (!nodes.content) {
     return;
@@ -326,8 +350,8 @@ export function syncOverlayPosition(
       return;
     }
 
-    content.setAttribute('data-askr-overlay-id', id);
-    const selector = dynamicAttributeSelector('data-askr-overlay-id', id);
+    content.setAttribute('data-askr-overlay-id', domId);
+    const selector = dynamicAttributeSelector('data-askr-overlay-id', domId);
 
     const position =
       resolvedOptions.mode === 'centered'
@@ -337,10 +361,15 @@ export function syncOverlayPosition(
           : null;
 
     if (position) {
-      setDynamicStyleRule(`overlay:${id}`, selector, {
-        ...position,
-        'z-index': resolvedOptions.zIndex,
-      });
+      setDynamicStyleRule(
+        overlayStyleKey(identity),
+        selector,
+        {
+          ...position,
+          'z-index': resolvedOptions.zIndex,
+        },
+        overlayNonces.get(identity)
+      );
     }
   };
 
@@ -382,6 +411,6 @@ export function syncOverlayPosition(
     resizeObserver?.disconnect();
     resizeObserver = null;
     nodes.content?.removeAttribute('data-askr-overlay-id');
-    removeDynamicStyleRule(`overlay:${id}`);
+    removeDynamicStyleRule(overlayStyleKey(identity));
   };
 }

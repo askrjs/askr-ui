@@ -22,6 +22,7 @@ export type SelectItemMetadata = {
 
 export type SelectRootContextValue = {
   selectId: string;
+  overlayIdentity: object;
   open: boolean;
   setOpen: (open: boolean) => void;
   contentId: string;

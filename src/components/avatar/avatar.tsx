@@ -18,10 +18,10 @@ type AvatarEntry = {
   status: AvatarLoadingStatus;
 };
 
-const avatarEntries = new Map<string, AvatarEntry>();
+const avatarEntries = new WeakMap<object, AvatarEntry>();
 
-function getAvatarEntry(avatarId: string) {
-  const existing = avatarEntries.get(avatarId);
+function getAvatarEntry(identity: object) {
+  const existing = avatarEntries.get(identity);
 
   if (existing) {
     return existing;
@@ -31,7 +31,7 @@ function getAvatarEntry(avatarId: string) {
     src: null,
     status: 'idle',
   };
-  avatarEntries.set(avatarId, created);
+  avatarEntries.set(identity, created);
   return created;
 }
 
@@ -56,7 +56,8 @@ export function Avatar(props: AvatarAsChildProps): JSX.Element;
 export function Avatar(props: AvatarProps | AvatarAsChildProps) {
   const { asChild, children, id, ref, ...rest } = props;
   const avatarId = resolveCompoundId('avatar', id, children);
-  const entry = getAvatarEntry(avatarId);
+  const identity = state<object>({})();
+  const entry = getAvatarEntry(identity);
   const statusState = state<AvatarLoadingStatus>(entry.status);
   const status = statusState();
 
@@ -68,6 +69,7 @@ export function Avatar(props: AvatarProps | AvatarAsChildProps) {
   });
   const context = {
     avatarId,
+    identity,
     get status() {
       return statusState();
     },
@@ -88,8 +90,8 @@ export function Avatar(props: AvatarProps | AvatarAsChildProps) {
 
 export function AvatarImage(props: AvatarImageProps): JSX.Element {
   const { alt, onLoadingStatusChange, ref, src, ...rest } = props;
-  const { avatarId, status, setStatus } = readAvatarContext();
-  const entry = getAvatarEntry(avatarId);
+  const { identity, status, setStatus } = readAvatarContext();
+  const entry = getAvatarEntry(identity);
   const normalizedSrc = typeof src === 'string' && src ? src : null;
   const sourceChanged = entry.src !== normalizedSrc;
 
@@ -103,7 +105,7 @@ export function AvatarImage(props: AvatarImageProps): JSX.Element {
       setStatus(entry.status);
     }
     return null;
-  }, [avatarId, normalizedSrc, sourceChanged]);
+  }, [identity, normalizedSrc, sourceChanged]);
 
   const updateStatus = (nextStatus: AvatarLoadingStatus) => {
     setStatus(nextStatus);

@@ -1,7 +1,10 @@
 import { controllableState } from '@askrjs/askr/foundations/state';
+import { cspNonce, state } from '@askrjs/askr';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import {
+  captureOverlayNonce,
   clearOverlayPosition,
+  createOverlayIdentity,
   getOverlayNodes,
   getPersistentPortal,
   syncOverlayPosition,
@@ -26,10 +29,12 @@ export function Popover(props: PopoverProps) {
     onChange: onOpenChange,
   });
   const popoverId = resolveCompoundId('popover', id, children);
+  const overlayIdentity = state(createOverlayIdentity())();
+  captureOverlayNonce(overlayIdentity, cspNonce());
   const triggerId = resolvePartId(popoverId, 'trigger');
   const contentId = resolvePartId(popoverId, 'content');
-  const portal = getPersistentPortal(popoverId);
-  const overlayNodes = getOverlayNodes(popoverId);
+  const portal = getPersistentPortal(overlayIdentity);
+  const overlayNodes = getOverlayNodes(overlayIdentity);
   let contentPosition: PopoverPositionOptions = resolvePopoverPositionOptions();
 
   const rootContext: PopoverRootContextValue = {
@@ -39,13 +44,13 @@ export function Popover(props: PopoverProps) {
       openState.set(nextOpen);
 
       if (!nextOpen) {
-        clearOverlayPosition(popoverId);
+        clearOverlayPosition(overlayIdentity);
         return;
       }
 
       schedulePopoverPortalSync(() => {
         if (overlayNodes.content) {
-          syncOverlayPosition(popoverId, contentPosition);
+          syncOverlayPosition(overlayIdentity, popoverId, contentPosition);
         }
       });
     },
@@ -63,11 +68,11 @@ export function Popover(props: PopoverProps) {
     },
     syncPosition: () => {
       if (overlayNodes.content) {
-        syncOverlayPosition(popoverId, contentPosition);
+        syncOverlayPosition(overlayIdentity, popoverId, contentPosition);
       }
     },
     clearPosition: () => {
-      clearOverlayPosition(popoverId);
+      clearOverlayPosition(overlayIdentity);
     },
   };
   const PortalHost = portal;

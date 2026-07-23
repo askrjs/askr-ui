@@ -1,11 +1,15 @@
-import { state } from '@askrjs/askr';
+import { cspNonce, state } from '@askrjs/askr';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import { rovingFocus } from '@askrjs/askr/foundations/interactions';
 import { focusSelectedCollectionItem } from '../_internal/focus';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import { getCompositeCollection } from '../_internal/composite';
 import { collectJsxElements } from '../_internal/jsx';
-import { getPersistentPortal } from '../_internal/overlay';
+import {
+  captureOverlayNonce,
+  createOverlayIdentity,
+  getPersistentPortal,
+} from '../_internal/overlay';
 import { MenubarMenu } from './menubar-menu';
 import {
   createMenubarRootRenderContext,
@@ -23,6 +27,7 @@ export function Menubar(props: MenubarProps) {
   const openPathState = state<string[]>([]);
   const portalEpochState = state(0);
   const currentTriggerIndexState = state(0);
+  const portalIdentitiesState = state<object[]>([]);
   const setOpenPath = (path: string[]) => {
     openPathState.set(path);
   };
@@ -37,6 +42,7 @@ export function Menubar(props: MenubarProps) {
   const rootState = resolveMenubarRootState(rootContextBase);
   const rootContext: MenubarRootContextValue = {
     ...rootContextBase,
+    portalIdentities: portalIdentitiesState(),
     openPath: openPathState(),
     getOpenPath: openPathState,
     setOpenPath,
@@ -52,6 +58,12 @@ export function Menubar(props: MenubarProps) {
     children,
     (element) => element.type === MenubarMenu
   ).map((_element, index) => resolvePartId(menubarId, `portal-${index}`));
+  while (rootContext.portalIdentities.length < portalIds.length) {
+    rootContext.portalIdentities.push(createOverlayIdentity());
+  }
+  for (const identity of rootContext.portalIdentities) {
+    captureOverlayNonce(identity, cspNonce());
+  }
   const collection = getCompositeCollection(menubarId);
   const nav = rovingFocus({
     currentIndex: rootState.currentTriggerIndex,
@@ -77,8 +89,10 @@ export function Menubar(props: MenubarProps) {
       <MenubarRootRenderContext value={runtimeRenderContext}>
         <div {...finalProps}>{children}</div>
         {
-          portalIds.map((portalId) => {
-            const PortalHost = getPersistentPortal(portalId);
+          portalIds.map((portalId, index) => {
+            const PortalHost = getPersistentPortal(
+              rootContext.portalIdentities[index]!
+            );
 
             return (
               <PortalHost key={`${portalId}-${rootContext.portalEpoch}`} />

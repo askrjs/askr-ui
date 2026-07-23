@@ -71,6 +71,7 @@ export function MenubarMenu(props: MenubarMenuProps) {
     triggerId: resolvePartId(root.menubarId, `trigger-${menuIndex}`),
     contentId: resolvePartId(root.menubarId, `content-${menuIndex}`),
     portalId: resolvePartId(root.menubarId, `portal-${menuIndex}`),
+    overlayIdentity: root.portalIdentities[menuIndex]!,
     path: [menuKey],
   };
 
@@ -128,7 +129,7 @@ export function MenubarTrigger(
     isNativeButton: !asChild,
   });
   const setNode = (node: HTMLElement | null) => {
-    getOverlayNodes(menu.triggerId).trigger = node;
+    getOverlayNodes(menu.overlayIdentity).trigger = node;
     registerCompositeNode(menu.triggerId, collection, node, {
       index: menu.menuIndex,
       disabled,
@@ -190,7 +191,7 @@ export function MenubarTrigger(
 export function MenubarPortal(props: MenubarPortalProps): JSX.Element | null {
   const root = readMenubarRootContext();
   const menu = readMenubarMenuContext();
-  const portal = getPersistentPortal(menu.portalId);
+  const portal = getPersistentPortal(menu.overlayIdentity);
   const open = pathIsOpen(root.openPath, menu.path);
 
   if (!open) {
