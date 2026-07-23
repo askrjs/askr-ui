@@ -1,6 +1,7 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { controllableState } from '@askrjs/askr/foundations/state';
+import { cspNonce, state } from '@askrjs/askr';
 import {
   dynamicAttributeSelector,
   removeDynamicStyleRuleWhenUnused,
@@ -34,11 +35,11 @@ type SliderEntry = {
   dragEnd: ((event: PointerEvent) => void) | null;
 };
 
-const sliderEntries = new Map<string, SliderEntry>();
-const sliderContexts = new Map<string, SliderRootContextValue>();
+const sliderEntries = new WeakMap<object, SliderEntry>();
+const sliderContexts = new WeakMap<object, SliderRootContextValue>();
 
-function getSliderEntry(sliderId: string) {
-  const existing = sliderEntries.get(sliderId);
+function getSliderEntry(identity: object) {
+  const existing = sliderEntries.get(identity);
 
   if (existing) {
     return existing;
@@ -50,12 +51,15 @@ function getSliderEntry(sliderId: string) {
     dragMove: null,
     dragEnd: null,
   };
-  sliderEntries.set(sliderId, created);
+  sliderEntries.set(identity, created);
   return created;
 }
 
-function getSliderRootContext(sliderId: string): SliderRootContextValue {
-  const existing = sliderContexts.get(sliderId);
+function getSliderRootContext(
+  identity: object,
+  sliderId: string
+): SliderRootContextValue {
+  const existing = sliderContexts.get(identity);
 
   if (existing) {
     return existing;
@@ -63,6 +67,7 @@ function getSliderRootContext(sliderId: string): SliderRootContextValue {
 
   const created: SliderRootContextValue = {
     sliderId,
+    identity,
     value: 0,
     setValue: () => {},
     min: 0,
@@ -73,7 +78,7 @@ function getSliderRootContext(sliderId: string): SliderRootContextValue {
     trackId: resolvePartId(sliderId, 'track'),
     thumbId: resolvePartId(sliderId, 'thumb'),
   };
-  sliderContexts.set(sliderId, created);
+  sliderContexts.set(identity, created);
   return created;
 }
 
@@ -94,7 +99,7 @@ function updateSliderValueFromPointer(
   event: PointerEvent,
   root: SliderRootContextValue
 ) {
-  const entry = getSliderEntry(root.sliderId);
+  const entry = getSliderEntry(root.identity);
 
   if (!entry.track) {
     return;
@@ -117,15 +122,18 @@ function updateSliderValueFromPointer(
   entry.thumb?.focus?.();
 }
 
-function beginSliderDrag(sliderId: string) {
-  const entry = getSliderEntry(sliderId);
+function beginSliderDrag(identity: object, sliderId: string) {
+  const entry = getSliderEntry(identity);
 
   if (entry.dragMove || entry.dragEnd) {
     return;
   }
 
   entry.dragMove = (event: PointerEvent) => {
-    updateSliderValueFromPointer(event, getSliderRootContext(sliderId));
+    updateSliderValueFromPointer(
+      event,
+      getSliderRootContext(identity, sliderId)
+    );
   };
   entry.dragEnd = () => {
     if (entry.dragMove) {
@@ -143,11 +151,12 @@ function beginSliderDrag(sliderId: string) {
   window.addEventListener('pointerup', entry.dragEnd);
 }
 
-function resolveLiveSliderRoot(sliderId: string) {
-  return getSliderRootContext(sliderId);
+function resolveLiveSliderRoot(identity: object, sliderId: string) {
+  return getSliderRootContext(identity, sliderId);
 }
 
 export function Slider(props: SliderProps) {
+  const nonce = cspNonce();
   const {
     children,
     defaultValue,
@@ -163,6 +172,7 @@ export function Slider(props: SliderProps) {
   } = props;
   const { max, min, step } = normalizeSliderConfig(props);
   const sliderId = resolveCompoundId('slider', id, children);
+  const identity = state<object>({})();
   const valueState = controllableState({
     value,
     defaultValue: snapRangeValue(defaultValue ?? min, min, max, step),
@@ -170,7 +180,7 @@ export function Slider(props: SliderProps) {
   });
   const normalizedValue = snapRangeValue(valueState(), min, max, step);
   const percentage = rangePercentage(normalizedValue, min, max);
-  const rootContext = getSliderRootContext(sliderId);
+  const rootContext = getSliderRootContext(identity, sliderId);
   rootContext.sliderId = sliderId;
   rootContext.value = normalizedValue;
   rootContext.setValue = (nextValue: number) => {
@@ -188,9 +198,14 @@ export function Slider(props: SliderProps) {
     'data-askr-slider-id',
     sliderId
   );
-  setDynamicStyleRule(sliderRuleKey, sliderSelector, {
-    '--ak-slider-percentage': `${percentage}%`,
-  });
+  setDynamicStyleRule(
+    sliderRuleKey,
+    sliderSelector,
+    {
+      '--ak-slider-percentage': `${percentage}%`,
+    },
+    nonce
+  );
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
       ref as
@@ -236,7 +251,7 @@ export function SliderTrack(props: SliderTrackAsChildProps): JSX.Element;
 export function SliderTrack(props: SliderTrackProps | SliderTrackAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const root = readSliderRootContext();
-  const entry = getSliderEntry(root.sliderId);
+  const entry = getSliderEntry(root.identity);
   const percentage = rangePercentage(root.value, root.min, root.max);
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
@@ -259,14 +274,14 @@ export function SliderTrack(props: SliderTrackProps | SliderTrackAsChildProps) {
         return;
       }
 
-      const liveRoot = resolveLiveSliderRoot(root.sliderId);
+      const liveRoot = resolveLiveSliderRoot(root.identity, root.sliderId);
 
       if (liveRoot.disabled) {
         return;
       }
 
       updateSliderValueFromPointer(event, liveRoot);
-      beginSliderDrag(liveRoot.sliderId);
+      beginSliderDrag(liveRoot.identity, liveRoot.sliderId);
     },
   });
 
@@ -303,7 +318,7 @@ export function SliderThumb(props: SliderThumbAsChildProps): JSX.Element;
 export function SliderThumb(props: SliderThumbProps | SliderThumbAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const root = readSliderRootContext();
-  const entry = getSliderEntry(root.sliderId);
+  const entry = getSliderEntry(root.identity);
   const percentage = rangePercentage(root.value, root.min, root.max);
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
@@ -334,14 +349,14 @@ export function SliderThumb(props: SliderThumbProps | SliderThumbAsChildProps) {
       }
 
       event.preventDefault();
-      beginSliderDrag(root.sliderId);
+      beginSliderDrag(root.identity, root.sliderId);
     },
     onKeyDown: (event: KeyboardEvent) => {
       if (root.disabled) {
         return;
       }
 
-      const liveRoot = resolveLiveSliderRoot(root.sliderId);
+      const liveRoot = resolveLiveSliderRoot(root.identity, root.sliderId);
 
       if (liveRoot.disabled) {
         return;

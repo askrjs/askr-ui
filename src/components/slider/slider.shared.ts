@@ -3,6 +3,7 @@ import type { SliderOrientation } from './slider.types';
 
 export type SliderRootContextValue = {
   sliderId: string;
+  identity: object;
   value: number;
   setValue: (value: number) => void;
   min: number;

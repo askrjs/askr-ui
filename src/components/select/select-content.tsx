@@ -43,7 +43,7 @@ export function SelectContent(
   const root = readSelectRootContext();
   const renderContext = readSelectRenderContext();
   const { items, currentIndex, disabledIndexes } = root.resolvedState;
-  const overlayNodes = getOverlayNodes(root.selectId);
+  const overlayNodes = getOverlayNodes(root.overlayIdentity);
   const collection = getMenuCollection(root.selectId);
   const hasEnabledItems =
     items.length > 0 && disabledIndexes.length < items.length;
@@ -69,7 +69,7 @@ export function SelectContent(
       (node: HTMLElement | null) => {
         overlayNodes.content = node;
         if (node && root.open) {
-          syncOverlayPosition(root.selectId, {
+          syncOverlayPosition(root.overlayIdentity, root.selectId, {
             side,
             align,
             sideOffset,
@@ -77,7 +77,7 @@ export function SelectContent(
             zIndex: OVERLAY_Z_INDEX.dropdown,
           });
         } else {
-          clearOverlayPosition(root.selectId);
+          clearOverlayPosition(root.overlayIdentity);
         }
 
         if (node && root.open && hasEnabledItems) {
