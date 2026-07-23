@@ -106,7 +106,6 @@ describe('Dialog - Behavior', () => {
     expect(rerenderedDialogs[0]?.textContent).toBe('First dialog');
     expect(rerenderedDialogs[1]?.textContent).toBe('Second dialog');
   });
-
   it('should toggles trigger expansion state when activated', async () => {
     container = mount(
       <Dialog>
