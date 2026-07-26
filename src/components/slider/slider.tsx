@@ -1,7 +1,7 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { controllableState } from '@askrjs/askr/foundations/state';
-import { cspNonce, state } from '@askrjs/askr';
+import { cspNonce, getSignal, state } from '@askrjs/askr';
 import {
   dynamicAttributeSelector,
   removeDynamicStyleRuleWhenUnused,
@@ -33,6 +33,7 @@ type SliderEntry = {
   thumb: HTMLElement | null;
   dragMove: ((event: PointerEvent) => void) | null;
   dragEnd: ((event: PointerEvent) => void) | null;
+  cleanupSignal: AbortSignal | null;
 };
 
 const sliderEntries = new WeakMap<object, SliderEntry>();
@@ -50,6 +51,7 @@ function getSliderEntry(identity: object) {
     thumb: null,
     dragMove: null,
     dragEnd: null,
+    cleanupSignal: null,
   };
   sliderEntries.set(identity, created);
   return created;
@@ -136,19 +138,43 @@ function beginSliderDrag(identity: object, sliderId: string) {
     );
   };
   entry.dragEnd = () => {
-    if (entry.dragMove) {
-      window.removeEventListener('pointermove', entry.dragMove);
-    }
-
-    if (entry.dragEnd) {
-      window.removeEventListener('pointerup', entry.dragEnd);
-    }
-
-    entry.dragMove = null;
-    entry.dragEnd = null;
+    endSliderDrag(identity);
   };
   window.addEventListener('pointermove', entry.dragMove);
   window.addEventListener('pointerup', entry.dragEnd);
+}
+
+function endSliderDrag(identity: object) {
+  const entry = sliderEntries.get(identity);
+  if (!entry) {
+    return;
+  }
+  if (entry.dragMove) {
+    window.removeEventListener('pointermove', entry.dragMove);
+  }
+  if (entry.dragEnd) {
+    window.removeEventListener('pointerup', entry.dragEnd);
+  }
+  entry.dragMove = null;
+  entry.dragEnd = null;
+}
+
+function registerSliderCleanup(identity: object) {
+  const entry = getSliderEntry(identity);
+  const signal = getSignal();
+  if (entry.cleanupSignal === signal) {
+    return;
+  }
+  entry.cleanupSignal = signal;
+  signal.addEventListener(
+    'abort',
+    () => {
+      endSliderDrag(identity);
+      sliderEntries.delete(identity);
+      sliderContexts.delete(identity);
+    },
+    { once: true }
+  );
 }
 
 function resolveLiveSliderRoot(identity: object, sliderId: string) {
@@ -173,6 +199,7 @@ export function Slider(props: SliderProps) {
   const { max, min, step } = normalizeSliderConfig(props);
   const sliderId = resolveCompoundId('slider', id, children);
   const identity = state<object>({})();
+  registerSliderCleanup(identity);
   const valueState = controllableState({
     value,
     defaultValue: snapRangeValue(defaultValue ?? min, min, max, step),
