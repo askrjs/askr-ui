@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import {
   Slider,
   SliderRange,
@@ -81,6 +81,55 @@ describe('Slider - Behavior', () => {
     expect(
       getComputedStyle(root).getPropertyValue('--ak-slider-percentage').trim()
     ).toBe('25%');
+  });
+
+  it('should remove active drag listeners when unmounted mid-drag', () => {
+    const removeEventListener = vi.spyOn(window, 'removeEventListener');
+    try {
+      container = mount(
+        <Slider defaultValue={20}>
+          <SliderTrack>
+            <SliderRange />
+            <SliderThumb />
+          </SliderTrack>
+        </Slider>
+      );
+      const track = container.querySelector(
+        '[data-slider-track="true"]'
+      ) as HTMLDivElement;
+      track.getBoundingClientRect = () =>
+        ({
+          left: 0,
+          top: 0,
+          width: 100,
+          height: 10,
+          right: 100,
+          bottom: 10,
+          x: 0,
+          y: 0,
+          toJSON: () => null,
+        }) as DOMRect;
+      track.dispatchEvent(
+        new PointerEvent('pointerdown', {
+          bubbles: true,
+          clientX: 50,
+          clientY: 5,
+        })
+      );
+
+      unmount(container);
+
+      expect(removeEventListener).toHaveBeenCalledWith(
+        'pointermove',
+        expect.any(Function)
+      );
+      expect(removeEventListener).toHaveBeenCalledWith(
+        'pointerup',
+        expect.any(Function)
+      );
+    } finally {
+      removeEventListener.mockRestore();
+    }
   });
 
   it('should support Home/End/PageUp/PageDown keyboard boundaries', async () => {
