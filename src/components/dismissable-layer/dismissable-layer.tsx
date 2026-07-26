@@ -1,5 +1,6 @@
 import { Slot, createLayer } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { getSignal } from '@askrjs/askr';
 import { resolveCompoundId } from '../_internal/id';
 import type {
   DismissableLayerAsChildProps,
@@ -22,6 +23,7 @@ type LayerEntry = {
   onPointerDownOutside?: (event: PointerEvent) => void;
   onInteractOutside?: (event: Event) => void;
   onDismiss?: () => void;
+  cleanupSignal: AbortSignal | null;
 };
 
 const layerManager = createLayer();
@@ -118,10 +120,34 @@ function getLayerEntry(layerId: string): LayerEntry {
     unregisterDocumentListeners: null,
     disabled: false,
     disableOutsidePointerEvents: false,
+    cleanupSignal: null,
   };
 
   layerEntries.set(layerId, created);
   return created;
+}
+
+function registerLayerCleanup(layerId: string, entry: LayerEntry) {
+  const signal = getSignal();
+  if (entry.cleanupSignal === signal) {
+    return;
+  }
+  entry.cleanupSignal = signal;
+  signal.addEventListener(
+    'abort',
+    () => {
+      if (entry.cleanupSignal !== signal) {
+        return;
+      }
+      unregisterLayer(layerId);
+      layerEntries.delete(layerId);
+    },
+    { once: true }
+  );
+}
+
+export function dismissableLayerEntryCountForTests(): number {
+  return layerEntries.size;
 }
 
 function unregisterLayer(layerId: string) {
@@ -209,6 +235,7 @@ export function DismissableLayer(
 
   const layerId = resolveCompoundId('dismissable-layer', id, children);
   const entry = getLayerEntry(layerId);
+  registerLayerCleanup(layerId, entry);
   entry.disabled = disabled;
   entry.disableOutsidePointerEvents = disableOutsidePointerEvents;
   entry.onEscapeKeyDown = onEscapeKeyDown;

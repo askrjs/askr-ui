@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { DismissableLayer } from '../../../../src/components/dismissable-layer';
+import { dismissableLayerEntryCountForTests } from '../../../../src/components/dismissable-layer/dismissable-layer';
 import { mount, unmount } from '../../test-utils';
 
 describe('DismissableLayer - Behavior', () => {
@@ -121,5 +122,19 @@ describe('DismissableLayer - Behavior', () => {
     );
 
     expect(onDismiss).toHaveBeenCalledTimes(0);
+  });
+
+  it('should delete per-ID registry entries after unmount', () => {
+    const baseline = dismissableLayerEntryCountForTests();
+    for (let index = 0; index < 25; index += 1) {
+      container = mount(
+        <DismissableLayer id={`transient-${index}`}>
+          <div>Layer</div>
+        </DismissableLayer>
+      );
+      unmount(container);
+    }
+
+    expect(dismissableLayerEntryCountForTests()).toBe(baseline);
   });
 });
