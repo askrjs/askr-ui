@@ -29,7 +29,7 @@ export type ButtonLikeProps<
 export type ButtonLikeAsChildProps = ButtonLikeOwnProps & {
   asChild: true;
   children: JSXElement;
-  ref?: Ref<unknown>;
+  ref?: Ref<Element>;
   type?: never;
 };
 
@@ -49,5 +49,5 @@ export type BoxProps<TTag extends keyof JSX.IntrinsicElements, TElement> = Omit<
 export type BoxAsChildProps = BoxOwnProps & {
   asChild: true;
   children: JSXElement;
-  ref?: Ref<unknown>;
+  ref?: Ref<Element>;
 };

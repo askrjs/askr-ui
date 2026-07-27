@@ -1,6 +1,6 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { controllableState } from '@askrjs/askr/foundations/state';
-import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import type {
   CheckboxInputProps,
@@ -116,7 +116,11 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
   }
 
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: composeRefs(ref, (node: HTMLInputElement | null) => {
+      if (node) {
+        node.indeterminate = indeterminate;
+      }
+    }),
     onClick: (e: Event) => {
       toggleChecked(e as PressEvent);
 
@@ -140,7 +144,6 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
     <input
       type="checkbox"
       checked={currentChecked}
-      indeterminate={indeterminate}
       disabled={disabled}
       required={required}
       name={name}

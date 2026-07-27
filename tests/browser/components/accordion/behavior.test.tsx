@@ -118,4 +118,60 @@ describe('Accordion - Behavior', () => {
     ).filter((element) => element.textContent?.includes('multiple'));
     expect(multiOpen).toHaveLength(2);
   });
+
+  it('should preserve consecutive uncontrolled updates before rerender', async () => {
+    const changes: string[][] = [];
+
+    container = mount(
+      <Accordion
+        type="multiple"
+        onValueChange={(value) => changes.push([...value])}
+      >
+        <AccordionItem value="one">
+          <AccordionHeader>
+            <AccordionTrigger>One</AccordionTrigger>
+          </AccordionHeader>
+          <AccordionContent>First</AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="two">
+          <AccordionHeader>
+            <AccordionTrigger>Two</AccordionTrigger>
+          </AccordionHeader>
+          <AccordionContent>Second</AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    );
+
+    getButtonByText(container, 'One').click();
+    getButtonByText(container, 'Two').click();
+
+    expect(changes).toEqual([['one'], ['one', 'two']]);
+
+    await flushUpdates();
+
+    expect(
+      container.querySelectorAll(
+        `[${ACCORDION_A11Y_CONTRACT.EXPANDED_ATTRIBUTE}="true"]`
+      )
+    ).toHaveLength(2);
+  });
+
+  it('should keep controlled state props off the native root', () => {
+    container = mount(
+      <Accordion value="one" onValueChange={() => undefined}>
+        <AccordionItem value="one">
+          <AccordionHeader>
+            <AccordionTrigger>One</AccordionTrigger>
+          </AccordionHeader>
+          <AccordionContent>First</AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    );
+
+    const root = container.querySelector('[data-slot="accordion"]');
+
+    expect(root?.getAttribute('value')).toBeNull();
+    expect(root?.getAttribute('defaultvalue')).toBeNull();
+    expect(root?.getAttribute('onvaluechange')).toBeNull();
+  });
 });

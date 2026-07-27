@@ -32,6 +32,9 @@ export function ToggleGroup(props: ToggleGroupProps) {
     orientation = 'horizontal',
     ref,
     type = 'single',
+    value: _value,
+    defaultValue: _defaultValue,
+    onValueChange: _onValueChange,
     ...rest
   } = props;
   const groupId = resolveCompoundId(

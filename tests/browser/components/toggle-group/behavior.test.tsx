@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { For } from '@askrjs/askr';
 import {
   ToggleGroup,
   ToggleGroupItem,
@@ -146,6 +147,84 @@ describe('ToggleGroup - Behavior', () => {
     expect(
       getToggleByText(container, 'Right').getAttribute('aria-pressed')
     ).toBe('true');
+  });
+
+  it('should support toggle items produced by a computed array', async () => {
+    const items = [
+      { value: 'all', label: 'All' },
+      { value: 'midge', label: 'Midge' },
+    ];
+    function ComputedToggleGroup() {
+      return (
+        <ToggleGroup defaultValue="all">
+          {items.map((item) => (
+            <ToggleGroupItem key={item.value} value={item.value}>
+              {item.label}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
+      );
+    }
+
+    container = mount(<ComputedToggleGroup />);
+
+    expect(getToggleByText(container, 'All').getAttribute('aria-pressed')).toBe(
+      'true'
+    );
+
+    getToggleByText(container, 'Midge').click();
+    await flushUpdates();
+
+    expect(
+      getToggleByText(container, 'Midge').getAttribute('aria-pressed')
+    ).toBe('true');
+  });
+
+  it('should support toggle items produced by For', async () => {
+    const items = [
+      { value: 'all', label: 'All' },
+      { value: 'midge', label: 'Midge' },
+    ];
+    function ForToggleGroup() {
+      return (
+        <ToggleGroup defaultValue="all">
+          <For each={items} by={(item) => item.value}>
+            {(item) => (
+              <ToggleGroupItem value={item.value}>{item.label}</ToggleGroupItem>
+            )}
+          </For>
+        </ToggleGroup>
+      );
+    }
+
+    container = mount(<ForToggleGroup />);
+
+    expect(getToggleByText(container, 'All').getAttribute('aria-pressed')).toBe(
+      'true'
+    );
+
+    getToggleByText(container, 'Midge').click();
+    await flushUpdates();
+
+    expect(
+      getToggleByText(container, 'Midge').getAttribute('aria-pressed')
+    ).toBe('true');
+  });
+
+  it('should reject computed toggle items outside ToggleGroup', () => {
+    const items = [{ value: 'all', label: 'All' }];
+
+    expect(() => {
+      container = mount(
+        <>
+          {items.map((item) => (
+            <ToggleGroupItem key={item.value} value={item.value}>
+              {item.label}
+            </ToggleGroupItem>
+          ))}
+        </>
+      );
+    }).toThrow('ToggleGroup components must be used within <ToggleGroup>');
   });
 
   it('should emits normalized values for single and multiple groups', async () => {
@@ -301,6 +380,9 @@ describe('ToggleGroup - Behavior', () => {
         <ToggleGroupItem value="right">Right</ToggleGroupItem>
       </ToggleGroup>
     );
+    const group = container.querySelector('[data-slot="toggle-group"]');
+
+    expect(group?.getAttribute('value')).toBeNull();
     getToggleByText(container, 'Right').click();
     await flushUpdates();
 

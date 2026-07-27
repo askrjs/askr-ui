@@ -25,7 +25,7 @@ export type SwitchButtonProps = Omit<
 export type SwitchAsChildProps = SwitchOwnProps & {
   asChild: true;
   children: JSXElement;
-  ref?: Ref<unknown>;
+  ref?: Ref<Element>;
   type?: never;
 };
 

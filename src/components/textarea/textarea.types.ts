@@ -19,7 +19,7 @@ export type TextareaElementProps = Omit<
 export type TextareaAsChildProps = TextareaOwnProps & {
   asChild: true;
   children: JSXElement;
-  ref?: Ref<unknown>;
+  ref?: Ref<Element>;
 };
 
 export type TextareaProps = TextareaElementProps | TextareaAsChildProps;

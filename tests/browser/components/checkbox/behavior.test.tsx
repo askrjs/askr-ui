@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vite-plus/test';
+import { state } from '@askrjs/askr';
 import { Checkbox } from '../../../../src/components/checkbox/checkbox';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
@@ -85,6 +86,43 @@ describe('Checkbox - Behavior', () => {
     expect(input).toBeTruthy();
     expect(input?.getAttribute('aria-checked')).toBeNull();
     expect(input?.getAttribute('data-state')).toBe('indeterminate');
+    expect(input?.indeterminate).toBe(true);
+  });
+
+  it('should update native indeterminate state on a retained input', async () => {
+    let setIndeterminate = (_value: boolean) => undefined;
+    let refNode: HTMLInputElement | null = null;
+    const App = () => {
+      const indeterminate = state(false);
+      setIndeterminate = indeterminate.set;
+
+      return (
+        <Checkbox
+          indeterminate={indeterminate()}
+          ref={(node) => (refNode = node)}
+        />
+      );
+    };
+
+    container = mount(<App />);
+    const input = container.querySelector('input') as HTMLInputElement;
+
+    expect(refNode).toBe(input);
+    expect(input.indeterminate).toBe(false);
+
+    setIndeterminate(true);
+    await flushUpdates();
+
+    expect(container.querySelector('input')).toBe(input);
+    expect(refNode).toBe(input);
+    expect(input.indeterminate).toBe(true);
+
+    setIndeterminate(false);
+    await flushUpdates();
+
+    expect(container.querySelector('input')).toBe(input);
+    expect(refNode).toBe(input);
+    expect(input.indeterminate).toBe(false);
   });
 
   it('should forwards refs to the asChild host', () => {

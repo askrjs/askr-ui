@@ -16,7 +16,7 @@ export type LabelLabelProps = Omit<Props, 'children'> &
 export type LabelAsChildProps = LabelOwnProps & {
   asChild: true;
   children: JSXElement;
-  ref?: Ref<unknown>;
+  ref?: Ref<Element>;
 };
 
 export type LabelProps = LabelLabelProps | LabelAsChildProps;
