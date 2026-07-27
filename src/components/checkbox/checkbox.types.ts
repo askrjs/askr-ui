@@ -68,7 +68,7 @@ export type CheckboxInputProps = Omit<
 export type CheckboxAsChildProps = CheckboxOwnProps & {
   asChild: true;
   children: JSXElement;
-  ref?: Ref<unknown>;
+  ref?: Ref<Element>;
 };
 
 /**

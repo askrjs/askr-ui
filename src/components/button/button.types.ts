@@ -67,7 +67,7 @@ export type ButtonNativeProps = Omit<
 export type ButtonAsChildProps = ButtonOwnProps & {
   asChild: true;
   children: ButtonAsChildElement;
-  ref?: Ref<unknown>;
+  ref?: Ref<Element>;
   type?: never;
 };
 

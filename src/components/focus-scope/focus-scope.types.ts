@@ -22,5 +22,5 @@ export type FocusScopeProps = Omit<
 export type FocusScopeAsChildProps = FocusScopeOwnProps & {
   asChild: true;
   children: JSXElement;
-  ref?: Ref<unknown>;
+  ref?: Ref<Element>;
 };

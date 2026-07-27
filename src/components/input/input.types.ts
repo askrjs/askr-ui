@@ -24,7 +24,7 @@ export type InputInputProps = Omit<
 export type InputAsChildProps = InputOwnProps & {
   asChild: true;
   children: JSXElement;
-  ref?: Ref<unknown>;
+  ref?: Ref<Element>;
 };
 
 export type DebouncedInputProps = Omit<InputInputProps, 'onInput' | 'type'> & {

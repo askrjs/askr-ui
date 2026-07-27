@@ -49,7 +49,7 @@ export interface CollapsibleTriggerAsChildProps {
   /** Child content */
   children: JSXElement;
   /** Ref forwarding */
-  ref?: Ref<unknown>;
+  ref?: Ref<Element>;
 }
 
 /**
@@ -77,5 +77,5 @@ export interface CollapsibleContentAsChildProps {
   /** Force mount even when closed (for animation) */
   forceMount?: boolean;
   /** Ref forwarding */
-  ref?: Ref<unknown>;
+  ref?: Ref<Element>;
 }

@@ -17,7 +17,7 @@ export type VisuallyHiddenSpanProps = Omit<
 export type VisuallyHiddenAsChildProps = VisuallyHiddenOwnProps & {
   asChild: true;
   children: JSXElement;
-  ref?: Ref<unknown>;
+  ref?: Ref<Element>;
 };
 
 export type VisuallyHiddenProps =
