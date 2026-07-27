@@ -7,6 +7,7 @@ import type {
 import type { OverlayAlign, OverlaySide } from '../_internal/overlay';
 
 export type SelectOwnProps = {
+  /** Supports literal, nested, array-mapped, and `For`-rendered descendants. */
   children?: unknown;
   id?: string;
   value?: string;

@@ -3,6 +3,7 @@ import type { BoxAsChildProps, BoxProps } from '../_internal/types';
 export type SliderOrientation = 'horizontal' | 'vertical';
 
 export type SliderOwnProps = {
+  /** Supports literal, nested, array-mapped, and `For`-rendered descendants. */
   children?: unknown;
   id?: string;
   value?: number;

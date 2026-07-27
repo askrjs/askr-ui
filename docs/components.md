@@ -59,6 +59,29 @@ These are documentation groupings only.
 - `VirtualTable` is a fixed-height table windowing primitive with a sticky
   head, stable keys, selection, and keyboard navigation.
 
+## Dynamic descendants
+
+Dynamic descendants are a supported composition contract for
+context-coordinated group families. Their parts may be written directly,
+nested in caller markup, returned from an array `.map()`, or rendered with
+Askr's `<For>`.
+
+| Family         | Dynamic descendant contract                                 |
+| -------------- | ----------------------------------------------------------- |
+| `accordion`    | `AccordionItem` and its parts retain Accordion context.     |
+| `dropdown`     | `DropdownItem` retains Dropdown and content context.        |
+| `menu`         | `MenuItem` retains Menu and content context.                |
+| `menubar`      | Menus, content, submenus, and items retain Menubar context. |
+| `radio-group`  | `RadioGroupItem` retains RadioGroup context.                |
+| `select`       | Select groups, labels, and items retain Select context.     |
+| `slider`       | Track, range, and thumb parts retain Slider context.        |
+| `toggle-group` | `ToggleGroupItem` retains ToggleGroup context.              |
+
+Use stable `key` props for array-mapped children and a stable `by` selector for
+`<For>`. Dynamically reordered `MenubarMenu` children should also provide a
+stable, unique `value`; it preserves each menu's trigger, content, and portal
+identity as its position changes. Duplicate sibling values are rejected.
+
 ## Virtualization
 
 ```ts

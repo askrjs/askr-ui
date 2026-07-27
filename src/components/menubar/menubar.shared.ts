@@ -19,7 +19,7 @@ export type MenubarSurfaceMetadata = {
 
 export type MenubarRootContextValue = {
   menubarId: string;
-  portalIdentities: object[];
+  ensureMenuPortal: (menuKey: string) => MenubarPortalRecord;
   openPath: string[];
   getOpenPath: () => string[];
   setOpenPath: (path: string[]) => void;
@@ -29,6 +29,11 @@ export type MenubarRootContextValue = {
   currentTriggerIndexCandidate: number;
   setCurrentTriggerIndex: (index: number) => void;
   resolvedState: MenubarRootResolvedState;
+};
+
+export type MenubarPortalRecord = {
+  identity: object;
+  ordinal: number;
 };
 
 export type MenubarRootStateInput = {

@@ -8,6 +8,7 @@ import type {
 } from '../_internal/types';
 
 export type MenuOwnProps = {
+  /** Supports literal, nested, array-mapped, and `For`-rendered descendants. */
   children?: unknown;
   id?: string;
   orientation?: Orientation;

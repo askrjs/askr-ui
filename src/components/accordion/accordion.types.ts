@@ -8,6 +8,7 @@ import type {
 export type AccordionOrientation = 'vertical' | 'horizontal';
 
 type AccordionSharedOwnProps = {
+  /** Supports literal, nested, array-mapped, and `For`-rendered descendants. */
   children?: unknown;
   id?: string;
   orientation?: AccordionOrientation;
