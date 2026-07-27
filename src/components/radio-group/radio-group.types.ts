@@ -39,5 +39,5 @@ export type RadioGroupItemProps = Omit<
 export type RadioGroupItemAsChildProps = RadioGroupItemOwnProps & {
   asChild: true;
   children: JSXElement;
-  ref?: Ref<unknown>;
+  ref?: Ref<Element>;
 };

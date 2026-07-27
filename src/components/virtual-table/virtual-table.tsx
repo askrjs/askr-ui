@@ -936,10 +936,18 @@ export function VirtualTable<Row>(
       'aria-describedby': ariaDescribedBy,
       'aria-rowcount': String(stateSnapshot.count),
       'aria-colcount': String(columns.length),
-      tabIndex: tabIndex ?? 0,
-      ...(onKeyDown ? { onKeyDown } : {}),
-      ...(onFocus ? { onFocus } : {}),
-      ...(onBlur ? { onBlur } : {}),
+      tabIndex: (tabIndex ?? 0) as JSX.IntrinsicElements['table']['tabIndex'],
+      ...(onKeyDown
+        ? {
+            onKeyDown: onKeyDown as JSX.IntrinsicElements['table']['onKeyDown'],
+          }
+        : {}),
+      ...(onFocus
+        ? { onFocus: onFocus as JSX.IntrinsicElements['table']['onFocus'] }
+        : {}),
+      ...(onBlur
+        ? { onBlur: onBlur as JSX.IntrinsicElements['table']['onBlur'] }
+        : {}),
     },
     {
       ref: entry.tableRef,

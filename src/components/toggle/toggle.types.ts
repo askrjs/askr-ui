@@ -54,7 +54,7 @@ export type ToggleButtonProps = Omit<
 export type ToggleAsChildProps = ToggleOwnProps & {
   asChild: true;
   children: JSXElement;
-  ref?: Ref<unknown>;
+  ref?: Ref<Element>;
   type?: never;
 };
 

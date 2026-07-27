@@ -47,6 +47,9 @@ export function Accordion(props: AccordionProps) {
     orientation = 'vertical',
     ref,
     type = 'single',
+    value: _value,
+    defaultValue: _defaultValue,
+    onValueChange: _onValueChange,
     ...rest
   } = props;
   const accordionId = resolveCompoundId('accordion', id, children);
@@ -59,6 +62,7 @@ export function Accordion(props: AccordionProps) {
       ? ((props as AccordionMultipleProps).defaultValue ?? [])
       : ((props as AccordionSingleProps).defaultValue ?? '')
   );
+  internalValueState();
   const valueState = (() => {
     const read = () => {
       if (type === 'multiple') {

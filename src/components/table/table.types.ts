@@ -17,7 +17,7 @@ type TableNativeProps<
 type TableAsChildBaseProps = TableBaseProps & {
   asChild: true;
   children: JSXElement;
-  ref?: Ref<unknown>;
+  ref?: Ref<Element>;
 };
 
 export type TableProps =

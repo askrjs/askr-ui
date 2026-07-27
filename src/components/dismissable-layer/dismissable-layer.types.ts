@@ -24,5 +24,5 @@ export type DismissableLayerProps = Omit<
 export type DismissableLayerAsChildProps = DismissableLayerOwnProps & {
   asChild: true;
   children: JSXElement;
-  ref?: Ref<unknown>;
+  ref?: Ref<Element>;
 };
