@@ -65,13 +65,14 @@ export function MenubarMenu(props: MenubarMenuProps) {
   const renderContext = readMenubarRootRenderContext();
   const menuIndex = renderContext.claimMenuIndex();
   const menuKey = props.value ?? `menu-${menuIndex}`;
+  const portalRecord = root.ensureMenuPortal(menuKey);
   const menuContext: MenubarMenuContextValue = {
     menuKey,
     menuIndex,
-    triggerId: resolvePartId(root.menubarId, `trigger-${menuIndex}`),
-    contentId: resolvePartId(root.menubarId, `content-${menuIndex}`),
-    portalId: resolvePartId(root.menubarId, `portal-${menuIndex}`),
-    overlayIdentity: root.portalIdentities[menuIndex]!,
+    triggerId: resolvePartId(root.menubarId, `trigger-${portalRecord.ordinal}`),
+    contentId: resolvePartId(root.menubarId, `content-${portalRecord.ordinal}`),
+    portalId: resolvePartId(root.menubarId, `portal-${portalRecord.ordinal}`),
+    overlayIdentity: portalRecord.identity,
     path: [menuKey],
   };
 

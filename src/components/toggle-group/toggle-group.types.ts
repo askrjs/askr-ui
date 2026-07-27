@@ -7,6 +7,7 @@ import type {
 export type ToggleGroupOrientation = 'horizontal' | 'vertical';
 
 type ToggleGroupSharedOwnProps = {
+  /** Supports literal, nested, array-mapped, and `For`-rendered descendants. */
   children?: unknown;
   id?: string;
   orientation?: ToggleGroupOrientation;

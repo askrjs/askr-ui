@@ -15,6 +15,7 @@ export default defineConfig({
       'tests/unit/react-free-public-surface.test.ts',
       'tests/unit/export-map.test.ts',
       'tests/unit/docs-contract.test.ts',
+      'tests/unit/dynamic-children-contract.test.ts',
     ],
   },
 });

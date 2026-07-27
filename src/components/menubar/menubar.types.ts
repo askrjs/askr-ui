@@ -7,6 +7,7 @@ import type {
 import type { OverlayAlign, OverlaySide } from '../_internal/overlay';
 
 export type MenubarOwnProps = {
+  /** Supports literal, nested, array-mapped, and `For`-rendered descendants. */
   children?: unknown;
   id?: string;
   loop?: boolean;
@@ -16,6 +17,7 @@ export type MenubarProps = BoxProps<'div', HTMLDivElement> & MenubarOwnProps;
 
 export type MenubarMenuProps = {
   children?: unknown;
+  /** Stable and unique among sibling menus when menus are rendered dynamically. */
   value?: string;
 };
 

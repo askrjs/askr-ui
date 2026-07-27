@@ -10,6 +10,7 @@ export type RadioGroupOwnProps = {
   name?: string;
   orientation?: Orientation;
   loop?: boolean;
+  /** Supports literal, nested, array-mapped, and `For`-rendered descendants. */
   children?: unknown;
 };
 
