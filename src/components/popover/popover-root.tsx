@@ -39,7 +39,9 @@ export function Popover(props: PopoverProps) {
 
   const rootContext: PopoverRootContextValue = {
     popoverId,
-    open: openState(),
+    get open() {
+      return openState();
+    },
     setOpen: (nextOpen: boolean) => {
       openState.set(nextOpen);
 

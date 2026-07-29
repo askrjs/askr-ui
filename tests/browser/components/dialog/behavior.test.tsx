@@ -25,7 +25,7 @@ describe('Dialog - Behavior', () => {
       const name = state('Ada');
 
       return (
-        <Dialog defaultOpen>
+        <Dialog id="controlled-input-dialog" defaultOpen>
           <DialogPortal>
             <DialogOverlay />
             <DialogContent>
@@ -43,7 +43,6 @@ describe('Dialog - Behavior', () => {
     container = mount(<Fixture />);
     await flushUpdates();
 
-    const overlay = document.body.querySelector('[data-slot="dialog-overlay"]');
     const dialog = document.body.querySelector('[data-slot="dialog-content"]');
     const input = document.body.querySelector(
       'input[aria-label="Name"]'
@@ -54,15 +53,24 @@ describe('Dialog - Behavior', () => {
     input.dispatchEvent(new Event('input', { bubbles: true }));
     await flushUpdates();
 
-    expect(document.body.querySelector('[data-slot="dialog-overlay"]')).toBe(
-      overlay
+    const updatedDialog = document.body.querySelector(
+      '[data-slot="dialog-content"]'
     );
-    expect(document.body.querySelector('[data-slot="dialog-content"]')).toBe(
-      dialog
+    const updatedInput = document.body.querySelector(
+      'input[aria-label="Name"]'
+    ) as HTMLInputElement;
+
+    expect(
+      document.body.querySelectorAll('[data-slot="dialog-overlay"]')
+    ).toHaveLength(1);
+    expect(
+      document.body.querySelectorAll('[data-slot="dialog-content"]')
+    ).toHaveLength(1);
+    expect(document.body.querySelectorAll('input[aria-label="Name"]')).toHaveLength(
+      1
     );
-    expect(document.body.querySelector('input[aria-label="Name"]')).toBe(input);
-    expect(input.value).toBe('Grace');
-    expect(dialog?.id).toBe(dialogId);
+    expect(updatedInput.value).toBe('Grace');
+    expect(updatedDialog?.id).toBe(dialogId);
   });
 
   it('should keep portals isolated when separate renders reuse the same public id', async () => {

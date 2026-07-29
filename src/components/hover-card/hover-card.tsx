@@ -62,7 +62,9 @@ export function HoverCard(props: HoverCardProps) {
 
   const rootContext: HoverCardRootContextValue = {
     hoverCardId,
-    open: openState(),
+    get open() {
+      return openState();
+    },
     setOpen: (nextOpen: boolean) => {
       clearTimers();
       openState.set(nextOpen);

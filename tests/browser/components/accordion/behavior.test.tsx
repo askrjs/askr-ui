@@ -174,4 +174,39 @@ describe('Accordion - Behavior', () => {
     expect(root?.getAttribute('defaultvalue')).toBeNull();
     expect(root?.getAttribute('onvaluechange')).toBeNull();
   });
+
+  it('should throw when AccordionItem is used outside Accordion', () => {
+    expect(() => {
+      mount(
+        <AccordionItem value="one">
+          <AccordionHeader>
+            <AccordionTrigger>Invalid</AccordionTrigger>
+          </AccordionHeader>
+          <AccordionContent>Body</AccordionContent>
+        </AccordionItem>
+      );
+    }).toThrow('Accordion components must be used within <Accordion>');
+  });
+
+  it('should throw when AccordionHeader is used outside AccordionItem', () => {
+    expect(() => {
+      mount(
+        <Accordion>
+          <AccordionHeader>
+            <AccordionTrigger>Invalid</AccordionTrigger>
+          </AccordionHeader>
+        </Accordion>
+      );
+    }).toThrow('Accordion parts must be used within <AccordionItem>');
+  });
+
+  it('should throw when AccordionContent is used outside AccordionItem', () => {
+    expect(() => {
+      mount(
+        <Accordion>
+          <AccordionContent>Invalid</AccordionContent>
+        </Accordion>
+      );
+    }).toThrow('Accordion parts must be used within <AccordionItem>');
+  });
 });

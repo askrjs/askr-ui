@@ -33,12 +33,11 @@ async function flushPortalUpdates() {
 
 async function flushOverlayPosition() {
   await flushPortalUpdates();
-  await new Promise<void>((resolve) => {
-    requestAnimationFrame(() => resolve());
-  });
-  await new Promise<void>((resolve) => {
-    requestAnimationFrame(() => resolve());
-  });
+  for (let frame = 0; frame < 10; frame++) {
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+  }
 }
 
 describe('Menubar - Behavior', () => {
@@ -148,9 +147,22 @@ describe('Menubar - Behavior', () => {
       '[data-slot="menubar-content"]'
     ) as HTMLElement | null;
 
+    const triggerId = fileTrigger.id;
     expect(content).not.toBeNull();
-    expect(content?.getAttribute('data-askr-overlay-id')).toBe(fileTrigger.id);
+    expect(content?.getAttribute('data-slot')).toBe('menubar-content');
+    expect(content?.getAttribute('aria-labelledby')).toBe(triggerId);
+    expect(content?.id).toBeTruthy();
     expect(getComputedStyle(content!).position).toBe('fixed');
     expect(document.body.scrollHeight).toBe(beforeHeight);
+
+    (content as HTMLElement).dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+    );
+    await flushPortalUpdates();
+    expect(
+      document.body.querySelector('[data-slot="menubar-content"]')
+    ).toBeNull();
+
+    expect(fileTrigger.getAttribute('aria-expanded')).toBe('false');
   });
 });

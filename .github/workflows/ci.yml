@@ -36,9 +36,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Chromium
+      - name: Install browser engines
         if: ${{ hashFiles('vitest.test.browser.config.ts', 'playwright.config.*') != '' }}
-        run: npx playwright install chromium
+        run: npx playwright install chromium firefox webkit
 
       - name: Format check
         run: npm run fmt --if-present -- --check
