@@ -103,7 +103,7 @@ function renderMenubarSurfaceContent(
       return overlayNodes.trigger;
     };
 
-      const isOpen = () => pathIsOpen(root.getOpenPath(), contentContext.path);
+    const isOpen = () => pathIsOpen(root.getOpenPath(), contentContext.path);
 
     const syncPosition = (attempt = 0) => {
       if (!node || overlayNodes.content !== node || !node.isConnected) {
