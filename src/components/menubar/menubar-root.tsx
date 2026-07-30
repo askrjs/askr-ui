@@ -48,9 +48,10 @@ export function Menubar(props: MenubarProps) {
   const { children, id, loop = true, ref, ...rest } = props;
   const nonce = cspNonce();
   const generatedMenubarId = state(resolveCompoundId('menubar', id, children));
+  const generatedMenubarIdValue = generatedMenubarId();
   const menubarId =
     id === undefined
-      ? generatedMenubarId()
+      ? generatedMenubarIdValue
       : resolveCompoundId('menubar', id, children);
   const openPathState = state<string[]>([]);
   const portalEpochState = state(0);
