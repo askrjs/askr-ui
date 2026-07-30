@@ -1,5 +1,6 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { controllableState } from '@askrjs/askr/foundations/state';
+import { state } from '@askrjs/askr';
+import { runCancelablePress } from '../_internal/press';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import type {
@@ -66,22 +67,21 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
     ...rest
   } = props;
 
-  const checkedState = controllableState({
-    value: checked,
-    defaultValue: defaultChecked,
-    onChange: onCheckedChange,
-  });
   const isControlled = checked !== undefined;
-  const currentChecked = checkedState();
+  const internalChecked = state(defaultChecked);
+  const internalCheckedValue = internalChecked();
+  const currentChecked = isControlled ? checked : internalCheckedValue;
+  const setChecked = (next: boolean) => {
+    if (!isControlled) {
+      internalChecked.set(next);
+    }
+    onCheckedChange?.(next);
+  };
 
   const toggleChecked = (event: PressEvent) => {
-    onPress?.(event);
-
-    if (event.defaultPrevented) {
-      return;
-    }
-
-    checkedState.set(!checkedState());
+    runCancelablePress(event, onPress, () => {
+      setChecked(!currentChecked);
+    });
   };
 
   const ariaChecked = indeterminate
@@ -125,12 +125,12 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
       toggleChecked(e as PressEvent);
 
       if (isControlled) {
-        (e.currentTarget as HTMLInputElement).checked = checkedState();
+        (e.currentTarget as HTMLInputElement).checked = currentChecked;
       }
     },
     onChange: isControlled
       ? (e: Event) => {
-          (e.currentTarget as HTMLInputElement).checked = checkedState();
+          (e.currentTarget as HTMLInputElement).checked = currentChecked;
         }
       : undefined,
     'aria-checked': indeterminate ? undefined : ariaChecked,

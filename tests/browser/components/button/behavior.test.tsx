@@ -1,3 +1,4 @@
+import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
 import { Link } from '@askrjs/askr/router';
@@ -171,6 +172,23 @@ describe('Button - Behavior', () => {
       new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
     );
     expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  it('should activates a non-native asChild host with Enter and Space', async () => {
+    const onPress = vi.fn();
+    container = mount(
+      <Button asChild onPress={onPress}>
+        <span>Save</span>
+      </Button>
+    );
+
+    const host = container.querySelector('[role="button"]') as HTMLElement;
+    host.focus();
+    await userEvent.keyboard('{Enter}');
+    host.focus();
+    await userEvent.keyboard(' ');
+
+    expect(onPress).toHaveBeenCalledTimes(2);
   });
 
   it('should replaces stateful icon children instead of accumulating them', async () => {

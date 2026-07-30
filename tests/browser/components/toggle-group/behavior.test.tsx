@@ -1,3 +1,4 @@
+import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 import { For } from '@askrjs/askr';
 import {
@@ -332,6 +333,33 @@ describe('ToggleGroup - Behavior', () => {
     expect(host.getAttribute('data-from-child')).toBe('yes');
     expect(host.getAttribute('aria-pressed')).toBe('true');
     expect(host.getAttribute('data-state')).toBe('on');
+  });
+
+  it('should toggles an asChild item with Enter and Space', async () => {
+    container = mount(
+      <ToggleGroup>
+        <ToggleGroupItem asChild value="left">
+          <span>Left</span>
+        </ToggleGroupItem>
+      </ToggleGroup>
+    );
+    await flushUpdates();
+    await flushUpdates();
+
+    let item = getToggleByText(container, 'Left');
+    item.focus();
+    await userEvent.keyboard('{Enter}');
+    await flushUpdates();
+
+    item = getToggleByText(container, 'Left');
+    expect(item.getAttribute('aria-pressed')).toBe('true');
+
+    item.focus();
+    await userEvent.keyboard(' ');
+    await flushUpdates();
+
+    item = getToggleByText(container, 'Left');
+    expect(item.getAttribute('aria-pressed')).toBe('false');
   });
 
   it('should forwards refs to the group container and item hosts', () => {

@@ -27,6 +27,9 @@ export type HoverCardRootContextValue = {
   registerContentPosition: (position: HoverCardPositionOptions) => void;
   setTriggerNode: (node: HTMLElement | null) => void;
   setContentNode: (node: HTMLElement | null) => void;
+  getTriggerNode: () => HTMLElement | null;
+  getContentNode: () => HTMLElement | null;
+  requestTriggerFocus: () => void;
   syncPosition: () => void;
   clearPosition: () => void;
 };

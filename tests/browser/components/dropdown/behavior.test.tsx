@@ -1,4 +1,5 @@
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { userEvent } from '@vitest/browser/context';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import {
   Dropdown,
   DropdownContent,
@@ -142,6 +143,120 @@ describe('Dropdown - Behavior', () => {
     expect(
       items.every((item) => item.getAttribute('aria-disabled') === 'true')
     ).toBe(true);
+  });
+
+  it('should supports menu-button opening, typeahead, activation, and Tab dismissal', async () => {
+    const onArchiveSelect = vi.fn();
+    container = mount(
+      <div>
+        <Dropdown>
+          <DropdownTrigger>Open database menu</DropdownTrigger>
+          <DropdownPortal>
+            <DropdownContent>
+              <DropdownItem>Alpha</DropdownItem>
+              <DropdownItem textValue="Database1" disabled>
+                Disabled database
+              </DropdownItem>
+              <DropdownItem textValue="Database2">
+                Primary database
+              </DropdownItem>
+              <DropdownItem
+                asChild
+                textValue="Database Archive"
+                onSelect={onArchiveSelect}
+              >
+                <span>Archived database</span>
+              </DropdownItem>
+            </DropdownContent>
+          </DropdownPortal>
+        </Dropdown>
+        <button type="button" data-testid="after-dropdown">
+          After dropdown
+        </button>
+      </div>
+    );
+
+    let trigger = container.querySelector(
+      '[data-slot="dropdown-trigger"]'
+    ) as HTMLButtonElement;
+    trigger.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await flushUpdates();
+    await flushUpdates();
+
+    trigger = container.querySelector(
+      '[data-slot="dropdown-trigger"]'
+    ) as HTMLButtonElement;
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+    expect(document.activeElement?.textContent?.trim()).toBe('Alpha');
+
+    await userEvent.keyboard('D');
+    expect(document.activeElement?.textContent?.trim()).toBe(
+      'Primary database'
+    );
+
+    await userEvent.keyboard('d');
+    expect(document.activeElement?.textContent?.trim()).toBe(
+      'Archived database'
+    );
+
+    await userEvent.keyboard('{Enter}');
+    await flushUpdates();
+    expect(onArchiveSelect).toHaveBeenCalledTimes(1);
+
+    trigger = container.querySelector(
+      '[data-slot="dropdown-trigger"]'
+    ) as HTMLButtonElement;
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+
+    trigger.focus();
+    await userEvent.keyboard(' ');
+    await flushUpdates();
+    await flushUpdates();
+    trigger = container.querySelector(
+      '[data-slot="dropdown-trigger"]'
+    ) as HTMLButtonElement;
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+
+    await userEvent.tab();
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    expect(document.activeElement).toBe(
+      container.querySelector('[data-testid="after-dropdown"]')
+    );
+  });
+
+  it('should activates an asChild item with Space', async () => {
+    const onSelect = vi.fn();
+    container = mount(
+      <Dropdown defaultOpen>
+        <DropdownTrigger>Open</DropdownTrigger>
+        <DropdownPortal>
+          <DropdownContent>
+            <DropdownItem asChild onSelect={onSelect}>
+              <span>Archive</span>
+            </DropdownItem>
+          </DropdownContent>
+        </DropdownPortal>
+      </Dropdown>
+    );
+    await flushUpdates();
+    await flushUpdates();
+
+    const item = document.body.querySelector(
+      '[data-slot="dropdown-item"]'
+    ) as HTMLElement;
+    item.focus();
+    await userEvent.keyboard(' ');
+    await flushUpdates();
+
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    const trigger = container.querySelector(
+      '[data-slot="dropdown-trigger"]'
+    ) as HTMLButtonElement;
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
 
   it('should throw when DropdownContent is used without Dropdown', () => {

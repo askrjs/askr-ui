@@ -1,6 +1,7 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
+import { runCancelablePress } from '../_internal/press';
 import { readDialogRootContext } from './dialog.shared';
 import type {
   DialogTriggerAsChildProps,
@@ -25,11 +26,9 @@ export function DialogTrigger(
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
-      onPress?.(event);
-
-      if (!event.defaultPrevented) {
+      runCancelablePress(event, onPress, () => {
         root.setOpen(!root.open);
-      }
+      });
     },
     isNativeButton: !asChild,
   });

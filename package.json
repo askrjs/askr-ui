@@ -229,7 +229,7 @@
     "test:types": "tsc -p tsconfig.type-tests.json --noEmit",
     "test:unit": "npm run test:types && vp test run --config vitest.test.unit.config.ts",
     "test:publint": "publint",
-    "pack:check": "npm pack --ignore-scripts --dry-run --json",
+    "pack:check": "node scripts/check-package.mjs",
     "check": "npm run build && npm run lint && npm run typecheck && npm test && npm run test:publint && npm run pack:check",
     "prepack": "npm run build",
     "prepublishOnly": "npm run check",
