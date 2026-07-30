@@ -107,12 +107,12 @@ function renderMenubarSurfaceContent(
     const isOpen = () => pathIsOpen(root.getOpenPath(), contentContext.path);
 
     const syncPosition = (attempt = 0) => {
-      if (!isOpen()) {
+      if (!node || overlayNodes.content !== node || !node.isConnected) {
         clearOverlayPosition(contentContext.overlayIdentity);
         return;
       }
 
-      if (!node) {
+      if (!isOpen()) {
         clearOverlayPosition(contentContext.overlayIdentity);
         return;
       }

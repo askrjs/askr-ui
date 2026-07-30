@@ -137,11 +137,8 @@ export function AvatarImage(props: AvatarImageProps): JSX.Element {
       );
       updateStatus('loaded');
       queueMicrotask(() => {
-        avatar
-          ?.querySelector('[data-avatar-fallback="true"]')
-          ?.parentNode?.removeChild(
-            avatar.querySelector('[data-avatar-fallback="true"]')!
-          );
+        const fallback = avatar?.querySelector('[data-avatar-fallback="true"]');
+        fallback?.parentNode?.removeChild(fallback);
       });
     },
     onError: () => {
