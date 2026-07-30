@@ -131,8 +131,15 @@ export function AvatarImage(props: AvatarImageProps): JSX.Element {
     'data-slot': 'avatar-image',
     'data-avatar-image': 'true',
     'data-state': status,
-    onLoad: () => {
+    onLoad: (event: Event) => {
+      const avatar = (event.currentTarget as HTMLElement | null)?.closest(
+        '[data-avatar="true"]'
+      );
       updateStatus('loaded');
+      queueMicrotask(() => {
+        const fallback = avatar?.querySelector('[data-avatar-fallback="true"]');
+        fallback?.parentNode?.removeChild(fallback);
+      });
     },
     onError: () => {
       updateStatus('error');
@@ -150,7 +157,8 @@ export function AvatarFallback(
   props: AvatarFallbackProps | AvatarFallbackAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
-  const { status } = readAvatarContext();
+  const context = readAvatarContext();
+  const status = context.status;
   const finalProps = mergeProps(rest, {
     ref,
     'data-slot': 'avatar-fallback',
@@ -159,7 +167,7 @@ export function AvatarFallback(
   });
 
   return (
-    <Presence present={status !== 'loaded'}>
+    <Presence present={() => context.status !== 'loaded'}>
       {asChild ? (
         <Slot asChild {...finalProps} children={children} />
       ) : (

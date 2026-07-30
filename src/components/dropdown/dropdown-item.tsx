@@ -28,6 +28,7 @@ export function DropdownItem(
     asChild,
     children,
     disabled = false,
+    value,
     onSelect,
     ref,
     type: typeProp,
@@ -37,7 +38,9 @@ export function DropdownItem(
   const root = readDropdownRootContext();
   const renderContext = readDropdownRenderContext();
   const itemIndex = renderContext.claimItemIndex();
-  const itemId = resolvePartId(root.dropdownId, `item-${itemIndex}`);
+  const stableItemKey =
+    typeof value === 'string' && value.length > 0 ? value : String(itemIndex);
+  const itemId = resolvePartId(root.dropdownId, `item-${stableItemKey}`);
   const itemText = resolveMenuItemText(children);
   const { items, currentIndex, disabledIndexes } = root.resolvedState;
   const hasEnabledItems = items.some(
@@ -74,6 +77,7 @@ export function DropdownItem(
     registerCollectionNode(itemId, collection, node, {
       index: itemIndex,
       disabled,
+      value: stableItemKey,
       text: itemText,
     });
   };

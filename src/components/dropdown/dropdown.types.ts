@@ -54,6 +54,7 @@ export type DropdownContentAsChildProps = BoxAsChildProps &
 export type DropdownItemOwnProps = {
   children?: unknown;
   disabled?: boolean;
+  value?: string;
   variant?: DropdownItemVariant;
   onSelect?: (event: PressEvent) => void;
 };

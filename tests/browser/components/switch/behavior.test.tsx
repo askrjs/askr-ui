@@ -114,9 +114,16 @@ describe('Switch - Behavior', () => {
     button?.click();
     await flushUpdates();
 
-    expect(button?.getAttribute('aria-checked')).toBe('true');
-    expect(button?.getAttribute('data-state')).toBe('checked');
-    expect(input?.checked).toBe(true);
+    const updatedButton = container.querySelector(
+      'button'
+    ) as HTMLButtonElement | null;
+    const updatedInput = container.querySelector(
+      'input[type="checkbox"]'
+    ) as HTMLInputElement | null;
+
+    expect(updatedButton?.getAttribute('aria-checked')).toBe('true');
+    expect(updatedButton?.getAttribute('data-state')).toBe('checked');
+    expect(updatedInput?.checked).toBe(true);
   });
 
   it('should supports asChild composition and merges host props', () => {

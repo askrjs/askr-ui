@@ -143,4 +143,37 @@ describe('Dropdown - Behavior', () => {
       items.every((item) => item.getAttribute('aria-disabled') === 'true')
     ).toBe(true);
   });
+
+  it('should throw when DropdownContent is used without Dropdown', () => {
+    expect(() => {
+      mount(
+        <DropdownPortal>
+          <DropdownContent>
+            <DropdownItem>Orphan</DropdownItem>
+          </DropdownContent>
+        </DropdownPortal>
+      );
+    }).toThrow('Dropdown components must be used within <Dropdown>');
+  });
+
+  it('should allow DropdownItem when used within Dropdown', () => {
+    mount(
+      <Dropdown defaultOpen>
+        <DropdownTrigger>Open</DropdownTrigger>
+        <DropdownPortal>
+          <DropdownItem>Orphan</DropdownItem>
+        </DropdownPortal>
+      </Dropdown>
+    );
+
+    const item = document.body.querySelector('[role="menuitem"]');
+
+    expect(item?.textContent).toBe('Orphan');
+  });
+
+  it('should throw when DropdownTrigger is used without Dropdown', () => {
+    expect(() => {
+      mount(<DropdownTrigger>Orphan</DropdownTrigger>);
+    }).toThrow('Dropdown components must be used within <Dropdown>');
+  });
 });

@@ -69,8 +69,8 @@ export function MenubarMenu(props: MenubarMenuProps) {
   const menuContext: MenubarMenuContextValue = {
     menuKey,
     menuIndex,
-    triggerId: resolvePartId(root.menubarId, `trigger-${portalRecord.ordinal}`),
-    contentId: resolvePartId(root.menubarId, `content-${portalRecord.ordinal}`),
+    triggerId: resolvePartId(root.menubarId, `trigger-${menuKey}`),
+    contentId: resolvePartId(root.menubarId, `content-${menuKey}`),
     portalId: resolvePartId(root.menubarId, `portal-${portalRecord.ordinal}`),
     overlayIdentity: portalRecord.identity,
     path: [menuKey],
@@ -116,14 +116,14 @@ export function MenubarTrigger(
       focusSelectedCollectionItem(collection, index);
     },
   });
-  const open = pathIsOpen(root.openPath, menu.path);
+  const isOpen = () => pathIsOpen(root.getOpenPath(), menu.path);
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
       onPress?.(event);
 
       if (!event.defaultPrevented) {
-        root.setOpenPath(open ? [] : menu.path);
+        root.setOpenPath(isOpen() ? [] : menu.path);
         scheduleMenubarPortalSync(root);
       }
     },
@@ -154,11 +154,11 @@ export function MenubarTrigger(
     id: menu.triggerId,
     role: 'menuitem',
     'aria-haspopup': 'menu',
-    'aria-expanded': open ? 'true' : 'false',
+    'aria-expanded': isOpen() ? 'true' : 'false',
     'aria-controls': menu.contentId,
     'data-slot': 'menubar-trigger',
     'data-disabled': disabled ? 'true' : undefined,
-    'data-state': open ? 'open' : 'closed',
+    'data-state': isOpen() ? 'open' : 'closed',
     onFocus: () => {
       root.setCurrentTriggerIndex(menu.menuIndex);
     },
@@ -193,7 +193,7 @@ export function MenubarPortal(props: MenubarPortalProps): JSX.Element | null {
   const root = readMenubarRootContext();
   const menu = readMenubarMenuContext();
   const portal = getPersistentPortal(menu.overlayIdentity);
-  const open = pathIsOpen(root.openPath, menu.path);
+  const open = pathIsOpen(root.getOpenPath(), menu.path);
 
   if (!open) {
     return portal.render({ children: null }) as JSX.Element | null;

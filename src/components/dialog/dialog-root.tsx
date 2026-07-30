@@ -86,7 +86,9 @@ export function Dialog(props: DialogProps) {
 
   const rootContext: DialogRootContextValue = {
     dialogId,
-    open: openState(),
+    get open() {
+      return openState();
+    },
     setOpen: (nextOpen: boolean) => {
       openState.set(nextOpen);
 

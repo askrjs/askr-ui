@@ -319,6 +319,204 @@ describe('dynamic children context contract', () => {
     }
   });
 
+  it('should preserve mapped and For-rendered Accordion identity across reorder and clear/refill', async () => {
+    const baseItems = [
+      { value: 'alpha', label: 'Alpha' },
+      { value: 'beta', label: 'Beta' },
+    ] as const;
+
+    for (const mode of modes()) {
+      let setItems:
+        | ((next: Array<(typeof baseItems)[number]>) => void)
+        | undefined;
+
+      function DynamicAccordion() {
+        const items = state(baseItems);
+        setItems = items.set;
+
+        return (
+          <Accordion type="multiple" key={mode} defaultValue={[]}>
+            <DynamicItems mode={mode} each={items()} by={(item) => item.value}>
+              {(item) => (
+                <AccordionItem key={item.value} value={item.value}>
+                  <AccordionHeader>
+                    <AccordionTrigger>
+                      {item.label} {mode}
+                    </AccordionTrigger>
+                  </AccordionHeader>
+                  <AccordionContent>
+                    {item.label} content {mode}
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+            </DynamicItems>
+          </Accordion>
+        );
+      }
+
+      if (container) {
+        unmount(container);
+      }
+
+      container = mount(<DynamicAccordion />);
+      await flushUpdates();
+
+      const getTrigger = (label: string) =>
+        Array.from(container.querySelectorAll('button')).find(
+          (button) => button.textContent?.trim() === `${label} ${mode}`
+        ) as HTMLButtonElement;
+
+      const betaTrigger = getTrigger('Beta');
+      const betaControls = betaTrigger?.getAttribute('aria-controls');
+      const alphaControls = getTrigger('Alpha')?.getAttribute('aria-controls');
+
+      expect(betaControls).toBeTruthy();
+      expect(alphaControls).toBeTruthy();
+      expect(betaControls).not.toBe(alphaControls);
+      betaTrigger.click();
+      await flushUpdates();
+
+      expect(container.textContent).toContain(`Beta content ${mode}`);
+
+      setItems?.([
+        { value: 'beta', label: 'Beta' },
+        { value: 'alpha', label: 'Alpha' },
+        { value: 'gamma', label: 'Gamma' },
+      ]);
+      await flushUpdates();
+
+      expect(getTrigger('Alpha').getAttribute('aria-controls')).toBe(
+        alphaControls
+      );
+      expect(getTrigger('Beta').getAttribute('aria-controls')).toBe(
+        betaControls
+      );
+      expect(
+        Array.from(container.querySelectorAll('[id]')).filter(
+          (node) => node.id === betaControls
+        )
+      ).toHaveLength(1);
+      expect(container.textContent).toContain(`Beta content ${mode}`);
+
+      setItems?.([]);
+      await flushUpdates();
+
+      expect(container.textContent).not.toContain('Beta content');
+      expect(container.textContent).not.toContain('Gamma content');
+
+      setItems?.([baseItems[0]!, baseItems[1]!]);
+      await flushUpdates();
+
+      expect(getTrigger('Alpha').getAttribute('aria-controls')).toBe(
+        alphaControls
+      );
+      expect(getTrigger('Beta').getAttribute('aria-controls')).toBe(
+        betaControls
+      );
+      expect(container.textContent).toContain(`Beta content ${mode}`);
+    }
+  });
+
+  it('should preserve static siblings while mapped and For-rendered Dropdown items re-shuffle', async () => {
+    const initialItems = [
+      { value: 'one', label: 'One' },
+      { value: 'two', label: 'Two' },
+      { value: 'three', label: 'Three' },
+    ];
+
+    for (const mode of modes()) {
+      let setItems:
+        | ((next: Array<(typeof initialItems)[number]>) => void)
+        | undefined;
+
+      function DynamicDropdown() {
+        const items = state(initialItems);
+        setItems = items.set;
+
+        return (
+          <div>
+            <div data-testid="prefix">prefix</div>
+            <Dropdown defaultOpen>
+              <DropdownTrigger>Open {mode}</DropdownTrigger>
+              <DropdownContent forceMount>
+                <DynamicItems
+                  mode={mode}
+                  each={items()}
+                  by={(item) => item.value}
+                >
+                  {(item) => (
+                    <DropdownItem key={item.value}>
+                      {item.label} {mode}
+                    </DropdownItem>
+                  )}
+                </DynamicItems>
+              </DropdownContent>
+            </Dropdown>
+            <div data-testid="suffix">suffix</div>
+          </div>
+        );
+      }
+
+      if (container) {
+        unmount(container);
+      }
+
+      container = mount(<DynamicDropdown />);
+      await flushUpdates();
+
+      const trigger = container.querySelector('button') as HTMLButtonElement;
+      expect(trigger).not.toBeNull();
+
+      const before = container.querySelector('[data-testid="prefix"]');
+      const after = container.querySelector('[data-testid="suffix"]');
+      expect(before?.textContent).toBe('prefix');
+      expect(after?.textContent).toBe('suffix');
+
+      const item = (label: string) =>
+        Array.from(document.body.querySelectorAll('[role="menuitem"]')).find(
+          (node) => node.textContent?.trim() === `${label} ${mode}`
+        ) as HTMLDivElement;
+
+      expect(item('Three')).not.toBeUndefined();
+
+      setItems?.([
+        { value: 'three', label: 'Three' },
+        { value: 'two', label: 'Two' },
+        { value: 'one', label: 'One' },
+      ]);
+      await flushUpdates();
+      await flushUpdates();
+
+      expect(
+        Array.from(document.body.querySelectorAll('[role="menuitem"]')).map(
+          (node) => node.textContent?.trim()
+        )
+      ).toEqual([`Three ${mode}`, `Two ${mode}`, `One ${mode}`]);
+
+      setItems?.([{ value: 'two', label: 'Two' }]);
+      await flushUpdates();
+      await flushUpdates();
+
+      expect(
+        Array.from(document.body.querySelectorAll('[role="menuitem"]')).map(
+          (node) => node.textContent?.trim()
+        )
+      ).toEqual([`Two ${mode}`]);
+
+      setItems?.(initialItems);
+      await flushUpdates();
+      await flushUpdates();
+
+      expect(
+        Array.from(document.body.querySelectorAll('[role="menuitem"]')).map(
+          (node) => node.textContent?.trim()
+        )
+      ).toEqual([`One ${mode}`, `Two ${mode}`, `Three ${mode}`]);
+      expect(before?.textContent).toBe('prefix');
+      expect(after?.textContent).toBe('suffix');
+    }
+  });
+
   it('should keep dynamic Menubar identities stable across reorder and removal', async () => {
     const initialMenus = [
       { value: 'alpha', label: 'Alpha' },
@@ -333,7 +531,7 @@ describe('dynamic children context contract', () => {
       setMenus = menus.set;
 
       return (
-        <Menubar>
+        <Menubar id="dynamic-menubar">
           {menus().map((menu) => (
             <MenubarMenu key={menu.value} value={menu.value}>
               <MenubarTrigger>{menu.label}</MenubarTrigger>
@@ -361,46 +559,57 @@ describe('dynamic children context contract', () => {
     };
 
     expect(initialControls.alpha).not.toBe(initialControls.beta);
+    expect(initialControls.alpha).toBeTruthy();
+    expect(initialControls.beta).toBeTruthy();
 
-    getTrigger('Beta').click();
+    const betaControls = initialControls.beta!;
+    const alphaControls = initialControls.alpha!;
+    const getMenuContentNodes = (contentId: string) =>
+      Array.from(document.body.querySelectorAll('[role="menu"]')).filter(
+        (node) => node.id === contentId
+      );
+
+    const betaTrigger = getTrigger('Beta');
+    betaTrigger.click();
     await flushUpdates();
     await flushUpdates();
     await flushUpdates();
 
-    expect(document.body.textContent).toContain('Beta action');
     expect(document.body.textContent).not.toContain('Alpha action');
+    expect(getMenuContentNodes(betaControls).length).toBe(1);
 
     setMenus?.([initialMenus[1]!, initialMenus[0]!]);
     await flushUpdates();
     await flushUpdates();
+    await flushUpdates();
 
-    expect(getTrigger('Alpha').getAttribute('aria-controls')).toBe(
-      initialControls.alpha
-    );
-    expect(getTrigger('Beta').getAttribute('aria-controls')).toBe(
-      initialControls.beta
-    );
-    expect(document.body.textContent).toContain('Beta action');
+    expect(document.body.textContent).not.toContain('Alpha action');
+
+    const betaAfterReorder = getTrigger('Beta');
+    const alphaAfterReorder = getTrigger('Alpha');
+    expect(alphaAfterReorder.getAttribute('aria-controls')).toBe(alphaControls);
+    expect(betaAfterReorder.getAttribute('aria-controls')).toBe(betaControls);
 
     setMenus?.([initialMenus[0]!]);
     await flushUpdates();
     await flushUpdates();
+    await flushUpdates();
 
-    expect(getTrigger('Alpha').getAttribute('aria-controls')).toBe(
-      initialControls.alpha
-    );
+    const alphaAfterRemoval = getTrigger('Alpha');
+    expect(alphaAfterRemoval.getAttribute('aria-controls')).toBe(alphaControls);
+    expect(document.body.textContent).not.toContain('Alpha action');
     expect(document.body.textContent).not.toContain('Beta action');
+    expect(getMenuContentNodes(betaControls).length).toBe(0);
 
     setMenus?.(initialMenus);
     await flushUpdates();
     await flushUpdates();
+    await flushUpdates();
 
-    expect(getTrigger('Alpha').getAttribute('aria-controls')).toBe(
-      initialControls.alpha
-    );
-    expect(getTrigger('Beta').getAttribute('aria-controls')).toBe(
-      initialControls.beta
-    );
+    const betaRestored = getTrigger('Beta');
+    const alphaRestored = getTrigger('Alpha');
+    expect(alphaRestored.getAttribute('aria-controls')).toBe(alphaControls);
+    expect(betaRestored.getAttribute('aria-controls')).toBe(betaControls);
   });
 
   it('should reject duplicate dynamic Menubar values', () => {

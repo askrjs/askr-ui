@@ -196,7 +196,7 @@ export function AccordionItem(props: AccordionItemProps): JSX.Element {
   const root = readAccordionRootContext();
   const renderContext = readAccordionRenderContext();
   const itemIndex = renderContext.claimItemIndex();
-  const itemId = resolvePartId(root.accordionId, `item-${itemIndex}`);
+  const itemId = resolvePartId(root.accordionId, `item-${value}`);
   const triggerId = resolvePartId(itemId, 'trigger');
   const contentId = resolvePartId(itemId, 'content');
   const itemDisabled = Boolean(disabled);
