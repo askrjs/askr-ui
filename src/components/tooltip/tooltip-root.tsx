@@ -38,7 +38,9 @@ export function Tooltip(props: TooltipProps) {
 
   const rootContext: TooltipRootContextValue = {
     tooltipId,
-    open: openState(),
+    get open() {
+      return openState();
+    },
     setOpen: (nextOpen: boolean) => {
       openState.set(nextOpen);
 

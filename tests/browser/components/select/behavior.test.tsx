@@ -277,4 +277,37 @@ describe('Select - Behavior', () => {
       true
     );
   });
+
+  it('should throw when SelectContent is used without Select', () => {
+    expect(() => {
+      mount(
+        <SelectPortal>
+          <SelectContent>
+            <SelectItem value="askr">Askr</SelectItem>
+          </SelectContent>
+        </SelectPortal>
+      );
+    }).toThrow('Select components must be used within <Select>');
+  });
+
+  it('should allow SelectItem when used within Select', () => {
+    mount(
+      <Select>
+        <SelectTrigger>Open</SelectTrigger>
+        <SelectPortal>
+          <SelectItem value="askr">Askr</SelectItem>
+        </SelectPortal>
+      </Select>
+    );
+
+    const item = document.body.querySelector('[role="option"]');
+
+    expect(item?.textContent).toBe('Askr');
+  });
+
+  it('should throw when SelectTrigger is used without Select', () => {
+    expect(() => {
+      mount(<SelectTrigger>Orphan</SelectTrigger>);
+    }).toThrow('Select components must be used within <Select>');
+  });
 });

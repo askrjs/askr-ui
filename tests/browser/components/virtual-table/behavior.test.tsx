@@ -184,6 +184,8 @@ describe('VirtualTable - Behavior', () => {
     await flushUpdates();
 
     expect(onScroll).toHaveBeenCalledTimes(1);
-    expect(api?.getScrollTop()).toBe(72);
+    // Firefox can expose a subpixel scroll offset after layout. The public
+    // contract is the requested logical position, not engine-specific rounding.
+    expect(api?.getScrollTop()).toBeCloseTo(72, 0);
   });
 });

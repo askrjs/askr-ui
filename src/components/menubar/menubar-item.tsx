@@ -186,7 +186,7 @@ export function MenubarSubTrigger(
       focusSelectedCollectionItem(collection, index);
     },
   });
-  const open = pathIsOpen(root.openPath, sub.path);
+  const isOpen = () => pathIsOpen(root.getOpenPath(), sub.path);
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
@@ -194,7 +194,7 @@ export function MenubarSubTrigger(
 
       if (!event.defaultPrevented) {
         content.setCurrentIndex(sub.surfaceIndex);
-        root.setOpenPath(open ? content.path : sub.path);
+        root.setOpenPath(isOpen() ? content.path : sub.path);
         scheduleMenubarPortalSync(root);
       }
     },
@@ -224,10 +224,10 @@ export function MenubarSubTrigger(
     id: sub.triggerId,
     role: 'menuitem',
     'aria-haspopup': 'menu',
-    'aria-expanded': open ? 'true' : 'false',
+    'aria-expanded': isOpen() ? 'true' : 'false',
     'aria-controls': sub.contentId,
     'data-slot': 'menubar-sub-trigger',
-    'data-state': open ? 'open' : 'closed',
+    'data-state': isOpen() ? 'open' : 'closed',
     'data-disabled': disabled ? 'true' : undefined,
     onPointerEnter: () => {
       if (!disabled) {

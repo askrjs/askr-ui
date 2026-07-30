@@ -38,7 +38,7 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
   const itemText = resolveMenuItemText(children, textValue);
   const isDisabled = root.disabled || disabled;
 
-  const itemId = resolvePartId(root.selectId, `item-${itemIndex}`);
+  const itemId = resolvePartId(root.selectId, `item-${value}`);
   const { items, currentIndex, disabledIndexes } = root.resolvedState;
   const collection = getMenuCollection(root.selectId);
   const hasEnabledItems =

@@ -90,8 +90,35 @@ function renderMenubarSurfaceContent(
   });
   const setNode = (node: HTMLElement | null) => {
     overlayNodes.content = node;
+    const ensureTriggerRegistered = () => {
+      if (overlayNodes.trigger) {
+        return overlayNodes.trigger;
+      }
 
-    if (node && open) {
+      const fallbackTrigger = document.getElementById(contentContext.triggerId);
+
+      if (fallbackTrigger) {
+        overlayNodes.trigger = fallbackTrigger as HTMLElement;
+      }
+
+      return overlayNodes.trigger;
+    };
+
+    const isOpen = () => pathIsOpen(root.getOpenPath(), contentContext.path);
+
+    const syncPosition = (attempt = 0) => {
+      if (!node || overlayNodes.content !== node || !node.isConnected) {
+        clearOverlayPosition(contentContext.overlayIdentity);
+        return;
+      }
+
+      if (!isOpen()) {
+        clearOverlayPosition(contentContext.overlayIdentity);
+        return;
+      }
+
+      ensureTriggerRegistered();
+
       syncOverlayPosition(
         contentContext.overlayIdentity,
         contentContext.overlayId,
@@ -102,6 +129,25 @@ function renderMenubarSurfaceContent(
           zIndex: OVERLAY_Z_INDEX.dropdown,
         }
       );
+
+      if (getComputedStyle(node).position === 'fixed') {
+        return;
+      }
+
+      if (attempt >= 8) {
+        node.style.position = 'fixed';
+        return;
+      }
+
+      requestAnimationFrame(() => {
+        syncPosition(attempt + 1);
+      });
+    };
+
+    if (node && isOpen()) {
+      queueMicrotask(() => {
+        syncPosition(0);
+      });
     } else {
       clearOverlayPosition(contentContext.overlayIdentity);
     }
