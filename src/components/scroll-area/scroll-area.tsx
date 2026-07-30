@@ -73,6 +73,8 @@ export function ScrollAreaViewport(
   const finalProps = mergeProps(rest, {
     ref,
     id: root.viewportId,
+    role: 'region',
+    tabIndex: 0,
     'data-slot': 'scroll-area-viewport',
   });
 
@@ -97,10 +99,13 @@ export function ScrollAreaScrollbar(
   const finalProps = mergeProps(rest, {
     ref,
     id: root.scrollbarId,
+    role: 'scrollbar',
+    'aria-controls': root.viewportId,
+    'aria-orientation': orientation,
+    tabIndex: 0,
     'data-slot': 'scroll-area-scrollbar',
     'data-orientation': orientation,
     'data-state': 'visible',
-    'aria-hidden': 'true',
   });
 
   return <div {...finalProps}>{children}</div>;
