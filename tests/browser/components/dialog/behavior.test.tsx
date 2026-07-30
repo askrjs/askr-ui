@@ -66,9 +66,9 @@ describe('Dialog - Behavior', () => {
     expect(
       document.body.querySelectorAll('[data-slot="dialog-content"]')
     ).toHaveLength(1);
-    expect(document.body.querySelectorAll('input[aria-label="Name"]')).toHaveLength(
-      1
-    );
+    expect(
+      document.body.querySelectorAll('input[aria-label="Name"]')
+    ).toHaveLength(1);
     expect(updatedInput.value).toBe('Grace');
     expect(updatedDialog?.id).toBe(dialogId);
   });
