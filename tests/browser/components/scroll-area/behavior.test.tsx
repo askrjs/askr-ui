@@ -83,12 +83,24 @@ describe('ScrollArea - Behavior', () => {
       </ScrollArea>
     );
     await flushUpdates();
-    const viewport = container.querySelector('[data-slot="scroll-area-viewport"]') as HTMLElement;
-    const bars = [...container.querySelectorAll('[data-slot="scroll-area-scrollbar"]')] as HTMLElement[];
+    const viewport = container.querySelector(
+      '[data-slot="scroll-area-viewport"]'
+    ) as HTMLElement;
+    const bars = [
+      ...container.querySelectorAll('[data-slot="scroll-area-scrollbar"]'),
+    ] as HTMLElement[];
     expect(viewport.getAttribute('role')).toBe('region');
-    expect(bars.map((bar) => bar.getAttribute('role'))).toEqual(['scrollbar', 'scrollbar']);
-    expect(bars.map((bar) => bar.getAttribute('aria-orientation'))).toEqual(['vertical', 'horizontal']);
-    expect(bars.every((bar) => bar.getAttribute('aria-controls') === viewport.id)).toBe(true);
+    expect(bars.map((bar) => bar.getAttribute('role'))).toEqual([
+      'scrollbar',
+      'scrollbar',
+    ]);
+    expect(bars.map((bar) => bar.getAttribute('aria-orientation'))).toEqual([
+      'vertical',
+      'horizontal',
+    ]);
+    expect(
+      bars.every((bar) => bar.getAttribute('aria-controls') === viewport.id)
+    ).toBe(true);
   });
 
   it('should preserve consumer scroll handlers and refs given ScrollAreaViewport asChild when the viewport rerenders', async () => {
@@ -102,7 +114,9 @@ describe('ScrollArea - Behavior', () => {
       </ScrollArea>
     );
     await flushUpdates();
-    const viewport = container.querySelector('[data-slot="scroll-area-viewport"]') as HTMLDivElement;
+    const viewport = container.querySelector(
+      '[data-slot="scroll-area-viewport"]'
+    ) as HTMLDivElement;
     viewport.dispatchEvent(new Event('scroll', { bubbles: true }));
     expect(ref.current).toBe(viewport);
     expect(onScroll).toHaveBeenCalledOnce();

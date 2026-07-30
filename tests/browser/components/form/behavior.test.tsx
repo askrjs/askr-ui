@@ -53,7 +53,9 @@ describe('Form - Behavior', () => {
     const form = container.querySelector('form') as HTMLFormElement;
     const input = container.querySelector('input') as HTMLInputElement;
     input.value = 'Grace';
-    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    form.dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true })
+    );
     form.dispatchEvent(new Event('reset', { bubbles: true }));
     await flushUpdates();
     expect(onSubmit).toHaveBeenCalledOnce();
@@ -62,7 +64,13 @@ describe('Form - Behavior', () => {
 
   it('should preserve form attributes given Form asChild when method, action, target, and encoding props are supplied', async () => {
     container = mount(
-      <Form asChild method="post" action="/save" target="_blank" encType="multipart/form-data">
+      <Form
+        asChild
+        method="post"
+        action="/save"
+        target="_blank"
+        encType="multipart/form-data"
+      >
         <section>Fields</section>
       </Form>
     );
