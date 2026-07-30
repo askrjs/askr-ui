@@ -95,7 +95,9 @@ describe('HoverCard - Behavior', () => {
         <HoverCardContent>Details</HoverCardContent>
       </HoverCard>
     );
-    const trigger = container.querySelector('[data-slot="hover-card-trigger"]') as HTMLElement;
+    const trigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
     trigger.dispatchEvent(new FocusEvent('focus', { bubbles: true }));
     await flushUpdates();
     expect(onOpenChange).toHaveBeenCalledWith(true);
@@ -111,13 +113,19 @@ describe('HoverCard - Behavior', () => {
       </HoverCard>
     );
     await flushUpdates();
-    const trigger = container.querySelector('[data-slot="hover-card-trigger"]') as HTMLElement;
-    const content = document.body.querySelector('[data-slot="hover-card-content"]') as HTMLElement;
+    const trigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
+    const content = document.body.querySelector(
+      '[data-slot="hover-card-content"]'
+    ) as HTMLElement;
     trigger.dispatchEvent(new PointerEvent('pointerleave', { bubbles: true }));
     content.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
     await vi.advanceTimersByTimeAsync(60);
     await flushUpdates();
-    expect(document.body.querySelector('[data-slot="hover-card-content"]')).not.toBeNull();
+    expect(
+      document.body.querySelector('[data-slot="hover-card-content"]')
+    ).not.toBeNull();
   });
 
   it('should expose complete dialog labeling given a trigger and content when the card is open', async () => {
@@ -128,8 +136,12 @@ describe('HoverCard - Behavior', () => {
       </HoverCard>
     );
     await flushUpdates();
-    const trigger = container.querySelector('[data-slot="hover-card-trigger"]') as HTMLElement;
-    const content = document.body.querySelector('[data-slot="hover-card-content"]') as HTMLElement;
+    const trigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
+    const content = document.body.querySelector(
+      '[data-slot="hover-card-content"]'
+    ) as HTMLElement;
     expect(content.getAttribute('role')).toBe('dialog');
     expect(content.getAttribute('aria-labelledby')).toBe(trigger.id);
   });
