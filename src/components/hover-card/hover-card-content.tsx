@@ -55,6 +55,10 @@ export function HoverCardContent(
     ),
     id: root.contentId,
     role: 'dialog',
+    // A HoverCard is an interactive dialog tied to its trigger.  Exposing the
+    // trigger as the accessible name keeps the relationship intact for both
+    // the inline and portal-rendered content paths.
+    'aria-labelledby': root.triggerId,
     tabIndex: -1,
     'data-slot': 'hover-card-content',
     'data-state': root.open ? 'open' : 'closed',

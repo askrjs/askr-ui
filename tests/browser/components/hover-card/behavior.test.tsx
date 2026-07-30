@@ -85,4 +85,64 @@ describe('HoverCard - Behavior', () => {
     expect(triggerRef.current).toBe(trigger);
     expect(contentRef.current).toBe(content);
   });
+
+  it('should preserve controlled open state given open and onOpenChange when hover and focus events interleave', async () => {
+    vi.useFakeTimers();
+    const onOpenChange = vi.fn();
+    container = mount(
+      <HoverCard open={false} onOpenChange={onOpenChange}>
+        <HoverCardTrigger>Preview</HoverCardTrigger>
+        <HoverCardContent>Details</HoverCardContent>
+      </HoverCard>
+    );
+    const trigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
+    trigger.dispatchEvent(new FocusEvent('focus', { bubbles: true }));
+    await flushUpdates();
+    expect(onOpenChange).toHaveBeenCalledWith(true);
+    expect(trigger.getAttribute('data-state')).toBe('closed');
+  });
+
+  it('should cancel delayed close given pointer movement from trigger to content when the close timer is pending', async () => {
+    vi.useFakeTimers();
+    container = mount(
+      <HoverCard defaultOpen closeDelay={50}>
+        <HoverCardTrigger>Preview</HoverCardTrigger>
+        <HoverCardContent>Details</HoverCardContent>
+      </HoverCard>
+    );
+    await flushUpdates();
+    const trigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
+    const content = document.body.querySelector(
+      '[data-slot="hover-card-content"]'
+    ) as HTMLElement;
+    trigger.dispatchEvent(new PointerEvent('pointerleave', { bubbles: true }));
+    content.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(60);
+    await flushUpdates();
+    expect(
+      document.body.querySelector('[data-slot="hover-card-content"]')
+    ).not.toBeNull();
+  });
+
+  it('should expose complete dialog labeling given a trigger and content when the card is open', async () => {
+    container = mount(
+      <HoverCard defaultOpen>
+        <HoverCardTrigger>Preview</HoverCardTrigger>
+        <HoverCardContent>Details</HoverCardContent>
+      </HoverCard>
+    );
+    await flushUpdates();
+    const trigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
+    const content = document.body.querySelector(
+      '[data-slot="hover-card-content"]'
+    ) as HTMLElement;
+    expect(content.getAttribute('role')).toBe('dialog');
+    expect(content.getAttribute('aria-labelledby')).toBe(trigger.id);
+  });
 });
