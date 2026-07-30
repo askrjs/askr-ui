@@ -1,8 +1,17 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
 import { Checkbox } from '../../../../src/components/checkbox';
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '../../../../src/components/dialog';
-import { Popover, PopoverContent, PopoverTrigger } from '../../../../src/components/popover';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from '../../../../src/components/dialog';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '../../../../src/components/popover';
 import { VirtualList } from '../../../../src/components/virtual-list';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
@@ -16,9 +25,18 @@ describe('Cross-component contracts', () => {
 
   it('should preserve controlled-to-uncontrolled state transitions given native controls when the value or checked prop changes from defined to undefined', async () => {
     const checked = state<boolean | undefined>(true);
-    container = mount(<Checkbox checked={checked()} onCheckedChange={(next) => checked.set(next)} />);
+    container = mount(
+      <Checkbox
+        checked={checked()}
+        onCheckedChange={(next) => checked.set(next)}
+      />
+    );
     await flushUpdates();
-    expect(container.querySelector('[data-slot="checkbox"]')?.getAttribute('data-state')).toBe('checked');
+    expect(
+      container
+        .querySelector('[data-slot="checkbox"]')
+        ?.getAttribute('data-state')
+    ).toBe('checked');
     checked.set(undefined);
     await flushUpdates();
     expect(container.querySelector('[data-slot="checkbox"]')).not.toBeNull();
@@ -38,8 +56,12 @@ describe('Cross-component contracts', () => {
       </Dialog>
     );
     await flushUpdates();
-    expect(document.body.querySelector('[data-slot="dialog-content"]')).not.toBeNull();
-    expect(document.body.querySelector('[data-slot="popover-content"]')).not.toBeNull();
+    expect(
+      document.body.querySelector('[data-slot="dialog-content"]')
+    ).not.toBeNull();
+    expect(
+      document.body.querySelector('[data-slot="popover-content"]')
+    ).not.toBeNull();
   });
 
   it('should hydrate asChild hosts without replacing nodes given server-rendered component trees when client props attach', async () => {
@@ -53,7 +75,9 @@ describe('Cross-component contracts', () => {
     );
     await flushUpdates();
     expect(ref.current?.tagName).toBe('BUTTON');
-    expect(container.querySelector('[data-slot="popover-trigger"]')).not.toBeNull();
+    expect(
+      container.querySelector('[data-slot="popover-trigger"]')
+    ).not.toBeNull();
   });
 
   it('should preserve virtualized row identity given reorder, resize, and scroll-anchor changes when data updates during virtualization', async () => {
