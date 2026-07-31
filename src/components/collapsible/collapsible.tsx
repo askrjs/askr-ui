@@ -129,23 +129,6 @@ export function CollapsibleTrigger(
     'aria-controls': root.contentId,
     'data-state': root.open ? 'open' : 'closed',
     'data-disabled': root.disabled ? 'true' : undefined,
-    onKeyDown: !asChild
-      ? (event: KeyboardEvent) => {
-          if (event.key === ' ') {
-            event.preventDefault();
-          }
-          if (event.key === 'Enter') {
-            toggleOpen(event);
-          }
-        }
-      : undefined,
-    onKeyUp: !asChild
-      ? (event: KeyboardEvent) => {
-          if (event.key === ' ') {
-            toggleOpen(event);
-          }
-        }
-      : undefined,
   });
 
   if (asChild) {

@@ -10,11 +10,13 @@ export type MenubarTriggerMetadata = {
   index: number;
   disabled: boolean;
   menuKey?: string;
+  text: string;
 };
 
 export type MenubarSurfaceMetadata = {
   index: number;
   disabled: boolean;
+  text: string;
 };
 
 export type MenubarRootContextValue = {
@@ -28,7 +30,10 @@ export type MenubarRootContextValue = {
   syncPortals: () => void;
   currentTriggerIndexCandidate: number;
   setCurrentTriggerIndex: (index: number) => void;
+  restoreTriggerFocus: (index: number, node: HTMLElement | null) => void;
   resolvedState: MenubarRootResolvedState;
+  handleTypeaheadKeyDown: (event: KeyboardEvent) => boolean;
+  handleTypeaheadKeyUp: (event: KeyboardEvent) => boolean;
 };
 
 export type MenubarPortalRecord = {
@@ -63,6 +68,10 @@ export type MenubarContentContextValue = {
   path: string[];
   currentIndexCandidate: number;
   setCurrentIndex: (index: number) => void;
+  focusItem: (index: number) => void;
+  restoreItemFocus: (index: number, node: HTMLElement | null) => void;
+  handleTypeaheadKeyDown: (event: KeyboardEvent) => boolean;
+  handleTypeaheadKeyUp: (event: KeyboardEvent) => boolean;
 };
 
 export type MenubarContentRenderContextValue = {
@@ -204,6 +213,7 @@ export function resolveMenubarRootState(
     index: item.index,
     disabled: item.disabled,
     menuKey: item.value,
+    text: item.text ?? '',
   }));
   const fallbackIndex = firstEnabledCompositeIndex(items);
   const candidateIndex = root.currentTriggerIndexCandidate;
@@ -227,6 +237,7 @@ export function resolveMenubarContentState(
   ).map((item) => ({
     index: item.index,
     disabled: item.disabled,
+    text: item.text ?? '',
   }));
   const fallbackIndex = firstEnabledCompositeIndex(items);
   const candidateIndex = content.currentIndexCandidate;

@@ -21,8 +21,15 @@ export type MenubarMenuProps = {
   value?: string;
 };
 
-export type MenubarTriggerProps = ButtonLikeProps<'button', HTMLButtonElement>;
-export type MenubarTriggerAsChildProps = ButtonLikeAsChildProps;
+export type MenubarTextValueOwnProps = {
+  /** Text used for typeahead when rendered children are not plain text. */
+  textValue?: string;
+};
+
+export type MenubarTriggerProps = ButtonLikeProps<'button', HTMLButtonElement> &
+  MenubarTextValueOwnProps;
+export type MenubarTriggerAsChildProps = ButtonLikeAsChildProps &
+  MenubarTextValueOwnProps;
 
 export type MenubarPortalProps = {
   children?: unknown;
@@ -40,8 +47,10 @@ export type MenubarContentProps = BoxProps<'div', HTMLDivElement> &
 export type MenubarContentAsChildProps = BoxAsChildProps &
   MenubarContentOwnProps;
 
-export type MenubarItemProps = ButtonLikeProps<'button', HTMLButtonElement>;
-export type MenubarItemAsChildProps = ButtonLikeAsChildProps;
+export type MenubarItemProps = ButtonLikeProps<'button', HTMLButtonElement> &
+  MenubarTextValueOwnProps;
+export type MenubarItemAsChildProps = ButtonLikeAsChildProps &
+  MenubarTextValueOwnProps;
 
 export type MenubarGroupProps = BoxProps<'div', HTMLDivElement>;
 export type MenubarGroupAsChildProps = BoxAsChildProps;
@@ -60,8 +69,10 @@ export type MenubarSubProps = {
 export type MenubarSubTriggerProps = ButtonLikeProps<
   'button',
   HTMLButtonElement
->;
-export type MenubarSubTriggerAsChildProps = ButtonLikeAsChildProps;
+> &
+  MenubarTextValueOwnProps;
+export type MenubarSubTriggerAsChildProps = ButtonLikeAsChildProps &
+  MenubarTextValueOwnProps;
 
 export type MenubarSubContentProps = BoxProps<'div', HTMLDivElement> &
   MenubarContentOwnProps;

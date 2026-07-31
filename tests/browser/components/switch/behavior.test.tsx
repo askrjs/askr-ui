@@ -1,3 +1,4 @@
+import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { Switch } from '../../../../src/components/switch/switch';
 import { mount, unmount } from '../../test-utils';
@@ -146,6 +147,31 @@ describe('Switch - Behavior', () => {
     expect(host?.getAttribute('role')).toBe('switch');
     expect(host?.getAttribute('aria-checked')).toBe('true');
     expect(host?.getAttribute('data-state')).toBe('checked');
+  });
+
+  it('should toggles an asChild host with Enter and Space', async () => {
+    const onCheckedChange = vi.fn();
+    container = mount(
+      <Switch asChild onCheckedChange={onCheckedChange}>
+        <span>Power</span>
+      </Switch>
+    );
+
+    let host = container.querySelector('[role="switch"]') as HTMLElement;
+    host.focus();
+    await userEvent.keyboard('{Enter}');
+    await flushUpdates();
+
+    host = container.querySelector('[role="switch"]') as HTMLElement;
+    expect(host.getAttribute('aria-checked')).toBe('true');
+
+    host.focus();
+    await userEvent.keyboard(' ');
+    await flushUpdates();
+
+    host = container.querySelector('[role="switch"]') as HTMLElement;
+    expect(host.getAttribute('aria-checked')).toBe('false');
+    expect(onCheckedChange.mock.calls).toEqual([[true], [false]]);
   });
 
   it('should applies disabled semantics to asChild hosts', () => {

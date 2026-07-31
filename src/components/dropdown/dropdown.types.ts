@@ -57,6 +57,8 @@ export type DropdownItemOwnProps = {
   value?: string;
   variant?: DropdownItemVariant;
   onSelect?: (event: PressEvent) => void;
+  /** Text used for typeahead when rendered children are not plain text. */
+  textValue?: string;
 };
 
 export type DropdownItemVariant = 'default' | 'destructive';

@@ -1,13 +1,13 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
-import { focusSelectedCollectionItem } from '../_internal/focus';
 import {
   getMenuCollection,
   registerCollectionNode,
   resolveMenuItemText,
 } from '../_internal/menu';
 import { resolvePartId } from '../_internal/id';
+import { runCancelablePress } from '../_internal/press';
 import {
   readDropdownRenderContext,
   readDropdownRootContext,
@@ -31,6 +31,7 @@ export function DropdownItem(
     value,
     onSelect,
     ref,
+    textValue,
     type: typeProp,
     variant,
     ...rest
@@ -41,7 +42,7 @@ export function DropdownItem(
   const stableItemKey =
     typeof value === 'string' && value.length > 0 ? value : String(itemIndex);
   const itemId = resolvePartId(root.dropdownId, `item-${stableItemKey}`);
-  const itemText = resolveMenuItemText(children);
+  const itemText = resolveMenuItemText(children, textValue);
   const { items, currentIndex, disabledIndexes } = root.resolvedState;
   const hasEnabledItems = items.some(
     (_item, index) => !disabledIndexes.includes(index)
@@ -59,20 +60,33 @@ export function DropdownItem(
       }
 
       root.setCurrentIndex(index);
-      focusSelectedCollectionItem(collection, index);
+      root.focusItem(index);
     },
   });
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
-      onSelect?.(event);
-      if (!event.defaultPrevented) {
+      runCancelablePress(event, onSelect, () => {
         root.setCurrentIndex(itemIndex);
         root.setOpen(false);
-      }
+      });
     },
-    isNativeButton: !asChild,
+    isNativeButton: false,
   });
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (!disabled && root.handleTypeaheadKeyDown(event)) {
+      return;
+    }
+
+    interactionProps.onKeyDown?.(event);
+  };
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (root.handleTypeaheadKeyUp(event)) {
+      return;
+    }
+
+    interactionProps.onKeyUp?.(event);
+  };
   const setNode = (node: HTMLElement | null) => {
     registerCollectionNode(itemId, collection, node, {
       index: itemIndex,
@@ -80,6 +94,7 @@ export function DropdownItem(
       value: stableItemKey,
       text: itemText,
     });
+    root.restoreItemFocus(itemIndex, node);
   };
   const refHandler = ref
     ? composeRefs(
@@ -93,11 +108,14 @@ export function DropdownItem(
     : setNode;
   const finalProps = mergeProps(rest, {
     ...interactionProps,
+    onKeyDown: handleKeyDown,
+    onKeyUp: handleKeyUp,
     ...nav.item(itemIndex),
     ...(disabled ? { tabIndex: -1 } : {}),
     ref: refHandler,
     id: itemId,
     role: 'menuitem',
+    disabled: disabled && !asChild ? true : undefined,
     'aria-disabled': disabled ? 'true' : undefined,
     'data-slot': 'dropdown-item',
     'data-disabled': disabled ? 'true' : undefined,

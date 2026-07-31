@@ -1,3 +1,4 @@
+import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
 import { Button } from '../../../../src/components/button';
@@ -178,6 +179,49 @@ describe('Dialog - Behavior', () => {
     expect(close.getAttribute('data-variant')).toBe('outline');
 
     close.click();
+    await flushUpdates();
+
+    expect(
+      document.body.querySelector('[data-slot="dialog-content"]')
+    ).toBeNull();
+  });
+
+  it('should opens and closes through asChild Enter and Space presses', async () => {
+    container = mount(
+      <Dialog>
+        <DialogTrigger asChild>
+          <span>Open dialog</span>
+        </DialogTrigger>
+        <DialogPortal>
+          <DialogContent>
+            Body
+            <DialogClose asChild>
+              <span>Close dialog</span>
+            </DialogClose>
+          </DialogContent>
+        </DialogPortal>
+      </Dialog>
+    );
+
+    let trigger = container.querySelector(
+      '[data-slot="dialog-trigger"]'
+    ) as HTMLElement;
+    trigger.focus();
+    await userEvent.keyboard('{Enter}');
+    await flushUpdates();
+    await flushUpdates();
+
+    trigger = container.querySelector(
+      '[data-slot="dialog-trigger"]'
+    ) as HTMLElement;
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+
+    const close = document.body.querySelector(
+      '[data-slot="dialog-close"]'
+    ) as HTMLElement;
+    close.focus();
+    await userEvent.keyboard(' ');
+    await flushUpdates();
     await flushUpdates();
 
     expect(

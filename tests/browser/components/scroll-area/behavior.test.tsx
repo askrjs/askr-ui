@@ -121,4 +121,77 @@ describe('ScrollArea - Behavior', () => {
     expect(ref.current).toBe(viewport);
     expect(onScroll).toHaveBeenCalledOnce();
   });
+
+  it('should synchronize range state and keyboard scrolling given overflow', async () => {
+    container = mount(
+      <>
+        <style>
+          {`[data-testid="metrics-viewport"] {
+            width: 200px;
+            height: 100px;
+            overflow: scroll;
+          }`}
+        </style>
+        <ScrollArea id="metrics">
+          <ScrollAreaViewport data-testid="metrics-viewport">
+            <div style={{ width: '600px', height: '500px' }}>Messages</div>
+          </ScrollAreaViewport>
+          <ScrollAreaScrollbar orientation="vertical">
+            <ScrollAreaThumb />
+          </ScrollAreaScrollbar>
+          <ScrollAreaScrollbar orientation="horizontal">
+            <ScrollAreaThumb />
+          </ScrollAreaScrollbar>
+        </ScrollArea>
+      </>
+    );
+    await flushUpdates();
+    const viewport = container.querySelector(
+      '[data-slot="scroll-area-viewport"]'
+    ) as HTMLElement;
+    viewport.dispatchEvent(new Event('scroll', { bubbles: true }));
+    await flushUpdates();
+    let bars = Array.from(
+      container.querySelectorAll<HTMLElement>(
+        '[data-slot="scroll-area-scrollbar"]'
+      )
+    );
+    expect(bars[0]?.id).not.toBe(bars[1]?.id);
+    expect(bars[0]?.getAttribute('aria-valuemin')).toBe('0');
+    expect(bars[0]?.getAttribute('aria-valuemax')).toBe('100');
+    expect(bars[0]?.getAttribute('aria-valuenow')).toBe('0');
+    expect(bars[0]?.tabIndex).toBe(0);
+
+    bars[0]?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'ArrowDown',
+        bubbles: true,
+        cancelable: true,
+      })
+    );
+    await flushUpdates();
+    bars = Array.from(
+      container.querySelectorAll<HTMLElement>(
+        '[data-slot="scroll-area-scrollbar"]'
+      )
+    );
+    expect(viewport.scrollTop).toBeCloseTo(40, 0);
+    expect(bars[0]?.getAttribute('aria-valuenow')).toBe('10');
+
+    bars[0]?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'End',
+        bubbles: true,
+        cancelable: true,
+      })
+    );
+    await flushUpdates();
+    bars = Array.from(
+      container.querySelectorAll<HTMLElement>(
+        '[data-slot="scroll-area-scrollbar"]'
+      )
+    );
+    expect(viewport.scrollTop).toBe(400);
+    expect(bars[0]?.getAttribute('aria-valuenow')).toBe('100');
+  });
 });

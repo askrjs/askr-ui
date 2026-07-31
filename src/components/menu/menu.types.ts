@@ -24,6 +24,8 @@ export type MenuItemOwnProps = {
   children?: unknown;
   disabled?: boolean;
   onSelect?: (event: PressEvent) => void;
+  /** Text used for typeahead when rendered children are not plain text. */
+  textValue?: string;
 };
 
 export type MenuItemProps = Omit<

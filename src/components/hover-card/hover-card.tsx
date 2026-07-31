@@ -1,5 +1,5 @@
 import { controllableState } from '@askrjs/askr/foundations/state';
-import { cspNonce, state } from '@askrjs/askr';
+import { cspNonce, getSignal, state } from '@askrjs/askr';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import {
   captureOverlayNonce,
@@ -38,6 +38,10 @@ export function HoverCard(props: HoverCardProps) {
   });
   const hoverCardId = resolveCompoundId('hover-card', id, children);
   const overlayIdentity = state(createOverlayIdentity())();
+  const focusEntry = state({
+    restoreTrigger: false,
+    restoreFrame: null as number | null,
+  })();
   captureOverlayNonce(overlayIdentity, cspNonce());
   const triggerId = resolvePartId(hoverCardId, 'trigger');
   const contentId = resolvePartId(hoverCardId, 'content');
@@ -59,6 +63,18 @@ export function HoverCard(props: HoverCardProps) {
       closeTimer = undefined;
     }
   };
+  const cleanupSignal = getSignal();
+  cleanupSignal.addEventListener(
+    'abort',
+    () => {
+      clearTimers();
+      clearOverlayPosition(overlayIdentity);
+      if (focusEntry.restoreFrame !== null) {
+        cancelAnimationFrame(focusEntry.restoreFrame);
+      }
+    },
+    { once: true }
+  );
 
   const rootContext: HoverCardRootContextValue = {
     hoverCardId,
@@ -111,9 +127,31 @@ export function HoverCard(props: HoverCardProps) {
     },
     setTriggerNode: (node: HTMLElement | null) => {
       overlayNodes.trigger = node;
+      if (node && focusEntry.restoreTrigger) {
+        focusEntry.restoreTrigger = false;
+        node.focus();
+      }
     },
     setContentNode: (node: HTMLElement | null) => {
       overlayNodes.content = node;
+    },
+    getTriggerNode: () => overlayNodes.trigger,
+    getContentNode: () => overlayNodes.content,
+    requestTriggerFocus: () => {
+      focusEntry.restoreTrigger = true;
+      overlayNodes.trigger?.focus();
+      if (focusEntry.restoreFrame !== null) {
+        cancelAnimationFrame(focusEntry.restoreFrame);
+      }
+      focusEntry.restoreFrame = requestAnimationFrame(() => {
+        focusEntry.restoreFrame = null;
+        const trigger =
+          document.getElementById(triggerId) ?? overlayNodes.trigger;
+        if (trigger) {
+          focusEntry.restoreTrigger = false;
+          trigger.focus();
+        }
+      });
     },
     syncPosition: () => {
       if (overlayNodes.content) {

@@ -1,3 +1,4 @@
+import { userEvent } from '@vitest/browser/context';
 import { state } from '@askrjs/askr';
 import { Portal } from '@askrjs/askr/foundations';
 import { Link } from '@askrjs/askr/router';
@@ -349,6 +350,51 @@ describe('Toast - Behavior', () => {
       '[data-toast-action="true"]'
     ) as HTMLButtonElement;
     action.click();
+    await flushUpdates();
+    expect(container.querySelector('[data-toast="true"]')).toBeNull();
+  });
+
+  it('should dismisses asChild actions and close controls with Enter and Space', async () => {
+    container = mount(
+      <ToastHost duration={60_000}>
+        <ToastViewport />
+        <Toast defaultOpen>
+          <ToastTitle>Action toast</ToastTitle>
+          <ToastAction asChild>
+            <span>Undo</span>
+          </ToastAction>
+        </Toast>
+      </ToastHost>
+    );
+    await flushUpdates();
+
+    const action = container.querySelector(
+      '[data-toast-action="true"]'
+    ) as HTMLElement;
+    action.focus();
+    await userEvent.keyboard('{Enter}');
+    await flushUpdates();
+    expect(container.querySelector('[data-toast="true"]')).toBeNull();
+
+    unmount(container);
+    container = mount(
+      <ToastHost duration={60_000}>
+        <ToastViewport />
+        <Toast defaultOpen>
+          <ToastTitle>Close toast</ToastTitle>
+          <ToastClose asChild>
+            <span>Dismiss</span>
+          </ToastClose>
+        </Toast>
+      </ToastHost>
+    );
+    await flushUpdates();
+
+    const close = container.querySelector(
+      '[data-toast-close="true"]'
+    ) as HTMLElement;
+    close.focus();
+    await userEvent.keyboard(' ');
     await flushUpdates();
     expect(container.querySelector('[data-toast="true"]')).toBeNull();
   });

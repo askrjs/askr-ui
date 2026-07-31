@@ -1,6 +1,7 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
+import { runCancelablePress } from '../_internal/press';
 import { readDialogRootContext } from './dialog.shared';
 import type { DialogCloseAsChildProps, DialogCloseProps } from './dialog.types';
 
@@ -20,11 +21,9 @@ export function DialogClose(props: DialogCloseProps | DialogCloseAsChildProps) {
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
-      onPress?.(event);
-
-      if (!event.defaultPrevented) {
+      runCancelablePress(event, onPress, () => {
         root.setOpen(false);
-      }
+      });
     },
     isNativeButton: !asChild,
   });

@@ -1,7 +1,7 @@
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { DismissableLayer } from '../dismissable-layer';
-import { FocusScope } from '../focus-scope';
+import { dismissPopupWithTab, getFocusableElements } from '../_internal/focus';
 import {
   readHoverCardRootContext,
   resolveHoverCardPositionOptions,
@@ -83,6 +83,63 @@ export function HoverCardContent(
     onMouseOut: () => {
       root.scheduleClose();
     },
+    onFocusIn: () => {
+      root.cancelClose();
+    },
+    onFocusOut: (event: FocusEvent) => {
+      const content = root.getContentNode();
+      const next =
+        event.relatedTarget instanceof Node ? event.relatedTarget : null;
+      if (!content || !next || !content.contains(next)) {
+        root.scheduleClose();
+      }
+    },
+    onKeyDown: (event: KeyboardEvent) => {
+      const content = root.getContentNode();
+      const trigger = root.getTriggerNode();
+      if (!content) {
+        return;
+      }
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        root.requestTriggerFocus();
+        root.setOpen(false);
+        queueMicrotask(() => {
+          queueMicrotask(() => {
+            (
+              document.getElementById(root.triggerId) ?? root.getTriggerNode()
+            )?.focus();
+          });
+        });
+        return;
+      }
+      if (event.key !== 'Tab') {
+        return;
+      }
+      const focusable = getFocusableElements(content);
+      const active =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null;
+      if (event.shiftKey && active === focusable[0] && trigger) {
+        event.preventDefault();
+        root.requestTriggerFocus();
+        root.setOpen(false);
+        queueMicrotask(() => {
+          queueMicrotask(() => {
+            (
+              document.getElementById(root.triggerId) ?? root.getTriggerNode()
+            )?.focus();
+          });
+        });
+        return;
+      }
+      if (!event.shiftKey && active === focusable[focusable.length - 1]) {
+        dismissPopupWithTab(event, trigger, [content], () =>
+          root.setOpen(false)
+        );
+      }
+    },
   });
   const contentNode = asChild ? (
     <Slot asChild {...finalProps} children={children} />
@@ -94,11 +151,12 @@ export function HoverCardContent(
 
   return (
     <Presence present={forceMount || root.open}>
-      <FocusScope restoreFocus>
-        <DismissableLayer onDismiss={() => root.setOpen(false)}>
-          {contentNode}
-        </DismissableLayer>
-      </FocusScope>
+      <DismissableLayer
+        onEscapeKeyDown={() => root.requestTriggerFocus()}
+        onDismiss={() => root.setOpen(false)}
+      >
+        {contentNode}
+      </DismissableLayer>
     </Presence>
   );
 }

@@ -1,4 +1,5 @@
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { userEvent } from '@vitest/browser/context';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import {
   Select,
   SelectContent,
@@ -16,6 +17,7 @@ describe('Select - Behavior', () => {
   let container: HTMLElement;
 
   afterEach(() => {
+    vi.useRealTimers();
     unmount(container);
   });
 
@@ -276,6 +278,286 @@ describe('Select - Behavior', () => {
     expect(items.every((item) => item.getAttribute('tabindex') === '-1')).toBe(
       true
     );
+  });
+
+  it('should supports buffered typeahead from the trigger and listbox focus', async () => {
+    vi.useFakeTimers();
+    container = mount(
+      <Select name="database" defaultValue="alpha">
+        <SelectTrigger>
+          <SelectValue placeholder="Choose one" />
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectContent tabIndex={0}>
+            <SelectItem value="alpha">Alpha</SelectItem>
+            <SelectItem value="database-1" textValue="Database1" disabled>
+              Disabled database
+            </SelectItem>
+            <SelectItem value="database-2" textValue="Database2">
+              Primary database
+            </SelectItem>
+            <SelectItem value="database-archive" textValue="Database Archive">
+              Archived database
+            </SelectItem>
+            <SelectItem value="delta">Delta</SelectItem>
+          </SelectContent>
+        </SelectPortal>
+      </Select>
+    );
+
+    let trigger = container.querySelector(
+      '[data-slot="select-trigger"]'
+    ) as HTMLButtonElement;
+    trigger.focus();
+
+    for (const key of 'database2') {
+      trigger = container.querySelector(
+        '[data-slot="select-trigger"]'
+      ) as HTMLButtonElement;
+      trigger.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key,
+          bubbles: true,
+          cancelable: true,
+        })
+      );
+      await flushUpdates();
+    }
+
+    expect(
+      (container.querySelector('input[name="database"]') as HTMLInputElement)
+        .value
+    ).toBe('database-2');
+    trigger = container.querySelector(
+      '[data-slot="select-trigger"]'
+    ) as HTMLButtonElement;
+    expect(document.activeElement).toBe(trigger);
+
+    trigger.click();
+    await flushUpdates();
+    await flushUpdates();
+
+    let content = document.body.querySelector(
+      '[data-slot="select-content"]'
+    ) as HTMLElement;
+    content.focus();
+
+    const firstD = new KeyboardEvent('keydown', {
+      key: 'D',
+      bubbles: true,
+      cancelable: true,
+    });
+    content.dispatchEvent(firstD);
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(firstD.defaultPrevented).toBe(true);
+    expect(document.activeElement?.textContent?.trim()).toBe(
+      'Archived database'
+    );
+
+    content = document.body.querySelector(
+      '[data-slot="select-content"]'
+    ) as HTMLElement;
+    content.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'd',
+        bubbles: true,
+        cancelable: true,
+      })
+    );
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(document.activeElement?.textContent?.trim()).toBe('Delta');
+
+    await vi.advanceTimersByTimeAsync(600);
+    content = document.body.querySelector(
+      '[data-slot="select-content"]'
+    ) as HTMLElement;
+    content.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'a',
+        bubbles: true,
+        cancelable: true,
+      })
+    );
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(document.activeElement?.textContent?.trim()).toBe('Alpha');
+
+    await vi.advanceTimersByTimeAsync(600);
+    for (const key of 'database archive') {
+      const target = document.activeElement as HTMLElement;
+      target.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key,
+          bubbles: true,
+          cancelable: true,
+        })
+      );
+      await flushUpdates();
+      (document.activeElement as HTMLElement).dispatchEvent(
+        new KeyboardEvent('keyup', {
+          key,
+          bubbles: true,
+          cancelable: true,
+        })
+      );
+      await flushUpdates();
+    }
+
+    expect(document.activeElement?.textContent?.trim()).toBe(
+      'Archived database'
+    );
+  });
+
+  it('should keeps arrow, Space, Enter, and Tab interactions intuitive', async () => {
+    container = mount(
+      <div>
+        <Select name="framework" defaultValue="alpha">
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectPortal>
+            <SelectContent>
+              <SelectItem value="alpha">Alpha</SelectItem>
+              <SelectItem asChild value="beta">
+                <span>Beta</span>
+              </SelectItem>
+            </SelectContent>
+          </SelectPortal>
+        </Select>
+        <button type="button" data-testid="after-select">
+          After select
+        </button>
+      </div>
+    );
+
+    let trigger = container.querySelector(
+      '[data-slot="select-trigger"]'
+    ) as HTMLButtonElement;
+    trigger.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await flushUpdates();
+    await flushUpdates();
+
+    trigger = container.querySelector(
+      '[data-slot="select-trigger"]'
+    ) as HTMLButtonElement;
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+    expect(document.activeElement?.textContent?.trim()).toBe('Alpha');
+
+    await userEvent.keyboard('{ArrowDown}');
+    await flushUpdates();
+    await flushUpdates();
+    expect(document.activeElement?.textContent?.trim()).toBe('Beta');
+
+    await userEvent.keyboard(' ');
+    await flushUpdates();
+
+    expect(
+      (container.querySelector('input[name="framework"]') as HTMLInputElement)
+        .value
+    ).toBe('beta');
+    trigger = container.querySelector(
+      '[data-slot="select-trigger"]'
+    ) as HTMLButtonElement;
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+
+    trigger.focus();
+    await userEvent.keyboard('{Enter}');
+    await flushUpdates();
+    await flushUpdates();
+    trigger = container.querySelector(
+      '[data-slot="select-trigger"]'
+    ) as HTMLButtonElement;
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+
+    await userEvent.keyboard('{Enter}');
+    await flushUpdates();
+    await flushUpdates();
+    trigger = container.querySelector(
+      '[data-slot="select-trigger"]'
+    ) as HTMLButtonElement;
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('should opens with Space and moves past the popup with Tab', async () => {
+    container = mount(
+      <div>
+        <Select defaultValue="alpha">
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectPortal>
+            <SelectContent>
+              <SelectItem value="alpha">Alpha</SelectItem>
+              <SelectItem value="beta">Beta</SelectItem>
+            </SelectContent>
+          </SelectPortal>
+        </Select>
+        <button type="button" data-testid="after-select">
+          After select
+        </button>
+      </div>
+    );
+
+    let trigger = container.querySelector(
+      '[data-slot="select-trigger"]'
+    ) as HTMLButtonElement;
+    trigger.focus();
+    await userEvent.keyboard(' ');
+    await flushUpdates();
+    await flushUpdates();
+    trigger = container.querySelector(
+      '[data-slot="select-trigger"]'
+    ) as HTMLButtonElement;
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+
+    await userEvent.tab();
+    await flushUpdates();
+    await flushUpdates();
+
+    trigger = container.querySelector(
+      '[data-slot="select-trigger"]'
+    ) as HTMLButtonElement;
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    expect(document.activeElement).toBe(
+      container.querySelector('[data-testid="after-select"]')
+    );
+  });
+
+  it('should opens an asChild trigger with Enter', async () => {
+    container = mount(
+      <Select defaultValue="alpha">
+        <SelectTrigger asChild>
+          <span>
+            <SelectValue />
+          </span>
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectContent>
+            <SelectItem value="alpha">Alpha</SelectItem>
+          </SelectContent>
+        </SelectPortal>
+      </Select>
+    );
+
+    let trigger = container.querySelector(
+      '[data-slot="select-trigger"]'
+    ) as HTMLElement;
+    trigger.focus();
+    await userEvent.keyboard('{Enter}');
+    await flushUpdates();
+    await flushUpdates();
+
+    trigger = container.querySelector(
+      '[data-slot="select-trigger"]'
+    ) as HTMLElement;
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+    expect(document.activeElement?.textContent?.trim()).toBe('Alpha');
   });
 
   it('should throw when SelectContent is used without Select', () => {

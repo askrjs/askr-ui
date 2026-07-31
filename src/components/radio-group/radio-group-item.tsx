@@ -56,6 +56,7 @@ export function RadioGroupItem(
     },
     isNativeButton: !asChild,
   });
+  const itemFocusProps = nav.item(itemIndex);
   const setNode = (node: HTMLElement | null) => {
     const changed = registerCompositeNode(itemId, collection, node, {
       index: itemIndex,
@@ -79,7 +80,7 @@ export function RadioGroupItem(
     : setNode;
   const finalProps = mergeProps(rest, {
     ...interactionProps,
-    ...nav.item(itemIndex),
+    ...itemFocusProps,
     ref: refHandler,
     id: itemId,
     role: 'radio',
@@ -87,7 +88,7 @@ export function RadioGroupItem(
     'data-slot': 'radio-group-item',
     'data-disabled': isDisabled ? 'true' : undefined,
     'data-state': checked ? 'checked' : 'unchecked',
-    tabIndex: isDisabled && asChild ? -1 : undefined,
+    tabIndex: isDisabled ? -1 : itemFocusProps.tabIndex,
     value,
   });
 

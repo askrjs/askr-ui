@@ -5,7 +5,9 @@ import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
 import { focusSelectedCollectionItem } from '../_internal/focus';
 import { resolvePartId } from '../_internal/id';
 import { pathIsOpen } from '../_internal/hierarchical-menu';
+import { resolveMenuItemText } from '../_internal/menu';
 import { getOverlayNodes } from '../_internal/overlay';
+import { runCancelablePress } from '../_internal/press';
 import {
   getCompositeCollection,
   registerCompositeNode,
@@ -46,6 +48,7 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
     disabled = false,
     onPress,
     ref,
+    textValue,
     type: typeProp,
     ...rest
   } = props;
@@ -60,6 +63,7 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
   }
 
   const surfaceId = resolvePartId(content.contentId, `item-${surfaceIndex}`);
+  const itemText = resolveMenuItemText(children, textValue);
   const { items, currentIndex, disabledItemIndexes } =
     resolveMenubarContentState(content);
   const collection = getCompositeCollection(content.contentId);
@@ -77,20 +81,35 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
-      onPress?.(event);
-
-      if (!event.defaultPrevented) {
+      runCancelablePress(event, onPress, () => {
         root.setOpenPath([]);
         scheduleMenubarPortalSync(root);
-      }
+      });
     },
-    isNativeButton: !asChild,
+    isNativeButton: false,
   });
+  const itemFocusProps = nav.item(surfaceIndex);
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (!disabled && content.handleTypeaheadKeyDown(event)) {
+      return;
+    }
+
+    interactionProps.onKeyDown?.(event);
+  };
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (content.handleTypeaheadKeyUp(event)) {
+      return;
+    }
+
+    interactionProps.onKeyUp?.(event);
+  };
   const setNode = (node: HTMLElement | null) => {
     registerCompositeNode(surfaceId, collection, node, {
       index: surfaceIndex,
       disabled,
+      text: itemText,
     });
+    content.restoreItemFocus(surfaceIndex, node);
   };
   const refHandler = ref
     ? composeRefs(
@@ -104,13 +123,17 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
     : setNode;
   const finalProps = mergeProps(rest, {
     ...interactionProps,
-    ...nav.item(surfaceIndex),
+    onKeyDown: handleKeyDown,
+    onKeyUp: handleKeyUp,
+    ...itemFocusProps,
     ref: refHandler,
     id: surfaceId,
     role: 'menuitem',
+    disabled: disabled && !asChild ? true : undefined,
     'aria-disabled': disabled ? 'true' : undefined,
     'data-slot': 'menubar-item',
     'data-disabled': disabled ? 'true' : undefined,
+    tabIndex: disabled ? -1 : itemFocusProps.tabIndex,
   });
 
   if (asChild) {
@@ -160,6 +183,7 @@ export function MenubarSubTrigger(
     disabled = false,
     onPress,
     ref,
+    textValue,
     type: typeProp,
     ...rest
   } = props;
@@ -174,6 +198,7 @@ export function MenubarSubTrigger(
 
   const { items, currentIndex, disabledItemIndexes } =
     resolveMenubarContentState(content);
+  const itemText = resolveMenuItemText(children, textValue);
   const collection = getCompositeCollection(content.contentId);
   const nav = rovingFocus({
     currentIndex,
@@ -190,22 +215,22 @@ export function MenubarSubTrigger(
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
-      onPress?.(event);
-
-      if (!event.defaultPrevented) {
+      runCancelablePress(event, onPress, () => {
         content.setCurrentIndex(sub.surfaceIndex);
         root.setOpenPath(isOpen() ? content.path : sub.path);
         scheduleMenubarPortalSync(root);
-      }
+      });
     },
-    isNativeButton: !asChild,
+    isNativeButton: false,
   });
   const setNode = (node: HTMLElement | null) => {
     getOverlayNodes(sub.overlayIdentity).trigger = node;
     registerCompositeNode(sub.triggerId, collection, node, {
       index: sub.surfaceIndex,
       disabled,
+      text: itemText,
     });
+    content.restoreItemFocus(sub.surfaceIndex, node);
   };
   const refHandler = ref
     ? composeRefs(
@@ -217,28 +242,46 @@ export function MenubarSubTrigger(
         setNode
       )
     : setNode;
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (!disabled && content.handleTypeaheadKeyDown(event)) {
+      return;
+    }
+
+    interactionProps.onKeyDown?.(event);
+
+    if (!event.defaultPrevented && event.key === 'ArrowRight') {
+      event.preventDefault();
+      content.setCurrentIndex(sub.surfaceIndex);
+      root.setOpenPath(sub.path);
+      scheduleMenubarPortalSync(root);
+    }
+  };
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (content.handleTypeaheadKeyUp(event)) {
+      return;
+    }
+
+    interactionProps.onKeyUp?.(event);
+  };
+  const itemFocusProps = nav.item(sub.surfaceIndex);
   const finalProps = mergeProps(rest, {
     ...interactionProps,
-    ...nav.item(sub.surfaceIndex),
+    onKeyDown: handleKeyDown,
+    onKeyUp: handleKeyUp,
+    ...itemFocusProps,
     ref: refHandler,
     id: sub.triggerId,
     role: 'menuitem',
+    disabled: disabled && !asChild ? true : undefined,
     'aria-haspopup': 'menu',
     'aria-expanded': isOpen() ? 'true' : 'false',
     'aria-controls': sub.contentId,
     'data-slot': 'menubar-sub-trigger',
     'data-state': isOpen() ? 'open' : 'closed',
     'data-disabled': disabled ? 'true' : undefined,
+    tabIndex: disabled ? -1 : itemFocusProps.tabIndex,
     onPointerEnter: () => {
       if (!disabled) {
-        content.setCurrentIndex(sub.surfaceIndex);
-        root.setOpenPath(sub.path);
-        scheduleMenubarPortalSync(root);
-      }
-    },
-    onKeyDown: (event: KeyboardEvent) => {
-      if (event.key === 'ArrowRight') {
-        event.preventDefault();
         content.setCurrentIndex(sub.surfaceIndex);
         root.setOpenPath(sub.path);
         scheduleMenubarPortalSync(root);

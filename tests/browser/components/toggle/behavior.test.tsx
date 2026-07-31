@@ -1,3 +1,4 @@
+import { userEvent } from '@vitest/browser/context';
 import { describe, it, expect, vi, afterEach } from 'vite-plus/test';
 import { Toggle } from '../../../../src/components/toggle/toggle';
 import { mount, unmount } from '../../test-utils';
@@ -109,6 +110,23 @@ describe('Toggle - Behavior', () => {
     host?.click();
 
     expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  it('should activates an asChild host with Enter and Space', async () => {
+    const onPress = vi.fn();
+    container = mount(
+      <Toggle asChild onPress={onPress}>
+        <span>Mute</span>
+      </Toggle>
+    );
+
+    const host = container.querySelector('[role="button"]') as HTMLElement;
+    host.focus();
+    await userEvent.keyboard('{Enter}');
+    host.focus();
+    await userEvent.keyboard(' ');
+
+    expect(onPress).toHaveBeenCalledTimes(2);
   });
 
   it('should applies disabled semantics to asChild hosts', () => {

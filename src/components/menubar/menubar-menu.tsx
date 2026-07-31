@@ -4,7 +4,9 @@ import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
 import { focusSelectedCollectionItem } from '../_internal/focus';
 import { resolvePartId } from '../_internal/id';
 import { pathIsOpen } from '../_internal/hierarchical-menu';
+import { resolveMenuItemText } from '../_internal/menu';
 import { getOverlayNodes, getPersistentPortal } from '../_internal/overlay';
+import { runCancelablePress } from '../_internal/press';
 import {
   getCompositeCollection,
   registerCompositeNode,
@@ -96,6 +98,7 @@ export function MenubarTrigger(
     disabled = false,
     onPress,
     ref,
+    textValue,
     type: typeProp,
     ...rest
   } = props;
@@ -117,17 +120,17 @@ export function MenubarTrigger(
     },
   });
   const isOpen = () => pathIsOpen(root.getOpenPath(), menu.path);
+  const itemText = resolveMenuItemText(children, textValue);
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
-      onPress?.(event);
-
-      if (!event.defaultPrevented) {
+      runCancelablePress(event, onPress, () => {
+        root.setCurrentTriggerIndex(menu.menuIndex);
         root.setOpenPath(isOpen() ? [] : menu.path);
         scheduleMenubarPortalSync(root);
-      }
+      });
     },
-    isNativeButton: !asChild,
+    isNativeButton: false,
   });
   const setNode = (node: HTMLElement | null) => {
     getOverlayNodes(menu.overlayIdentity).trigger = node;
@@ -135,7 +138,9 @@ export function MenubarTrigger(
       index: menu.menuIndex,
       disabled,
       value: menu.menuKey,
+      text: itemText,
     });
+    root.restoreTriggerFocus(menu.menuIndex, node);
   };
   const refHandler = ref
     ? composeRefs(
@@ -147,31 +152,50 @@ export function MenubarTrigger(
         setNode
       )
     : setNode;
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (!disabled && root.handleTypeaheadKeyDown(event)) {
+      return;
+    }
+
+    interactionProps.onKeyDown?.(event);
+
+    if (!event.defaultPrevented && event.key === 'ArrowDown') {
+      event.preventDefault();
+      root.setCurrentTriggerIndex(menu.menuIndex);
+      root.setOpenPath(menu.path);
+      scheduleMenubarPortalSync(root);
+    }
+  };
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (root.handleTypeaheadKeyUp(event)) {
+      return;
+    }
+
+    interactionProps.onKeyUp?.(event);
+  };
+  const itemFocusProps = nav.item(menu.menuIndex);
   const finalProps = mergeProps(rest, {
     ...interactionProps,
-    ...nav.item(menu.menuIndex),
+    onKeyDown: handleKeyDown,
+    onKeyUp: handleKeyUp,
+    ...itemFocusProps,
     ref: refHandler,
     id: menu.triggerId,
     role: 'menuitem',
+    disabled: disabled && !asChild ? true : undefined,
     'aria-haspopup': 'menu',
     'aria-expanded': isOpen() ? 'true' : 'false',
     'aria-controls': menu.contentId,
     'data-slot': 'menubar-trigger',
     'data-disabled': disabled ? 'true' : undefined,
     'data-state': isOpen() ? 'open' : 'closed',
+    tabIndex: disabled ? -1 : itemFocusProps.tabIndex,
     onFocus: () => {
       root.setCurrentTriggerIndex(menu.menuIndex);
     },
     onPointerEnter: () => {
       if (!disabled && root.getOpenPath().length > 0) {
         root.setCurrentTriggerIndex(menu.menuIndex);
-        root.setOpenPath(menu.path);
-        scheduleMenubarPortalSync(root);
-      }
-    },
-    onKeyDown: (event: KeyboardEvent) => {
-      if (event.key === 'ArrowDown') {
-        event.preventDefault();
         root.setOpenPath(menu.path);
         scheduleMenubarPortalSync(root);
       }
