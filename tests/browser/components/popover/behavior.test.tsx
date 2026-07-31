@@ -1,6 +1,8 @@
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { userEvent } from '@vitest/browser/context';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import {
   Popover,
+  PopoverClose,
   PopoverContent,
   PopoverPortal,
   PopoverTrigger,
@@ -66,6 +68,49 @@ describe('Popover - Behavior', () => {
     expect(content).toBeTruthy();
     expect(trigger?.id).toBeTruthy();
     expect(content?.getAttribute('aria-labelledby')).toBe(trigger?.id);
+  });
+
+  it('should opens and closes through asChild Enter and Space presses', async () => {
+    container = mount(
+      <Popover>
+        <PopoverTrigger asChild>
+          <span>Open popover</span>
+        </PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent>
+            Details
+            <PopoverClose asChild>
+              <span>Close popover</span>
+            </PopoverClose>
+          </PopoverContent>
+        </PopoverPortal>
+      </Popover>
+    );
+
+    let trigger = container.querySelector(
+      '[data-slot="popover-trigger"]'
+    ) as HTMLElement;
+    trigger.focus();
+    await userEvent.keyboard('{Enter}');
+    await flushUpdates();
+    await flushUpdates();
+
+    trigger = container.querySelector(
+      '[data-slot="popover-trigger"]'
+    ) as HTMLElement;
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+
+    const close = document.body.querySelector(
+      '[data-slot="popover-close"]'
+    ) as HTMLElement;
+    close.focus();
+    await userEvent.keyboard(' ');
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(
+      document.body.querySelector('[data-slot="popover-content"]')
+    ).toBeNull();
   });
 
   it('should maps typed width affordance to a stable data attribute', async () => {

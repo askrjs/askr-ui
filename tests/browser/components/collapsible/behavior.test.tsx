@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vite-plus/test';
+import { userEvent } from '@vitest/browser/context';
 import { Button } from '../../../../src/components/button';
 import {
   Collapsible,
@@ -145,6 +146,64 @@ describe('Collapsible — Behavior', () => {
       const span = container.querySelector('span');
       expect(span).toBeDefined();
       expect(span?.textContent).toBe('Custom Trigger');
+    });
+
+    it('should toggles exactly once with Enter and Space on native and asChild triggers', async () => {
+      const onNativeOpenChange = vi.fn();
+      container = mount(
+        <Collapsible onOpenChange={onNativeOpenChange}>
+          <CollapsibleTrigger>Native trigger</CollapsibleTrigger>
+          <CollapsibleContent>Native content</CollapsibleContent>
+        </Collapsible>
+      );
+
+      let trigger = container.querySelector('button') as HTMLButtonElement;
+      trigger.focus();
+      await userEvent.keyboard('{Enter}');
+
+      expect(onNativeOpenChange).toHaveBeenCalledTimes(1);
+      expect(onNativeOpenChange).toHaveBeenLastCalledWith(true);
+      expect(container.textContent).toContain('Native content');
+
+      trigger = container.querySelector('button') as HTMLButtonElement;
+      trigger.focus();
+      await userEvent.keyboard(' ');
+
+      expect(onNativeOpenChange).toHaveBeenCalledTimes(2);
+      expect(onNativeOpenChange).toHaveBeenLastCalledWith(false);
+      expect(container.textContent).not.toContain('Native content');
+
+      unmount(container);
+
+      const onChildOpenChange = vi.fn();
+      container = mount(
+        <Collapsible onOpenChange={onChildOpenChange}>
+          <CollapsibleTrigger asChild>
+            <span>Child trigger</span>
+          </CollapsibleTrigger>
+          <CollapsibleContent>Child content</CollapsibleContent>
+        </Collapsible>
+      );
+
+      let childTrigger = container.querySelector(
+        '[data-collapsible-trigger="true"]'
+      ) as HTMLElement;
+      childTrigger.focus();
+      await userEvent.keyboard('{Enter}');
+
+      expect(onChildOpenChange).toHaveBeenCalledTimes(1);
+      expect(onChildOpenChange).toHaveBeenLastCalledWith(true);
+      expect(container.textContent).toContain('Child content');
+
+      childTrigger = container.querySelector(
+        '[data-collapsible-trigger="true"]'
+      ) as HTMLElement;
+      childTrigger.focus();
+      await userEvent.keyboard(' ');
+
+      expect(onChildOpenChange).toHaveBeenCalledTimes(2);
+      expect(onChildOpenChange).toHaveBeenLastCalledWith(false);
+      expect(container.textContent).not.toContain('Child content');
     });
 
     it('should preserves button styling props when trigger composes as child', () => {

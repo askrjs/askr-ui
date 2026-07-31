@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
+import { createIsland } from '@askrjs/askr/boot';
 import { Checkbox } from '../../../../src/components/checkbox';
 import {
   Dialog,
@@ -24,13 +25,19 @@ describe('Cross-component contracts', () => {
   });
 
   it('should preserve controlled-to-uncontrolled state transitions given native controls when the value or checked prop changes from defined to undefined', async () => {
-    const checked = state<boolean | undefined>(true);
-    container = mount(
-      <Checkbox
-        checked={checked()}
-        onCheckedChange={(next) => checked.set(next)}
-      />
-    );
+    let checked!: ReturnType<typeof state<boolean | undefined>>;
+    function ControlledCheckbox() {
+      checked = state<boolean | undefined>(true);
+      return (
+        <Checkbox
+          checked={checked()}
+          onCheckedChange={(next) => checked.set(next)}
+        />
+      );
+    }
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    createIsland({ root: container, component: ControlledCheckbox });
     await flushUpdates();
     expect(
       container
@@ -85,6 +92,7 @@ describe('Cross-component contracts', () => {
       <VirtualList
         items={[{ id: 'a' }, { id: 'b' }]}
         rowHeight={24}
+        overscan={2}
         getKey={(item) => item.id}
         rowComponent={({ item }) => <div>{item.id}</div>}
       />

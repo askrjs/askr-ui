@@ -4,6 +4,7 @@ export type CompositeCollectionMetadata = {
   index: number;
   disabled: boolean;
   value?: string;
+  text?: string;
 };
 
 const compositeCollections = new Map<
@@ -52,7 +53,8 @@ function isSameCompositeMetadata(
   return (
     left.index === right.index &&
     left.disabled === right.disabled &&
-    left.value === right.value
+    left.value === right.value &&
+    left.text === right.text
   );
 }
 
@@ -95,7 +97,7 @@ export function registerCompositeNode(
     unregister,
   });
 
-  return metadataChanged;
+  return true;
 }
 
 export function firstEnabledCompositeIndex(

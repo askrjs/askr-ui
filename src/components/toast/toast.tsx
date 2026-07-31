@@ -22,6 +22,7 @@ import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import { pressable } from '@askrjs/askr/foundations/interactions';
+import { runCancelablePress } from '../_internal/press';
 import { state } from '@askrjs/askr';
 import { resource } from '@askrjs/askr/resources';
 import { DismissableLayer } from '../dismissable-layer';
@@ -521,11 +522,9 @@ export function ToastAction(props: ToastActionProps | ToastActionAsChildProps) {
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
-      onPress?.(event);
-
-      if (!event.defaultPrevented) {
+      runCancelablePress(event, onPress, () => {
         root.setOpen(false);
-      }
+      });
     },
     isNativeButton: !asChild,
   });
@@ -567,11 +566,9 @@ export function ToastClose(props: ToastCloseProps | ToastCloseAsChildProps) {
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
-      onPress?.(event);
-
-      if (!event.defaultPrevented) {
+      runCancelablePress(event, onPress, () => {
         root.setOpen(false);
-      }
+      });
     },
     isNativeButton: !asChild,
   });

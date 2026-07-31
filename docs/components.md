@@ -34,7 +34,7 @@ These are documentation groupings only.
 | Disclosure                 | Accordion, Collapsible                                                                                                                                   |
 | Status                     | Progress, ProgressCircle, Toast                                                                                                                          |
 | Identity                   | Avatar                                                                                                                                                   |
-| Navigation                 | Menubar, Navigation Menu                                                                                                                                 |
+| Navigation                 | Menubar                                                                                                                                                  |
 | Layout and layout-adjacent | Scroll Area                                                                                                                                              |
 | Virtualization             | VirtualList, VirtualTable                                                                                                                                |
 
@@ -58,6 +58,37 @@ These are documentation groupings only.
   anchor correction, and optional follow-bottom behavior.
 - `VirtualTable` is a fixed-height table windowing primitive with a sticky
   head, stable keys, selection, and keyboard navigation.
+
+## Keyboard interaction
+
+Keyboard behavior follows the semantic role of each public component and is
+preserved through `asChild` composition.
+
+| Surface                             | Keyboard contract                                                                                                                                                                                                           |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pressable controls                  | `Enter` activates on keydown, `Space` activates on keyup, disabled controls do not activate, and caller cancellation still suppresses the component's default action.                                                       |
+| Roving composites                   | Arrow keys move the single active tab stop and skip disabled items. `Tab` leaves the composite or dismisses an open popup and continues to the next page control.                                                           |
+| Menu, Dropdown, Menubar, and Select | Printable keys perform case-insensitive prefix matching against `textValue` (or rendered text), skip disabled items, wrap to the next match, and cycle when the same character is repeated. The buffer resets after 500 ms. |
+| Select                              | Typeahead works while either the closed trigger or open listbox has focus. Closed-trigger matches update the value; open-listbox matches move focus.                                                                        |
+| Accordion                           | Every enabled trigger remains in the page Tab sequence. Orientation arrows and Home/End provide optional direct navigation.                                                                                                 |
+| RadioGroup                          | Arrows skip disabled radios and move focus and selection.                                                                                                                                                                   |
+| ToggleGroup                         | Arrows move focus only; Enter or Space activates the focused toggle.                                                                                                                                                        |
+| ScrollArea                          | Its enabled scrollbar uses arrows for 40 CSS-pixel steps, PageUp/PageDown for one viewport, and Home/End for the boundaries.                                                                                                |
+
+Spaces typed after a typeahead prefix can match multiword values; a standalone
+`Space` remains an activation key. Typeahead only moves focus or selection. A
+visible text field that filters options is a separate Combobox capability, not
+Select behavior.
+
+Native buttons and direct `asChild` buttons retain browser activation and form
+submit/reset behavior. Non-native `asChild` hosts receive button-role
+Enter/Space behavior. Component defaults run only when neither an ancestor nor
+the caller canceled the event; activation remains exactly once in either path.
+Menu-item links preserve native Enter navigation, while Space maps to one click.
+
+HoverCard is a non-modal interactive preview. Pointer opening does not move
+focus. Tab can enter its content from the trigger, Escape restores the trigger,
+and leaving its final control continues after the trigger.
 
 ## Dynamic descendants
 

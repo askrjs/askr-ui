@@ -374,10 +374,14 @@ const menuContentAsChildProps: MenuContentAsChildProps = {
   asChild: true,
   children: slotChild,
 };
-const menuItemProps: MenuItemProps = { children: 'Menu item' };
+const menuItemProps: MenuItemProps = {
+  children: 'Menu item',
+  textValue: 'Menu item',
+};
 const menuItemAsChildProps: MenuItemAsChildProps = {
   asChild: true,
   children: slotChild,
+  textValue: 'Menu item',
 };
 
 const dropdownContentProps: DropdownContentProps = {};
@@ -401,11 +405,13 @@ const dropdownTriggerAsChildProps: DropdownTriggerAsChildProps = {
 const dropdownItemVariant: DropdownItemVariant = 'destructive';
 const dropdownItemProps: DropdownItemProps = {
   children: 'Action',
+  textValue: 'Action',
   variant: dropdownItemVariant,
 };
 const dropdownItemAsChildProps: DropdownItemAsChildProps = {
   asChild: true,
   children: slotChild,
+  textValue: 'Action',
   variant: 'destructive',
 };
 
@@ -436,11 +442,13 @@ const selectContentAsChildProps: SelectContentAsChildProps = {
 const selectItemProps: SelectItemProps = {
   value: 'one',
   children: 'One',
+  textValue: 'One',
 };
 const selectItemAsChildProps: SelectItemAsChildProps = {
   asChild: true,
   value: 'one',
   children: slotChild,
+  textValue: 'One',
 };
 
 const _invalidButtonAsChild: ButtonAsChildProps = {

@@ -3,7 +3,10 @@ import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { rovingFocus } from '@askrjs/askr/foundations/interactions';
 import { DismissableLayer } from '../dismissable-layer';
 import { FocusScope } from '../focus-scope';
-import { focusSelectedCollectionItem } from '../_internal/focus';
+import {
+  dismissPopupWithTab,
+  focusSelectedCollectionItem,
+} from '../_internal/focus';
 import { getMenuCollection } from '../_internal/menu';
 import {
   clearOverlayPosition,
@@ -55,7 +58,7 @@ export function DropdownContent(
       }
 
       root.setCurrentIndex(index);
-      focusSelectedCollectionItem(collection, index);
+      root.focusItem(index);
     },
   });
   const setNode = (node: HTMLElement | null) => {
@@ -87,7 +90,6 @@ export function DropdownContent(
       )
     : setNode;
   const finalProps = mergeProps(rest, {
-    ...nav.container,
     ref: refHandler,
     id: root.contentId,
     role: 'menu',
@@ -96,6 +98,26 @@ export function DropdownContent(
     'data-side': side,
     'data-align': align,
     'data-side-offset': String(sideOffset),
+    onKeyDown: (event: KeyboardEvent) => {
+      if (root.handleTypeaheadKeyDown(event)) {
+        return;
+      }
+
+      nav.container.onKeyDown?.(event);
+
+      if (event.defaultPrevented) {
+        return;
+      }
+
+      dismissPopupWithTab(
+        event,
+        overlayNodes.trigger,
+        overlayNodes.content ? [overlayNodes.content] : [],
+        () => {
+          root.setOpen(false);
+        }
+      );
+    },
   });
   const contentNode = asChild ? (
     <Slot asChild {...finalProps} children={children} />

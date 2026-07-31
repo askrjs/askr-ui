@@ -1,3 +1,4 @@
+import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 import {
   Accordion,
@@ -154,6 +155,45 @@ describe('Accordion - Behavior', () => {
         `[${ACCORDION_A11Y_CONTRACT.EXPANDED_ATTRIBUTE}="true"]`
       )
     ).toHaveLength(2);
+  });
+
+  it('should activates an asChild trigger with Enter and Space', async () => {
+    container = mount(
+      <Accordion collapsible>
+        <AccordionItem value="details">
+          <AccordionHeader>
+            <AccordionTrigger asChild>
+              <span>Details</span>
+            </AccordionTrigger>
+          </AccordionHeader>
+          <AccordionContent>Body</AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    );
+    await flushUpdates();
+
+    let trigger = container.querySelector(
+      '[data-slot="accordion-trigger"]'
+    ) as HTMLElement;
+    trigger.focus();
+    await userEvent.keyboard('{Enter}');
+    await flushUpdates();
+
+    trigger = container.querySelector(
+      '[data-slot="accordion-trigger"]'
+    ) as HTMLElement;
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+    expect(container.textContent).toContain('Body');
+
+    trigger.focus();
+    await userEvent.keyboard(' ');
+    await flushUpdates();
+
+    trigger = container.querySelector(
+      '[data-slot="accordion-trigger"]'
+    ) as HTMLElement;
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    expect(container.textContent).not.toContain('Body');
   });
 
   it('should keep controlled state props off the native root', () => {

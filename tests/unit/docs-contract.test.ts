@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 import * as askrUi from '../../src';
 import {
+  componentSurface,
   publicValueExports,
   removedPublicExports,
 } from './fixtures/public-surface';
@@ -115,6 +116,40 @@ describe('Docs contract', () => {
       expect(
         symbol in askrUi,
         `Published export is missing from package surface: ${symbol}`
+      ).toBe(true);
+    }
+  });
+
+  it('should only list public component families in the conceptual groupings', () => {
+    const docs = readFileSync(
+      join(process.cwd(), 'docs', 'components.md'),
+      'utf8'
+    );
+    const grouping = docs.match(
+      /## Conceptual groupings([\s\S]*?)## Family notes/
+    )?.[1];
+    expect(grouping).toBeTruthy();
+    const documentedFamilies = Array.from(
+      grouping!.matchAll(/^\|[^|]+\|([^|]+)\|$/gm),
+      (match) => match[1]
+    )
+      .flatMap((cell) => cell.split(','))
+      .map((name) =>
+        name
+          .trim()
+          .replace(/([a-z])([A-Z])/g, '$1-$2')
+          .toLowerCase()
+          .replaceAll(' ', '-')
+      )
+      .filter(
+        (name) =>
+          name.length > 0 && name !== 'families' && !name.startsWith('---')
+      );
+    const publicFamilies = new Set(componentSurface.map(({ name }) => name));
+    for (const family of documentedFamilies) {
+      expect(
+        publicFamilies.has(family as never),
+        `Documented family is not public: ${family}`
       ).toBe(true);
     }
   });

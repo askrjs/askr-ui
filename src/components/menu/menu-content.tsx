@@ -1,5 +1,6 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { moveFocusOutsideCompositeWithTab } from '../_internal/focus';
 import { readMenuRootContext } from './menu.shared';
 import type { MenuContentAsChildProps, MenuContentProps } from './menu.types';
 
@@ -9,13 +10,26 @@ export function MenuContent(props: MenuContentProps | MenuContentAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const root = readMenuRootContext();
   const finalProps = mergeProps(rest, {
-    ...root.navigation.container,
     ref,
     'data-slot': 'menu-content',
     'data-orientation': root.orientation,
     role: 'menu',
     'aria-orientation':
       root.orientation === 'both' ? undefined : root.orientation,
+    onKeyDown: (event: KeyboardEvent) => {
+      if (root.handleTypeaheadKeyDown(event)) {
+        return;
+      }
+
+      root.navigation.container.onKeyDown?.(event);
+
+      if (!event.defaultPrevented) {
+        moveFocusOutsideCompositeWithTab(
+          event,
+          event.currentTarget as HTMLElement
+        );
+      }
+    },
   });
 
   if (asChild) {

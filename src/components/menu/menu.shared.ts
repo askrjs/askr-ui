@@ -21,6 +21,8 @@ export type MenuRootContextValue = {
   setCurrentIndex: (index: number) => void;
   resolvedState: MenuResolvedState;
   navigation: RovingFocusResult;
+  handleTypeaheadKeyDown: (event: KeyboardEvent) => boolean;
+  handleTypeaheadKeyUp: (event: KeyboardEvent) => boolean;
 };
 
 export type MenuRenderContextValue = {

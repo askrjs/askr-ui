@@ -19,6 +19,7 @@ import {
   MenubarItem,
   MenubarMenu,
   MenubarPortal,
+  MenubarSubTrigger,
   MenubarTrigger,
   Progress,
   ProgressCircle,
@@ -58,6 +59,8 @@ import {
   type MenubarItemProps,
   type MenubarMenuProps,
   type MenubarProps,
+  type MenubarSubTriggerAsChildProps,
+  type MenubarSubTriggerProps,
   type MenubarTriggerAsChildProps,
   type MenubarTriggerProps,
   type ProgressCircleProps,
@@ -141,20 +144,37 @@ const tableHeaderCellProps: TableHeaderCellProps = { children: 'name' };
 const tableCellProps: TableCellProps = { children: 'Alice' };
 const menubarProps: MenubarProps = { children: 'menu' };
 const menubarMenuProps: MenubarMenuProps = { children: 'menu' };
-const menubarTriggerProps: MenubarTriggerProps = { children: 'File' };
+const menubarTriggerProps: MenubarTriggerProps = {
+  children: 'File',
+  textValue: 'File',
+};
 const menubarTriggerAsChildProps: MenubarTriggerAsChildProps = {
   asChild: true,
   children: slotChild,
+  textValue: 'File',
 };
 const menubarContentProps: MenubarContentProps = { children: 'Panel' };
 const menubarContentAsChildProps: MenubarContentAsChildProps = {
   asChild: true,
   children: slotChild,
 };
-const menubarItemProps: MenubarItemProps = { children: 'Item' };
+const menubarItemProps: MenubarItemProps = {
+  children: 'Item',
+  textValue: 'Item',
+};
 const menubarItemAsChildProps: MenubarItemAsChildProps = {
   asChild: true,
   children: slotChild,
+  textValue: 'Item',
+};
+const menubarSubTriggerProps: MenubarSubTriggerProps = {
+  children: 'Recent',
+  textValue: 'Recent',
+};
+const menubarSubTriggerAsChildProps: MenubarSubTriggerAsChildProps = {
+  asChild: true,
+  children: slotChild,
+  textValue: 'Recent',
 };
 const accordionSingleProps: AccordionSingleProps = { defaultValue: 'a' };
 const accordionMultipleProps: AccordionMultipleProps = {
@@ -253,6 +273,7 @@ void [
   MenubarPortal,
   MenubarContent,
   MenubarItem,
+  MenubarSubTrigger,
   CollapsibleTrigger,
   CollapsibleContent,
   ProgressIndicator,
@@ -298,6 +319,8 @@ void [
   menubarContentAsChildProps,
   menubarItemProps,
   menubarItemAsChildProps,
+  menubarSubTriggerProps,
+  menubarSubTriggerAsChildProps,
   accordionSingleProps,
   accordionMultipleProps,
   accordionTriggerProps,

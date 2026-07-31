@@ -25,7 +25,7 @@ describe('HoverCard - Behavior', () => {
       </HoverCard>
     );
 
-    const trigger = container.querySelector(
+    let trigger = container.querySelector(
       '[data-slot="hover-card-trigger"]'
     ) as HTMLElement;
 
@@ -95,7 +95,7 @@ describe('HoverCard - Behavior', () => {
         <HoverCardContent>Details</HoverCardContent>
       </HoverCard>
     );
-    const trigger = container.querySelector(
+    let trigger = container.querySelector(
       '[data-slot="hover-card-trigger"]'
     ) as HTMLElement;
     trigger.dispatchEvent(new FocusEvent('focus', { bubbles: true }));
@@ -113,7 +113,7 @@ describe('HoverCard - Behavior', () => {
       </HoverCard>
     );
     await flushUpdates();
-    const trigger = container.querySelector(
+    let trigger = container.querySelector(
       '[data-slot="hover-card-trigger"]'
     ) as HTMLElement;
     const content = document.body.querySelector(
@@ -144,5 +144,91 @@ describe('HoverCard - Behavior', () => {
     ) as HTMLElement;
     expect(content.getAttribute('role')).toBe('dialog');
     expect(content.getAttribute('aria-labelledby')).toBe(trigger.id);
+  });
+
+  it('should preserve pointer focus and support Tab, Shift+Tab, and Escape across interactive content', async () => {
+    container = mount(
+      <>
+        <button data-testid="before">Before</button>
+        <HoverCard>
+          <HoverCardTrigger>Preview</HoverCardTrigger>
+          <HoverCardContent>
+            <a href="/first">First</a>
+            <button>Last</button>
+          </HoverCardContent>
+        </HoverCard>
+        <button data-testid="after">After</button>
+      </>
+    );
+    const before = container.querySelector(
+      '[data-testid="before"]'
+    ) as HTMLElement;
+    let trigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
+    before.focus();
+    trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+    await flushUpdates();
+    expect(document.activeElement).toBe(before);
+
+    trigger.focus();
+    await flushUpdates();
+    trigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
+    trigger.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'Tab',
+        bubbles: true,
+        cancelable: true,
+      })
+    );
+    await flushUpdates();
+    const first = document.body.querySelector(
+      '[data-slot="hover-card-content"] a'
+    ) as HTMLElement;
+    expect(document.activeElement).toBe(first);
+
+    first.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'Tab',
+        shiftKey: true,
+        bubbles: true,
+        cancelable: true,
+      })
+    );
+    await flushUpdates();
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() => resolve())
+    );
+    trigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
+    expect(document.activeElement).toBe(trigger);
+
+    trigger.dispatchEvent(new FocusEvent('focus', { bubbles: true }));
+    await flushUpdates();
+    const reopenedFirst = document.body.querySelector(
+      '[data-slot="hover-card-content"] a'
+    ) as HTMLElement;
+    reopenedFirst.focus();
+    reopenedFirst.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'Escape',
+        bubbles: true,
+        cancelable: true,
+      })
+    );
+    await flushUpdates();
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() => resolve())
+    );
+    trigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
+    expect(document.activeElement).toBe(trigger);
+    expect(
+      document.body.querySelector('[data-slot="hover-card-content"]')
+    ).toBeNull();
   });
 });

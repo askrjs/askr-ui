@@ -3,6 +3,7 @@ import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
 import { focusSelectedCollectionItem } from '../_internal/focus';
+import { runCancelablePress } from '../_internal/press';
 import {
   disabledIndexes,
   firstEnabledCompositeIndex,
@@ -282,9 +283,7 @@ export function AccordionTrigger(
   const interactionProps = pressable({
     disabled: isDisabled,
     onPress: (event) => {
-      onPress?.(event);
-
-      if (!event.defaultPrevented) {
+      runCancelablePress(event, onPress, () => {
         root.setValue(
           toggleDisclosureValue(
             root.type,
@@ -294,13 +293,14 @@ export function AccordionTrigger(
           )
         );
         root.setCurrentIndex(item.itemIndex);
-      }
+      });
     },
     isNativeButton: !asChild,
   });
+  const itemFocusProps = nav.item(item.itemIndex);
   const finalProps = mergeProps(rest, {
     ...interactionProps,
-    ...nav.item(item.itemIndex),
+    ...itemFocusProps,
     ref: composeRefs(
       ref as
         | ((value: HTMLElement | null) => void)
@@ -321,6 +321,7 @@ export function AccordionTrigger(
     'aria-expanded': open ? 'true' : 'false',
     'data-state': open ? 'open' : 'closed',
     'data-disabled': isDisabled ? 'true' : undefined,
+    tabIndex: isDisabled ? -1 : 0,
   });
 
   if (asChild) {

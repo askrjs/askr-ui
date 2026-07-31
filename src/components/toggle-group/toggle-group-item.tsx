@@ -2,6 +2,7 @@ import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
 import { focusSelectedCollectionItem } from '../_internal/focus';
+import { runCancelablePress } from '../_internal/press';
 import {
   getCompositeCollection,
   registerCompositeNode,
@@ -59,9 +60,7 @@ export function ToggleGroupItem(
   const interactionProps = pressable({
     disabled: isDisabled,
     onPress: (event) => {
-      onPress?.(event);
-
-      if (!event.defaultPrevented) {
+      runCancelablePress(event, onPress, () => {
         const nextValue = toggleDisclosureValue(
           root.type,
           root.getValue(),
@@ -70,13 +69,14 @@ export function ToggleGroupItem(
         );
         root.setValue(nextValue);
         root.setCurrentIndex(itemIndex);
-      }
+      });
     },
     isNativeButton: !asChild,
   });
+  const itemFocusProps = nav.item(itemIndex);
   const finalProps = mergeProps(rest, {
     ...interactionProps,
-    ...nav.item(itemIndex),
+    ...itemFocusProps,
     ref: composeRefs(
       ref as
         | ((value: HTMLElement | null) => void)
@@ -100,7 +100,7 @@ export function ToggleGroupItem(
     'data-slot': 'toggle-group-item',
     'data-state': pressed ? 'on' : 'off',
     'data-disabled': isDisabled ? 'true' : undefined,
-    tabIndex: isDisabled && asChild ? -1 : undefined,
+    tabIndex: isDisabled ? -1 : itemFocusProps.tabIndex,
   });
 
   if (asChild) {

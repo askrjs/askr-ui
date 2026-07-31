@@ -1,3 +1,4 @@
+import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import {
   RadioGroup,
@@ -188,6 +189,40 @@ describe('RadioGroup - Behavior', () => {
     expect(host.getAttribute('data-from-child')).toBe('yes');
     expect(host.getAttribute('aria-checked')).toBe('true');
     expect(host.getAttribute('data-state')).toBe('checked');
+  });
+
+  it('should activates asChild items with Enter and Space', async () => {
+    container = mount(
+      <RadioGroup defaultValue="small">
+        <RadioGroupItem value="small">Small</RadioGroupItem>
+        <RadioGroupItem asChild value="medium">
+          <span>Medium</span>
+        </RadioGroupItem>
+      </RadioGroup>
+    );
+    await flushUpdates();
+    await flushUpdates();
+
+    let medium = getRadioByText(container, 'Medium');
+    medium.focus();
+    await userEvent.keyboard(' ');
+    await flushUpdates();
+
+    medium = getRadioByText(container, 'Medium');
+    expect(medium.getAttribute('aria-checked')).toBe('true');
+
+    const small = getRadioByText(container, 'Small');
+    small.click();
+    await flushUpdates();
+
+    medium = getRadioByText(container, 'Medium');
+    medium.focus();
+    await userEvent.keyboard('{Enter}');
+    await flushUpdates();
+
+    expect(
+      getRadioByText(container, 'Medium').getAttribute('aria-checked')
+    ).toBe('true');
   });
 
   it('should forwards refs to the group container and item hosts', () => {

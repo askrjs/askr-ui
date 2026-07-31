@@ -2,6 +2,7 @@ import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { getOverlayNodes } from '../_internal/overlay';
+import { runCancelablePress } from '../_internal/press';
 import { readSelectRootContext } from './select.shared';
 import type {
   SelectPortalProps,
@@ -34,15 +35,40 @@ export function SelectTrigger(
   const interactionProps = pressable({
     disabled: isDisabled,
     onPress: (event) => {
-      onPress?.(event);
-      if (!event.defaultPrevented) {
+      runCancelablePress(event, onPress, () => {
         root.setOpen(!root.open);
-      }
+      });
     },
-    isNativeButton: !asChild,
+    isNativeButton: false,
   });
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (!isDisabled && root.handleTypeaheadKeyDown(event)) {
+      return;
+    }
+
+    interactionProps.onKeyDown?.(event);
+
+    if (event.defaultPrevented || isDisabled) {
+      return;
+    }
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      root.setOpen(true);
+      return;
+    }
+  };
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (root.handleTypeaheadKeyUp(event)) {
+      return;
+    }
+
+    interactionProps.onKeyUp?.(event);
+  };
   const finalProps = mergeProps(rest, {
     ...interactionProps,
+    onKeyDown: handleKeyDown,
+    onKeyUp: handleKeyUp,
     ref: composeRefs(
       ref as
         | ((value: HTMLElement | null) => void)
@@ -56,6 +82,7 @@ export function SelectTrigger(
     'aria-haspopup': 'listbox',
     'aria-expanded': root.open ? 'true' : 'false',
     'aria-controls': root.contentId,
+    disabled: isDisabled && !asChild ? true : undefined,
     'data-slot': 'select-trigger',
     'data-disabled': isDisabled ? 'true' : undefined,
     'data-size': size && size !== 'md' ? size : undefined,

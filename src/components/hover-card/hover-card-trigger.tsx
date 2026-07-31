@@ -1,6 +1,7 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { hoverable, pressable } from '@askrjs/askr/foundations/interactions';
+import { focusFirstDescendant } from '../_internal/focus';
 import { readHoverCardRootContext } from './hover-card.shared';
 import type {
   HoverCardTriggerAsChildProps,
@@ -62,8 +63,22 @@ export function HoverCardTrigger(
       root.cancelClose();
       root.setOpen(true);
     },
+    onFocusIn: () => {
+      root.cancelClose();
+      root.setOpen(true);
+    },
     onBlur: () => {
       root.scheduleClose();
+    },
+    onKeyDown: (event: KeyboardEvent) => {
+      if (event.key !== 'Tab' || event.shiftKey || !root.open) {
+        return;
+      }
+      const content = root.getContentNode();
+      if (content && focusFirstDescendant(content)) {
+        event.preventDefault();
+        root.cancelClose();
+      }
     },
   });
 

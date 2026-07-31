@@ -7,6 +7,7 @@ import {
   resolveMenuItemText,
 } from '../_internal/menu';
 import { resolvePartId } from '../_internal/id';
+import { runCancelablePress } from '../_internal/press';
 import { readMenuRenderContext, readMenuRootContext } from './menu.shared';
 import type { MenuItemAsChildProps, MenuItemProps } from './menu.types';
 
@@ -19,6 +20,7 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
     disabled = false,
     onSelect,
     ref,
+    textValue,
     type: typeProp,
     ...rest
   } = props;
@@ -26,21 +28,37 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
   const renderContext = readMenuRenderContext();
   const itemIndex = renderContext.claimItemIndex();
   const itemId = resolvePartId(root.menuId, `item-${itemIndex}`);
-  const itemText = resolveMenuItemText(children);
+  const itemText = resolveMenuItemText(children, textValue);
   const collection = getMenuCollection(root.menuId);
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
-      onSelect?.(event);
-      if (!event.defaultPrevented) {
+      runCancelablePress(event, onSelect, () => {
         root.setCurrentIndex(itemIndex);
-      }
+      });
     },
-    isNativeButton: !asChild,
+    isNativeButton: false,
   });
+  const itemFocusProps = root.navigation.item(itemIndex);
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (!disabled && root.handleTypeaheadKeyDown(event)) {
+      return;
+    }
+
+    interactionProps.onKeyDown?.(event);
+  };
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (root.handleTypeaheadKeyUp(event)) {
+      return;
+    }
+
+    interactionProps.onKeyUp?.(event);
+  };
   const finalProps = mergeProps(rest, {
     ...interactionProps,
-    ...root.navigation.item(itemIndex),
+    onKeyDown: handleKeyDown,
+    onKeyUp: handleKeyUp,
+    ...itemFocusProps,
     ref: composeRefs(
       ref as
         | ((value: HTMLElement | null) => void)
@@ -57,9 +75,11 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
     ),
     id: itemId,
     role: 'menuitem',
+    disabled: disabled && !asChild ? true : undefined,
     'aria-disabled': disabled ? 'true' : undefined,
     'data-slot': 'menu-item',
     'data-disabled': disabled ? 'true' : undefined,
+    tabIndex: disabled ? -1 : itemFocusProps.tabIndex,
   });
 
   if (asChild) {

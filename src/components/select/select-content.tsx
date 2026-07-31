@@ -3,7 +3,10 @@ import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { rovingFocus } from '@askrjs/askr/foundations/interactions';
 import { DismissableLayer } from '../dismissable-layer';
 import { FocusScope } from '../focus-scope';
-import { focusSelectedCollectionItem } from '../_internal/focus';
+import {
+  dismissPopupWithTab,
+  focusSelectedCollectionItem,
+} from '../_internal/focus';
 import { getMenuCollection } from '../_internal/menu';
 import {
   clearOverlayPosition,
@@ -55,11 +58,10 @@ export function SelectContent(
     isDisabled: (index) => disabledIndexes.includes(index),
     onNavigate: (index) => {
       root.setCurrentIndex(index);
-      focusSelectedCollectionItem(collection, index);
+      root.focusItem(index);
     },
   });
   const finalProps = mergeProps(rest, {
-    ...nav.container,
     ref: composeRefs(
       ref as
         | ((value: HTMLElement | null) => void)
@@ -92,6 +94,26 @@ export function SelectContent(
     'data-side': side,
     'data-align': align,
     'data-side-offset': String(sideOffset),
+    onKeyDown: (event: KeyboardEvent) => {
+      if (root.handleTypeaheadKeyDown(event)) {
+        return;
+      }
+
+      nav.container.onKeyDown?.(event);
+
+      if (event.defaultPrevented) {
+        return;
+      }
+
+      dismissPopupWithTab(
+        event,
+        overlayNodes.trigger,
+        overlayNodes.content ? [overlayNodes.content] : [],
+        () => {
+          root.setOpen(false);
+        }
+      );
+    },
   });
   const contentNode = asChild ? (
     <Slot asChild {...finalProps} children={children} />

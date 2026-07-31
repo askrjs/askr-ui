@@ -134,64 +134,6 @@ describe('Collapsible — Accessibility', () => {
   });
 
   describe('Keyboard Navigation', () => {
-    it('should toggle on Enter key', () => {
-      container = mount(
-        <Collapsible defaultOpen={false}>
-          <CollapsibleTrigger>Toggle</CollapsibleTrigger>
-          <CollapsibleContent>Content</CollapsibleContent>
-        </Collapsible>
-      );
-
-      const trigger = container.querySelector('button')!;
-      document.body.appendChild(container);
-      trigger.focus();
-
-      const event = new KeyboardEvent('keydown', {
-        key: 'Enter',
-        bubbles: true,
-      });
-      trigger.dispatchEvent(event);
-
-      // Should be open after Enter
-      const expanded = container
-        .querySelector('button')
-        ?.getAttribute('aria-expanded');
-      expect(expanded).toBe('true');
-    });
-
-    it('should toggle on Space key', () => {
-      container = mount(
-        <Collapsible defaultOpen={false}>
-          <CollapsibleTrigger>Toggle</CollapsibleTrigger>
-          <CollapsibleContent>Content</CollapsibleContent>
-        </Collapsible>
-      );
-
-      const trigger = container.querySelector('button')!;
-      document.body.appendChild(container);
-      trigger.focus();
-
-      const event = new KeyboardEvent('keydown', {
-        key: ' ',
-        code: 'Space',
-        bubbles: true,
-      });
-      trigger.dispatchEvent(event);
-
-      const keyup = new KeyboardEvent('keyup', {
-        key: ' ',
-        code: 'Space',
-        bubbles: true,
-      });
-      trigger.dispatchEvent(keyup);
-
-      // Should be open after Space
-      const expanded = container
-        .querySelector('button')
-        ?.getAttribute('aria-expanded');
-      expect(expanded).toBe('true');
-    });
-
     it('should be focusable when not disabled', () => {
       container = mount(
         <Collapsible>

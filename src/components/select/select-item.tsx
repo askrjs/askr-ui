@@ -1,13 +1,13 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
-import { focusSelectedCollectionItem } from '../_internal/focus';
 import {
   getMenuCollection,
   registerCollectionNode,
   resolveMenuItemText,
 } from '../_internal/menu';
 import { resolvePartId } from '../_internal/id';
+import { runCancelablePress } from '../_internal/press';
 import {
   readSelectRenderContext,
   readSelectRootContext,
@@ -55,26 +55,41 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
       }
 
       root.setCurrentIndex(index);
-      focusSelectedCollectionItem(collection, index);
+      root.focusItem(index);
     },
   });
   const selected = root.value === value;
   const interactionProps = pressable({
     disabled: isDisabled,
     onPress: (event) => {
-      if (event.defaultPrevented) {
-        return;
-      }
-
-      root.setValue(value);
-      root.setCurrentIndex(itemIndex);
-      root.setOpen(false);
+      runCancelablePress(event, undefined, () => {
+        root.setValue(value);
+        root.setCurrentIndex(itemIndex);
+        root.setOpen(false);
+      });
     },
-    isNativeButton: !asChild,
+    isNativeButton: false,
   });
+  const itemFocusProps = nav.item(itemIndex);
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (!isDisabled && root.handleTypeaheadKeyDown(event)) {
+      return;
+    }
+
+    interactionProps.onKeyDown?.(event);
+  };
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (root.handleTypeaheadKeyUp(event)) {
+      return;
+    }
+
+    interactionProps.onKeyUp?.(event);
+  };
   const finalProps = mergeProps(rest, {
     ...interactionProps,
-    ...nav.item(itemIndex),
+    onKeyDown: handleKeyDown,
+    onKeyUp: handleKeyUp,
+    ...itemFocusProps,
     ref: composeRefs(
       ref as
         | ((value: HTMLElement | null) => void)
@@ -88,16 +103,18 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
           value,
           text: itemText,
         });
+        root.restoreItemFocus(itemIndex, node);
       }
     ),
     id: itemId,
     role: 'option',
-    tabIndex: isDisabled ? -1 : undefined,
+    disabled: isDisabled && !asChild ? true : undefined,
     'aria-selected': selected ? 'true' : 'false',
     'data-slot': 'select-item',
     'data-state': selected ? 'checked' : 'unchecked',
     'data-disabled': isDisabled ? 'true' : undefined,
     'aria-disabled': isDisabled ? 'true' : undefined,
+    tabIndex: isDisabled ? -1 : itemFocusProps.tabIndex,
   });
 
   if (asChild) {

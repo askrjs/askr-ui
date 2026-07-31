@@ -1,9 +1,19 @@
 import { cspNonce, getSignal, state } from '@askrjs/askr';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import { rovingFocus } from '@askrjs/askr/foundations/interactions';
-import { focusSelectedCollectionItem } from '../_internal/focus';
+import {
+  focusCollectionItemWithRestore,
+  restorePendingCollectionItemFocus,
+  type PendingCollectionFocus,
+} from '../_internal/focus';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import { getCompositeCollection } from '../_internal/composite';
+import {
+  handleTypeaheadKeyDown,
+  handleTypeaheadKeyUp,
+  registerTypeaheadCleanup,
+  resetTypeahead,
+} from '../_internal/typeahead';
 import {
   captureOverlayNonce,
   createOverlayIdentity,
@@ -56,14 +66,24 @@ export function Menubar(props: MenubarProps) {
   const openPathState = state<string[]>([]);
   const portalEpochState = state(0);
   const currentTriggerIndexState = state(0);
+  const pendingTriggerFocus = state<PendingCollectionFocus>({
+    index: null,
+  })();
   const identity = state<object>({})();
+  const signal = getSignal();
+  registerTypeaheadCleanup(identity, signal);
   const portalRegistry = getMenubarPortalRegistry(identity);
   const renderedMenuKeys = new Set<string>();
   const setOpenPath = (path: string[]) => {
+    if (path.length === 0) {
+      resetTypeahead(identity);
+    }
     openPathState.set(path);
   };
   const setCurrentTriggerIndex = (index: number) => {
-    currentTriggerIndexState.set(index);
+    if (currentTriggerIndexState() !== index) {
+      currentTriggerIndexState.set(index);
+    }
   };
   const rootContextBase: MenubarRootStateInput = {
     menubarId,
@@ -71,6 +91,47 @@ export function Menubar(props: MenubarProps) {
   };
   const runtimeRenderContext = createMenubarRootRenderContext();
   const rootState = resolveMenubarRootState(rootContextBase);
+  const collection = getCompositeCollection(menubarId);
+  const syncPortals = () => {
+    portalEpochState.set(portalEpochState() + 1);
+  };
+  const navigateToTrigger = (index: number) => {
+    const menuKey = resolveMenubarRootState({
+      menubarId,
+      currentTriggerIndexCandidate: currentTriggerIndexState(),
+    }).items[index]?.menuKey;
+    setCurrentTriggerIndex(index);
+    focusCollectionItemWithRestore(
+      pendingTriggerFocus,
+      collection,
+      index,
+      menuKey === undefined
+        ? undefined
+        : () =>
+            document.getElementById(
+              resolvePartId(menubarId, `trigger-${menuKey}`)
+            )
+    );
+
+    if (openPathState().length > 0) {
+      if (menuKey) {
+        openPathState.set([menuKey]);
+        queueMicrotask(syncPortals);
+      }
+    }
+  };
+  const handleRootTypeaheadKeyDown = (event: KeyboardEvent) => {
+    const liveState = resolveMenubarRootState({
+      menubarId,
+      currentTriggerIndexCandidate: currentTriggerIndexState(),
+    });
+
+    return handleTypeaheadKeyDown(identity, event, {
+      currentIndex: liveState.currentTriggerIndex,
+      items: liveState.items,
+      onMatch: navigateToTrigger,
+    });
+  };
   const ensureMenuPortal = (menuKey: string) => {
     if (renderedMenuKeys.has(menuKey)) {
       throw new Error(
@@ -103,35 +164,37 @@ export function Menubar(props: MenubarProps) {
     setOpenPath,
     loop,
     portalEpoch: portalEpochState(),
-    syncPortals: () => {
-      portalEpochState.set(portalEpochState() + 1);
-    },
+    syncPortals,
     setCurrentTriggerIndex,
+    restoreTriggerFocus: (index, node) => {
+      restorePendingCollectionItemFocus(pendingTriggerFocus, index, node);
+    },
     resolvedState: rootState,
+    handleTypeaheadKeyDown: handleRootTypeaheadKeyDown,
+    handleTypeaheadKeyUp: (event) => handleTypeaheadKeyUp(identity, event),
   };
   for (const record of portalRegistry.byKey.values()) {
     captureOverlayNonce(record.identity, nonce);
   }
-  const collection = getCompositeCollection(menubarId);
   const nav = rovingFocus({
     currentIndex: rootState.currentTriggerIndex,
     itemCount: Math.max(rootState.items.length, 1),
     orientation: 'horizontal',
     loop,
     isDisabled: (index) => rootState.disabledTriggerIndexes.includes(index),
-    onNavigate: (index) => {
-      currentTriggerIndexState.set(index);
-      focusSelectedCollectionItem(collection, index);
-    },
+    onNavigate: navigateToTrigger,
   });
   const finalProps = mergeProps(rest, {
-    ...nav.container,
     ref,
     role: 'menubar',
     'data-slot': 'menubar',
     'data-menubar': 'true',
+    onKeyDown: (event: KeyboardEvent) => {
+      if (!handleRootTypeaheadKeyDown(event)) {
+        nav.container.onKeyDown?.(event);
+      }
+    },
   });
-  const signal = getSignal();
   queueMicrotask(() => {
     if (signal.aborted) {
       return;

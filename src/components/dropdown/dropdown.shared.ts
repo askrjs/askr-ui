@@ -21,7 +21,11 @@ export type DropdownRootContextValue = {
   portal: OverlayPortal;
   currentIndexCandidate: number;
   setCurrentIndex: (index: number) => void;
+  focusItem: (index: number) => void;
+  restoreItemFocus: (index: number, node: HTMLElement | null) => void;
   resolvedState: DropdownResolvedState;
+  handleTypeaheadKeyDown: (event: KeyboardEvent) => boolean;
+  handleTypeaheadKeyUp: (event: KeyboardEvent) => boolean;
 };
 
 export type DropdownRenderContextValue = {

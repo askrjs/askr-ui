@@ -1,3 +1,4 @@
+import { userEvent } from '@vitest/browser/context';
 import { describe, it, expect, vi, afterEach } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
 import { Checkbox } from '../../../../src/components/checkbox/checkbox';
@@ -137,5 +138,56 @@ describe('Checkbox - Behavior', () => {
 
     expect(div).toBeTruthy();
     expect(refNode).toBe(div);
+  });
+
+  it('should toggles an asChild host with Enter and Space', async () => {
+    const onCheckedChange = vi.fn();
+    container = mount(
+      <Checkbox asChild onCheckedChange={onCheckedChange}>
+        <span>Remember me</span>
+      </Checkbox>
+    );
+
+    let checkbox = container.querySelector(
+      '[data-slot="checkbox"]'
+    ) as HTMLElement;
+    checkbox.focus();
+    await userEvent.keyboard('{Enter}');
+    await flushUpdates();
+
+    checkbox = container.querySelector('[data-slot="checkbox"]') as HTMLElement;
+    expect(checkbox.getAttribute('aria-checked')).toBe('true');
+
+    checkbox.focus();
+    await userEvent.keyboard(' ');
+    await flushUpdates();
+
+    checkbox = container.querySelector('[data-slot="checkbox"]') as HTMLElement;
+    expect(checkbox.getAttribute('aria-checked')).toBe('false');
+    expect(onCheckedChange.mock.calls).toEqual([[true], [false]]);
+  });
+
+  it('should honors caller cancellation for asChild keyboard presses', async () => {
+    const onCheckedChange = vi.fn();
+    container = mount(
+      <Checkbox
+        asChild
+        onPress={(event) => event.preventDefault?.()}
+        onCheckedChange={onCheckedChange}
+      >
+        <span>Remember me</span>
+      </Checkbox>
+    );
+
+    const checkbox = container.querySelector(
+      '[data-slot="checkbox"]'
+    ) as HTMLElement;
+    checkbox.focus();
+    await userEvent.keyboard('{Enter}');
+    await userEvent.keyboard(' ');
+    await flushUpdates();
+
+    expect(checkbox.getAttribute('aria-checked')).toBe('false');
+    expect(onCheckedChange).not.toHaveBeenCalled();
   });
 });

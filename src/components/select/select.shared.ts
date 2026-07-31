@@ -9,6 +9,7 @@ import type { OverlayPortal } from '../_internal/overlay';
 export type SelectStateInput = {
   selectId: string;
   value: string;
+  open: boolean;
   currentIndexCandidate: number;
   disabled: boolean;
   declaredItems: SelectItemMetadata[];
@@ -31,9 +32,13 @@ export type SelectRootContextValue = {
   setValue: (value: string) => void;
   currentIndexCandidate: number;
   setCurrentIndex: (index: number) => void;
+  focusItem: (index: number) => void;
+  restoreItemFocus: (index: number, node: HTMLElement | null) => void;
   disabled: boolean;
   declaredItems: SelectItemMetadata[];
   resolvedState: SelectResolvedState;
+  handleTypeaheadKeyDown: (event: KeyboardEvent) => boolean;
+  handleTypeaheadKeyUp: (event: KeyboardEvent) => boolean;
 };
 
 export type SelectRenderContextValue = {
@@ -135,14 +140,18 @@ export function resolveSelectState(
     items.length > 0 && effectiveItems.every((item) => item.disabled);
   const candidateIndex = root.currentIndexCandidate;
   const currentIndex =
-    selectedIndex >= 0 && !effectiveItems[selectedIndex]?.disabled
-      ? selectedIndex
-      : effectiveItems[candidateIndex] &&
-          !effectiveItems[candidateIndex]?.disabled
-        ? candidateIndex
-        : allItemsDisabled
-          ? -1
-          : fallbackIndex;
+    root.open &&
+    effectiveItems[candidateIndex] &&
+    !effectiveItems[candidateIndex]?.disabled
+      ? candidateIndex
+      : selectedIndex >= 0 && !effectiveItems[selectedIndex]?.disabled
+        ? selectedIndex
+        : effectiveItems[candidateIndex] &&
+            !effectiveItems[candidateIndex]?.disabled
+          ? candidateIndex
+          : allItemsDisabled
+            ? -1
+            : fallbackIndex;
 
   return {
     items,
