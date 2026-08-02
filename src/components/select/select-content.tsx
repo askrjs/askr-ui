@@ -3,11 +3,8 @@ import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { rovingFocus } from '@askrjs/askr/foundations/interactions';
 import { DismissableLayer } from '../dismissable-layer';
 import { FocusScope } from '../focus-scope';
-import {
-  dismissPopupWithTab,
-  focusSelectedCollectionItem,
-} from '../_internal/focus';
-import { getMenuCollection } from '../_internal/menu';
+import { dismissPopupWithTab } from '../_internal/focus';
+import { getMenuCollection, getMenuCollectionItems } from '../_internal/menu';
 import {
   clearOverlayPosition,
   getOverlayNodes,
@@ -48,8 +45,6 @@ export function SelectContent(
   const { items, currentIndex, disabledIndexes } = root.resolvedState;
   const overlayNodes = getOverlayNodes(root.overlayIdentity);
   const collection = getMenuCollection(root.selectId);
-  const hasEnabledItems =
-    items.length > 0 && disabledIndexes.length < items.length;
   const nav = rovingFocus({
     currentIndex,
     itemCount: Math.max(items.length, 1),
@@ -82,8 +77,26 @@ export function SelectContent(
           clearOverlayPosition(root.overlayIdentity);
         }
 
-        if (node && root.open && hasEnabledItems) {
-          focusSelectedCollectionItem(collection, currentIndex);
+        if (node && root.open) {
+          queueMicrotask(() => {
+            if (
+              overlayNodes.content !== node ||
+              !node.isConnected ||
+              node.contains(document.activeElement)
+            ) {
+              return;
+            }
+
+            const liveItems = getMenuCollectionItems(collection);
+            const target =
+              liveItems.find(
+                (item) => item.index === currentIndex && !item.disabled
+              ) ?? liveItems.find((item) => !item.disabled);
+
+            if (target) {
+              root.focusItem(target.index);
+            }
+          });
         }
       }
     ),

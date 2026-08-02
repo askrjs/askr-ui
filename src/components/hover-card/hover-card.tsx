@@ -41,12 +41,36 @@ export function HoverCard(props: HoverCardProps) {
   const focusEntry = state({
     restoreTrigger: false,
     restoreFrame: null as number | null,
+    restoreGeneration: 0,
   })();
   captureOverlayNonce(overlayIdentity, cspNonce());
   const triggerId = resolvePartId(hoverCardId, 'trigger');
   const contentId = resolvePartId(hoverCardId, 'content');
   const portal = getPersistentPortal(overlayIdentity);
   const overlayNodes = getOverlayNodes(overlayIdentity);
+  const focusTrigger = (trigger: HTMLElement | null) => {
+    if (!trigger) {
+      return;
+    }
+
+    const generation = focusEntry.restoreGeneration + 1;
+    focusEntry.restoreGeneration = generation;
+    focusEntry.restoreTrigger = true;
+    try {
+      trigger.focus();
+    } finally {
+      // Release on the third microtask, after the two-microtask trigger adoption pass.
+      queueMicrotask(() => {
+        queueMicrotask(() => {
+          queueMicrotask(() => {
+            if (focusEntry.restoreGeneration === generation) {
+              focusEntry.restoreTrigger = false;
+            }
+          });
+        });
+      });
+    }
+  };
   let contentPosition: HoverCardPositionOptions =
     resolveHoverCardPositionOptions();
   let openTimer: ReturnType<typeof setTimeout> | undefined;
@@ -83,6 +107,9 @@ export function HoverCard(props: HoverCardProps) {
     },
     setOpen: (nextOpen: boolean) => {
       clearTimers();
+      if (nextOpen && focusEntry.restoreTrigger) {
+        return;
+      }
       openState.set(nextOpen);
 
       if (!nextOpen) {
@@ -128,7 +155,6 @@ export function HoverCard(props: HoverCardProps) {
     setTriggerNode: (node: HTMLElement | null) => {
       overlayNodes.trigger = node;
       if (node && focusEntry.restoreTrigger) {
-        focusEntry.restoreTrigger = false;
         node.focus();
       }
     },
@@ -138,8 +164,7 @@ export function HoverCard(props: HoverCardProps) {
     getTriggerNode: () => overlayNodes.trigger,
     getContentNode: () => overlayNodes.content,
     requestTriggerFocus: () => {
-      focusEntry.restoreTrigger = true;
-      overlayNodes.trigger?.focus();
+      focusTrigger(document.getElementById(triggerId) ?? overlayNodes.trigger);
       if (focusEntry.restoreFrame !== null) {
         cancelAnimationFrame(focusEntry.restoreFrame);
       }
@@ -147,10 +172,7 @@ export function HoverCard(props: HoverCardProps) {
         focusEntry.restoreFrame = null;
         const trigger =
           document.getElementById(triggerId) ?? overlayNodes.trigger;
-        if (trigger) {
-          focusEntry.restoreTrigger = false;
-          trigger.focus();
-        }
+        focusTrigger(trigger);
       });
     },
     syncPosition: () => {

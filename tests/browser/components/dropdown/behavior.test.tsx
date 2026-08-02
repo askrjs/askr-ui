@@ -45,6 +45,27 @@ describe('Dropdown - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
 
+  it('should focus the first item when pointer activation mounts content', async () => {
+    container = mount(
+      <Dropdown>
+        <DropdownTrigger>Open dropdown</DropdownTrigger>
+        <DropdownPortal>
+          <DropdownContent>
+            <DropdownItem>Archive</DropdownItem>
+          </DropdownContent>
+        </DropdownPortal>
+      </Dropdown>
+    );
+
+    container
+      .querySelector<HTMLButtonElement>('[aria-haspopup="menu"]')!
+      .click();
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(document.activeElement?.textContent).toBe('Archive');
+  });
+
   it('should renders typed trigger and item variants for themed menus', async () => {
     container = mount(
       <Dropdown defaultOpen>

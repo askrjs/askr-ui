@@ -11,6 +11,7 @@ describe('HoverCard - Behavior', () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
     unmount(container);
     container = undefined;
   });
@@ -230,5 +231,48 @@ describe('HoverCard - Behavior', () => {
     expect(
       document.body.querySelector('[data-slot="hover-card-content"]')
     ).toBeNull();
+  });
+
+  it('should allow a later focus open when the restoration frame is throttled', async () => {
+    const requestFrame = vi
+      .spyOn(window, 'requestAnimationFrame')
+      .mockImplementation(() => 1);
+    container = mount(
+      <HoverCard defaultOpen>
+        <HoverCardTrigger>Preview</HoverCardTrigger>
+        <HoverCardContent>
+          <button>Action</button>
+        </HoverCardContent>
+      </HoverCard>
+    );
+    await flushUpdates();
+
+    const action = document.body.querySelector(
+      '[data-slot="hover-card-content"] button'
+    ) as HTMLButtonElement;
+    action.focus();
+    action.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'Escape',
+        bubbles: true,
+        cancelable: true,
+      })
+    );
+    await flushUpdates();
+
+    const trigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
+    expect(requestFrame).toHaveBeenCalled();
+    expect(
+      document.body.querySelector('[data-slot="hover-card-content"]')
+    ).toBeNull();
+
+    trigger.dispatchEvent(new FocusEvent('focus', { bubbles: true }));
+    await flushUpdates();
+
+    expect(
+      document.body.querySelector('[data-slot="hover-card-content"]')
+    ).not.toBeNull();
   });
 });
