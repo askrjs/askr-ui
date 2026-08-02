@@ -56,26 +56,8 @@ type ToastLifecycleEntry = {
   node: HTMLElement | null;
   timer: ReturnType<typeof setTimeout> | null;
   previousFocused: HTMLElement | null;
+  focusWasInside: boolean;
 };
-
-const toastEntries = new Map<string, ToastLifecycleEntry>();
-const toastHostContexts = new Map<string, ToastHostContextValue>();
-
-function getToastEntry(toastId: string) {
-  const existing = toastEntries.get(toastId);
-
-  if (existing) {
-    return existing;
-  }
-
-  const created: ToastLifecycleEntry = {
-    node: null,
-    timer: null,
-    previousFocused: null,
-  };
-  toastEntries.set(toastId, created);
-  return created;
-}
 
 function clearToastTimer(entry: ToastLifecycleEntry) {
   if (entry.timer) {
@@ -86,37 +68,18 @@ function clearToastTimer(entry: ToastLifecycleEntry) {
 
 function restoreToastFocus(entry: ToastLifecycleEntry) {
   const previousFocused = entry.previousFocused;
+  const activeElement = document.activeElement;
+  const shouldRestore =
+    entry.focusWasInside ||
+    (entry.node !== null &&
+      activeElement instanceof HTMLElement &&
+      entry.node.contains(activeElement));
   entry.previousFocused = null;
+  entry.focusWasInside = false;
 
-  if (
-    previousFocused &&
-    (!entry.node ||
-      !(
-        document.activeElement instanceof HTMLElement &&
-        entry.node.contains(document.activeElement)
-      ))
-  ) {
+  if (previousFocused && shouldRestore) {
     previousFocused.focus?.();
   }
-}
-
-function getToastHostContext(hostId: string): ToastHostContextValue {
-  const existing = toastHostContexts.get(hostId);
-
-  if (existing) {
-    return existing;
-  }
-
-  const created: ToastHostContextValue = {
-    hostId,
-    duration: 0,
-    toasts: [],
-    getToasts: () => [],
-    registerToast: () => {},
-    unregisterToast: () => {},
-  };
-  toastHostContexts.set(hostId, created);
-  return created;
 }
 
 function ToastRegistrationView(props: {
@@ -147,12 +110,26 @@ function ToastRegistrationView(props: {
   const hasDescription =
     collectJsxElements(children, (element) => element.type === ToastDescription)
       .length > 0;
-  const entry = getToastEntry(toastId);
+  const entryState = state<ToastLifecycleEntry>({
+    node: null,
+    timer: null,
+    previousFocused: null,
+    focusWasInside: false,
+  });
+  const entry = entryState();
   const resolvedDuration = duration ?? props.host.duration;
   const setOpen = (nextOpen: boolean) => {
     openState.set(nextOpen);
   };
   const setNode = (node: HTMLElement | null) => {
+    if (
+      node === null &&
+      entry.node !== null &&
+      document.activeElement instanceof HTMLElement &&
+      entry.node.contains(document.activeElement)
+    ) {
+      entry.focusWasInside = true;
+    }
     entry.node = node;
   };
   const rootContext: ToastRootContextValue = {
@@ -226,7 +203,6 @@ function ToastRegistrationView(props: {
           clearToastTimer(entry);
           restoreToastFocus(entry);
           entry.node = null;
-          toastEntries.delete(toastId);
         },
         { once: true }
       );
@@ -287,7 +263,15 @@ export function ToastHost(props: ToastHostProps) {
     id === undefined
       ? generatedHostId()
       : resolveCompoundId('toast-host', id, children);
-  const hostContext = getToastHostContext(hostId);
+  const hostContextState = state<ToastHostContextValue>({
+    hostId,
+    duration,
+    toasts: [],
+    getToasts: () => [],
+    registerToast: () => {},
+    unregisterToast: () => {},
+  });
+  const hostContext = hostContextState();
   const toastRegistrationsState = state<ToastRegistration[]>(
     hostContext.toasts
   );
@@ -345,21 +329,6 @@ export function ToastHost(props: ToastHostProps) {
     'data-slot': 'toast-host',
     'data-toast-host': 'true',
   });
-
-  resource(
-    ({ signal }) => {
-      signal.addEventListener(
-        'abort',
-        () => {
-          toastHostContexts.delete(hostId);
-        },
-        { once: true }
-      );
-
-      return null;
-    },
-    [hostId]
-  );
 
   return (
     <ToastHostContext value={hostContext}>
