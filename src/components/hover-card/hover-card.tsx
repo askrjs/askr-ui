@@ -59,7 +59,7 @@ export function HoverCard(props: HoverCardProps) {
     try {
       trigger.focus();
     } finally {
-      // Keep the guard through the two-microtask trigger adoption pass.
+      // Release on the third microtask, after the two-microtask trigger adoption pass.
       queueMicrotask(() => {
         queueMicrotask(() => {
           queueMicrotask(() => {
