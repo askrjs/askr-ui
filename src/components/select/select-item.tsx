@@ -85,6 +85,7 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
 
     interactionProps.onKeyUp?.(event);
   };
+  const registrationOwner = {};
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
@@ -97,12 +98,18 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
         | null
         | undefined,
       (node: HTMLElement | null) => {
-        registerCollectionNode(itemId, collection, node, {
-          index: itemIndex,
-          disabled: isDisabled,
-          value,
-          text: itemText,
-        });
+        registerCollectionNode(
+          itemId,
+          collection,
+          node,
+          {
+            index: itemIndex,
+            disabled: isDisabled,
+            value,
+            text: itemText,
+          },
+          registrationOwner
+        );
         root.restoreItemFocus(itemIndex, node);
       }
     ),

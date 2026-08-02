@@ -19,7 +19,10 @@ const menuCollections = new Map<
   string,
   ReturnType<typeof createCollection<HTMLElement, MenuCollectionMetadata>>
 >();
-const menuCollectionUnregisters = new Map<string, () => void>();
+const menuCollectionRegistrations = new Map<
+  string,
+  { node: HTMLElement; owner?: object; unregister: () => void }
+>();
 
 export function getMenuCollection(id: string) {
   const existing = menuCollections.get(id);
@@ -69,14 +72,24 @@ export function registerCollectionNode(
     typeof createCollection<HTMLElement, MenuCollectionMetadata>
   >,
   node: HTMLElement | null,
-  metadata: MenuCollectionMetadata
+  metadata: MenuCollectionMetadata,
+  owner?: object
 ) {
-  menuCollectionUnregisters.get(key)?.();
+  const existing = menuCollectionRegistrations.get(key);
 
   if (!node) {
-    menuCollectionUnregisters.delete(key);
+    if (owner && existing?.owner !== owner) {
+      return;
+    }
+    existing?.unregister();
+    menuCollectionRegistrations.delete(key);
     return;
   }
 
-  menuCollectionUnregisters.set(key, collection.register(node, metadata));
+  existing?.unregister();
+  menuCollectionRegistrations.set(key, {
+    node,
+    owner,
+    unregister: collection.register(node, metadata),
+  });
 }

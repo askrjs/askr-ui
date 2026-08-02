@@ -83,6 +83,9 @@ export function HoverCard(props: HoverCardProps) {
     },
     setOpen: (nextOpen: boolean) => {
       clearTimers();
+      if (nextOpen && focusEntry.restoreTrigger) {
+        return;
+      }
       openState.set(nextOpen);
 
       if (!nextOpen) {
@@ -128,7 +131,6 @@ export function HoverCard(props: HoverCardProps) {
     setTriggerNode: (node: HTMLElement | null) => {
       overlayNodes.trigger = node;
       if (node && focusEntry.restoreTrigger) {
-        focusEntry.restoreTrigger = false;
         node.focus();
       }
     },
@@ -148,9 +150,9 @@ export function HoverCard(props: HoverCardProps) {
         const trigger =
           document.getElementById(triggerId) ?? overlayNodes.trigger;
         if (trigger) {
-          focusEntry.restoreTrigger = false;
           trigger.focus();
         }
+        focusEntry.restoreTrigger = false;
       });
     },
     syncPosition: () => {

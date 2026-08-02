@@ -132,14 +132,21 @@ export function MenubarTrigger(
     },
     isNativeButton: false,
   });
+  const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
     getOverlayNodes(menu.overlayIdentity).trigger = node;
-    registerCompositeNode(menu.triggerId, collection, node, {
-      index: menu.menuIndex,
-      disabled,
-      value: menu.menuKey,
-      text: itemText,
-    });
+    registerCompositeNode(
+      menu.triggerId,
+      collection,
+      node,
+      {
+        index: menu.menuIndex,
+        disabled,
+        value: menu.menuKey,
+        text: itemText,
+      },
+      registrationOwner
+    );
     root.restoreTriggerFocus(menu.menuIndex, node);
   };
   const refHandler = ref

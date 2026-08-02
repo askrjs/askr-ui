@@ -19,6 +19,7 @@ const compositeRegistrations = new Map<
     >;
     node: HTMLElement;
     metadata: CompositeCollectionMetadata;
+    owner?: object;
     unregister: () => void;
   }
 >();
@@ -64,11 +65,15 @@ export function registerCompositeNode(
     typeof createCollection<HTMLElement, CompositeCollectionMetadata>
   >,
   node: HTMLElement | null,
-  metadata: CompositeCollectionMetadata
+  metadata: CompositeCollectionMetadata,
+  owner?: object
 ): boolean {
   const existing = compositeRegistrations.get(key);
 
   if (!node) {
+    if (owner && existing?.owner !== owner) {
+      return false;
+    }
     existing?.unregister();
     compositeRegistrations.delete(key);
     return Boolean(existing);
@@ -83,6 +88,7 @@ export function registerCompositeNode(
     existing.node === node &&
     !metadataChanged
   ) {
+    existing.owner = owner;
     return false;
   }
 
@@ -94,6 +100,7 @@ export function registerCompositeNode(
     collection,
     node,
     metadata,
+    owner,
     unregister,
   });
 

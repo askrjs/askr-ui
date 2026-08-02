@@ -15,24 +15,8 @@ import type {
 type ScopeEntry = {
   node: HTMLElement | null;
   previousFocused: HTMLElement | null;
+  pendingDetachedNode: HTMLElement | null;
 };
-
-const scopeEntries = new WeakMap<object, ScopeEntry>();
-
-function getScopeEntry(identity: object): ScopeEntry {
-  const existing = scopeEntries.get(identity);
-
-  if (existing) {
-    return existing;
-  }
-
-  const created: ScopeEntry = {
-    node: null,
-    previousFocused: null,
-  };
-  scopeEntries.set(identity, created);
-  return created;
-}
 
 export function FocusScope(props: FocusScopeProps): JSX.Element;
 export function FocusScope(props: FocusScopeAsChildProps): JSX.Element;
@@ -50,12 +34,33 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
   } = props;
 
   const scopeId = resolveCompoundId('focus-scope', id, children);
-  const identity = state<object>({})();
-  const scopeEntry = getScopeEntry(identity);
+  const scopeEntry = state<ScopeEntry>({
+    node: null,
+    previousFocused: null,
+    pendingDetachedNode: null,
+  })();
 
   const setNode = (node: HTMLElement | null) => {
     if (node) {
+      const pendingDetachedNode = scopeEntry.pendingDetachedNode;
+      scopeEntry.pendingDetachedNode = null;
       scopeEntry.node = node;
+
+      if (pendingDetachedNode) {
+        if (
+          pendingDetachedNode !== node &&
+          !(
+            document.activeElement instanceof HTMLElement &&
+            node.contains(document.activeElement)
+          )
+        ) {
+          if (!focusFirstDescendant(node)) {
+            node.focus();
+          }
+        }
+        return;
+      }
+
       scopeEntry.previousFocused =
         document.activeElement instanceof HTMLElement
           ? document.activeElement
@@ -74,11 +79,19 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
       return;
     }
 
+    const detachedNode = scopeEntry.node;
     scopeEntry.node = null;
+    scopeEntry.pendingDetachedNode = detachedNode;
+    queueMicrotask(() => {
+      if (scopeEntry.pendingDetachedNode !== detachedNode) {
+        return;
+      }
 
-    if (restoreFocus) {
-      scopeEntry.previousFocused?.focus?.();
-    }
+      scopeEntry.pendingDetachedNode = null;
+      if (restoreFocus) {
+        scopeEntry.previousFocused?.focus?.();
+      }
+    });
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
