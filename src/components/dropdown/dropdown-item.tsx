@@ -87,13 +87,20 @@ export function DropdownItem(
 
     interactionProps.onKeyUp?.(event);
   };
+  const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
-    registerCollectionNode(itemId, collection, node, {
-      index: itemIndex,
-      disabled,
-      value: stableItemKey,
-      text: itemText,
-    });
+    registerCollectionNode(
+      itemId,
+      collection,
+      node,
+      {
+        index: itemIndex,
+        disabled,
+        value: stableItemKey,
+        text: itemText,
+      },
+      registrationOwner
+    );
     root.restoreItemFocus(itemIndex, node);
   };
   const refHandler = ref

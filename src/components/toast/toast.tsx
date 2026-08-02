@@ -119,6 +119,14 @@ function ToastRegistrationView(props: {
   const entry = entryState();
   const resolvedDuration = duration ?? props.host.duration;
   const setOpen = (nextOpen: boolean) => {
+    if (
+      !nextOpen &&
+      entry.node !== null &&
+      document.activeElement instanceof HTMLElement &&
+      entry.node.contains(document.activeElement)
+    ) {
+      entry.focusWasInside = true;
+    }
     openState.set(nextOpen);
   };
   const setNode = (node: HTMLElement | null) => {
@@ -232,6 +240,16 @@ function ToastRegistrationView(props: {
     'data-state': rootContext.open ? 'open' : 'closed',
     'data-toast': 'true',
     'data-variant': variant && variant !== 'default' ? variant : undefined,
+    onFocusIn: (event: FocusEvent) => {
+      const previousFocused = event.relatedTarget;
+      if (
+        previousFocused instanceof HTMLElement &&
+        entry.node !== null &&
+        !entry.node.contains(previousFocused)
+      ) {
+        entry.previousFocused = previousFocused;
+      }
+    },
   });
 
   return (

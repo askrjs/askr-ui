@@ -298,6 +298,7 @@ export function AccordionTrigger(
     isNativeButton: !asChild,
   });
   const itemFocusProps = nav.item(item.itemIndex);
+  const registrationOwner = {};
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     ...itemFocusProps,
@@ -308,11 +309,17 @@ export function AccordionTrigger(
         | null
         | undefined,
       (node: HTMLElement | null) => {
-        registerCompositeNode(item.triggerId, collection, node, {
-          index: item.itemIndex,
-          disabled: isDisabled,
-          value: item.itemValue,
-        });
+        registerCompositeNode(
+          item.triggerId,
+          collection,
+          node,
+          {
+            index: item.itemIndex,
+            disabled: isDisabled,
+            value: item.itemValue,
+          },
+          registrationOwner
+        );
       }
     ),
     id: item.triggerId,

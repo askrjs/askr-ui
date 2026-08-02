@@ -57,12 +57,19 @@ export function RadioGroupItem(
     isNativeButton: !asChild,
   });
   const itemFocusProps = nav.item(itemIndex);
+  const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
-    const changed = registerCompositeNode(itemId, collection, node, {
-      index: itemIndex,
-      disabled: isDisabled,
-      value,
-    });
+    const changed = registerCompositeNode(
+      itemId,
+      collection,
+      node,
+      {
+        index: itemIndex,
+        disabled: isDisabled,
+        value,
+      },
+      registrationOwner
+    );
 
     if (changed) {
       root.scheduleItemsSync();

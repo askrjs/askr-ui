@@ -54,6 +54,7 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
 
     interactionProps.onKeyUp?.(event);
   };
+  const registrationOwner = {};
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
@@ -66,11 +67,17 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
         | null
         | undefined,
       (node: HTMLElement | null) => {
-        registerCollectionNode(itemId, collection, node, {
-          index: itemIndex,
-          disabled,
-          text: itemText,
-        });
+        registerCollectionNode(
+          itemId,
+          collection,
+          node,
+          {
+            index: itemIndex,
+            disabled,
+            text: itemText,
+          },
+          registrationOwner
+        );
       }
     ),
     id: itemId,

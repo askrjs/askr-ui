@@ -12,6 +12,7 @@ import {
   MenubarTrigger,
 } from '../../../../src/components/menubar';
 import { MENUBAR_A11Y_CONTRACT } from '../../../../src/components/menubar/menubar.a11y';
+import { getCompositeCollection } from '../../../../src/components/_internal/composite';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 function getButtonByText(text: string): HTMLButtonElement {
@@ -219,6 +220,13 @@ describe('Menubar - Behavior', () => {
 
     await userEvent.keyboard('{Enter}');
     await flushPortalUpdates();
+    expect(
+      document.body.querySelectorAll('[data-slot="menubar-content"]')
+    ).toHaveLength(1);
+    const openContent = document.body.querySelector<HTMLElement>(
+      '[data-slot="menubar-content"]'
+    )!;
+    expect(getCompositeCollection(openContent.id).items()).toHaveLength(5);
     expect(document.activeElement?.textContent?.trim()).toBe('Alpha action');
 
     await userEvent.keyboard('d');

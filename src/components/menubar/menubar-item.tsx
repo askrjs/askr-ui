@@ -103,12 +103,19 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
 
     interactionProps.onKeyUp?.(event);
   };
+  const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
-    registerCompositeNode(surfaceId, collection, node, {
-      index: surfaceIndex,
-      disabled,
-      text: itemText,
-    });
+    registerCompositeNode(
+      surfaceId,
+      collection,
+      node,
+      {
+        index: surfaceIndex,
+        disabled,
+        text: itemText,
+      },
+      registrationOwner
+    );
     content.restoreItemFocus(surfaceIndex, node);
   };
   const refHandler = ref
@@ -223,13 +230,20 @@ export function MenubarSubTrigger(
     },
     isNativeButton: false,
   });
+  const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
     getOverlayNodes(sub.overlayIdentity).trigger = node;
-    registerCompositeNode(sub.triggerId, collection, node, {
-      index: sub.surfaceIndex,
-      disabled,
-      text: itemText,
-    });
+    registerCompositeNode(
+      sub.triggerId,
+      collection,
+      node,
+      {
+        index: sub.surfaceIndex,
+        disabled,
+        text: itemText,
+      },
+      registrationOwner
+    );
     content.restoreItemFocus(sub.surfaceIndex, node);
   };
   const refHandler = ref

@@ -7,7 +7,6 @@ import { FocusScope } from '../focus-scope';
 import {
   dismissPopupWithTab,
   focusCollectionItemWithRestore,
-  focusSelectedCollectionItem,
   restorePendingCollectionItemFocus,
   type PendingCollectionFocus,
 } from '../_internal/focus';
@@ -194,7 +193,26 @@ function renderMenubarSurfaceContent(
     }
 
     if (node && open) {
-      focusSelectedCollectionItem(collection, currentIndex);
+      queueMicrotask(() => {
+        queueMicrotask(() => {
+          if (
+            document.getElementById(contentContext.contentId) !== node ||
+            !node.isConnected ||
+            node.contains(document.activeElement)
+          ) {
+            return;
+          }
+
+          const liveItems = collection.items();
+          const target =
+            liveItems.find(
+              (item) =>
+                item.metadata.index === currentIndex && !item.metadata.disabled
+            ) ?? liveItems.find((item) => !item.metadata.disabled);
+
+          target?.node.focus();
+        });
+      });
     }
   };
   const refHandler = ref
