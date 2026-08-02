@@ -45,8 +45,6 @@ export function SelectContent(
   const { items, currentIndex, disabledIndexes } = root.resolvedState;
   const overlayNodes = getOverlayNodes(root.overlayIdentity);
   const collection = getMenuCollection(root.selectId);
-  const hasEnabledItems =
-    items.length > 0 && disabledIndexes.length < items.length;
   const nav = rovingFocus({
     currentIndex,
     itemCount: Math.max(items.length, 1),
@@ -79,7 +77,7 @@ export function SelectContent(
           clearOverlayPosition(root.overlayIdentity);
         }
 
-        if (node && root.open && hasEnabledItems) {
+        if (node && root.open) {
           queueMicrotask(() => {
             if (
               overlayNodes.content !== node ||
