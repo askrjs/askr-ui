@@ -28,6 +28,7 @@ function ControlledToastFixture() {
       >
         Show toast
       </button>
+      <button id="elsewhere">Elsewhere</button>
       <ToastHost duration={1000}>
         <ToastViewport />
         <Toast open={openState()} onOpenChange={(open) => openState.set(open)}>
@@ -245,11 +246,36 @@ describe('Toast - Behavior', () => {
     const close = container.querySelector(
       '[data-toast-close="true"]'
     ) as HTMLButtonElement;
+    close.focus();
+    expect(document.activeElement).toBe(close);
     close.click();
     await flushUpdates();
     await flushUpdates();
 
     expect(document.activeElement).toBe(launcher);
+  });
+
+  it('should not steal focus when focus moved outside a closing toast', async () => {
+    container = mount(<ControlledToastFixture />);
+
+    const launcher = container.querySelector('#launcher') as HTMLButtonElement;
+    launcher.focus();
+    await flushUpdates();
+    await flushUpdates();
+
+    const elsewhere = container.querySelector(
+      '#elsewhere'
+    ) as HTMLButtonElement;
+    const close = container.querySelector(
+      '[data-toast-close="true"]'
+    ) as HTMLButtonElement;
+    elsewhere.focus();
+    close.click();
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(container.querySelector('[data-toast="true"]')).toBeNull();
+    expect(document.activeElement).toBe(elsewhere);
   });
 
   it('should opens a controlled toast from a user action without locking the page', async () => {
