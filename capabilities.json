@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "package": "@askrjs/ui",
+  "capabilities": [
+    {
+      "intent": "headless accessible component primitives",
+      "package": "@askrjs/ui",
+      "import": "@askrjs/ui",
+      "exports": [
+        "Button",
+        "Dialog",
+        "Popover",
+        "Menu",
+        "Table",
+        "Select",
+        "Tabs",
+        "Tooltip"
+      ],
+      "constraints": [
+        "components provide behavior and accessibility semantics",
+        "styles are consumer-owned"
+      ],
+      "stability": "stable",
+      "docs": "https://github.com/askrjs/askr-ui/blob/main/README.md",
+      "docsPath": "README.md"
+    },
+    {
+      "intent": "focused accessibility and interaction primitives",
+      "package": "@askrjs/ui",
+      "import": "@askrjs/ui/focus-scope",
+      "exports": ["FocusScope"],
+      "constraints": ["focus behavior is scoped to the mounted subtree"],
+      "stability": "stable",
+      "docs": "https://github.com/askrjs/askr-ui/blob/main/README.md",
+      "docsPath": "README.md"
+    }
+  ]
+}
