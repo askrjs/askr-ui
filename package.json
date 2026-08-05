@@ -206,8 +206,7 @@
       "import": "./dist/components/tooltip/index.js",
       "require": "./dist/components/tooltip/index.cjs"
     },
-    "./package.json": "./package.json",
-    "./capabilities.json": "./capabilities.json"
+    "./package.json": "./package.json"
   },
   "publishConfig": {
     "access": "public"
