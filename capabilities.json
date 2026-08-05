@@ -28,12 +28,8 @@
       "intent": "focused accessibility and interaction primitives",
       "package": "@askrjs/ui",
       "import": "@askrjs/ui/focus-scope",
-      "exports": [
-        "FocusScope"
-      ],
-      "constraints": [
-        "focus behavior is scoped to the mounted subtree"
-      ],
+      "exports": ["FocusScope"],
+      "constraints": ["focus behavior is scoped to the mounted subtree"],
       "stability": "stable",
       "docs": "https://github.com/askrjs/askr-ui/blob/main/README.md",
       "docsPath": "README.md"
