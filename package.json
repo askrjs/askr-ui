@@ -23,7 +23,8 @@
     "url": "git+https://github.com/askrjs/askr-ui.git"
   },
   "files": [
-    "dist"
+    "dist",
+    "capabilities.json"
   ],
   "type": "module",
   "sideEffects": false,
@@ -205,7 +206,8 @@
       "import": "./dist/components/tooltip/index.js",
       "require": "./dist/components/tooltip/index.cjs"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./capabilities.json": "./capabilities.json"
   },
   "publishConfig": {
     "access": "public"
