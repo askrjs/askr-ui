@@ -23,7 +23,8 @@
     "url": "git+https://github.com/askrjs/askr-ui.git"
   },
   "files": [
-    "dist"
+    "dist",
+    "capabilities.json"
   ],
   "type": "module",
   "sideEffects": false,
