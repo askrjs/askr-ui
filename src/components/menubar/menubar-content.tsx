@@ -21,6 +21,7 @@ import {
   clearOverlayPosition,
   getOverlayNodes,
   OVERLAY_Z_INDEX,
+  primeOverlayPosition,
   syncOverlayPosition,
 } from '../_internal/overlay';
 import {
@@ -117,6 +118,15 @@ function renderMenubarSurfaceContent(
     resolveMenubarContentState(contentContext);
   const open = pathIsOpen(root.openPath, contentContext.path);
   const overlayNodes = getOverlayNodes(contentContext.overlayIdentity);
+
+  if (open) {
+    primeOverlayPosition(
+      contentContext.overlayIdentity,
+      contentContext.overlayId,
+      OVERLAY_Z_INDEX.dropdown
+    );
+  }
+
   const nav = rovingFocus({
     currentIndex,
     itemCount: Math.max(items.length, 1),
