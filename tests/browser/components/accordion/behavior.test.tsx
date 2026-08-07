@@ -32,7 +32,7 @@ describe('Accordion - Behavior', () => {
     unmount(container);
   });
 
-  it('should mounts single and multiple accordions without render-time state errors', () => {
+  it('should mount single and multiple accordions without render-time state errors', () => {
     expect(() => {
       container = mount(
         <div>
@@ -157,7 +157,7 @@ describe('Accordion - Behavior', () => {
     ).toHaveLength(2);
   });
 
-  it('should activates an asChild trigger with Enter and Space', async () => {
+  it('should activate an asChild trigger with Enter and Space', async () => {
     container = mount(
       <Accordion collapsible>
         <AccordionItem value="details">

@@ -79,7 +79,7 @@ describe('Docs contract', () => {
     }
   });
 
-  it('should keeps the documented component names aligned with the published surface', () => {
+  it('should keep the documented component names aligned with the published surface', () => {
     const docs = [
       'README.md',
       'askr-ui.md',

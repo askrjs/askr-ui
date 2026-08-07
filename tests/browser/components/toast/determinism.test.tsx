@@ -8,7 +8,7 @@ import {
 import { expectDeterministicRender } from '../../determinism';
 
 describe('Toast - Determinism', () => {
-  it('should renders deterministic toast markup', () => {
+  it('should render deterministic toast markup', () => {
     expectDeterministicRender(() => (
       <ToastHost>
         <ToastViewport />

@@ -37,7 +37,7 @@ describe('Consistency Reset - Internal Props', () => {
     unmount(container);
   });
 
-  it('should does not forward __* injected props to menubar DOM nodes', async () => {
+  it('should not forward __* injected props to menubar DOM nodes', async () => {
     container = mount(
       <Menubar>
         <MenubarMenu value="file">

@@ -10,7 +10,7 @@ describe('IconBase', () => {
     container = undefined;
   });
 
-  it('should emits the canonical icon theme hooks', () => {
+  it('should emit the canonical icon theme hooks', () => {
     container = mount(IconBase({ iconName: 'Search' }));
 
     const svg = container.querySelector('svg')!;
@@ -19,7 +19,7 @@ describe('IconBase', () => {
     expect(svg.getAttribute('data-color')).toBe('current');
   });
 
-  it('should emits semantic data-size only for named sizes', () => {
+  it('should emit semantic data-size only for named sizes', () => {
     container = mount(IconBase({ size: 'sm' }));
 
     const svg = container.querySelector('svg')!;
@@ -29,7 +29,7 @@ describe('IconBase', () => {
     );
   });
 
-  it('should treats raw CSS sizes as consumer overrides', () => {
+  it('should treat raw CSS sizes as consumer overrides', () => {
     container = mount(IconBase({ size: '1.5rem' }));
 
     const svg = container.querySelector('svg')!;
@@ -37,7 +37,7 @@ describe('IconBase', () => {
     expect(svg.style.getPropertyValue('--ak-icon-size').trim()).toBe('1.5rem');
   });
 
-  it('should marks unlabeled icons as decorative', () => {
+  it('should mark unlabeled icons as decorative', () => {
     container = mount(IconBase({}));
 
     const svg = container.querySelector('svg')!;
@@ -45,7 +45,7 @@ describe('IconBase', () => {
     expect(svg.getAttribute('data-decorative')).toBe('true');
   });
 
-  it('should renders a title for labeled icons', () => {
+  it('should render a title for labeled icons', () => {
     container = mount(IconBase({ title: 'Search' }));
 
     const svg = container.querySelector('svg')!;
@@ -54,7 +54,7 @@ describe('IconBase', () => {
     expect(svg.querySelector('title')?.textContent).toBe('Search');
   });
 
-  it('should preserves explicit stroke width overrides', () => {
+  it('should preserve explicit stroke width overrides', () => {
     container = mount(IconBase({ strokeWidth: 1.5 }));
 
     const svg = container.querySelector('svg')!;
@@ -63,7 +63,7 @@ describe('IconBase', () => {
     );
   });
 
-  it('should pins intrinsic svg sizing while exposing css size hooks', () => {
+  it('should pin intrinsic svg sizing while exposing css size hooks', () => {
     container = mount(IconBase({ size: 15 }));
 
     const svg = container.querySelector('svg')!;

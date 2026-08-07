@@ -14,7 +14,7 @@ const items: Item[] = [
 ];
 
 describe('VirtualList - Determinism', () => {
-  it('should renders deterministic virtual list markup', () => {
+  it('should render deterministic virtual list markup', () => {
     vi.useFakeTimers();
 
     try {

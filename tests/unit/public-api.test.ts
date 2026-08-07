@@ -11,7 +11,7 @@ function isPublicValueExport(name: string) {
 }
 
 describe('Public API', () => {
-  it('should matches the manifest-driven surface from the root entrypoint', () => {
+  it('should match the manifest-driven surface from the root entrypoint', () => {
     const sourceExportNames = Array.from(
       new Set(
         componentSurface.flatMap((entry) =>

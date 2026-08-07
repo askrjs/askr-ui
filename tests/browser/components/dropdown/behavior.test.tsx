@@ -16,7 +16,7 @@ describe('Dropdown - Behavior', () => {
     unmount(container);
   });
 
-  it('should toggles trigger expansion state when activated', async () => {
+  it('should toggle trigger expansion state when activated', async () => {
     container = mount(
       <Dropdown>
         <DropdownTrigger>Open dropdown</DropdownTrigger>
@@ -66,7 +66,7 @@ describe('Dropdown - Behavior', () => {
     expect(document.activeElement?.textContent).toBe('Archive');
   });
 
-  it('should renders typed trigger and item variants for themed menus', async () => {
+  it('should render typed trigger and item variants for themed menus', async () => {
     container = mount(
       <Dropdown defaultOpen>
         <DropdownTrigger variant="ghost" size="icon" aria-label="Open menu">
@@ -98,7 +98,7 @@ describe('Dropdown - Behavior', () => {
     expect(item.getAttribute('data-variant')).toBe('destructive');
   });
 
-  it('should supports nested dropdown item composition without direct child injection', async () => {
+  it('should support nested dropdown item composition without direct child injection', async () => {
     container = mount(
       <Dropdown defaultOpen>
         <DropdownTrigger>Open dropdown</DropdownTrigger>
@@ -127,7 +127,7 @@ describe('Dropdown - Behavior', () => {
     expect(items[1]?.getAttribute('tabindex')).toBe('-1');
   });
 
-  it('should keeps dropdown open when all items are disabled and arrow navigation is attempted', async () => {
+  it('should keep dropdown open when all items are disabled and arrow navigation is attempted', async () => {
     container = mount(
       <Dropdown defaultOpen>
         <DropdownTrigger>Open dropdown</DropdownTrigger>
@@ -166,7 +166,7 @@ describe('Dropdown - Behavior', () => {
     ).toBe(true);
   });
 
-  it('should supports menu-button opening, typeahead, activation, and Tab dismissal', async () => {
+  it('should support menu-button opening, typeahead, activation, and Tab dismissal', async () => {
     const onArchiveSelect = vi.fn();
     container = mount(
       <div>
@@ -249,7 +249,7 @@ describe('Dropdown - Behavior', () => {
     );
   });
 
-  it('should activates an asChild item with Space', async () => {
+  it('should activate an asChild item with Space', async () => {
     const onSelect = vi.fn();
     container = mount(
       <Dropdown defaultOpen>
