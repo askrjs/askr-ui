@@ -1,6 +1,6 @@
 {
   "name": "@askrjs/ui",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "Headless Askr components",
   "keywords": [
     "accessible",
@@ -237,7 +237,7 @@
     "test:checks": "vp test run -c vitest.test.checks.config.ts"
   },
   "devDependencies": {
-    "@askrjs/askr": ">=0.0.87 <0.1.0",
+    "@askrjs/askr": ">=0.0.88 <0.1.0",
     "@askrjs/vite": ">=0.0.12 <0.1.0",
     "@types/node": "^26.1.2",
     "@vitest/browser-playwright": "4.1.10",
@@ -251,7 +251,7 @@
     "vite-plus": "^0.2.8"
   },
   "peerDependencies": {
-    "@askrjs/askr": ">=0.0.87 <0.1.0"
+    "@askrjs/askr": ">=0.0.88 <0.1.0"
   },
   "engines": {
     "node": ">=24.0.0"
