@@ -3,6 +3,18 @@ import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import { getButtonInteractionProps } from './button-interactions';
 import type { ButtonNativeProps, ButtonAsChildProps } from './button.types';
 
+function normalizeAriaProps(
+  props: Record<string, unknown>
+): Record<string, unknown> {
+  const normalized = { ...props };
+  for (const key of Object.keys(normalized)) {
+    if (key.startsWith('aria-') && typeof normalized[key] === 'boolean') {
+      normalized[key] = String(normalized[key]);
+    }
+  }
+  return normalized;
+}
+
 /**
  * Headless Button component
  *
@@ -64,7 +76,7 @@ export function Button(props: ButtonNativeProps | ButtonAsChildProps) {
   });
 
   // Prop composition: merge user props, interaction props, and ref
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeProps(normalizeAriaProps(rest), {
     ...interactionProps,
     'data-slot': 'button',
     'data-disabled': disabled ? 'true' : undefined,

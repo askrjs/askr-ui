@@ -75,4 +75,12 @@ describe('Button - jsdom regression', () => {
   it('should replaces a stateful icon child instead of accumulating icons in dist', async () => {
     await expectSingleIconAcrossToggles(DistButton);
   });
+
+  it('should preserve explicit false ARIA state', async () => {
+    container = mount(<Button aria-expanded={false}>Search</Button>);
+
+    expect(
+      container.querySelector('button')?.getAttribute('aria-expanded')
+    ).toBe('false');
+  });
 });
