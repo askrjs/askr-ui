@@ -311,6 +311,24 @@ export function clearOverlayPosition(identity: OverlayIdentity) {
   nodes.cleanup = undefined;
 }
 
+export function primeOverlayPosition(
+  identity: OverlayIdentity,
+  domId: string,
+  zIndex: OverlayZIndex
+) {
+  setDynamicStyleRule(
+    overlayStyleKey(identity),
+    dynamicAttributeSelector('data-askr-overlay-id', domId),
+    {
+      position: 'fixed',
+      inset: 'auto',
+      margin: '0',
+      'z-index': zIndex,
+    },
+    overlayNonces.get(identity)
+  );
+}
+
 export function syncOverlayPosition(
   identity: OverlayIdentity,
   domId: string,
