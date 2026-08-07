@@ -27,14 +27,14 @@ describe('VisuallyHidden — Behavior', () => {
     }
   });
 
-  it('should renders a hidden span by default', () => {
+  it('should render a hidden span by default', () => {
     container = mount(<VisuallyHidden>Hidden text</VisuallyHidden>);
     const span = container.querySelector('span');
     expect(span?.textContent).toBe('Hidden text');
     expect(span?.getAttribute('data-askr-visually-hidden')).toBe('true');
   });
 
-  it('should supports asChild composition', () => {
+  it('should support asChild composition', () => {
     container = mount(
       <VisuallyHidden asChild>
         <strong>Hidden</strong>

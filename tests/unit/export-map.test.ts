@@ -33,7 +33,7 @@ function readPackageJson(): PackageJson {
 }
 
 describe('Package exports', () => {
-  it('should publishes the curated root and direct component entrypoints only', () => {
+  it('should publish the curated root and direct component entrypoints only', () => {
     const packageJson = readPackageJson();
 
     expectExportTarget(

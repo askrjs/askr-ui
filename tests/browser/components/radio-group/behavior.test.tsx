@@ -28,7 +28,7 @@ describe('RadioGroup - Behavior', () => {
     container = undefined;
   });
 
-  it('should renders the radiogroup container and checked hooks in uncontrolled mode', () => {
+  it('should render the radiogroup container and checked hooks in uncontrolled mode', () => {
     container = mount(
       <RadioGroup defaultValue="medium" orientation="horizontal">
         <RadioGroupItem value="small">Small</RadioGroupItem>
@@ -53,7 +53,7 @@ describe('RadioGroup - Behavior', () => {
     expect(medium.getAttribute('data-state')).toBe('checked');
   });
 
-  it('should updates uncontrolled selection and hidden input value', async () => {
+  it('should update uncontrolled selection and hidden input value', async () => {
     container = mount(
       <RadioGroup name="size" defaultValue="small">
         <RadioGroupItem value="small">Small</RadioGroupItem>
@@ -75,7 +75,7 @@ describe('RadioGroup - Behavior', () => {
     ).toBe('medium');
   });
 
-  it('should supports nested radio items without relying on direct child cloning', async () => {
+  it('should support nested radio items without relying on direct child cloning', async () => {
     container = mount(
       <RadioGroup name="size" defaultValue="small">
         <div>
@@ -101,7 +101,7 @@ describe('RadioGroup - Behavior', () => {
     ).toBe('medium');
   });
 
-  it('should treats value as controlled state when provided', async () => {
+  it('should treat value as controlled state when provided', async () => {
     const onValueChange = vi.fn();
 
     container = mount(
@@ -123,7 +123,7 @@ describe('RadioGroup - Behavior', () => {
     ).toBe('false');
   });
 
-  it('should blocks interaction when the group or item is disabled', async () => {
+  it('should block interaction when the group or item is disabled', async () => {
     const onGroupValueChange = vi.fn();
     const onItemValueChange = vi.fn();
 
@@ -168,7 +168,7 @@ describe('RadioGroup - Behavior', () => {
     ).toBe('true');
   });
 
-  it('should supports asChild item composition and merges host props', () => {
+  it('should support asChild item composition and merge host props', () => {
     container = mount(
       <RadioGroup defaultValue="left">
         <RadioGroupItem
@@ -191,7 +191,7 @@ describe('RadioGroup - Behavior', () => {
     expect(host.getAttribute('data-state')).toBe('checked');
   });
 
-  it('should activates asChild items with Enter and Space', async () => {
+  it('should activate asChild items with Enter and Space', async () => {
     container = mount(
       <RadioGroup defaultValue="small">
         <RadioGroupItem value="small">Small</RadioGroupItem>
@@ -225,7 +225,7 @@ describe('RadioGroup - Behavior', () => {
     ).toBe('true');
   });
 
-  it('should forwards refs to the group container and item hosts', () => {
+  it('should forward refs to the group container and item hosts', () => {
     let groupRef: HTMLDivElement | null = null;
     let nativeItemRef: HTMLButtonElement | null = null;
     let childItemRef: HTMLElement | null = null;
@@ -262,7 +262,7 @@ describe('RadioGroup - Behavior', () => {
     expect(childItemRef).toBe(childHost);
   });
 
-  it('should renders a hidden input only when name is provided', () => {
+  it('should render a hidden input only when name is provided', () => {
     container = mount(
       <div>
         <RadioGroup defaultValue="small">
@@ -282,7 +282,7 @@ describe('RadioGroup - Behavior', () => {
     expect(inputs[0]?.getAttribute('value')).toBe('medium');
   });
 
-  it('should does not wrap selection at boundaries when loop is false', async () => {
+  it('should not wrap selection at boundaries when loop is false', async () => {
     container = mount(
       <RadioGroup defaultValue="small" orientation="horizontal" loop={false}>
         <RadioGroupItem value="small">Small</RadioGroupItem>
@@ -305,7 +305,7 @@ describe('RadioGroup - Behavior', () => {
     ).toBe('false');
   });
 
-  it('should does not activate disabled items during keyboard navigation attempts', async () => {
+  it('should not activate disabled items during keyboard navigation attempts', async () => {
     container = mount(
       <RadioGroup defaultValue="small" orientation="vertical">
         <RadioGroupItem value="small">Small</RadioGroupItem>

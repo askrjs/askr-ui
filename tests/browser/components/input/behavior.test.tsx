@@ -13,7 +13,7 @@ describe('Input - Behavior', () => {
     container = undefined;
   });
 
-  it('should renders a native input by default', () => {
+  it('should render a native input by default', () => {
     container = mount(<Input type="email" placeholder="Email" />);
 
     const input = container.querySelector('input') as HTMLInputElement | null;
@@ -24,7 +24,7 @@ describe('Input - Behavior', () => {
     expect(input?.getAttribute('data-slot')).toBe('input');
   });
 
-  it('should applies disabled and readonly semantics to native inputs', () => {
+  it('should apply disabled and readonly semantics to native inputs', () => {
     container = mount(<Input disabled readOnly aria-label="locked-input" />);
 
     const input = container.querySelector('input') as HTMLInputElement | null;
@@ -36,7 +36,7 @@ describe('Input - Behavior', () => {
     expect(input?.hasAttribute('readonly')).toBe(true);
   });
 
-  it('should supports asChild composition and merges host props', () => {
+  it('should support asChild composition and merge host props', () => {
     container = mount(
       <Input asChild data-testid="custom-input" data-from-input="yes">
         <input aria-label="Email" data-from-child="yes" />
@@ -51,7 +51,7 @@ describe('Input - Behavior', () => {
     expect(input?.getAttribute('data-slot')).toBe('input');
   });
 
-  it('should applies disabled semantics to asChild input hosts', () => {
+  it('should apply disabled semantics to asChild input hosts', () => {
     container = mount(
       <Input asChild disabled>
         <input aria-label="Email" />
@@ -65,7 +65,7 @@ describe('Input - Behavior', () => {
     expect(host?.getAttribute('tabindex')).toBe('-1');
   });
 
-  it('should uses search as the default debounced input type', () => {
+  it('should use search as the default debounced input type', () => {
     container = mount(<DebouncedInput aria-label="Search" />);
 
     const input = container.querySelector('input') as HTMLInputElement | null;
@@ -73,7 +73,7 @@ describe('Input - Behavior', () => {
     expect(input?.type).toBe('search');
   });
 
-  it('should preserves input identity and value through sibling rerenders', async () => {
+  it('should preserve input identity and value through sibling rerenders', async () => {
     const InputFixture = () => {
       const value = state('');
       const version = state(0);
@@ -124,7 +124,7 @@ describe('Input - Behavior', () => {
     );
   });
 
-  it('should forwards onInput and debounces committed value', async () => {
+  it('should forward onInput and debounce committed value', async () => {
     vi.useFakeTimers();
 
     const typedValues: string[] = [];
@@ -160,7 +160,7 @@ describe('Input - Behavior', () => {
     expect(committedValues).toEqual(['nor']);
   });
 
-  it('should emits immediate committed input when debounceMs is zero', () => {
+  it('should emit immediate committed input when debounceMs is zero', () => {
     const committedValues: string[] = [];
 
     container = mount(
@@ -177,7 +177,7 @@ describe('Input - Behavior', () => {
     expect(committedValues).toEqual(['northwind']);
   });
 
-  it('should cancels pending debounced input on unmount', () => {
+  it('should cancel pending debounced input on unmount', () => {
     vi.useFakeTimers();
 
     const committedValues: string[] = [];

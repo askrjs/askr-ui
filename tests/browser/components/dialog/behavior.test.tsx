@@ -115,7 +115,7 @@ describe('Dialog - Behavior', () => {
     expect(rerenderedDialogs[0]?.textContent).toBe('First dialog');
     expect(rerenderedDialogs[1]?.textContent).toBe('Second dialog');
   });
-  it('should toggles trigger expansion state when activated', async () => {
+  it('should toggle trigger expansion state when activated', async () => {
     container = mount(
       <Dialog>
         <DialogTrigger>Open dialog</DialogTrigger>
@@ -143,7 +143,7 @@ describe('Dialog - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('should preserves button styling props when trigger and close compose as children', async () => {
+  it('should preserve button styling props when trigger and close compose as children', async () => {
     container = mount(
       <Dialog>
         <Button asChild variant="outline">
@@ -186,7 +186,7 @@ describe('Dialog - Behavior', () => {
     ).toBeNull();
   });
 
-  it('should opens and closes through asChild Enter and Space presses', async () => {
+  it('should open and close through asChild Enter and Space presses', async () => {
     container = mount(
       <Dialog>
         <DialogTrigger asChild>
@@ -229,7 +229,7 @@ describe('Dialog - Behavior', () => {
     ).toBeNull();
   });
 
-  it('should omits generated title and description references when those parts are absent', async () => {
+  it('should omit generated title and description references when those parts are absent', async () => {
     container = mount(
       <Dialog defaultOpen>
         <DialogTrigger>Open dialog</DialogTrigger>
@@ -250,7 +250,7 @@ describe('Dialog - Behavior', () => {
     expect(content.getAttribute('aria-describedby')).toBeNull();
   });
 
-  it('should keeps dialog open when DialogContent onDismiss is provided and handles Escape', async () => {
+  it('should keep dialog open when DialogContent onDismiss is provided and handle Escape', async () => {
     const onDismiss = vi.fn();
 
     container = mount(
@@ -283,7 +283,7 @@ describe('Dialog - Behavior', () => {
     ).not.toBeNull();
   });
 
-  it('should keeps centered dialog content within viewport padding on narrow viewports', async () => {
+  it('should keep centered dialog content within viewport padding on narrow viewports', async () => {
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
       (callback: FrameRequestCallback) => {
         callback(0);

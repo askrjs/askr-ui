@@ -50,7 +50,7 @@ describe('Consistency Reset - Portal Contract', () => {
     unmount(container);
   });
 
-  it('should renders retained portal content at the root sink instead of inline', async () => {
+  it('should render retained portal content at the root sink instead of inline', async () => {
     container = mount(
       <div>
         <Dialog key="dialog" defaultOpen>
@@ -109,7 +109,7 @@ describe('Consistency Reset - Portal Contract', () => {
     expect(text.indexOf('Choose one')).toBeLessThan(text.lastIndexOf('Askr'));
   });
 
-  it('should registers dialog titles and descriptions without render-time state writes', async () => {
+  it('should register dialog titles and descriptions without render-time state writes', async () => {
     container = mount(
       <div>
         <Dialog key="dialog" defaultOpen>

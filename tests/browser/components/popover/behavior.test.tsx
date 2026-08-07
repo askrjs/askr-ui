@@ -23,7 +23,7 @@ describe('Popover - Behavior', () => {
     unmount(container);
   });
 
-  it('should toggles trigger expansion state through the trigger', async () => {
+  it('should toggle trigger expansion state through the trigger', async () => {
     container = mount(
       <Popover>
         <PopoverTrigger>Open popover</PopoverTrigger>
@@ -49,7 +49,7 @@ describe('Popover - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('should applies trigger-based dialog labeling by default', async () => {
+  it('should apply trigger-based dialog labeling by default', async () => {
     container = mount(
       <Popover defaultOpen>
         <PopoverTrigger>Open popover</PopoverTrigger>
@@ -70,7 +70,7 @@ describe('Popover - Behavior', () => {
     expect(content?.getAttribute('aria-labelledby')).toBe(trigger?.id);
   });
 
-  it('should opens and closes through asChild Enter and Space presses', async () => {
+  it('should open and close through asChild Enter and Space presses', async () => {
     container = mount(
       <Popover>
         <PopoverTrigger asChild>
@@ -113,7 +113,7 @@ describe('Popover - Behavior', () => {
     ).toBeNull();
   });
 
-  it('should maps typed width affordance to a stable data attribute', async () => {
+  it('should map typed width affordance to a stable data attribute', async () => {
     container = mount(
       <Popover defaultOpen>
         <PopoverTrigger>Open popover</PopoverTrigger>
@@ -130,7 +130,7 @@ describe('Popover - Behavior', () => {
     expect(content?.getAttribute('data-width')).toBe('md');
   });
 
-  it('should preserves explicit aria-label over automatic trigger labeling', async () => {
+  it('should preserve explicit aria-label over automatic trigger labeling', async () => {
     container = mount(
       <Popover defaultOpen>
         <PopoverTrigger>Open popover</PopoverTrigger>
@@ -149,7 +149,7 @@ describe('Popover - Behavior', () => {
     expect(content?.hasAttribute('aria-labelledby')).toBe(false);
   });
 
-  it('should keeps custom content positioning through the post-open portal sync', async () => {
+  it('should keep custom content positioning through the post-open portal sync', async () => {
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
       (callback: FrameRequestCallback) => {
         callback(0);
@@ -231,7 +231,7 @@ describe('Popover - Behavior', () => {
     expect(getComputedStyle(content as Element).top).toBe('90px');
   });
 
-  it('should closes nested popover without closing parent dialog on Escape', async () => {
+  it('should close nested popover without closing parent dialog on Escape', async () => {
     container = mount(
       <Dialog defaultOpen>
         <DialogTrigger>Open dialog</DialogTrigger>

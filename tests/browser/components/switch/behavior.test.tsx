@@ -12,7 +12,7 @@ describe('Switch - Behavior', () => {
     container = undefined;
   });
 
-  it('should renders native switch semantics by default', () => {
+  it('should render native switch semantics by default', () => {
     container = mount(<Switch>Airplane mode</Switch>);
     const button = container.querySelector(
       'button'
@@ -27,7 +27,7 @@ describe('Switch - Behavior', () => {
     expect(button?.getAttribute('data-state')).toBe('unchecked');
   });
 
-  it('should preserves an explicit native button type and checked state hooks', () => {
+  it('should preserve an explicit native button type and checked state hooks', () => {
     container = mount(
       <Switch type="submit" checked>
         Publish
@@ -42,7 +42,7 @@ describe('Switch - Behavior', () => {
     expect(button?.getAttribute('data-state')).toBe('checked');
   });
 
-  it('should emits uncontrolled state changes through onCheckedChange', async () => {
+  it('should emit uncontrolled state changes through onCheckedChange', async () => {
     const onCheckedChange = vi.fn();
 
     container = mount(
@@ -62,7 +62,7 @@ describe('Switch - Behavior', () => {
     expect(onCheckedChange).toHaveBeenCalledWith(true);
   });
 
-  it('should calls onCheckedChange in controlled mode', () => {
+  it('should call onCheckedChange in controlled mode', () => {
     const onCheckedChange = vi.fn();
 
     container = mount(
@@ -76,7 +76,7 @@ describe('Switch - Behavior', () => {
     expect(onCheckedChange).toHaveBeenCalledWith(true);
   });
 
-  it('should renders hidden form input when named', () => {
+  it('should render hidden form input when named', () => {
     container = mount(
       <Switch name="notifications" defaultChecked value="enabled">
         Notifications
@@ -95,7 +95,7 @@ describe('Switch - Behavior', () => {
     expect(input?.checked).toBe(true);
   });
 
-  it('should keeps the hidden form input in sync after uncontrolled presses', async () => {
+  it('should keep the hidden form input in sync after uncontrolled presses', async () => {
     container = mount(
       <Switch name="notifications" defaultChecked={false}>
         Notifications
@@ -127,7 +127,7 @@ describe('Switch - Behavior', () => {
     expect(updatedInput?.checked).toBe(true);
   });
 
-  it('should supports asChild composition and merges host props', () => {
+  it('should support asChild composition and merge host props', () => {
     container = mount(
       <Switch
         asChild
@@ -149,7 +149,7 @@ describe('Switch - Behavior', () => {
     expect(host?.getAttribute('data-state')).toBe('checked');
   });
 
-  it('should toggles an asChild host with Enter and Space', async () => {
+  it('should toggle an asChild host with Enter and Space', async () => {
     const onCheckedChange = vi.fn();
     container = mount(
       <Switch asChild onCheckedChange={onCheckedChange}>
@@ -174,7 +174,7 @@ describe('Switch - Behavior', () => {
     expect(onCheckedChange.mock.calls).toEqual([[true], [false]]);
   });
 
-  it('should applies disabled semantics to asChild hosts', () => {
+  it('should apply disabled semantics to asChild hosts', () => {
     const onCheckedChange = vi.fn();
 
     container = mount(
@@ -195,7 +195,7 @@ describe('Switch - Behavior', () => {
     expect(onCheckedChange).not.toHaveBeenCalled();
   });
 
-  it('should forwards refs to native and asChild hosts', () => {
+  it('should forward refs to native and asChild hosts', () => {
     let nativeRef: HTMLButtonElement | null = null;
     let childRef: HTMLElement | null = null;
 

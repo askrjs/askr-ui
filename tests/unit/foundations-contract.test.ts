@@ -23,7 +23,7 @@ function walkSourceFiles(dir: string): string[] {
 }
 
 describe('Foundations contract', () => {
-  it('should keeps the legacy local foundations entrypoint out of the package', () => {
+  it('should keep the legacy local foundations entrypoint out of the package', () => {
     const packageJson = JSON.parse(
       readFileSync(join(process.cwd(), 'package.json'), 'utf8')
     ) as { exports: Record<string, unknown> };

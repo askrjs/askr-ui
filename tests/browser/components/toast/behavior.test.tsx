@@ -168,7 +168,7 @@ describe('Toast - Behavior', () => {
     expect(container.querySelector('[data-toast="true"]')).toBeNull();
   });
 
-  it('should renders toast content inside the viewport in declaration order', async () => {
+  it('should render toast content inside the viewport in declaration order', async () => {
     container = mount(
       <ToastHost>
         <ToastViewport />
@@ -189,7 +189,7 @@ describe('Toast - Behavior', () => {
     expect(titles).toEqual(['First', 'Second']);
   });
 
-  it('should dismisses toasts on their configured timer', async () => {
+  it('should dismiss toasts on their configured timer', async () => {
     vi.useFakeTimers();
     container = mount(
       <ToastHost duration={50}>
@@ -210,7 +210,7 @@ describe('Toast - Behavior', () => {
     expect(container.querySelector('[data-toast="true"]')).toBeNull();
   });
 
-  it('should dismisses multiple open toasts when timers expire at the same time', async () => {
+  it('should dismiss multiple open toasts when timers expire at the same time', async () => {
     vi.useFakeTimers();
     container = mount(
       <ToastHost duration={40}>
@@ -233,7 +233,7 @@ describe('Toast - Behavior', () => {
     expect(container.querySelectorAll('[data-toast="true"]').length).toBe(0);
   });
 
-  it('should restores focus after closing a controlled toast', async () => {
+  it('should restore focus after closing a controlled toast', async () => {
     container = mount(<ControlledToastFixture />);
 
     const launcher = container.querySelector('#launcher') as HTMLButtonElement;
@@ -278,7 +278,7 @@ describe('Toast - Behavior', () => {
     expect(document.activeElement).toBe(elsewhere);
   });
 
-  it('should opens a controlled toast from a user action without locking the page', async () => {
+  it('should open a controlled toast from a user action without locking the page', async () => {
     container = mount(<ControlledToastOpenerFixture />);
     await flushUpdates();
 
@@ -302,7 +302,7 @@ describe('Toast - Behavior', () => {
     expect(action.getAttribute('href')).toBe('/logs');
   });
 
-  it('should opens a controlled toast with a link action without locking the page', async () => {
+  it('should open a controlled toast with a link action without locking the page', async () => {
     container = mount(<ControlledToastLinkActionFixture />);
     await flushUpdates();
 
@@ -324,7 +324,7 @@ describe('Toast - Behavior', () => {
     expect(action.getAttribute('href')).toBe('/logs');
   });
 
-  it('should opens a controlled toast from a press button without locking the page', async () => {
+  it('should open a controlled toast from a press button without locking the page', async () => {
     container = mount(<ControlledToastPressButtonFixture />);
     await flushUpdates();
 
@@ -340,7 +340,7 @@ describe('Toast - Behavior', () => {
     expect(container.querySelector('[data-toast="true"]')).not.toBeNull();
   });
 
-  it('should dismisses on escape and action press', async () => {
+  it('should dismiss on escape and action press', async () => {
     container = mount(
       <ToastHost>
         <ToastViewport />
@@ -380,7 +380,7 @@ describe('Toast - Behavior', () => {
     expect(container.querySelector('[data-toast="true"]')).toBeNull();
   });
 
-  it('should dismisses asChild actions and close controls with Enter and Space', async () => {
+  it('should dismiss asChild actions and close controls with Enter and Space', async () => {
     container = mount(
       <ToastHost duration={60_000}>
         <ToastViewport />
@@ -425,7 +425,7 @@ describe('Toast - Behavior', () => {
     expect(container.querySelector('[data-toast="true"]')).toBeNull();
   });
 
-  it('should preserves action styling and href when composed with a link child', async () => {
+  it('should preserve action styling and href when composed with a link child', async () => {
     container = mount(
       <ToastHost>
         <ToastViewport />
