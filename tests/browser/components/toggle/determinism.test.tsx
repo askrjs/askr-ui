@@ -4,7 +4,7 @@ import { expectDeterministicRender } from '../../determinism';
 import { mount, unmount } from '../../test-utils';
 
 describe('Toggle - Determinism', () => {
-  it('should renders deterministic native toggle markup', () => {
+  it('should render deterministic native toggle markup', () => {
     expectDeterministicRender(() => <Toggle>Mute</Toggle>);
     expectDeterministicRender(() => (
       <Toggle pressed type="submit">
@@ -13,7 +13,7 @@ describe('Toggle - Determinism', () => {
     ));
   });
 
-  it('should renders deterministic asChild toggle markup', () => {
+  it('should render deterministic asChild toggle markup', () => {
     expectDeterministicRender(() => (
       <Toggle asChild pressed>
         <span>Mute</span>
@@ -21,7 +21,7 @@ describe('Toggle - Determinism', () => {
     ));
   });
 
-  it('should keeps pressed state props-driven across remounts', () => {
+  it('should keep pressed state props-driven across remounts', () => {
     let container = mount(<Toggle pressed={false}>Mute</Toggle>);
 
     try {
@@ -41,7 +41,7 @@ describe('Toggle - Determinism', () => {
     }
   });
 
-  it('should does not schedule timers during render', () => {
+  it('should not schedule timers during render', () => {
     const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
     const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
     const container = mount(<Toggle>Mute</Toggle>);

@@ -148,7 +148,7 @@ describe('Collapsible — Behavior', () => {
       expect(span?.textContent).toBe('Custom Trigger');
     });
 
-    it('should toggles exactly once with Enter and Space on native and asChild triggers', async () => {
+    it('should toggle exactly once with Enter and Space on native and asChild triggers', async () => {
       const onNativeOpenChange = vi.fn();
       container = mount(
         <Collapsible onOpenChange={onNativeOpenChange}>
@@ -206,7 +206,7 @@ describe('Collapsible — Behavior', () => {
       expect(container.textContent).not.toContain('Child content');
     });
 
-    it('should preserves button styling props when trigger composes as child', () => {
+    it('should preserve button styling props when trigger composes as child', () => {
       container = mount(
         <Collapsible>
           <Button asChild variant="ghost" size="sm">

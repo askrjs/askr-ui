@@ -26,7 +26,7 @@ describe('VirtualList - Behavior', () => {
     container = undefined;
   });
 
-  it('should renders a virtual window, scrolls by index, and follows the bottom', async () => {
+  it('should render a virtual window, scroll by index, and follow the bottom', async () => {
     let api: VirtualListApi<Item> | null = null;
     let appendItem: (() => void) | undefined;
 
@@ -98,7 +98,7 @@ describe('VirtualList - Behavior', () => {
     expect(container.querySelector('[data-key="item-8"]')).toBeTruthy();
   });
 
-  it('should maps typed viewport affordance to a stable data attribute', async () => {
+  it('should map typed viewport affordance to a stable data attribute', async () => {
     container = mount(
       <VirtualList
         aria-label="Messages"
@@ -119,7 +119,7 @@ describe('VirtualList - Behavior', () => {
     ).toBe('lg');
   });
 
-  it('should supports asChild composition with semantic list items', async () => {
+  it('should support asChild composition with semantic list items', async () => {
     container = mount(
       <VirtualList
         asChild

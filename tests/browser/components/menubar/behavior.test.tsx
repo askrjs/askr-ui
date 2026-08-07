@@ -49,7 +49,7 @@ describe('Menubar - Behavior', () => {
     unmount(container);
   });
 
-  it('should opens top-level triggers and nested submenus', async () => {
+  it('should open top-level triggers and nested submenus', async () => {
     container = mount(
       <Menubar>
         <MenubarMenu value="file">
@@ -89,7 +89,7 @@ describe('Menubar - Behavior', () => {
     expect(document.body.textContent).toContain('Email');
   });
 
-  it('should supports keyboard opening and escape dismissal', async () => {
+  it('should support keyboard opening and escape dismissal', async () => {
     container = mount(
       <Menubar>
         <MenubarMenu value="file">
@@ -121,7 +121,7 @@ describe('Menubar - Behavior', () => {
     expect(document.body.textContent).not.toContain('New');
   });
 
-  it('should supports typeahead, activation keys, submenus, and Tab dismissal', async () => {
+  it('should support typeahead, activation keys, submenus, and Tab dismissal', async () => {
     const onArchiveAction = vi.fn();
     container = mount(
       <div>
@@ -273,7 +273,7 @@ describe('Menubar - Behavior', () => {
     );
   });
 
-  it('should preserves Enter activation for asChild menu and submenu triggers', async () => {
+  it('should preserve Enter activation for asChild menu and submenu triggers', async () => {
     const onFilePress = vi.fn();
     container = mount(
       <Menubar>

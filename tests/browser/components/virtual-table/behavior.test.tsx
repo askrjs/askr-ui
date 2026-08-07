@@ -41,7 +41,7 @@ describe('VirtualTable - Behavior', () => {
     container = undefined;
   });
 
-  it('should renders a sticky-headed virtual table and supports keyboard selection', async () => {
+  it('should render a sticky-headed virtual table and support keyboard selection', async () => {
     const onRowClick = vi.fn();
     let api: VirtualTableApi<Row> | null = null;
 
@@ -102,7 +102,7 @@ describe('VirtualTable - Behavior', () => {
     expect(container.querySelector('[data-row-key="row-9"]')).toBeTruthy();
   });
 
-  it('should maps typed viewport and table width affordances to stable data attributes', async () => {
+  it('should map typed viewport and table width affordances to stable data attributes', async () => {
     container = mount(
       <VirtualTable
         aria-label="Users"
@@ -124,7 +124,7 @@ describe('VirtualTable - Behavior', () => {
     expect(table?.getAttribute('data-table-width')).toBe('compact');
   });
 
-  it('should supports asChild composition on the wrapper host', async () => {
+  it('should support asChild composition on the wrapper host', async () => {
     container = mount(
       <VirtualTable
         asChild

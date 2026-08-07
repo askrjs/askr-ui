@@ -21,7 +21,7 @@ describe('Select - Behavior', () => {
     unmount(container);
   });
 
-  it('should wires the hidden input and trigger expansion state', async () => {
+  it('should wire the hidden input and trigger expansion state', async () => {
     container = mount(
       <Select name="framework" defaultValue="askr">
         <SelectTrigger>
@@ -54,7 +54,7 @@ describe('Select - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
   });
 
-  it('should renders typed trigger size for themed select controls', () => {
+  it('should render typed trigger size for themed select controls', () => {
     container = mount(
       <Select defaultValue="askr">
         <SelectTrigger size="sm">
@@ -75,7 +75,7 @@ describe('Select - Behavior', () => {
     expect(trigger.getAttribute('data-size')).toBe('sm');
   });
 
-  it('should applies root disabled semantics to the trigger and hidden input', async () => {
+  it('should apply root disabled semantics to the trigger and hidden input', async () => {
     container = mount(
       <Select disabled name="framework" defaultValue="askr">
         <SelectTrigger>
@@ -107,7 +107,7 @@ describe('Select - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('should uses explicit item text values for trigger rendering', () => {
+  it('should use explicit item text values for trigger rendering', () => {
     container = mount(
       <Select defaultValue="askr">
         <SelectTrigger>
@@ -134,7 +134,7 @@ describe('Select - Behavior', () => {
     expect(trigger.textContent).toBe('Askr');
   });
 
-  it('should labels select groups through nested SelectLabel parts', async () => {
+  it('should label select groups through nested SelectLabel parts', async () => {
     container = mount(
       <Select defaultOpen defaultValue="askr">
         <SelectTrigger aria-label="Framework">
@@ -166,7 +166,7 @@ describe('Select - Behavior', () => {
     expect(group.getAttribute('aria-labelledby')).toBe(label.id);
   });
 
-  it('should updates hidden input and closes content when an enabled item is selected', async () => {
+  it('should update hidden input and close content when an enabled item is selected', async () => {
     container = mount(
       <Select name="framework" defaultValue="askr">
         <SelectTrigger>
@@ -206,7 +206,7 @@ describe('Select - Behavior', () => {
     expect(nextTrigger.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('should does not change value when clicking a disabled item', async () => {
+  it('should not change value when clicking a disabled item', async () => {
     container = mount(
       <Select name="framework" defaultValue="askr">
         <SelectTrigger>
@@ -248,7 +248,7 @@ describe('Select - Behavior', () => {
     expect(nextTrigger.textContent).toContain('Askr');
   });
 
-  it('should keeps all disabled select items unfocusable when navigation is attempted', async () => {
+  it('should keep all disabled select items unfocusable when navigation is attempted', async () => {
     container = mount(
       <Select defaultOpen defaultValue="askr">
         <SelectTrigger>
@@ -280,7 +280,7 @@ describe('Select - Behavior', () => {
     );
   });
 
-  it('should supports buffered typeahead from the trigger and listbox focus', async () => {
+  it('should support buffered typeahead from the trigger and listbox focus', async () => {
     vi.useFakeTimers();
     container = mount(
       <Select name="database" defaultValue="alpha">
@@ -413,7 +413,7 @@ describe('Select - Behavior', () => {
     );
   });
 
-  it('should keeps arrow, Space, Enter, and Tab interactions intuitive', async () => {
+  it('should keep arrow, Space, Enter, and Tab interactions intuitive', async () => {
     container = mount(
       <div>
         <Select name="framework" defaultValue="alpha">
@@ -484,7 +484,7 @@ describe('Select - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('should opens with Space and moves past the popup with Tab', async () => {
+  it('should open with Space and move past the popup with Tab', async () => {
     container = mount(
       <div>
         <Select defaultValue="alpha">
@@ -529,7 +529,7 @@ describe('Select - Behavior', () => {
     );
   });
 
-  it('should opens an asChild trigger with Enter', async () => {
+  it('should open an asChild trigger with Enter', async () => {
     container = mount(
       <Select defaultValue="alpha">
         <SelectTrigger asChild>

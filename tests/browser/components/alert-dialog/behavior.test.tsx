@@ -18,7 +18,7 @@ describe('AlertDialog - Behavior', () => {
     unmount(container);
   });
 
-  it('should keeps trigger expansion state open after re-activation', async () => {
+  it('should keep trigger expansion state open after re-activation', async () => {
     container = mount(
       <AlertDialog>
         <AlertDialogTrigger>Open alert</AlertDialogTrigger>
@@ -45,7 +45,7 @@ describe('AlertDialog - Behavior', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
   });
 
-  it('should preserves button styling props when composed controls are children', async () => {
+  it('should preserve button styling props when composed controls are children', async () => {
     container = mount(
       <AlertDialog>
         <Button asChild variant="destructive">
@@ -94,7 +94,7 @@ describe('AlertDialog - Behavior', () => {
     ).toBeNull();
   });
 
-  it('should forwards dismiss callbacks from alert dialog content', async () => {
+  it('should forward dismiss callbacks from alert dialog content', async () => {
     const onDismiss = vi.fn();
 
     container = mount(
@@ -126,7 +126,7 @@ describe('AlertDialog - Behavior', () => {
     ).toBeNull();
   });
 
-  it('should keeps centered alert dialog content within viewport padding on narrow viewports', async () => {
+  it('should keep centered alert dialog content within viewport padding on narrow viewports', async () => {
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
       (callback: FrameRequestCallback) => {
         callback(0);

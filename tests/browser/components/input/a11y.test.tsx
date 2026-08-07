@@ -5,11 +5,11 @@ import { expectNoAxeViolations } from '../../accessibility';
 import { mount, unmount } from '../../test-utils';
 
 describe('Input - Accessibility', () => {
-  it('should has no automated axe violations for a labelled native input', async () => {
+  it('should have no automated axe violations for a labelled native input', async () => {
     await expectNoAxeViolations(<Input aria-label="Email" type="email" />);
   });
 
-  it('should has no automated axe violations for a labelled asChild input', async () => {
+  it('should have no automated axe violations for a labelled asChild input', async () => {
     await expectNoAxeViolations(
       <Input asChild>
         <input aria-label="Email" type="email" />
@@ -17,7 +17,7 @@ describe('Input - Accessibility', () => {
     );
   });
 
-  it('should uses native disabled semantics for the default host', () => {
+  it('should use native disabled semantics for the default host', () => {
     const container = mount(<Input aria-label="Email" disabled />);
 
     try {
@@ -32,7 +32,7 @@ describe('Input - Accessibility', () => {
     }
   });
 
-  it('should uses native disabled semantics for disabled asChild input hosts', () => {
+  it('should use native disabled semantics for disabled asChild input hosts', () => {
     const container = mount(
       <Input asChild disabled>
         <input aria-label="Email" />
@@ -51,7 +51,7 @@ describe('Input - Accessibility', () => {
     }
   });
 
-  it('should matches the documented input accessibility contract', () => {
+  it('should match the documented input accessibility contract', () => {
     expect(INPUT_A11Y_CONTRACT.HOST_ELEMENT).toBe('input');
     expect(INPUT_A11Y_CONTRACT.DISABLED_ATTRIBUTES).toEqual({
       native: 'disabled',

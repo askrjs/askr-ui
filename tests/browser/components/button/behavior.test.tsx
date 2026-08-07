@@ -13,7 +13,7 @@ describe('Button - Behavior', () => {
     container = undefined;
   });
 
-  it('should renders a native button with the default button type', () => {
+  it('should render a native button with the default button type', () => {
     container = mount(<Button>Save</Button>);
 
     const button = container.querySelector(
@@ -25,7 +25,7 @@ describe('Button - Behavior', () => {
     expect(button?.getAttribute('data-slot')).toBe('button');
   });
 
-  it('should invokes onPress and merges host props for native buttons', () => {
+  it('should invoke onPress and merge host props for native buttons', () => {
     const onPress = vi.fn();
 
     container = mount(
@@ -46,7 +46,7 @@ describe('Button - Behavior', () => {
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it('should prevents native interaction when disabled', () => {
+  it('should prevent native interaction when disabled', () => {
     const onPress = vi.fn();
 
     container = mount(
@@ -67,7 +67,7 @@ describe('Button - Behavior', () => {
     expect(onPress).not.toHaveBeenCalled();
   });
 
-  it('should supports asChild hosts with composed props and disabled semantics', () => {
+  it('should support asChild hosts with composed props and disabled semantics', () => {
     const onPress = vi.fn();
 
     container = mount(
@@ -174,7 +174,7 @@ describe('Button - Behavior', () => {
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it('should activates a non-native asChild host with Enter and Space', async () => {
+  it('should activate a non-native asChild host with Enter and Space', async () => {
     const onPress = vi.fn();
     container = mount(
       <Button asChild onPress={onPress}>
@@ -191,7 +191,7 @@ describe('Button - Behavior', () => {
     expect(onPress).toHaveBeenCalledTimes(2);
   });
 
-  it('should replaces stateful icon children instead of accumulating them', async () => {
+  it('should replace stateful icon children instead of accumulating them', async () => {
     const onPress = vi.fn();
 
     const ThemeLikeButton = () => {
