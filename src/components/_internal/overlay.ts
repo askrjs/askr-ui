@@ -384,6 +384,7 @@ export function syncOverlayPosition(
     });
   };
 
+  update();
   scheduleUpdate();
   window.addEventListener('resize', scheduleUpdate);
   window.addEventListener('scroll', scheduleUpdate, true);
