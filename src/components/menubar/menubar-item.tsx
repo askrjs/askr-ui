@@ -1,3 +1,4 @@
+import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { state } from '@askrjs/askr';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
@@ -153,7 +154,7 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
   }
 
   return (
-    <button type={typeProp ?? 'button'} {...finalProps}>
+    <button type={typeProp ?? 'button'} {...nativeButtonProps(finalProps)}>
       {children}
     </button>
   );
@@ -321,7 +322,7 @@ export function MenubarSubTrigger(
   }
 
   return (
-    <button type={typeProp ?? 'button'} {...finalProps}>
+    <button type={typeProp ?? 'button'} {...nativeButtonProps(finalProps)}>
       {children}
     </button>
   );

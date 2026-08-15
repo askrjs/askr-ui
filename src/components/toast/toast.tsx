@@ -1,3 +1,4 @@
+import { nativeButtonProps } from '../_internal/native-control';
 /**
  * Toast is the stacked notification family.
  *
@@ -548,7 +549,7 @@ export function ToastAction(props: ToastActionProps | ToastActionAsChildProps) {
   }
 
   return (
-    <button type={typeProp ?? 'button'} {...finalProps}>
+    <button type={typeProp ?? 'button'} {...nativeButtonProps(finalProps)}>
       {children}
     </button>
   );
@@ -597,7 +598,7 @@ export function ToastClose(props: ToastCloseProps | ToastCloseAsChildProps) {
   }
 
   return (
-    <button type={typeProp ?? 'button'} {...finalProps}>
+    <button type={typeProp ?? 'button'} {...nativeButtonProps(finalProps)}>
       {children ?? 'Close'}
     </button>
   );
