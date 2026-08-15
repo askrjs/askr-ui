@@ -214,6 +214,51 @@ describe('VirtualList - Behavior', () => {
     expect(api?.getVisibleRange().visibleStartIndex).toBe(1_000);
   });
 
+  it('should clamp a pending scroll commit when its dataset is replaced', async () => {
+    let api: VirtualListApi<Item> | null = null;
+    let replaceItems: (() => void) | undefined;
+
+    const FilterableList = () => {
+      const itemsState = state(createItems(5_000));
+      replaceItems = () => {
+        itemsState.set(
+          Array.from({ length: 20 }, (_, index) => ({
+            id: `filtered-item-${index}`,
+            label: `Filtered ${index}`,
+          }))
+        );
+      };
+
+      return (
+        <VirtualList
+          aria-label="Filterable messages"
+          style={{ height: '100px', overflowY: 'auto' }}
+          items={itemsState()}
+          rowHeight={20}
+          getKey={(item) => item.id}
+          rowComponent={({ item }) => <span>{item.label}</span>}
+          apiRef={(next) => {
+            api = next;
+          }}
+        />
+      );
+    };
+
+    container = mount(<FilterableList />);
+    await flushUpdates();
+
+    api?.scrollToIndex(4_000, 'start');
+    replaceItems?.();
+    await flushUpdates();
+
+    const maximumScrollTop = 20 * 20 - 100;
+    expect(api?.getScrollTop()).toBeLessThanOrEqual(maximumScrollTop);
+
+    await nextAnimationFrame();
+
+    expect(api?.getScrollTop()).toBeLessThanOrEqual(maximumScrollTop);
+  });
+
   it('should report no ResizeObserver loop errors during dynamic resize churn', async () => {
     const resizeErrors: string[] = [];
     const onWindowError = (event: ErrorEvent) => {
