@@ -40,15 +40,18 @@ describe('Source layout', () => {
       })) {
         if (!entry.isFile() || !entry.name.endsWith('.tsx')) continue;
         const path = join(componentDirectory, entry.name);
-        if (/<button\b/.test(readFileSync(path, 'utf8'))) {
-          rawNativeButtons.push(`${directory}/${entry.name}`);
+        const source = readFileSync(path, 'utf8');
+        for (const tag of source.matchAll(/<button\b[\s\S]*?>/g)) {
+          if (!tag[0].includes('nativeButtonProps(')) {
+            rawNativeButtons.push(`${directory}/${entry.name}`);
+          }
         }
       }
     }
 
     expect(rawNativeButtons).toEqual([]);
     const sharedControl = readFileSync(
-      join(componentsDirectory, '_internal', 'native-control.tsx'),
+      join(componentsDirectory, '_internal', 'native-control.ts'),
       'utf8'
     );
     expect(sharedControl).toContain("font: 'inherit'");
