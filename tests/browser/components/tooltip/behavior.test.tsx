@@ -1,3 +1,4 @@
+import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 import {
   Tooltip,
@@ -37,6 +38,49 @@ describe('Tooltip - Behavior', () => {
     trigger = container.querySelector('button') as HTMLButtonElement;
 
     expect(trigger.getAttribute('data-state')).toBe('closed');
+  });
+
+  it('should open once from native focus and real keyboard Tab without exhausting the scheduler', async () => {
+    const onOpenChange = vi.fn();
+    container = mount(
+      <>
+        <button data-testid="before">Before</button>
+        <Tooltip onOpenChange={onOpenChange}>
+          <TooltipTrigger>Hover me</TooltipTrigger>
+          <TooltipPortal>
+            <TooltipContent>Helpful text</TooltipContent>
+          </TooltipPortal>
+        </Tooltip>
+      </>
+    );
+
+    let trigger = container.querySelector(
+      '[data-slot="tooltip-trigger"]'
+    ) as HTMLButtonElement;
+    expect(() => trigger.focus()).not.toThrow();
+    await flushUpdates();
+
+    trigger = container.querySelector(
+      '[data-slot="tooltip-trigger"]'
+    ) as HTMLButtonElement;
+    expect(document.activeElement).toBe(trigger);
+    expect(trigger.getAttribute('data-state')).toBe('open');
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+
+    trigger.blur();
+    await flushUpdates();
+    const before = container.querySelector(
+      '[data-testid="before"]'
+    ) as HTMLButtonElement;
+    before.focus();
+    await userEvent.tab();
+    await flushUpdates();
+
+    trigger = container.querySelector(
+      '[data-slot="tooltip-trigger"]'
+    ) as HTMLButtonElement;
+    expect(document.activeElement).toBe(trigger);
+    expect(trigger.getAttribute('data-state')).toBe('open');
   });
 
   it('should keep custom content positioning through the post-open portal sync', async () => {

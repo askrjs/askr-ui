@@ -129,6 +129,54 @@ describe('HoverCard - Behavior', () => {
     ).not.toBeNull();
   });
 
+  it('should cancel a pending open when the pointer leaves immediately', async () => {
+    vi.useFakeTimers();
+    container = mount(
+      <HoverCard openDelay={0} closeDelay={90}>
+        <HoverCardTrigger>Preview</HoverCardTrigger>
+        <HoverCardContent>Details</HoverCardContent>
+      </HoverCard>
+    );
+
+    const trigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
+    trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+    trigger.dispatchEvent(new PointerEvent('pointerleave', { bubbles: true }));
+
+    await vi.advanceTimersByTimeAsync(100);
+    await flushUpdates();
+
+    expect(trigger.getAttribute('data-state')).toBe('closed');
+    expect(
+      document.body.querySelector('[data-slot="hover-card-content"]')
+    ).toBeNull();
+  });
+
+  it('should cancel a pending close when the pointer re-enters before its deadline', async () => {
+    vi.useFakeTimers();
+    container = mount(
+      <HoverCard defaultOpen closeDelay={90}>
+        <HoverCardTrigger>Preview</HoverCardTrigger>
+        <HoverCardContent>Details</HoverCardContent>
+      </HoverCard>
+    );
+    await flushUpdates();
+
+    const trigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
+    trigger.dispatchEvent(new PointerEvent('pointerleave', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(40);
+    trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(60);
+    await flushUpdates();
+
+    expect(
+      document.body.querySelector('[data-slot="hover-card-content"]')
+    ).not.toBeNull();
+  });
+
   it('should expose complete dialog labeling given a trigger and content when the card is open', async () => {
     container = mount(
       <HoverCard defaultOpen>
