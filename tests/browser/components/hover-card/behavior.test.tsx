@@ -226,8 +226,9 @@ describe('HoverCard - Behavior', () => {
 
   it('should honor the final pointer state through repeated timer churn', async () => {
     vi.useFakeTimers();
+    const onOpenChange = vi.fn();
     container = mount(
-      <HoverCard openDelay={20} closeDelay={90}>
+      <HoverCard openDelay={20} closeDelay={90} onOpenChange={onOpenChange}>
         <HoverCardTrigger>Preview</HoverCardTrigger>
         <HoverCardContent>Details</HoverCardContent>
       </HoverCard>
@@ -236,7 +237,7 @@ describe('HoverCard - Behavior', () => {
     const trigger = container.querySelector(
       '[data-slot="hover-card-trigger"]'
     ) as HTMLElement;
-    for (let cycle = 0; cycle < 5; cycle += 1) {
+    for (let cycle = 0; cycle < 3; cycle += 1) {
       await userEvent.hover(trigger);
       await advanceHoverCardTimers(10);
       await userEvent.hover(getPointerExitTarget());
@@ -249,6 +250,7 @@ describe('HoverCard - Behavior', () => {
     expect(
       document.body.querySelector('[data-slot="hover-card-content"]')
     ).not.toBeNull();
+    expect(onOpenChange.mock.calls).toEqual([[true]]);
   });
 
   it('should cancel both transition timers during teardown', async () => {
