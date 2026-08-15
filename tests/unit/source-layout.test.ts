@@ -138,6 +138,17 @@ describe('Source layout', () => {
     expect(hoverCardSuite).toContain('pointer re-enters before its deadline');
     expect(hoverCardSuite).toContain('repeated timer churn');
     expect(hoverCardSuite).toContain('both transition timers during teardown');
+    expect(hoverCardSuite).toContain('userEvent.hover(getPointerExitTarget())');
+
+    const hoverCardSource = readFileSync(
+      join(componentsDirectory, 'hover-card', 'hover-card.tsx'),
+      'utf8'
+    );
+    expect(hoverCardSource).toContain("addEventListener('pointerover'");
+    expect(hoverCardSource).toContain(
+      "removeEventListener(\n            'pointerover'"
+    );
+    expect(hoverCardSource).toContain('clearOpenTimer()');
 
     const tooltipSuite = readFileSync(
       join(browserDirectory, 'tooltip', 'behavior.test.tsx'),
