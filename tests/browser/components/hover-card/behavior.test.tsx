@@ -49,6 +49,7 @@ describe('HoverCard - Behavior', () => {
     ) as HTMLElement;
 
     trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+    await flushUpdates();
     await vi.advanceTimersByTimeAsync(1);
     await flushUpdates();
 
@@ -62,7 +63,8 @@ describe('HoverCard - Behavior', () => {
     openTrigger.dispatchEvent(
       new PointerEvent('pointerleave', { bubbles: true })
     );
-    await vi.runAllTimersAsync();
+    await flushUpdates();
+    await vi.advanceTimersByTimeAsync(90);
     const closedTrigger = await waitForHoverCardState(container, 'closed');
 
     expect(closedTrigger.getAttribute('data-state')).toBe('closed');
