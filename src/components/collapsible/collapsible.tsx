@@ -1,3 +1,4 @@
+import { NativeButton } from '../_internal/native-control';
 import { defineScope, readScope } from '@askrjs/askr';
 import { Slot, Presence } from '@askrjs/askr/foundations/structures';
 import { controllableState } from '@askrjs/askr/foundations/state';
@@ -144,9 +145,9 @@ export function CollapsibleTrigger(
   }
 
   return (
-    <button type="button" {...finalProps}>
+    <NativeButton type="button" {...finalProps}>
       {children}
-    </button>
+    </NativeButton>
   );
 }
 

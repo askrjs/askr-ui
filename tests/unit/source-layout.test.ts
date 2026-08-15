@@ -35,7 +35,9 @@ describe('Source layout', () => {
     for (const directory of readComponentDirectories()) {
       if (directory === '_internal') continue;
       const componentDirectory = join(componentsDirectory, directory);
-      for (const entry of readdirSync(componentDirectory, { withFileTypes: true })) {
+      for (const entry of readdirSync(componentDirectory, {
+        withFileTypes: true,
+      })) {
         if (!entry.isFile() || !entry.name.endsWith('.tsx')) continue;
         const path = join(componentDirectory, entry.name);
         if (/<button\b/.test(readFileSync(path, 'utf8'))) {

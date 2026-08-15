@@ -66,8 +66,12 @@ describe('Native control typography', () => {
       </div>
     );
 
-    const override = container.querySelector<HTMLElement>('[data-testid="override"]')!;
-    const asChild = container.querySelector<HTMLElement>('[data-testid="as-child"]')!;
+    const override = container.querySelector<HTMLElement>(
+      '[data-testid="override"]'
+    )!;
+    const asChild = container.querySelector<HTMLElement>(
+      '[data-testid="as-child"]'
+    )!;
     expect(getComputedStyle(override).fontSize).toBe('21px');
     expect(getComputedStyle(asChild).fontSize).toBe('19px');
     expect(asChild.style.font).toBe('');

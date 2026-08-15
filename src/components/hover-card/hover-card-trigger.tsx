@@ -1,3 +1,4 @@
+import { NativeButton } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { hoverable, pressable } from '@askrjs/askr/foundations/interactions';
@@ -92,8 +93,8 @@ export function HoverCardTrigger(
   }
 
   return (
-    <button type={typeProp ?? 'button'} {...finalProps}>
+    <NativeButton type={typeProp ?? 'button'} {...finalProps}>
       {children}
-    </button>
+    </NativeButton>
   );
 }

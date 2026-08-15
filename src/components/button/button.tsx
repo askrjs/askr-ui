@@ -1,3 +1,4 @@
+import { NativeButton } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import { getButtonInteractionProps } from './button-interactions';
@@ -98,8 +99,8 @@ export function Button(props: ButtonNativeProps | ButtonAsChildProps) {
   // Explicit type="button" default prevents accidental form submission
   const type = typeProp ?? 'button';
   return (
-    <button type={type} {...finalProps}>
+    <NativeButton type={type} {...finalProps}>
       {children}
-    </button>
+    </NativeButton>
   );
 }
