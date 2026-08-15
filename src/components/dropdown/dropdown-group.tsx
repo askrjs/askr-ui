@@ -9,6 +9,11 @@ import type {
   DropdownSeparatorProps,
 } from './dropdown.types';
 
+/**
+ * Renders the `dropdown-group` part of `dropdown` with `role="group"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function DropdownGroup(
   props: DropdownGroupProps | DropdownGroupAsChildProps
 ) {
@@ -26,6 +31,11 @@ export function DropdownGroup(
   return <div {...finalProps}>{children}</div>;
 }
 
+/**
+ * Renders the `dropdown-label` part of `dropdown`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function DropdownLabel(
   props: DropdownLabelProps | DropdownLabelAsChildProps
 ) {
@@ -43,6 +53,11 @@ export function DropdownLabel(
   return <div {...finalProps}>{children}</div>;
 }
 
+/**
+ * Renders the `dropdown-separator` part of `dropdown` with `role="separator"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function DropdownSeparator(
   props: DropdownSeparatorProps | DropdownSeparatorAsChildProps
 ) {

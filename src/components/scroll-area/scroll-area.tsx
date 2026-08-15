@@ -54,6 +54,9 @@ function readScrollAreaRootContext(): ScrollAreaRootContextValue {
   return context;
 }
 
+/**
+ * Renders a part of `scroll-area`.
+ */
 export function ScrollArea(props: ScrollAreaProps): JSX.Element;
 export function ScrollArea(props: ScrollAreaAsChildProps): JSX.Element;
 export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
@@ -222,6 +225,9 @@ export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
   );
 }
 
+/**
+ * Renders a part of `scroll-area`.
+ */
 export function ScrollAreaViewport(props: ScrollAreaViewportProps): JSX.Element;
 export function ScrollAreaViewport(
   props: ScrollAreaViewportAsChildProps
@@ -263,6 +269,9 @@ export function ScrollAreaViewport(
   return <div {...finalProps}>{children}</div>;
 }
 
+/**
+ * Renders the `scroll-area-scrollbar` part of `scroll-area` with `role="scrollbar"`.
+ */
 export function ScrollAreaScrollbar(
   props: ScrollAreaScrollbarProps
 ): JSX.Element {
@@ -320,6 +329,9 @@ export function ScrollAreaScrollbar(
   );
 }
 
+/**
+ * Renders the `scroll-area-thumb` part of `scroll-area`.
+ */
 export function ScrollAreaThumb(props: ScrollAreaThumbProps): JSX.Element {
   const { children, ref, style: _style, ...rest } = props;
   readScrollAreaRootContext();
@@ -338,6 +350,9 @@ export function ScrollAreaThumb(props: ScrollAreaThumbProps): JSX.Element {
   return <div {...finalProps}>{children}</div>;
 }
 
+/**
+ * Renders the `scroll-area-corner` part of `scroll-area`.
+ */
 export function ScrollAreaCorner(props: ScrollAreaCornerProps): JSX.Element {
   const { children, ref, style: _style, ...rest } = props;
   const root = readScrollAreaRootContext();

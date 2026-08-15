@@ -22,6 +22,11 @@ import type {
   SelectContentProps,
 } from './select.types';
 
+/**
+ * Renders a part of `select` with `role="listbox"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function SelectContent(props: SelectContentProps): JSX.Element | null;
 export function SelectContent(
   props: SelectContentAsChildProps

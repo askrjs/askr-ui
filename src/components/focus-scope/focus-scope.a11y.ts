@@ -10,4 +10,5 @@ export const FOCUS_SCOPE_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Focus Scope A11y Contract object. */
 export type FocusScopeA11yContract = typeof FOCUS_SCOPE_A11Y_CONTRACT;

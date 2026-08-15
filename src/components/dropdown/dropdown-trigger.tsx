@@ -10,6 +10,11 @@ import type {
   DropdownTriggerProps,
 } from './dropdown.types';
 
+/**
+ * Renders the `dropdown-trigger` part of `dropdown`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function DropdownTrigger(
   props: DropdownTriggerProps
 ): JSX.Element | null;
@@ -91,6 +96,9 @@ export function DropdownTrigger(
   );
 }
 
+/**
+ * Renders a part of `dropdown`.
+ */
 export function DropdownPortal(props: DropdownPortalProps): JSX.Element | null {
   const root = readDropdownRootContext();
 

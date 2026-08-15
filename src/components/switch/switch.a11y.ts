@@ -30,4 +30,5 @@ export const SWITCH_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Switch A11y Contract object. */
 export type SwitchA11yContract = typeof SWITCH_A11Y_CONTRACT;

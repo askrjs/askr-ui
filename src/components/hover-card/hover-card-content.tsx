@@ -11,6 +11,11 @@ import type {
   HoverCardContentProps,
 } from './hover-card.types';
 
+/**
+ * Renders the `hover-card-content` part of `hover-card` with `role="dialog"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function HoverCardContent(
   props: HoverCardContentProps
 ): JSX.Element | null;

@@ -359,6 +359,11 @@ export function ToastHost(props: ToastHostProps) {
  * ToastViewport renders the live toast stack and the notification region.
  */
 export function ToastViewport(props: ToastViewportProps): JSX.Element;
+/**
+ * Renders the `toast-viewport` part of `toast` with `role="region"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function ToastViewport(props: ToastViewportAsChildProps): JSX.Element;
 export function ToastViewport(
   props: ToastViewportProps | ToastViewportAsChildProps
@@ -446,6 +451,11 @@ export function Toast(props: ToastProps): JSX.Element | null {
  * ToastTitle marks the accessible title slot for a toast entry.
  */
 export function ToastTitle(props: ToastTitleProps): JSX.Element;
+/**
+ * Renders the `toast-title` part of `toast`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function ToastTitle(props: ToastTitleAsChildProps): JSX.Element;
 export function ToastTitle(props: ToastTitleProps | ToastTitleAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
@@ -468,6 +478,11 @@ export function ToastTitle(props: ToastTitleProps | ToastTitleAsChildProps) {
  * ToastDescription marks the accessible description slot for a toast entry.
  */
 export function ToastDescription(props: ToastDescriptionProps): JSX.Element;
+/**
+ * Renders the `toast-description` part of `toast`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function ToastDescription(
   props: ToastDescriptionAsChildProps
 ): JSX.Element;
@@ -494,6 +509,11 @@ export function ToastDescription(
  * ToastAction closes the toast after handling a user-triggered action.
  */
 export function ToastAction(props: ToastActionProps): JSX.Element;
+/**
+ * Renders the `toast-action` part of `toast`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function ToastAction(props: ToastActionAsChildProps): JSX.Element;
 export function ToastAction(props: ToastActionProps | ToastActionAsChildProps) {
   const {
@@ -538,6 +558,11 @@ export function ToastAction(props: ToastActionProps | ToastActionAsChildProps) {
  * ToastClose is the dedicated dismiss control for a toast entry.
  */
 export function ToastClose(props: ToastCloseProps): JSX.Element;
+/**
+ * Renders the `toast-close` part of `toast`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function ToastClose(props: ToastCloseAsChildProps): JSX.Element;
 export function ToastClose(props: ToastCloseProps | ToastCloseAsChildProps) {
   const {

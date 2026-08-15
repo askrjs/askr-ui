@@ -5,6 +5,7 @@ import {
   type OverlayZIndex,
 } from '../_internal/overlay';
 
+/** Hover Card Position Options. */
 export type HoverCardPositionOptions = {
   mode?: 'anchored';
   side?: 'top' | 'right' | 'bottom' | 'left';
@@ -14,6 +15,7 @@ export type HoverCardPositionOptions = {
   zIndex?: OverlayZIndex;
 };
 
+/** Shape of the Hover Card Root Context Value. */
 export type HoverCardRootContextValue = {
   hoverCardId: string;
   open: boolean;
@@ -37,6 +39,9 @@ export type HoverCardRootContextValue = {
 export const HoverCardRootContext =
   defineScope<HoverCardRootContextValue | null>(null);
 
+/**
+ * Reads the Hover Card Root Context; throws if called outside its provider.
+ */
 export function readHoverCardRootContext(): HoverCardRootContextValue {
   const context = readScope(HoverCardRootContext);
 
@@ -47,6 +52,9 @@ export function readHoverCardRootContext(): HoverCardRootContextValue {
   return context;
 }
 
+/**
+ * Builds overlay positioning options for Hover Card Position Options.
+ */
 export function resolveHoverCardPositionOptions(
   position: HoverCardPositionOptions = {}
 ): Required<HoverCardPositionOptions> {

@@ -11,6 +11,11 @@ import { runCancelablePress } from '../_internal/press';
 import { readMenuRenderContext, readMenuRootContext } from './menu.shared';
 import type { MenuItemAsChildProps, MenuItemProps } from './menu.types';
 
+/**
+ * Renders the `menu-item` part of `menu` with `role="menuitem"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function MenuItem(props: MenuItemProps): JSX.Element | null;
 export function MenuItem(props: MenuItemAsChildProps): JSX.Element | null;
 export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {

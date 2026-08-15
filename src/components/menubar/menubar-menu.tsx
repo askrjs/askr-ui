@@ -62,6 +62,9 @@ function MenubarPortalRuntimeView(props: {
   );
 }
 
+/**
+ * Renders a part of `menubar`.
+ */
 export function MenubarMenu(props: MenubarMenuProps) {
   const root = readMenubarRootContext();
   const renderContext = readMenubarRootRenderContext();
@@ -85,6 +88,11 @@ export function MenubarMenu(props: MenubarMenuProps) {
   );
 }
 
+/**
+ * Renders a part of `menubar`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function MenubarTrigger(props: MenubarTriggerProps): JSX.Element | null;
 export function MenubarTrigger(
   props: MenubarTriggerAsChildProps
@@ -220,6 +228,9 @@ export function MenubarTrigger(
   );
 }
 
+/**
+ * Renders a part of `menubar`.
+ */
 export function MenubarPortal(props: MenubarPortalProps): JSX.Element | null {
   const root = readMenubarRootContext();
   const menu = readMenubarMenuContext();

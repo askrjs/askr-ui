@@ -7,6 +7,11 @@ import type {
   TooltipTriggerProps,
 } from './tooltip.types';
 
+/**
+ * Renders the `tooltip-trigger` part of `tooltip`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function TooltipTrigger(props: TooltipTriggerProps): JSX.Element;
 export function TooltipTrigger(props: TooltipTriggerAsChildProps): JSX.Element;
 export function TooltipTrigger(

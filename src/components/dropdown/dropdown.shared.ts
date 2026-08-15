@@ -7,11 +7,13 @@ import {
 } from '../_internal/menu';
 import type { OverlayPortal } from '../_internal/overlay';
 
+/** Dropdown State Input. */
 export type DropdownStateInput = {
   dropdownId: string;
   currentIndexCandidate: number;
 };
 
+/** Shape of the Dropdown Root Context Value. */
 export type DropdownRootContextValue = {
   dropdownId: string;
   overlayIdentity: object;
@@ -28,10 +30,12 @@ export type DropdownRootContextValue = {
   handleTypeaheadKeyUp: (event: KeyboardEvent) => boolean;
 };
 
+/** Shape of the Dropdown Render Context Value. */
 export type DropdownRenderContextValue = {
   claimItemIndex: () => number;
 };
 
+/** Dropdown Resolved State. */
 export type DropdownResolvedState = {
   items: MenuItemMetadata[];
   currentIndex: number;
@@ -44,6 +48,9 @@ export const DropdownRootContext = defineScope<DropdownRootContextValue | null>(
 export const DropdownRenderContext =
   defineScope<DropdownRenderContextValue | null>(null);
 
+/**
+ * Reads the Dropdown Root Context; throws if called outside its provider.
+ */
 export function readDropdownRootContext(): DropdownRootContextValue {
   const context = readScope(DropdownRootContext);
 
@@ -54,6 +61,9 @@ export function readDropdownRootContext(): DropdownRootContextValue {
   return context;
 }
 
+/**
+ * Reads the Dropdown Render Context; throws if called outside its provider.
+ */
 export function readDropdownRenderContext(): DropdownRenderContextValue {
   const context = readScope(DropdownRenderContext);
 
@@ -64,6 +74,9 @@ export function readDropdownRenderContext(): DropdownRenderContextValue {
   return context;
 }
 
+/**
+ * Creates a fresh Dropdown Render Context instance.
+ */
 export function createDropdownRenderContext(): DropdownRenderContextValue {
   let nextItemIndex = 0;
 
@@ -76,6 +89,10 @@ export function createDropdownRenderContext(): DropdownRenderContextValue {
   };
 }
 
+/**
+ * Computes the resolved Dropdown State (collection items, current index,
+ * and disabled indexes) from root context input.
+ */
 export function resolveDropdownState(
   root: DropdownStateInput
 ): DropdownResolvedState {

@@ -1,6 +1,7 @@
 import type { JSXElement } from '@askrjs/askr/foundations/structures';
 import type { Ref } from '@askrjs/askr/foundations/utilities';
 
+/** Own props for Dismissable Layer, before merging with native element attributes. */
 export type DismissableLayerOwnProps = {
   children?: unknown;
   id?: string;
@@ -12,6 +13,7 @@ export type DismissableLayerOwnProps = {
   onDismiss?: () => void;
 };
 
+/** Props for Dismissable Layer. */
 export type DismissableLayerProps = Omit<
   JSX.IntrinsicElements['div'],
   'children' | 'ref'
@@ -21,6 +23,7 @@ export type DismissableLayerProps = Omit<
     ref?: Ref<HTMLDivElement>;
   };
 
+/** Props for the `asChild` (polymorphic) rendering of Dismissable Layer. */
 export type DismissableLayerAsChildProps = DismissableLayerOwnProps & {
   asChild: true;
   children: JSXElement;

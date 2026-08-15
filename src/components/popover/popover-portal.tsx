@@ -1,6 +1,9 @@
 import { readPopoverRootContext } from './popover.shared';
 import type { PopoverPortalProps } from './popover.types';
 
+/**
+ * Renders a part of `popover`.
+ */
 export function PopoverPortal(props: PopoverPortalProps): JSX.Element | null {
   const root = readPopoverRootContext();
 

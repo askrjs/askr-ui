@@ -17,6 +17,11 @@ import type {
   DropdownItemProps,
 } from './dropdown.types';
 
+/**
+ * Renders a part of `dropdown`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function DropdownItem(props: DropdownItemProps): JSX.Element | null;
 export function DropdownItem(
   props: DropdownItemAsChildProps

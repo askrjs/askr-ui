@@ -43,6 +43,9 @@ function readCollapsibleRootContext(): CollapsibleRootContextValue {
   return context;
 }
 
+/**
+ * Renders a part of `collapsible`.
+ */
 export function Collapsible(props: CollapsibleProps) {
   const {
     id,
@@ -80,6 +83,11 @@ export function Collapsible(props: CollapsibleProps) {
   );
 }
 
+/**
+ * Renders the `collapsible-trigger` part of `collapsible`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function CollapsibleTrigger(props: CollapsibleTriggerProps): JSX.Element;
 export function CollapsibleTrigger(
   props: CollapsibleTriggerAsChildProps
@@ -142,6 +150,11 @@ export function CollapsibleTrigger(
   );
 }
 
+/**
+ * Renders the `collapsible-content` part of `collapsible`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function CollapsibleContent(
   props: CollapsibleContentProps
 ): JSX.Element | null;

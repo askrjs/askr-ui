@@ -8,6 +8,11 @@ type ButtonInteractionOptions = {
   onPress?: (event: PressEvent) => void;
 };
 
+/**
+ * Renders a part of `button`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function getButtonInteractionProps({
   asChild,
   children,

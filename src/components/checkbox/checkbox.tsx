@@ -49,6 +49,11 @@ import type {
  * ```
  */
 export function Checkbox(props: CheckboxInputProps): JSX.Element;
+/**
+ * Renders the `checkbox` part of `checkbox` with `role="checkbox"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function Checkbox(props: CheckboxAsChildProps): JSX.Element;
 export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
   const {

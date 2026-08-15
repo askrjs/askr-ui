@@ -4,6 +4,11 @@ import { moveFocusOutsideCompositeWithTab } from '../_internal/focus';
 import { readMenuRootContext } from './menu.shared';
 import type { MenuContentAsChildProps, MenuContentProps } from './menu.types';
 
+/**
+ * Renders the `menu-content` part of `menu` with `role="menu"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function MenuContent(props: MenuContentProps): JSX.Element;
 export function MenuContent(props: MenuContentAsChildProps): JSX.Element;
 export function MenuContent(props: MenuContentProps | MenuContentAsChildProps) {

@@ -16,4 +16,5 @@ export const PROGRESS_A11Y_CONTRACT = {
   INDICATOR_PERCENTAGE_ATTRIBUTE: 'data-percentage' as const,
 } as const;
 
+/** Type of the Progress A11y Contract object. */
 export type ProgressA11yContract = typeof PROGRESS_A11Y_CONTRACT;

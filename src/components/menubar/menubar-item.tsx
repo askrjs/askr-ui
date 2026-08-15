@@ -39,6 +39,11 @@ function scheduleMenubarPortalSync(root: { syncPortals: () => void }) {
   });
 }
 
+/**
+ * Renders a part of `menubar`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function MenubarItem(props: MenubarItemProps): JSX.Element | null;
 export function MenubarItem(props: MenubarItemAsChildProps): JSX.Element | null;
 export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
@@ -154,6 +159,9 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
   );
 }
 
+/**
+ * Renders a part of `menubar`.
+ */
 export function MenubarSub(props: MenubarSubProps) {
   const content = readMenubarContentContext();
   const renderContext = readMenubarContentRenderContext();
@@ -175,6 +183,11 @@ export function MenubarSub(props: MenubarSubProps) {
   );
 }
 
+/**
+ * Renders a part of `menubar`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function MenubarSubTrigger(
   props: MenubarSubTriggerProps
 ): JSX.Element | null;

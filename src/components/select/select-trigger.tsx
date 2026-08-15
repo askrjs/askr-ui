@@ -12,6 +12,11 @@ import type {
   SelectValueProps,
 } from './select.types';
 
+/**
+ * Renders the `select-trigger` part of `select`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function SelectTrigger(props: SelectTriggerProps): JSX.Element | null;
 export function SelectTrigger(
   props: SelectTriggerAsChildProps
@@ -100,6 +105,11 @@ export function SelectTrigger(
   );
 }
 
+/**
+ * Renders the `select-value` part of `select`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function SelectValue(props: SelectValueProps): JSX.Element | null;
 export function SelectValue(props: SelectValueAsChildProps): JSX.Element | null;
 export function SelectValue(props: SelectValueProps | SelectValueAsChildProps) {
@@ -120,6 +130,9 @@ export function SelectValue(props: SelectValueProps | SelectValueAsChildProps) {
   return <span {...finalProps}>{renderedChildren}</span>;
 }
 
+/**
+ * Renders a part of `select`.
+ */
 export function SelectPortal(props: SelectPortalProps): JSX.Element | null {
   const root = readSelectRootContext();
 

@@ -15,4 +15,5 @@ export const ACCORDION_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Accordion A11y Contract object. */
 export type AccordionA11yContract = typeof ACCORDION_A11Y_CONTRACT;

@@ -11,6 +11,7 @@ type VirtualTableRootProps = Omit<
   'children' | 'onScroll' | 'ref'
 >;
 
+/** Props for Virtual Table Cell Component. */
 export type VirtualTableCellComponentProps<Row> = {
   row: Row;
   rowIndex: number;
@@ -19,16 +20,21 @@ export type VirtualTableCellComponentProps<Row> = {
   selected: boolean;
 };
 
+/** Virtual Table Cell Element. */
 export type VirtualTableCellElement = JSXElement | JSX.Element;
 
+/** Virtual Table Cell Component. */
 export type VirtualTableCellComponent<Row> = (
   props: VirtualTableCellComponentProps<Row>
 ) => VirtualTableCellElement | null;
 
+/** Virtual Table Viewport. */
 export type VirtualTableViewport = 'lg';
 
+/** Virtual Table Width. */
 export type VirtualTableWidth = 'compact';
 
+/** Virtual Table Column. */
 export type VirtualTableColumn<Row> = {
   id: string;
   header: JSXElement | string;
@@ -36,6 +42,7 @@ export type VirtualTableColumn<Row> = {
   cellComponent: VirtualTableCellComponent<Row>;
 };
 
+/** Virtual Table State. */
 export type VirtualTableState = {
   count: number;
   rowHeight: number;
@@ -50,6 +57,7 @@ export type VirtualTableState = {
   selectedRowIndex: number;
 };
 
+/** Virtual Table Api. */
 export type VirtualTableApi<_Row> = {
   scrollToIndex: (index: number, alignment?: VirtualScrollAlignment) => void;
   scrollToTop: () => void;
@@ -67,6 +75,7 @@ export type VirtualTableApi<_Row> = {
   clearSelection: () => void;
 };
 
+/** Props for Virtual Table. */
 export type VirtualTableProps<Row> = VirtualTableRootProps & {
   rows: readonly Row[];
   rowHeight: number;
@@ -91,6 +100,7 @@ export type VirtualTableProps<Row> = VirtualTableRootProps & {
   asChild?: false;
 };
 
+/** Props for the `asChild` (polymorphic) rendering of Virtual Table. */
 export type VirtualTableAsChildProps<Row> = Omit<
   VirtualTableRootProps,
   'children'

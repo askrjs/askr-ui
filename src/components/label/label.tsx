@@ -3,6 +3,11 @@ import type { JSXElement } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import type { LabelAsChildProps, LabelLabelProps } from './label.types';
 
+/**
+ * Renders the `label` part of `label`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function Label(props: LabelLabelProps): JSXElement;
 export function Label(props: LabelAsChildProps): JSXElement;
 export function Label(props: LabelLabelProps | LabelAsChildProps) {

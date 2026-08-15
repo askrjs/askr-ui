@@ -6,6 +6,11 @@ import type {
   DialogOverlayProps,
 } from './dialog.types';
 
+/**
+ * Renders the `dialog-overlay` part of `dialog`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function DialogOverlay(props: DialogOverlayProps): JSX.Element | null;
 export function DialogOverlay(
   props: DialogOverlayAsChildProps

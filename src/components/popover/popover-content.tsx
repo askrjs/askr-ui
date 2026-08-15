@@ -11,6 +11,11 @@ import type {
   PopoverContentProps,
 } from './popover.types';
 
+/**
+ * Renders the `popover-content` part of `popover` with `role="dialog"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function PopoverContent(props: PopoverContentProps): JSX.Element | null;
 export function PopoverContent(
   props: PopoverContentAsChildProps

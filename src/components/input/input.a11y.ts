@@ -22,4 +22,5 @@ export const INPUT_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Input A11y Contract object. */
 export type InputA11yContract = typeof INPUT_A11Y_CONTRACT;
