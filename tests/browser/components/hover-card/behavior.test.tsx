@@ -1,3 +1,4 @@
+import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { flush as flushScheduler } from '@askrjs/askr/testing';
 import {
@@ -36,6 +37,25 @@ async function waitForHoverCardState(
   throw new Error(`Expected HoverCard trigger to become ${expected}`);
 }
 
+function getPointerExitTarget(): HTMLElement {
+  const existing = document.querySelector(
+    '[data-hover-card-pointer-exit]'
+  ) as HTMLElement | null;
+  if (existing) {
+    return existing;
+  }
+  const target = document.createElement('button');
+  target.setAttribute('data-hover-card-pointer-exit', 'true');
+  target.style.position = 'fixed';
+  target.style.right = '0';
+  target.style.bottom = '0';
+  target.style.width = '2px';
+  target.style.height = '2px';
+  target.style.zIndex = '2147483647';
+  document.body.appendChild(target);
+  return target;
+}
+
 describe('HoverCard - Behavior', () => {
   let container: HTMLElement | undefined;
 
@@ -43,6 +63,7 @@ describe('HoverCard - Behavior', () => {
     vi.useRealTimers();
     vi.restoreAllMocks();
     unmount(container);
+    document.querySelector('[data-hover-card-pointer-exit]')?.remove();
     container = undefined;
   });
 
@@ -61,7 +82,7 @@ describe('HoverCard - Behavior', () => {
       '[data-slot="hover-card-trigger"]'
     ) as HTMLElement;
 
-    trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+    await userEvent.hover(trigger);
     await flushUpdates();
     await advanceHoverCardTimers(1);
 
@@ -72,9 +93,7 @@ describe('HoverCard - Behavior', () => {
       document.body.querySelector('[data-slot="hover-card-content"]')
     ).not.toBeNull();
 
-    openTrigger.dispatchEvent(
-      new PointerEvent('pointerleave', { bubbles: true })
-    );
+    await userEvent.hover(getPointerExitTarget());
     await flushUpdates();
     await advanceHoverCardTimers(90);
     const closedTrigger = await waitForHoverCardState(container, 'closed');
@@ -147,8 +166,7 @@ describe('HoverCard - Behavior', () => {
     const content = document.body.querySelector(
       '[data-slot="hover-card-content"]'
     ) as HTMLElement;
-    trigger.dispatchEvent(new PointerEvent('pointerleave', { bubbles: true }));
-    content.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+    await userEvent.hover(content);
     await advanceHoverCardTimers(60);
     expect(
       document.body.querySelector('[data-slot="hover-card-content"]')
@@ -168,8 +186,8 @@ describe('HoverCard - Behavior', () => {
     const trigger = container.querySelector(
       '[data-slot="hover-card-trigger"]'
     ) as HTMLElement;
-    trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
-    trigger.dispatchEvent(new PointerEvent('pointerleave', { bubbles: true }));
+    await userEvent.hover(trigger);
+    await userEvent.hover(getPointerExitTarget());
 
     await advanceHoverCardTimers(100);
 
@@ -196,9 +214,9 @@ describe('HoverCard - Behavior', () => {
     const trigger = container.querySelector(
       '[data-slot="hover-card-trigger"]'
     ) as HTMLElement;
-    trigger.dispatchEvent(new PointerEvent('pointerleave', { bubbles: true }));
+    await userEvent.hover(getPointerExitTarget());
     await advanceHoverCardTimers(40);
-    trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+    await userEvent.hover(trigger);
     await advanceHoverCardTimers(60);
 
     expect(
@@ -219,16 +237,12 @@ describe('HoverCard - Behavior', () => {
       '[data-slot="hover-card-trigger"]'
     ) as HTMLElement;
     for (let cycle = 0; cycle < 5; cycle += 1) {
-      trigger.dispatchEvent(
-        new PointerEvent('pointerenter', { bubbles: true })
-      );
+      await userEvent.hover(trigger);
       await advanceHoverCardTimers(10);
-      trigger.dispatchEvent(
-        new PointerEvent('pointerleave', { bubbles: true })
-      );
+      await userEvent.hover(getPointerExitTarget());
       await advanceHoverCardTimers(10);
     }
-    trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+    await userEvent.hover(trigger);
 
     await advanceHoverCardTimers(100);
 
@@ -250,7 +264,7 @@ describe('HoverCard - Behavior', () => {
     const trigger = container.querySelector(
       '[data-slot="hover-card-trigger"]'
     ) as HTMLElement;
-    trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+    await userEvent.hover(trigger);
     unmount(container);
     container = undefined;
 
