@@ -1,10 +1,17 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { flush as flushScheduler } from '@askrjs/askr/testing';
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from '../../../../src/components/hover-card';
 import { flushUpdates, mount, unmount } from '../../test-utils';
+
+async function advanceHoverCardTimers(milliseconds: number): Promise<void> {
+  await vi.advanceTimersByTimeAsync(milliseconds);
+  flushScheduler();
+  await flushUpdates();
+}
 
 async function waitForHoverCardState(
   container: HTMLElement,
@@ -50,8 +57,7 @@ describe('HoverCard - Behavior', () => {
 
     trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
     await flushUpdates();
-    await vi.advanceTimersByTimeAsync(1);
-    await flushUpdates();
+    await advanceHoverCardTimers(1);
 
     const openTrigger = await waitForHoverCardState(container, 'open');
 
@@ -64,7 +70,7 @@ describe('HoverCard - Behavior', () => {
       new PointerEvent('pointerleave', { bubbles: true })
     );
     await flushUpdates();
-    await vi.advanceTimersByTimeAsync(90);
+    await advanceHoverCardTimers(90);
     const closedTrigger = await waitForHoverCardState(container, 'closed');
 
     expect(closedTrigger.getAttribute('data-state')).toBe('closed');
@@ -137,8 +143,7 @@ describe('HoverCard - Behavior', () => {
     ) as HTMLElement;
     trigger.dispatchEvent(new PointerEvent('pointerleave', { bubbles: true }));
     content.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
-    await vi.advanceTimersByTimeAsync(60);
-    await flushUpdates();
+    await advanceHoverCardTimers(60);
     expect(
       document.body.querySelector('[data-slot="hover-card-content"]')
     ).not.toBeNull();
@@ -160,8 +165,7 @@ describe('HoverCard - Behavior', () => {
     trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
     trigger.dispatchEvent(new PointerEvent('pointerleave', { bubbles: true }));
 
-    await vi.advanceTimersByTimeAsync(100);
-    await flushUpdates();
+    await advanceHoverCardTimers(100);
 
     const currentTrigger = container.querySelector(
       '[data-slot="hover-card-trigger"]'
@@ -187,10 +191,9 @@ describe('HoverCard - Behavior', () => {
       '[data-slot="hover-card-trigger"]'
     ) as HTMLElement;
     trigger.dispatchEvent(new PointerEvent('pointerleave', { bubbles: true }));
-    await vi.advanceTimersByTimeAsync(40);
+    await advanceHoverCardTimers(40);
     trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
-    await vi.advanceTimersByTimeAsync(60);
-    await flushUpdates();
+    await advanceHoverCardTimers(60);
 
     expect(
       document.body.querySelector('[data-slot="hover-card-content"]')
@@ -213,16 +216,15 @@ describe('HoverCard - Behavior', () => {
       trigger.dispatchEvent(
         new PointerEvent('pointerenter', { bubbles: true })
       );
-      await vi.advanceTimersByTimeAsync(10);
+      await advanceHoverCardTimers(10);
       trigger.dispatchEvent(
         new PointerEvent('pointerleave', { bubbles: true })
       );
-      await vi.advanceTimersByTimeAsync(10);
+      await advanceHoverCardTimers(10);
     }
     trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
 
-    await vi.advanceTimersByTimeAsync(100);
-    await flushUpdates();
+    await advanceHoverCardTimers(100);
 
     expect(
       document.body.querySelector('[data-slot="hover-card-content"]')
@@ -246,7 +248,7 @@ describe('HoverCard - Behavior', () => {
     unmount(container);
     container = undefined;
 
-    await vi.advanceTimersByTimeAsync(100);
+    await advanceHoverCardTimers(100);
     expect(onOpenChange).not.toHaveBeenCalled();
   });
 
