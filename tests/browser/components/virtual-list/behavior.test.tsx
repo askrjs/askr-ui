@@ -18,6 +18,12 @@ function createItems(count: number): Item[] {
   }));
 }
 
+function nextAnimationFrame(): Promise<void> {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => resolve());
+  });
+}
+
 describe('VirtualList - Behavior', () => {
   let container: HTMLElement | undefined;
 
@@ -174,5 +180,111 @@ describe('VirtualList - Behavior', () => {
     await flushUpdates();
 
     expect(onScroll).toHaveBeenCalledTimes(1);
+  });
+
+  it('should reserve the full native scroll extent and advance from browser scrolling', async () => {
+    let api: VirtualListApi<Item> | null = null;
+
+    container = mount(
+      <VirtualList
+        aria-label="Large messages"
+        style={{ height: '200px', overflowY: 'auto' }}
+        items={createItems(10_000)}
+        rowHeight={20}
+        getKey={(item) => item.id}
+        rowComponent={({ item }) => <span>{item.label}</span>}
+        apiRef={(next) => {
+          api = next;
+        }}
+      />
+    );
+    await flushUpdates();
+
+    const host = container.querySelector(
+      '[data-slot="virtual-list"]'
+    ) as HTMLElement;
+
+    expect(host.scrollHeight).toBe(200_000);
+
+    host.scrollTop = 20_000;
+    host.dispatchEvent(new Event('scroll', { bubbles: true }));
+    await flushUpdates();
+
+    expect(host.scrollTop).toBeCloseTo(20_000, 0);
+    expect(api?.getVisibleRange().visibleStartIndex).toBe(1_000);
+  });
+
+  it('should report no ResizeObserver loop errors during dynamic resize churn', async () => {
+    const resizeErrors: string[] = [];
+    const onWindowError = (event: ErrorEvent) => {
+      if (event.message.includes('ResizeObserver loop')) {
+        resizeErrors.push(event.message);
+        event.preventDefault();
+      }
+    };
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation((...values: unknown[]) => {
+        const message = values.map(String).join(' ');
+        if (message.includes('ResizeObserver loop')) resizeErrors.push(message);
+      });
+    window.addEventListener('error', onWindowError);
+
+    try {
+      container = mount(
+        <VirtualList
+          aria-label="Resizable messages"
+          style={{ height: '100px', overflowY: 'auto' }}
+          items={createItems(1_000)}
+          rowHeight={20}
+          getKey={(item) => item.id}
+          rowComponent={({ item }) => <span>{item.label}</span>}
+        />
+      );
+      await flushUpdates();
+
+      const host = container.querySelector(
+        '[data-slot="virtual-list"]'
+      ) as HTMLElement;
+      host.scrollTop = 10_000;
+      host.dispatchEvent(new Event('scroll', { bubbles: true }));
+
+      for (const height of [0, 50, 400, 1, 10_000, 0, 300]) {
+        host.style.height = `${height}px`;
+        await nextAnimationFrame();
+      }
+      await nextAnimationFrame();
+
+      expect(resizeErrors).toEqual([]);
+    } finally {
+      window.removeEventListener('error', onWindowError);
+      consoleError.mockRestore();
+    }
+  });
+
+  it('should contain content within its fixed row-height contract', async () => {
+    container = mount(
+      <VirtualList
+        aria-label="Overflowing messages"
+        style={{ height: '40px', overflowY: 'auto' }}
+        items={createItems(2)}
+        rowHeight={20}
+        getKey={(item) => item.id}
+        rowComponent={({ item }) => (
+          <div style={{ height: '200px' }}>{item.label}</div>
+        )}
+      />
+    );
+    await flushUpdates();
+
+    const rows = Array.from(
+      container.querySelectorAll<HTMLElement>('[data-slot="virtual-list-row"]')
+    );
+    const firstBox = rows[0].getBoundingClientRect();
+    const secondBox = rows[1].getBoundingClientRect();
+
+    expect(getComputedStyle(rows[0]).overflowY).toBe('hidden');
+    expect(firstBox.height).toBeCloseTo(20, 0);
+    expect(secondBox.top - firstBox.top).toBeCloseTo(20, 0);
   });
 });
