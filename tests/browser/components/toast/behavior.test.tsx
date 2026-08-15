@@ -143,7 +143,7 @@ function SiblingToastRegistrationFixture() {
       <button
         id="open-sibling-toast"
         onClick={() => {
-          siblingOpen.set(true);
+          siblingOpen.set(!siblingOpen());
         }}
       >
         Open sibling
@@ -283,8 +283,18 @@ describe('Toast - Behavior', () => {
 
     expect(container.querySelector('#original-toast')).toBe(original);
     expect(document.activeElement).toBe(originalClose);
+    expect(container.querySelectorAll('#sibling-toast')).toHaveLength(1);
 
-    await vi.advanceTimersByTimeAsync(45);
+    await vi.advanceTimersByTimeAsync(5);
+    launcher.click();
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(container.querySelector('#original-toast')).toBe(original);
+    expect(document.activeElement).toBe(originalClose);
+    expect(container.querySelectorAll('#sibling-toast')).toHaveLength(0);
+
+    await vi.advanceTimersByTimeAsync(40);
     await flushUpdates();
     await flushUpdates();
 

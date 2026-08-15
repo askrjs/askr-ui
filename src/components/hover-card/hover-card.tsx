@@ -79,16 +79,21 @@ export function HoverCard(props: HoverCardProps) {
   let openTimer: ReturnType<typeof setTimeout> | undefined;
   let closeTimer: ReturnType<typeof setTimeout> | undefined;
 
-  const clearTimers = () => {
-    if (openTimer) {
+  const clearOpenTimer = () => {
+    if (openTimer !== undefined) {
       clearTimeout(openTimer);
       openTimer = undefined;
     }
-
-    if (closeTimer) {
+  };
+  const clearCloseTimer = () => {
+    if (closeTimer !== undefined) {
       clearTimeout(closeTimer);
       closeTimer = undefined;
     }
+  };
+  const clearTimers = () => {
+    clearOpenTimer();
+    clearCloseTimer();
   };
   const cleanupSignal = getSignal();
   cleanupSignal.addEventListener(
@@ -127,28 +132,28 @@ export function HoverCard(props: HoverCardProps) {
       });
     },
     scheduleOpen: () => {
-      if (openTimer) {
-        clearTimeout(openTimer);
-      }
+      clearCloseTimer();
+      clearOpenTimer();
 
       if (openState()) {
         return;
       }
 
       openTimer = setTimeout(() => {
+        openTimer = undefined;
         rootContext.setOpen(true);
       }, openDelay);
     },
     scheduleClose: () => {
-      if (closeTimer) {
-        clearTimeout(closeTimer);
-      }
+      clearOpenTimer();
+      clearCloseTimer();
 
       closeTimer = setTimeout(() => {
+        closeTimer = undefined;
         rootContext.setOpen(false);
       }, closeDelay);
     },
-    cancelClose: clearTimers,
+    cancelClose: clearCloseTimer,
     triggerId,
     contentId,
     portal,

@@ -53,7 +53,7 @@ export function TooltipTrigger(
     ...hoverProps,
     ref: refHandler,
     onFocus: () => {
-      root.setOpen(true);
+      root.openFromFocus();
     },
     onBlur: () => {
       root.setOpen(false);

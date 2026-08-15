@@ -177,6 +177,59 @@ describe('HoverCard - Behavior', () => {
     ).not.toBeNull();
   });
 
+  it('should honor the final pointer state through repeated timer churn', async () => {
+    vi.useFakeTimers();
+    container = mount(
+      <HoverCard openDelay={20} closeDelay={90}>
+        <HoverCardTrigger>Preview</HoverCardTrigger>
+        <HoverCardContent>Details</HoverCardContent>
+      </HoverCard>
+    );
+
+    const trigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
+    for (let cycle = 0; cycle < 5; cycle += 1) {
+      trigger.dispatchEvent(
+        new PointerEvent('pointerenter', { bubbles: true })
+      );
+      await vi.advanceTimersByTimeAsync(10);
+      trigger.dispatchEvent(
+        new PointerEvent('pointerleave', { bubbles: true })
+      );
+      await vi.advanceTimersByTimeAsync(10);
+    }
+    trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+
+    await vi.advanceTimersByTimeAsync(100);
+    await flushUpdates();
+
+    expect(
+      document.body.querySelector('[data-slot="hover-card-content"]')
+    ).not.toBeNull();
+  });
+
+  it('should cancel both transition timers during teardown', async () => {
+    vi.useFakeTimers();
+    const onOpenChange = vi.fn();
+    container = mount(
+      <HoverCard openDelay={50} closeDelay={50} onOpenChange={onOpenChange}>
+        <HoverCardTrigger>Preview</HoverCardTrigger>
+        <HoverCardContent>Details</HoverCardContent>
+      </HoverCard>
+    );
+
+    const trigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
+    trigger.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+    unmount(container);
+    container = undefined;
+
+    await vi.advanceTimersByTimeAsync(100);
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
   it('should expose complete dialog labeling given a trigger and content when the card is open', async () => {
     container = mount(
       <HoverCard defaultOpen>
