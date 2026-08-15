@@ -3,6 +3,10 @@ import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
 import {
+  compositeItemFocusProps,
+  repairFocusForDisabledItem,
+} from '../_internal/focus';
+import {
   getMenuCollection,
   registerCollectionNode,
   resolveMenuItemText,
@@ -77,6 +81,7 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
     isNativeButton: false,
   });
   const itemFocusProps = nav.item(itemIndex);
+  const focusRepairProps = compositeItemFocusProps();
   const handleKeyDown = (event: KeyboardEvent) => {
     if (!isDisabled && root.handleTypeaheadKeyDown(event)) {
       return;
@@ -117,6 +122,14 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
           registrationOwner
         );
         root.restoreItemFocus(itemIndex, node);
+        repairFocusForDisabledItem({
+          collection,
+          disabled: isDisabled,
+          index: itemIndex,
+          loop: true,
+          node,
+          setCurrentIndex: root.setCurrentIndex,
+        });
       }
     ),
     id: itemId,
@@ -128,6 +141,7 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
     'data-disabled': isDisabled ? 'true' : undefined,
     'aria-disabled': isDisabled ? 'true' : undefined,
     tabIndex: isDisabled ? -1 : itemFocusProps.tabIndex,
+    ...focusRepairProps,
   });
 
   if (asChild) {

@@ -3,13 +3,17 @@ import { state } from '@askrjs/askr';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
-import { focusSelectedCollectionItem } from '../_internal/focus';
+import {
+  compositeItemFocusProps,
+  focusSelectedCollectionItem,
+  repairFocusForDisabledItem,
+} from '../_internal/focus';
 import { runCancelablePress } from '../_internal/press';
 import {
   disabledIndexes,
   firstEnabledCompositeIndex,
-  getCompositeCollection,
   getCompositeCollectionItems,
+  observeCompositeCollection,
   registerCompositeNode,
 } from '../_internal/composite';
 import {
@@ -134,7 +138,7 @@ export function Accordion(props: AccordionProps) {
       ): void;
     };
   })();
-  const collection = getCompositeCollection(accordionId);
+  const collection = observeCompositeCollection(accordionId);
   const items = getCompositeCollectionItems(collection).filter(
     (item): item is typeof item & { value: string } =>
       typeof item.value === 'string'
@@ -186,11 +190,23 @@ export function Accordion(props: AccordionProps) {
     'data-accordion': 'true',
     'data-orientation': orientation,
   });
+  const nav = rovingFocus({
+    currentIndex,
+    itemCount: Math.max(items.length, 1),
+    orientation,
+    loop,
+    isDisabled: (index) => disabledIndexList.includes(index),
+    onNavigate: (index) => {
+      currentIndexState.set(index);
+      focusSelectedCollectionItem(collection, index);
+    },
+  });
+  const mergedProps = mergeProps(finalProps, nav.container);
 
   return (
     <AccordionRootContext value={rootContext}>
       <AccordionRenderContext value={renderContext}>
-        <div {...finalProps}>{children}</div>
+        <div {...mergedProps}>{children}</div>
       </AccordionRenderContext>
     </AccordionRootContext>
   );
@@ -315,6 +331,7 @@ export function AccordionTrigger(
     isNativeButton: !asChild,
   });
   const itemFocusProps = nav.item(item.itemIndex);
+  const focusRepairProps = compositeItemFocusProps();
   const registrationOwner = {};
   const finalProps = mergeProps(rest, {
     ...interactionProps,
@@ -337,6 +354,14 @@ export function AccordionTrigger(
           },
           registrationOwner
         );
+        repairFocusForDisabledItem({
+          collection,
+          disabled: isDisabled,
+          index: item.itemIndex,
+          loop: root.loop,
+          node,
+          setCurrentIndex: root.setCurrentIndex,
+        });
       }
     ),
     id: item.triggerId,
@@ -346,6 +371,7 @@ export function AccordionTrigger(
     'data-state': open ? 'open' : 'closed',
     'data-disabled': isDisabled ? 'true' : undefined,
     tabIndex: isDisabled ? -1 : 0,
+    ...focusRepairProps,
   });
 
   if (asChild) {

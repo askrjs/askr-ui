@@ -1,5 +1,6 @@
 import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { state } from '@askrjs/askr';
 import {
   Menubar,
   MenubarContent,
@@ -119,6 +120,63 @@ describe('Menubar - Behavior', () => {
     );
     await flushPortalUpdates();
     expect(document.body.textContent).not.toContain('New');
+  });
+
+  it('should move actual focus between open menu items with vertical arrows', async () => {
+    container = mount(
+      <Menubar>
+        <MenubarMenu value="file">
+          <MenubarTrigger>File</MenubarTrigger>
+          <MenubarPortal>
+            <MenubarContent>
+              <MenubarItem>One</MenubarItem>
+              <MenubarItem disabled>Two</MenubarItem>
+              <MenubarItem>Three</MenubarItem>
+            </MenubarContent>
+          </MenubarPortal>
+        </MenubarMenu>
+      </Menubar>
+    );
+
+    getButtonByText('File').click();
+    await flushPortalUpdates();
+    getButtonByText('One').focus();
+
+    await userEvent.keyboard('{ArrowDown}');
+    await flushPortalUpdates();
+    const focusedThree = getButtonByText('Three');
+    expect(document.activeElement).toBe(focusedThree);
+    expect(focusedThree.getAttribute('tabindex')).toBe('0');
+
+    await userEvent.keyboard('{ArrowUp}');
+    await flushPortalUpdates();
+    expect(document.activeElement).toBe(getButtonByText('One'));
+  });
+
+  it('should move focus when a focused root trigger becomes disabled', async () => {
+    let disabled!: ReturnType<typeof state<boolean>>;
+    function DynamicMenubar() {
+      disabled = state(false);
+      return (
+        <Menubar>
+          <MenubarMenu value="file">
+            <MenubarTrigger disabled={disabled()}>File</MenubarTrigger>
+          </MenubarMenu>
+          <MenubarMenu value="edit">
+            <MenubarTrigger>Edit</MenubarTrigger>
+          </MenubarMenu>
+        </Menubar>
+      );
+    }
+
+    container = mount(<DynamicMenubar />);
+    await flushPortalUpdates();
+    getButtonByText('File').focus();
+
+    disabled.set(true);
+    await flushPortalUpdates();
+
+    expect(document.activeElement).toBe(getButtonByText('Edit'));
   });
 
   it('should support typeahead, activation keys, submenus, and Tab dismissal', async () => {

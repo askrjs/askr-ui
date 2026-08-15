@@ -11,7 +11,10 @@ import {
   type PendingCollectionFocus,
 } from '../_internal/focus';
 import { pathIsOpen } from '../_internal/hierarchical-menu';
-import { getCompositeCollection } from '../_internal/composite';
+import {
+  getCompositeCollection,
+  observeCompositeCollection,
+} from '../_internal/composite';
 import {
   handleTypeaheadKeyDown,
   handleTypeaheadKeyUp,
@@ -74,7 +77,7 @@ function renderMenubarSurfaceContent(
       currentIndexState.set(index);
     }
   };
-  const collection = getCompositeCollection(owner.contentId);
+  const collection = observeCompositeCollection(owner.contentId);
   const focusItem = (index: number) => {
     focusCollectionItemWithRestore(pendingFocus, collection, index);
   };

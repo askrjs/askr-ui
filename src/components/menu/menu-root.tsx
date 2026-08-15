@@ -2,7 +2,10 @@ import { getSignal, state } from '@askrjs/askr';
 import { rovingFocus } from '@askrjs/askr/foundations/interactions';
 import { resolveCompoundId } from '../_internal/id';
 import { focusSelectedCollectionItem } from '../_internal/focus';
-import { getMenuCollection, getMenuCollectionItems } from '../_internal/menu';
+import {
+  getMenuCollectionItems,
+  observeMenuCollection,
+} from '../_internal/menu';
 import {
   handleTypeaheadKeyDown,
   handleTypeaheadKeyUp,
@@ -36,7 +39,7 @@ export function Menu(props: MenuProps) {
     currentIndexCandidate: currentIndexState(),
   };
   const resolvedState = resolveMenuState(rootContextBase);
-  const collection = getMenuCollection(menuId);
+  const collection = observeMenuCollection(menuId);
   const navigation = rovingFocus({
     currentIndex: resolvedState.currentIndex,
     itemCount: Math.max(resolvedState.items.length, 1),

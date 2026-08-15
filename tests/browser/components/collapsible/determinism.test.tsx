@@ -5,6 +5,7 @@ import {
   CollapsibleContent,
 } from '../../../../src/components/collapsible/collapsible';
 import { createIsland } from '@askrjs/askr/boot';
+import { cleanupApp } from '@askrjs/askr/boot';
 
 function mount(element: JSX.Element): HTMLElement {
   const container = document.createElement('div');
@@ -17,6 +18,7 @@ function mount(element: JSX.Element): HTMLElement {
 }
 
 function unmount(container: HTMLElement) {
+  cleanupApp(container);
   if (container.parentNode) {
     container.parentNode.removeChild(container);
   }
