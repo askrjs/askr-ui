@@ -7,7 +7,7 @@ import {
   type PendingCollectionFocus,
 } from '../_internal/focus';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
-import { getCompositeCollection } from '../_internal/composite';
+import { observeCompositeCollection } from '../_internal/composite';
 import {
   handleTypeaheadKeyDown,
   handleTypeaheadKeyUp,
@@ -94,7 +94,7 @@ export function Menubar(props: MenubarProps) {
   };
   const runtimeRenderContext = createMenubarRootRenderContext();
   const rootState = resolveMenubarRootState(rootContextBase);
-  const collection = getCompositeCollection(menubarId);
+  const collection = observeCompositeCollection(menubarId);
   const syncPortals = () => {
     portalEpochState.set(portalEpochState() + 1);
   };

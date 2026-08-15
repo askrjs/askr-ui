@@ -14,6 +14,16 @@ import {
   PopoverTrigger,
 } from '../../../../src/components/popover';
 import { VirtualList } from '../../../../src/components/virtual-list';
+import { Menu, MenuContent, MenuItem } from '../../../../src/components/menu';
+import {
+  Menubar,
+  MenubarMenu,
+  MenubarTrigger,
+} from '../../../../src/components/menubar';
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from '../../../../src/components/toggle-group';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Cross-component contracts', () => {
@@ -100,5 +110,98 @@ describe('Cross-component contracts', () => {
     await flushUpdates();
     expect(container.querySelector('[data-key="a"]')).not.toBeNull();
     expect(container.querySelector('[data-key="b"]')).not.toBeNull();
+  });
+
+  it('should isolate identical composite ids while keeping each mounted identity stable', async () => {
+    let rerender!: ReturnType<typeof state<number>>;
+    function IdenticalComposites() {
+      rerender = state(0);
+      return (
+        <div data-render={rerender()}>
+          <ToggleGroup>
+            <ToggleGroupItem value="same">Same toggle</ToggleGroupItem>
+          </ToggleGroup>
+          <ToggleGroup>
+            <ToggleGroupItem value="same">Same toggle</ToggleGroupItem>
+          </ToggleGroup>
+          <Menu>
+            <MenuContent>
+              <MenuItem>Same menu item</MenuItem>
+            </MenuContent>
+          </Menu>
+          <Menu>
+            <MenuContent>
+              <MenuItem>Same menu item</MenuItem>
+            </MenuContent>
+          </Menu>
+          <Menubar>
+            <MenubarMenu value="same">
+              <MenubarTrigger>Same menubar</MenubarTrigger>
+            </MenubarMenu>
+          </Menubar>
+          <Menubar>
+            <MenubarMenu value="same">
+              <MenubarTrigger>Same menubar</MenubarTrigger>
+            </MenubarMenu>
+          </Menubar>
+          <Menu id="explicit-menu">
+            <MenuContent>
+              <MenuItem>Explicit item</MenuItem>
+            </MenuContent>
+          </Menu>
+        </div>
+      );
+    }
+
+    container = mount(<IdenticalComposites />);
+    await flushUpdates();
+    await flushUpdates();
+    const slots = ['toggle-group-item', 'menu-item', 'menubar-trigger'];
+    const initialIds = new Map<string, string[]>();
+
+    for (const slot of slots) {
+      const ids = Array.from(
+        container.querySelectorAll<HTMLElement>(`[data-slot="${slot}"]`)
+      )
+        .filter((node) => node.textContent !== 'Explicit item')
+        .map((node) => node.id);
+      expect(ids).toHaveLength(2);
+      expect(new Set(ids).size).toBe(2);
+      initialIds.set(slot, ids);
+    }
+    expect(
+      container.querySelector<HTMLElement>('[data-slot="menu-item"]')?.id
+    ).not.toBe('menu-explicit-menu-item-0');
+    expect(
+      Array.from(
+        container.querySelectorAll<HTMLElement>('[data-slot="menu-item"]')
+      ).find((node) => node.textContent === 'Explicit item')?.id
+    ).toBe('menu-explicit-menu-item-0');
+
+    rerender.set(1);
+    await flushUpdates();
+    await flushUpdates();
+
+    for (const slot of slots) {
+      const ids = Array.from(
+        container.querySelectorAll<HTMLElement>(`[data-slot="${slot}"]`)
+      )
+        .filter((node) => node.textContent !== 'Explicit item')
+        .map((node) => node.id);
+      expect(ids).toEqual(initialIds.get(slot));
+    }
+
+    const firstToggleId = initialIds.get('toggle-group-item')![0];
+    unmount(container);
+    container = mount(
+      <ToggleGroup>
+        <ToggleGroupItem value="same">Same toggle</ToggleGroupItem>
+      </ToggleGroup>
+    );
+    await flushUpdates();
+    expect(
+      container.querySelector<HTMLElement>('[data-slot="toggle-group-item"]')
+        ?.id
+    ).toBe(firstToggleId);
   });
 });

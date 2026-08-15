@@ -1,5 +1,6 @@
 import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { state } from '@askrjs/askr';
 import {
   Menubar,
   MenubarContent,
@@ -151,6 +152,32 @@ describe('Menubar - Behavior', () => {
     await userEvent.keyboard('{ArrowUp}');
     await flushPortalUpdates();
     expect(document.activeElement).toBe(one);
+  });
+
+  it('should move focus when a focused root trigger becomes disabled', async () => {
+    let disabled!: ReturnType<typeof state<boolean>>;
+    function DynamicMenubar() {
+      disabled = state(false);
+      return (
+        <Menubar>
+          <MenubarMenu value="file">
+            <MenubarTrigger disabled={disabled()}>File</MenubarTrigger>
+          </MenubarMenu>
+          <MenubarMenu value="edit">
+            <MenubarTrigger>Edit</MenubarTrigger>
+          </MenubarMenu>
+        </Menubar>
+      );
+    }
+
+    container = mount(<DynamicMenubar />);
+    await flushPortalUpdates();
+    getButtonByText('File').focus();
+
+    disabled.set(true);
+    await flushPortalUpdates();
+
+    expect(document.activeElement).toBe(getButtonByText('Edit'));
   });
 
   it('should support typeahead, activation keys, submenus, and Tab dismissal', async () => {

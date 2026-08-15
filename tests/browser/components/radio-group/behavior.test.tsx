@@ -358,14 +358,10 @@ describe('RadioGroup - Behavior', () => {
       container.querySelectorAll<HTMLElement>('[data-slot="radio-group"]')
     );
     const firstItems = Array.from(
-      groups[0]!.querySelectorAll<HTMLElement>(
-        '[data-slot="radio-group-item"]'
-      )
+      groups[0]!.querySelectorAll<HTMLElement>('[data-slot="radio-group-item"]')
     );
     const secondItems = Array.from(
-      groups[1]!.querySelectorAll<HTMLElement>(
-        '[data-slot="radio-group-item"]'
-      )
+      groups[1]!.querySelectorAll<HTMLElement>('[data-slot="radio-group-item"]')
     );
 
     expect(firstItems.map((item) => item.id)).not.toEqual(
@@ -409,5 +405,34 @@ describe('RadioGroup - Behavior', () => {
     expect(getRadioByText(container, 'Medium').getAttribute('tabindex')).toBe(
       '-1'
     );
+  });
+
+  it('should leave no disabled item focused when every item becomes disabled', async () => {
+    let disabled!: ReturnType<typeof state<boolean>>;
+    function AllDisabledRadioGroup() {
+      disabled = state(false);
+      return (
+        <RadioGroup defaultValue="only">
+          <RadioGroupItem value="only" disabled={disabled()}>
+            Only
+          </RadioGroupItem>
+        </RadioGroup>
+      );
+    }
+
+    container = mount(<AllDisabledRadioGroup />);
+    await flushUpdates();
+    const only = getRadioByText(container, 'Only');
+    only.focus();
+
+    disabled.set(true);
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(document.activeElement).not.toBe(only);
+    expect(
+      document.activeElement instanceof HTMLElement &&
+        document.activeElement.hasAttribute('disabled')
+    ).toBe(false);
   });
 });

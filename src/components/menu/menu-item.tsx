@@ -3,6 +3,10 @@ import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import {
+  compositeItemFocusProps,
+  repairFocusForDisabledItem,
+} from '../_internal/focus';
+import {
   getMenuCollection,
   registerCollectionNode,
   resolveMenuItemText,
@@ -61,6 +65,7 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
     interactionProps.onKeyUp?.(event);
   };
   const registrationOwner = {};
+  const focusRepairProps = compositeItemFocusProps();
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
@@ -84,6 +89,14 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
           },
           registrationOwner
         );
+        repairFocusForDisabledItem({
+          collection,
+          disabled,
+          index: itemIndex,
+          loop: root.loop,
+          node,
+          setCurrentIndex: root.setCurrentIndex,
+        });
       }
     ),
     id: itemId,
@@ -93,6 +106,7 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
     'data-slot': 'menu-item',
     'data-disabled': disabled ? 'true' : undefined,
     tabIndex: disabled ? -1 : itemFocusProps.tabIndex,
+    ...focusRepairProps,
   });
 
   if (asChild) {

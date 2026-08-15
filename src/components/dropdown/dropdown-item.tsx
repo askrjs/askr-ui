@@ -3,6 +3,10 @@ import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
 import {
+  compositeItemFocusProps,
+  repairFocusForDisabledItem,
+} from '../_internal/focus';
+import {
   getMenuCollection,
   registerCollectionNode,
   resolveMenuItemText,
@@ -79,6 +83,7 @@ export function DropdownItem(
     },
     isNativeButton: false,
   });
+  const focusRepairProps = compositeItemFocusProps();
   const handleKeyDown = (event: KeyboardEvent) => {
     if (!disabled && root.handleTypeaheadKeyDown(event)) {
       return;
@@ -108,6 +113,14 @@ export function DropdownItem(
       registrationOwner
     );
     root.restoreItemFocus(itemIndex, node);
+    repairFocusForDisabledItem({
+      collection,
+      disabled,
+      index: itemIndex,
+      loop: true,
+      node,
+      setCurrentIndex: root.setCurrentIndex,
+    });
   };
   const refHandler = ref
     ? composeRefs(
@@ -133,6 +146,7 @@ export function DropdownItem(
     'data-slot': 'dropdown-item',
     'data-disabled': disabled ? 'true' : undefined,
     'data-variant': variant && variant !== 'default' ? variant : undefined,
+    ...focusRepairProps,
   });
 
   if (asChild) {

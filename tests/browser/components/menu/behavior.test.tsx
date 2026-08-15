@@ -1,5 +1,6 @@
 import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { state } from '@askrjs/askr';
 import {
   Menu,
   MenuContent,
@@ -132,5 +133,35 @@ describe('Menu - Behavior', () => {
     await userEvent.keyboard('{ArrowUp}');
     await flushUpdates();
     expect(document.activeElement).toBe(items[0]);
+  });
+
+  it('should move focus when the focused item becomes disabled', async () => {
+    let disabled!: ReturnType<typeof state<boolean>>;
+    function DynamicMenu() {
+      disabled = state(false);
+      return (
+        <Menu>
+          <MenuContent>
+            <MenuItem>One</MenuItem>
+            <MenuItem disabled={disabled()}>Two</MenuItem>
+            <MenuItem>Three</MenuItem>
+          </MenuContent>
+        </Menu>
+      );
+    }
+
+    container = mount(<DynamicMenu />);
+    await flushUpdates();
+    await flushUpdates();
+    const two = Array.from(
+      container.querySelectorAll<HTMLElement>('[role="menuitem"]')
+    ).find((item) => item.textContent === 'Two')!;
+    two.focus();
+
+    disabled.set(true);
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(document.activeElement?.textContent).toBe('Three');
   });
 });

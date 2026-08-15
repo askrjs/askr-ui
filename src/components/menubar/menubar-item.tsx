@@ -3,7 +3,11 @@ import { Slot } from '@askrjs/askr/foundations/structures';
 import { state } from '@askrjs/askr';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
-import { focusSelectedCollectionItem } from '../_internal/focus';
+import {
+  compositeItemFocusProps,
+  focusSelectedCollectionItem,
+  repairFocusForDisabledItem,
+} from '../_internal/focus';
 import { resolvePartId } from '../_internal/id';
 import { pathIsOpen } from '../_internal/hierarchical-menu';
 import { resolveMenuItemText } from '../_internal/menu';
@@ -95,6 +99,7 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
     isNativeButton: false,
   });
   const itemFocusProps = nav.item(surfaceIndex);
+  const focusRepairProps = compositeItemFocusProps();
   const handleKeyDown = (event: KeyboardEvent) => {
     if (!disabled && content.handleTypeaheadKeyDown(event)) {
       return;
@@ -123,6 +128,14 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
       registrationOwner
     );
     content.restoreItemFocus(surfaceIndex, node);
+    repairFocusForDisabledItem({
+      collection,
+      disabled,
+      index: surfaceIndex,
+      loop: true,
+      node,
+      setCurrentIndex: content.setCurrentIndex,
+    });
   };
   const refHandler = ref
     ? composeRefs(
@@ -147,6 +160,7 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
     'data-slot': 'menubar-item',
     'data-disabled': disabled ? 'true' : undefined,
     tabIndex: disabled ? -1 : itemFocusProps.tabIndex,
+    ...focusRepairProps,
   });
 
   if (asChild) {
@@ -244,6 +258,7 @@ export function MenubarSubTrigger(
     },
     isNativeButton: false,
   });
+  const focusRepairProps = compositeItemFocusProps();
   const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
     getOverlayNodes(sub.overlayIdentity).trigger = node;
@@ -259,6 +274,14 @@ export function MenubarSubTrigger(
       registrationOwner
     );
     content.restoreItemFocus(sub.surfaceIndex, node);
+    repairFocusForDisabledItem({
+      collection,
+      disabled,
+      index: sub.surfaceIndex,
+      loop: true,
+      node,
+      setCurrentIndex: content.setCurrentIndex,
+    });
   };
   const refHandler = ref
     ? composeRefs(
@@ -308,6 +331,7 @@ export function MenubarSubTrigger(
     'data-state': isOpen() ? 'open' : 'closed',
     'data-disabled': disabled ? 'true' : undefined,
     tabIndex: disabled ? -1 : itemFocusProps.tabIndex,
+    ...focusRepairProps,
     onPointerEnter: () => {
       if (!disabled) {
         content.setCurrentIndex(sub.surfaceIndex);
