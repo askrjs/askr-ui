@@ -144,8 +144,9 @@ describe('HoverCard - Behavior', () => {
 
   it('should cancel a pending open when the pointer leaves immediately', async () => {
     vi.useFakeTimers();
+    const onOpenChange = vi.fn();
     container = mount(
-      <HoverCard openDelay={0} closeDelay={90}>
+      <HoverCard openDelay={0} closeDelay={90} onOpenChange={onOpenChange}>
         <HoverCardTrigger>Preview</HoverCardTrigger>
         <HoverCardContent>Details</HoverCardContent>
       </HoverCard>
@@ -160,10 +161,14 @@ describe('HoverCard - Behavior', () => {
     await vi.advanceTimersByTimeAsync(100);
     await flushUpdates();
 
-    expect(trigger.getAttribute('data-state')).toBe('closed');
+    const currentTrigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement;
+    expect(currentTrigger.getAttribute('data-state')).toBe('closed');
     expect(
       document.body.querySelector('[data-slot="hover-card-content"]')
     ).toBeNull();
+    expect(onOpenChange).not.toHaveBeenCalled();
   });
 
   it('should cancel a pending close when the pointer re-enters before its deadline', async () => {
