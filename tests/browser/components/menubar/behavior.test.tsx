@@ -140,18 +140,17 @@ describe('Menubar - Behavior', () => {
 
     getButtonByText('File').click();
     await flushPortalUpdates();
-    const one = getButtonByText('One');
-    const three = getButtonByText('Three');
-    one.focus();
+    getButtonByText('One').focus();
 
     await userEvent.keyboard('{ArrowDown}');
     await flushPortalUpdates();
-    expect(document.activeElement).toBe(three);
-    expect(three.getAttribute('tabindex')).toBe('0');
+    const focusedThree = getButtonByText('Three');
+    expect(document.activeElement).toBe(focusedThree);
+    expect(focusedThree.getAttribute('tabindex')).toBe('0');
 
     await userEvent.keyboard('{ArrowUp}');
     await flushPortalUpdates();
-    expect(document.activeElement).toBe(one);
+    expect(document.activeElement).toBe(getButtonByText('One'));
   });
 
   it('should move focus when a focused root trigger becomes disabled', async () => {
