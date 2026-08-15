@@ -1,3 +1,4 @@
+import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
@@ -134,7 +135,7 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
   }
 
   return (
-    <button type={type ?? 'button'} {...finalProps}>
+    <button type={type ?? 'button'} {...nativeButtonProps(finalProps)}>
       {children}
     </button>
   );

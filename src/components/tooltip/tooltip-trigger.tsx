@@ -1,3 +1,4 @@
+import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { hoverable } from '@askrjs/askr/foundations/interactions';
@@ -68,7 +69,11 @@ export function TooltipTrigger(
   }
 
   return (
-    <button type={typeProp ?? 'button'} disabled={disabled} {...finalProps}>
+    <button
+      type={typeProp ?? 'button'}
+      disabled={disabled}
+      {...nativeButtonProps(finalProps)}
+    >
       {children}
     </button>
   );
