@@ -8,6 +8,11 @@ import type {
   DialogContentProps,
 } from './dialog.types';
 
+/**
+ * Renders the `dialog-content` part of `dialog`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function DialogContent(props: DialogContentProps): JSX.Element | null;
 export function DialogContent(
   props: DialogContentAsChildProps

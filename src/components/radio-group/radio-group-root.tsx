@@ -58,6 +58,9 @@ function RadioGroupRootView(props: {
   );
 }
 
+/**
+ * Renders a part of `radio-group`.
+ */
 export function RadioGroup(props: RadioGroupProps) {
   const {
     children,

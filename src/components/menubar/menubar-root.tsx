@@ -54,6 +54,9 @@ function getMenubarPortalRegistry(identity: object) {
   return created;
 }
 
+/**
+ * Renders a part of `menubar`.
+ */
 export function Menubar(props: MenubarProps) {
   const { children, id, loop = true, ref, ...rest } = props;
   const nonce = cspNonce();

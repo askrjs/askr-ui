@@ -9,6 +9,11 @@ import type {
   MenubarSeparatorProps,
 } from './menubar.types';
 
+/**
+ * Renders the `menubar-group` part of `menubar` with `role="group"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function MenubarGroup(
   props: MenubarGroupProps | MenubarGroupAsChildProps
 ) {
@@ -27,6 +32,11 @@ export function MenubarGroup(
   );
 }
 
+/**
+ * Renders the `menubar-label` part of `menubar`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function MenubarLabel(
   props: MenubarLabelProps | MenubarLabelAsChildProps
 ) {
@@ -44,6 +54,11 @@ export function MenubarLabel(
   );
 }
 
+/**
+ * Renders the `menubar-separator` part of `menubar` with `role="separator"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function MenubarSeparator(
   props: MenubarSeparatorProps | MenubarSeparatorAsChildProps
 ) {

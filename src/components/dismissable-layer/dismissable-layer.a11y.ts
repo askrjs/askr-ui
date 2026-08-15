@@ -7,5 +7,6 @@ export const DISMISSABLE_LAYER_A11Y_CONTRACT = {
   INTERACTION_POLICY: 'background-dismissable' as const,
 } as const;
 
+/** Type of the Dismissable Layer A11y Contract object. */
 export type DismissableLayerA11yContract =
   typeof DISMISSABLE_LAYER_A11Y_CONTRACT;

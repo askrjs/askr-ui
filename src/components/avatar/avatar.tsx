@@ -51,6 +51,11 @@ function AvatarView(props: {
   );
 }
 
+/**
+ * Renders the `avatar` part of `avatar`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function Avatar(props: AvatarProps): JSX.Element;
 export function Avatar(props: AvatarAsChildProps): JSX.Element;
 export function Avatar(props: AvatarProps | AvatarAsChildProps) {
@@ -88,6 +93,9 @@ export function Avatar(props: AvatarProps | AvatarAsChildProps) {
   );
 }
 
+/**
+ * Renders the `avatar-image` part of `avatar`.
+ */
 export function AvatarImage(props: AvatarImageProps): JSX.Element {
   const { alt, onLoadingStatusChange, ref, src, ...rest } = props;
   const { identity, status, setStatus } = readAvatarContext();
@@ -149,6 +157,11 @@ export function AvatarImage(props: AvatarImageProps): JSX.Element {
   return <img {...finalProps} />;
 }
 
+/**
+ * Renders the `avatar-fallback` part of `avatar`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function AvatarFallback(props: AvatarFallbackProps): JSX.Element | null;
 export function AvatarFallback(
   props: AvatarFallbackAsChildProps

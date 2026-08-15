@@ -7,4 +7,5 @@ export const VISUALLY_HIDDEN_A11Y_CONTRACT = {
   HOST_ELEMENT: 'span' as const,
 } as const;
 
+/** Type of the Visually Hidden A11y Contract object. */
 export type VisuallyHiddenA11yContract = typeof VISUALLY_HIDDEN_A11Y_CONTRACT;

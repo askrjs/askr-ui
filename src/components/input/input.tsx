@@ -9,6 +9,11 @@ import type {
   InputInputProps,
 } from './input.types';
 
+/**
+ * Renders the `input` part of `input`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function Input(props: InputInputProps): JSX.Element;
 export function Input(props: InputAsChildProps): JSX.Element;
 export function Input(props: InputInputProps | InputAsChildProps) {

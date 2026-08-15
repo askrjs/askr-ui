@@ -17,6 +17,11 @@ import type {
   DropdownContentProps,
 } from './dropdown.types';
 
+/**
+ * Renders a part of `dropdown`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function DropdownContent(
   props: DropdownContentProps
 ): JSX.Element | null;

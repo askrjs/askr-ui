@@ -1,6 +1,7 @@
 import { defineScope, readScope } from '@askrjs/askr';
 import type { AvatarLoadingStatus } from './avatar.types';
 
+/** Shape of the Avatar Context Value. */
 export type AvatarContextValue = {
   avatarId: string;
   identity: object;
@@ -10,6 +11,9 @@ export type AvatarContextValue = {
 
 export const AvatarContext = defineScope<AvatarContextValue | null>(null);
 
+/**
+ * Reads the Avatar Context; throws if called outside its provider.
+ */
 export function readAvatarContext(): AvatarContextValue {
   const context = readScope(AvatarContext);
 

@@ -793,6 +793,11 @@ function renderVirtualTableRows<Row>(
   return renderedRows;
 }
 
+/**
+ * Renders a part of `virtual-table`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function VirtualTable<Row>(props: VirtualTableProps<Row>): JSX.Element;
 export function VirtualTable<Row>(
   props: VirtualTableAsChildProps<Row>

@@ -8,6 +8,11 @@ import type {
   PopoverCloseProps,
 } from './popover.types';
 
+/**
+ * Renders the `popover-close` part of `popover`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function PopoverClose(props: PopoverCloseProps): JSX.Element;
 export function PopoverClose(props: PopoverCloseAsChildProps): JSX.Element;
 export function PopoverClose(

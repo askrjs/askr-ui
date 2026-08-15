@@ -27,6 +27,9 @@ import {
 } from './dropdown.shared';
 import type { DropdownProps } from './dropdown.types';
 
+/**
+ * Renders a part of `dropdown`.
+ */
 export function Dropdown(props: DropdownProps) {
   const { children, id, open, defaultOpen = false, onOpenChange } = props;
   const openState = controllableState({

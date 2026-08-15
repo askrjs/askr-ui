@@ -9,6 +9,11 @@ import type {
   MenuSeparatorProps,
 } from './menu.types';
 
+/**
+ * Renders the `menu-group` part of `menu` with `role="group"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function MenuGroup(props: MenuGroupProps): JSX.Element;
 export function MenuGroup(props: MenuGroupAsChildProps): JSX.Element;
 export function MenuGroup(props: MenuGroupProps | MenuGroupAsChildProps) {
@@ -26,6 +31,11 @@ export function MenuGroup(props: MenuGroupProps | MenuGroupAsChildProps) {
   return <div {...finalProps}>{children}</div>;
 }
 
+/**
+ * Renders the `menu-label` part of `menu`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function MenuLabel(props: MenuLabelProps): JSX.Element | null;
 export function MenuLabel(props: MenuLabelAsChildProps): JSX.Element | null;
 export function MenuLabel(props: MenuLabelProps | MenuLabelAsChildProps) {
@@ -42,6 +52,11 @@ export function MenuLabel(props: MenuLabelProps | MenuLabelAsChildProps) {
   return <div {...finalProps}>{children}</div>;
 }
 
+/**
+ * Renders the `menu-separator` part of `menu` with `role="separator"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function MenuSeparator(props: MenuSeparatorProps): JSX.Element | null;
 export function MenuSeparator(
   props: MenuSeparatorAsChildProps

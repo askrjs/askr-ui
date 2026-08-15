@@ -1,6 +1,9 @@
 import { readHoverCardRootContext } from './hover-card.shared';
 import type { HoverCardPortalProps } from './hover-card.types';
 
+/**
+ * Renders a part of `hover-card`.
+ */
 export function HoverCardPortal(
   props: HoverCardPortalProps
 ): JSX.Element | null {

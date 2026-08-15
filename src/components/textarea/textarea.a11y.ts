@@ -22,4 +22,5 @@ export const TEXTAREA_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Textarea A11y Contract object. */
 export type TextareaA11yContract = typeof TEXTAREA_A11Y_CONTRACT;

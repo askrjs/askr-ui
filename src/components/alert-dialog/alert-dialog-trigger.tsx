@@ -5,6 +5,11 @@ import type {
   AlertDialogTriggerProps,
 } from './alert-dialog.types';
 
+/**
+ * Renders a part of `alert-dialog`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function AlertDialogTrigger(
   props: AlertDialogTriggerProps | AlertDialogTriggerAsChildProps
 ) {

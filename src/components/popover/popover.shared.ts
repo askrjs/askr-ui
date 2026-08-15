@@ -2,6 +2,7 @@ import { defineScope, readScope } from '@askrjs/askr';
 import { OVERLAY_Z_INDEX, type OverlayPortal } from '../_internal/overlay';
 import type { PopoverContentOwnProps } from './popover.types';
 
+/** Popover Position Options. */
 export type PopoverPositionOptions = {
   side: NonNullable<PopoverContentOwnProps['side']>;
   align: NonNullable<PopoverContentOwnProps['align']>;
@@ -9,6 +10,7 @@ export type PopoverPositionOptions = {
   zIndex: typeof OVERLAY_Z_INDEX.popover;
 };
 
+/** Shape of the Popover Root Context Value. */
 export type PopoverRootContextValue = {
   popoverId: string;
   open: boolean;
@@ -27,6 +29,9 @@ export const PopoverRootContext = defineScope<PopoverRootContextValue | null>(
   null
 );
 
+/**
+ * Reads the Popover Root Context; throws if called outside its provider.
+ */
 export function readPopoverRootContext(): PopoverRootContextValue {
   const context = readScope(PopoverRootContext);
 
@@ -37,6 +42,9 @@ export function readPopoverRootContext(): PopoverRootContextValue {
   return context;
 }
 
+/**
+ * Builds overlay positioning options for Popover Position Options.
+ */
 export function resolvePopoverPositionOptions(
   options: Partial<Omit<PopoverPositionOptions, 'zIndex'>> = {}
 ): PopoverPositionOptions {

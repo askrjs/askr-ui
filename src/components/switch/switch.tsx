@@ -4,6 +4,11 @@ import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import type { SwitchAsChildProps, SwitchButtonProps } from './switch.types';
 
+/**
+ * Renders the `switch` part of `switch` with `role="switch"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function Switch(props: SwitchButtonProps): JSX.Element;
 export function Switch(props: SwitchAsChildProps): JSX.Element;
 export function Switch(props: SwitchButtonProps | SwitchAsChildProps) {

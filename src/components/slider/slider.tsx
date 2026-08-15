@@ -181,6 +181,9 @@ function resolveLiveSliderRoot(identity: object, sliderId: string) {
   return getSliderRootContext(identity, sliderId);
 }
 
+/**
+ * Renders the `slider` part of `slider`.
+ */
 export function Slider(props: SliderProps) {
   const nonce = cspNonce();
   const {
@@ -273,6 +276,11 @@ export function Slider(props: SliderProps) {
   );
 }
 
+/**
+ * Renders the `slider-track` part of `slider`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function SliderTrack(props: SliderTrackProps): JSX.Element;
 export function SliderTrack(props: SliderTrackAsChildProps): JSX.Element;
 export function SliderTrack(props: SliderTrackProps | SliderTrackAsChildProps) {
@@ -319,6 +327,11 @@ export function SliderTrack(props: SliderTrackProps | SliderTrackAsChildProps) {
   return <div {...finalProps}>{children}</div>;
 }
 
+/**
+ * Renders the `slider-range` part of `slider`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function SliderRange(props: SliderRangeProps): JSX.Element;
 export function SliderRange(props: SliderRangeAsChildProps): JSX.Element;
 export function SliderRange(props: SliderRangeProps | SliderRangeAsChildProps) {
@@ -340,6 +353,11 @@ export function SliderRange(props: SliderRangeProps | SliderRangeAsChildProps) {
   return <div {...finalProps}>{children}</div>;
 }
 
+/**
+ * Renders the `slider-thumb` part of `slider` with `role="slider"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function SliderThumb(props: SliderThumbProps): JSX.Element;
 export function SliderThumb(props: SliderThumbAsChildProps): JSX.Element;
 export function SliderThumb(props: SliderThumbProps | SliderThumbAsChildProps) {

@@ -11,6 +11,7 @@ type VirtualListRootProps = Omit<
   'children' | 'onScroll' | 'ref'
 >;
 
+/** Props for Virtual List Row Component. */
 export type VirtualListRowComponentProps<Item> = {
   item: Item;
   index: number;
@@ -18,14 +19,18 @@ export type VirtualListRowComponentProps<Item> = {
   isVisible: boolean;
 };
 
+/** Virtual List Row Element. */
 export type VirtualListRowElement = JSXElement | JSX.Element;
 
+/** Virtual List Row Component. */
 export type VirtualListRowComponent<Item> = (
   props: VirtualListRowComponentProps<Item>
 ) => VirtualListRowElement | null;
 
+/** Virtual List Viewport. */
 export type VirtualListViewport = 'lg';
 
+/** Virtual List State. */
 export type VirtualListState = {
   count: number;
   scrollTop: number;
@@ -38,6 +43,7 @@ export type VirtualListState = {
   pendingUnseenCount: number;
 };
 
+/** Virtual List Api. */
 export type VirtualListApi<_Item> = {
   scrollToIndex: (index: number, alignment?: VirtualScrollAlignment) => void;
   scrollToTop: () => void;
@@ -53,6 +59,7 @@ export type VirtualListApi<_Item> = {
   setFollowBottom: (followBottom: boolean) => void;
 };
 
+/** Props for Virtual List. */
 export type VirtualListProps<Item> = VirtualListRootProps & {
   items: readonly Item[];
   rowHeight: number;
@@ -67,6 +74,7 @@ export type VirtualListProps<Item> = VirtualListRootProps & {
   asChild?: false;
 };
 
+/** Props for the `asChild` (polymorphic) rendering of Virtual List. */
 export type VirtualListAsChildProps<Item> = Omit<
   VirtualListRootProps,
   'children'

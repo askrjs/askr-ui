@@ -18,6 +18,11 @@ type ScopeEntry = {
   pendingDetachedNode: HTMLElement | null;
 };
 
+/**
+ * Renders a part of `focus-scope`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function FocusScope(props: FocusScopeProps): JSX.Element;
 export function FocusScope(props: FocusScopeAsChildProps): JSX.Element;
 export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {

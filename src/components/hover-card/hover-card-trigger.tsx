@@ -8,6 +8,11 @@ import type {
   HoverCardTriggerProps,
 } from './hover-card.types';
 
+/**
+ * Renders the `hover-card-trigger` part of `hover-card`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function HoverCardTrigger(props: HoverCardTriggerProps): JSX.Element;
 export function HoverCardTrigger(
   props: HoverCardTriggerAsChildProps

@@ -15,4 +15,5 @@ export const PROGRESS_CIRCLE_A11Y_CONTRACT = {
   INDICATOR_MARKER: 'data-progress-circle-indicator' as const,
 } as const;
 
+/** Type of the Progress Circle A11y Contract object. */
 export type ProgressCircleA11yContract = typeof PROGRESS_CIRCLE_A11Y_CONTRACT;

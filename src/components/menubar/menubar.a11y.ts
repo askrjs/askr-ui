@@ -17,4 +17,5 @@ export const MENUBAR_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Menubar A11y Contract object. */
 export type MenubarA11yContract = typeof MENUBAR_A11Y_CONTRACT;

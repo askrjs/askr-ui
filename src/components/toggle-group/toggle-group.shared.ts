@@ -1,11 +1,13 @@
 import { defineScope, readScope } from '@askrjs/askr';
 import type { ToggleGroupOrientation } from './toggle-group.types';
 
+/** Toggle Group Root Item. */
 export type ToggleGroupRootItem = {
   value: string;
   disabled: boolean;
 };
 
+/** Shape of the Toggle Group Root Context Value. */
 export type ToggleGroupRootContextValue = {
   groupId: string;
   type: 'single' | 'multiple';
@@ -23,6 +25,7 @@ export type ToggleGroupRootContextValue = {
   disabledItemIndexes: number[];
 };
 
+/** Shape of the Toggle Group Render Context Value. */
 export type ToggleGroupRenderContextValue = {
   claimItemIndex: () => number;
 };
@@ -33,6 +36,9 @@ export const ToggleGroupRootContext =
 export const ToggleGroupRenderContext =
   defineScope<ToggleGroupRenderContextValue | null>(null);
 
+/**
+ * Reads the Toggle Group Root Context; throws if called outside its provider.
+ */
 export function readToggleGroupRootContext(): ToggleGroupRootContextValue {
   const context = readScope(ToggleGroupRootContext);
 
@@ -43,6 +49,9 @@ export function readToggleGroupRootContext(): ToggleGroupRootContextValue {
   return context;
 }
 
+/**
+ * Reads the Toggle Group Render Context; throws if called outside its provider.
+ */
 export function readToggleGroupRenderContext(): ToggleGroupRenderContextValue {
   const context = readScope(ToggleGroupRenderContext);
 
@@ -53,6 +62,9 @@ export function readToggleGroupRenderContext(): ToggleGroupRenderContextValue {
   return context;
 }
 
+/**
+ * Creates a fresh Toggle Group Render Context instance.
+ */
 export function createToggleGroupRenderContext(): ToggleGroupRenderContextValue {
   let itemIndex = 0;
 
@@ -62,7 +74,11 @@ export function createToggleGroupRenderContext(): ToggleGroupRenderContextValue 
 }
 
 export const ToggleGroupContext = ToggleGroupRootContext;
+/** Shape of the Toggle Group Context Value. */
 export type ToggleGroupContextValue = ToggleGroupRootContextValue;
+/**
+ * Reads the Toggle Group Context; throws if called outside its provider.
+ */
 export function readToggleGroupContext(): ToggleGroupRootContextValue {
   return readToggleGroupRootContext();
 }

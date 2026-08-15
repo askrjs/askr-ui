@@ -1,6 +1,7 @@
 import type { JSXElement } from '@askrjs/askr/foundations/structures';
 import type { Ref } from '@askrjs/askr/foundations/utilities';
 
+/** Own props for Switch, before merging with native element attributes. */
 export type SwitchOwnProps = {
   children?: unknown;
   checked?: boolean;
@@ -12,6 +13,7 @@ export type SwitchOwnProps = {
   value?: string;
 };
 
+/** Props for Switch Button. */
 export type SwitchButtonProps = Omit<
   JSX.IntrinsicElements['button'],
   'children' | 'onClick' | 'type' | 'ref'
@@ -22,6 +24,7 @@ export type SwitchButtonProps = Omit<
     type?: 'button' | 'submit' | 'reset';
   };
 
+/** Props for the `asChild` (polymorphic) rendering of Switch. */
 export type SwitchAsChildProps = SwitchOwnProps & {
   asChild: true;
   children: JSXElement;
@@ -29,4 +32,5 @@ export type SwitchAsChildProps = SwitchOwnProps & {
   type?: never;
 };
 
+/** Props for Switch. */
 export type SwitchProps = SwitchButtonProps | SwitchAsChildProps;

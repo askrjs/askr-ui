@@ -6,6 +6,7 @@ import {
   getCompositeCollectionItems,
 } from '../_internal/composite';
 
+/** Menubar Trigger Metadata. */
 export type MenubarTriggerMetadata = {
   index: number;
   disabled: boolean;
@@ -13,12 +14,14 @@ export type MenubarTriggerMetadata = {
   text: string;
 };
 
+/** Menubar Surface Metadata. */
 export type MenubarSurfaceMetadata = {
   index: number;
   disabled: boolean;
   text: string;
 };
 
+/** Shape of the Menubar Root Context Value. */
 export type MenubarRootContextValue = {
   menubarId: string;
   ensureMenuPortal: (menuKey: string) => MenubarPortalRecord;
@@ -36,20 +39,24 @@ export type MenubarRootContextValue = {
   handleTypeaheadKeyUp: (event: KeyboardEvent) => boolean;
 };
 
+/** Menubar Portal Record. */
 export type MenubarPortalRecord = {
   identity: object;
   ordinal: number;
 };
 
+/** Menubar Root State Input. */
 export type MenubarRootStateInput = {
   menubarId: string;
   currentTriggerIndexCandidate: number;
 };
 
+/** Shape of the Menubar Root Render Context Value. */
 export type MenubarRootRenderContextValue = {
   claimMenuIndex: () => number;
 };
 
+/** Shape of the Menubar Menu Context Value. */
 export type MenubarMenuContextValue = {
   menuKey: string;
   menuIndex: number;
@@ -60,6 +67,7 @@ export type MenubarMenuContextValue = {
   path: string[];
 };
 
+/** Shape of the Menubar Content Context Value. */
 export type MenubarContentContextValue = {
   contentId: string;
   triggerId: string;
@@ -74,10 +82,12 @@ export type MenubarContentContextValue = {
   handleTypeaheadKeyUp: (event: KeyboardEvent) => boolean;
 };
 
+/** Shape of the Menubar Content Render Context Value. */
 export type MenubarContentRenderContextValue = {
   claimSurfaceIndex: () => number;
 };
 
+/** Shape of the Menubar Sub Context Value. */
 export type MenubarSubContextValue = {
   surfaceIndex: number;
   triggerId: string;
@@ -86,12 +96,14 @@ export type MenubarSubContextValue = {
   overlayIdentity: object;
 };
 
+/** Menubar Root Resolved State. */
 export type MenubarRootResolvedState = {
   items: MenubarTriggerMetadata[];
   currentTriggerIndex: number;
   disabledTriggerIndexes: number[];
 };
 
+/** Menubar Content Resolved State. */
 export type MenubarContentResolvedState = {
   items: MenubarSurfaceMetadata[];
   currentIndex: number;
@@ -114,6 +126,9 @@ export const MenubarSubContext = defineScope<MenubarSubContextValue | null>(
   null
 );
 
+/**
+ * Reads the Menubar Root Context; throws if called outside its provider.
+ */
 export function readMenubarRootContext(): MenubarRootContextValue {
   const context = readScope(MenubarRootContext);
 
@@ -124,10 +139,16 @@ export function readMenubarRootContext(): MenubarRootContextValue {
   return context;
 }
 
+/**
+ * Reads the Optional Menubar Root Context; throws if called outside its provider.
+ */
 export function readOptionalMenubarRootContext(): MenubarRootContextValue | null {
   return readScope(MenubarRootContext);
 }
 
+/**
+ * Reads the Menubar Root Render Context; throws if called outside its provider.
+ */
 export function readMenubarRootRenderContext(): MenubarRootRenderContextValue {
   const context = readScope(MenubarRootRenderContext);
 
@@ -138,6 +159,9 @@ export function readMenubarRootRenderContext(): MenubarRootRenderContextValue {
   return context;
 }
 
+/**
+ * Reads the Menubar Menu Context; throws if called outside its provider.
+ */
 export function readMenubarMenuContext(): MenubarMenuContextValue {
   const context = readScope(MenubarMenuContext);
 
@@ -148,6 +172,9 @@ export function readMenubarMenuContext(): MenubarMenuContextValue {
   return context;
 }
 
+/**
+ * Reads the Menubar Content Context; throws if called outside its provider.
+ */
 export function readMenubarContentContext(): MenubarContentContextValue {
   const context = readScope(MenubarContentContext);
 
@@ -158,6 +185,9 @@ export function readMenubarContentContext(): MenubarContentContextValue {
   return context;
 }
 
+/**
+ * Reads the Menubar Content Render Context; throws if called outside its provider.
+ */
 export function readMenubarContentRenderContext(): MenubarContentRenderContextValue {
   const context = readScope(MenubarContentRenderContext);
 
@@ -168,6 +198,9 @@ export function readMenubarContentRenderContext(): MenubarContentRenderContextVa
   return context;
 }
 
+/**
+ * Reads the Menubar Sub Context; throws if called outside its provider.
+ */
 export function readMenubarSubContext(): MenubarSubContextValue {
   const context = readScope(MenubarSubContext);
 
@@ -180,6 +213,9 @@ export function readMenubarSubContext(): MenubarSubContextValue {
   return context;
 }
 
+/**
+ * Creates a fresh Menubar Root Render Context instance.
+ */
 export function createMenubarRootRenderContext(): MenubarRootRenderContextValue {
   let nextMenuIndex = 0;
 
@@ -192,6 +228,9 @@ export function createMenubarRootRenderContext(): MenubarRootRenderContextValue 
   };
 }
 
+/**
+ * Creates a fresh Menubar Content Render Context instance.
+ */
 export function createMenubarContentRenderContext(): MenubarContentRenderContextValue {
   let nextSurfaceIndex = 0;
 
@@ -204,6 +243,10 @@ export function createMenubarContentRenderContext(): MenubarContentRenderContext
   };
 }
 
+/**
+ * Computes the resolved Menubar Root State (collection items, current index,
+ * and disabled indexes) from root context input.
+ */
 export function resolveMenubarRootState(
   root: MenubarRootStateInput
 ): MenubarRootResolvedState {
@@ -229,6 +272,10 @@ export function resolveMenubarRootState(
   };
 }
 
+/**
+ * Computes the resolved Menubar Content State (collection items, current index,
+ * and disabled indexes) from root context input.
+ */
 export function resolveMenubarContentState(
   content: MenubarContentContextValue
 ): MenubarContentResolvedState {
@@ -253,6 +300,9 @@ export function resolveMenubarContentState(
   };
 }
 
+/**
+ * Resolves the owning element for Menubar Content Owner.
+ */
 export function resolveMenubarContentOwner(): {
   contentId: string;
   triggerId: string;

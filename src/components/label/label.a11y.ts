@@ -15,4 +15,5 @@ export const LABEL_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Label A11y Contract object. */
 export type LabelA11yContract = typeof LABEL_A11Y_CONTRACT;

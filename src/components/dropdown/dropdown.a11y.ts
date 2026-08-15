@@ -19,4 +19,5 @@ export const DROPDOWN_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Dropdown A11y Contract object. */
 export type DropdownA11yContract = typeof DROPDOWN_A11Y_CONTRACT;

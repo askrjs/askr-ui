@@ -110,4 +110,5 @@ export const CHECKBOX_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Checkbox A11y Contract object. */
 export type CheckboxA11yContract = typeof CHECKBOX_A11Y_CONTRACT;

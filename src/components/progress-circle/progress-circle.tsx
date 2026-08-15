@@ -42,6 +42,13 @@ function readProgressCircleRootContext(): ProgressCircleRootContextValue {
   return context;
 }
 
+/**
+ * Headless circular progress indicator root.
+ *
+ * Normalizes value/max, computes percentage, exposes `--ak-progress-percentage`
+ * as a dynamically injected CSS custom property, and provides progress state
+ * to `ProgressCircleIndicator` via context.
+ */
 export function ProgressCircle(props: ProgressCircleProps) {
   const nonce = cspNonce();
   const {
@@ -118,6 +125,11 @@ export function ProgressCircle(props: ProgressCircleProps) {
   );
 }
 
+/**
+ * Visual indicator for `ProgressCircle`, rendering the fill/arc element.
+ * Must be used within a `ProgressCircle`; reads progress state from context
+ * and exposes it as `data-state`/`data-value`/`data-max`/`data-percentage`.
+ */
 export function ProgressCircleIndicator(
   props: ProgressCircleIndicatorProps
 ): JSX.Element;

@@ -2,6 +2,7 @@ import { defineScope, readScope } from '@askrjs/askr';
 import type { getCompositeCollection } from '../_internal/composite';
 import type { AccordionOrientation } from './accordion.types';
 
+/** Shape of the Accordion Root Context Value. */
 export type AccordionRootContextValue = {
   accordionId: string;
   type: 'single' | 'multiple';
@@ -17,10 +18,12 @@ export type AccordionRootContextValue = {
   collection: ReturnType<typeof getCompositeCollection>;
 };
 
+/** Shape of the Accordion Render Context Value. */
 export type AccordionRenderContextValue = {
   claimItemIndex: () => number;
 };
 
+/** Shape of the Accordion Item Context Value. */
 export type AccordionItemContextValue = {
   accordionId: string;
   itemIndex: number;
@@ -38,6 +41,9 @@ export const AccordionRenderContext =
 export const AccordionItemContext =
   defineScope<AccordionItemContextValue | null>(null);
 
+/**
+ * Reads the Accordion Root Context; throws if called outside its provider.
+ */
 export function readAccordionRootContext(): AccordionRootContextValue {
   const context = readScope(AccordionRootContext);
 
@@ -48,6 +54,9 @@ export function readAccordionRootContext(): AccordionRootContextValue {
   return context;
 }
 
+/**
+ * Reads the Accordion Render Context; throws if called outside its provider.
+ */
 export function readAccordionRenderContext(): AccordionRenderContextValue {
   const context = readScope(AccordionRenderContext);
 
@@ -58,6 +67,9 @@ export function readAccordionRenderContext(): AccordionRenderContextValue {
   return context;
 }
 
+/**
+ * Reads the Accordion Item Context; throws if called outside its provider.
+ */
 export function readAccordionItemContext(): AccordionItemContextValue {
   const context = readScope(AccordionItemContext);
 
@@ -68,6 +80,9 @@ export function readAccordionItemContext(): AccordionItemContextValue {
   return context;
 }
 
+/**
+ * Creates a fresh Accordion Render Context instance.
+ */
 export function createAccordionRenderContext(): AccordionRenderContextValue {
   let nextItemIndex = 0;
 

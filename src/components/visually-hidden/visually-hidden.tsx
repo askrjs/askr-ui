@@ -30,6 +30,11 @@ function ensureVisuallyHiddenRule(nonce: string | undefined) {
   );
 }
 
+/**
+ * Renders a part of `visually-hidden`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function VisuallyHidden(props: VisuallyHiddenSpanProps): JSX.Element;
 export function VisuallyHidden(props: VisuallyHiddenAsChildProps): JSX.Element;
 export function VisuallyHidden(

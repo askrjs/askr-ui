@@ -8,11 +8,13 @@ import {
 } from '../_internal/menu';
 import type { MenuOwnProps } from './menu.types';
 
+/** Menu State Input. */
 export type MenuStateInput = {
   menuId: string;
   currentIndexCandidate: number;
 };
 
+/** Shape of the Menu Root Context Value. */
 export type MenuRootContextValue = {
   menuId: string;
   orientation: MenuOwnProps['orientation'];
@@ -25,10 +27,12 @@ export type MenuRootContextValue = {
   handleTypeaheadKeyUp: (event: KeyboardEvent) => boolean;
 };
 
+/** Shape of the Menu Render Context Value. */
 export type MenuRenderContextValue = {
   claimItemIndex: () => number;
 };
 
+/** Menu Resolved State. */
 export type MenuResolvedState = {
   items: MenuItemMetadata[];
   currentIndex: number;
@@ -40,6 +44,9 @@ export const MenuRenderContext = defineScope<MenuRenderContextValue | null>(
   null
 );
 
+/**
+ * Reads the Menu Root Context; throws if called outside its provider.
+ */
 export function readMenuRootContext(): MenuRootContextValue {
   const context = readScope(MenuRootContext);
 
@@ -50,6 +57,9 @@ export function readMenuRootContext(): MenuRootContextValue {
   return context;
 }
 
+/**
+ * Reads the Menu Render Context; throws if called outside its provider.
+ */
 export function readMenuRenderContext(): MenuRenderContextValue {
   const context = readScope(MenuRenderContext);
 
@@ -60,6 +70,9 @@ export function readMenuRenderContext(): MenuRenderContextValue {
   return context;
 }
 
+/**
+ * Creates a fresh Menu Render Context instance.
+ */
 export function createMenuRenderContext(): MenuRenderContextValue {
   let nextItemIndex = 0;
 
@@ -72,6 +85,10 @@ export function createMenuRenderContext(): MenuRenderContextValue {
   };
 }
 
+/**
+ * Computes the resolved Menu State (collection items, current index,
+ * and disabled indexes) from root context input.
+ */
 export function resolveMenuState(root: MenuStateInput): MenuResolvedState {
   const items = getMenuCollectionItems(getMenuCollection(root.menuId));
   const fallbackIndex = firstEnabledIndex(items);

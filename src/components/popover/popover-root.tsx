@@ -21,6 +21,9 @@ function schedulePopoverPortalSync(callback: () => void) {
   queueMicrotask(callback);
 }
 
+/**
+ * Renders a part of `popover`.
+ */
 export function Popover(props: PopoverProps) {
   const { children, id, open, defaultOpen = false, onOpenChange } = props;
   const openState = controllableState({

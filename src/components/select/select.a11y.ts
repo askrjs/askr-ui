@@ -21,4 +21,5 @@ export const SELECT_A11Y_CONTRACT = {
   ITEM_SELECTION_ATTRIBUTE: 'aria-selected' as const,
 } as const;
 
+/** Type of the Select A11y Contract object. */
 export type SelectA11yContract = typeof SELECT_A11Y_CONTRACT;

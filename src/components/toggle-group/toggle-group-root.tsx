@@ -23,6 +23,9 @@ import type {
   ToggleGroupSingleProps,
 } from './toggle-group.types';
 
+/**
+ * Renders a part of `toggle-group`.
+ */
 export function ToggleGroup(props: ToggleGroupProps) {
   const {
     children,

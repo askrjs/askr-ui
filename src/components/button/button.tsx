@@ -53,6 +53,11 @@ function normalizeAriaProps(
  * ```
  */
 export function Button(props: ButtonNativeProps): JSX.Element;
+/**
+ * Renders the `button` part of `button`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function Button(props: ButtonAsChildProps): JSX.Element;
 export function Button(props: ButtonNativeProps | ButtonAsChildProps) {
   const {

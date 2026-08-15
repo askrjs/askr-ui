@@ -1,12 +1,14 @@
 import { defineScope, readScope } from '@askrjs/askr';
 import type { ToastVariant, ToastProps } from './toast.types';
 
+/** Toast Registration. */
 export type ToastRegistration = {
   toastId: string;
   signature: string;
   props: ToastProps;
 };
 
+/** Shape of the Toast Host Context Value. */
 export type ToastHostContextValue = {
   hostId: string;
   duration: number;
@@ -16,6 +18,7 @@ export type ToastHostContextValue = {
   unregisterToast: (toastId: string, registration: ToastRegistration) => void;
 };
 
+/** Shape of the Toast Root Context Value. */
 export type ToastRootContextValue = {
   hostId: string;
   toastId: string;
@@ -32,6 +35,9 @@ export type ToastRootContextValue = {
 export const ToastHostContext = defineScope<ToastHostContextValue | null>(null);
 export const ToastRootContext = defineScope<ToastRootContextValue | null>(null);
 
+/**
+ * Reads the Toast Host Context; throws if called outside its provider.
+ */
 export function readToastHostContext(): ToastHostContextValue {
   const context = readScope(ToastHostContext);
 
@@ -42,6 +48,9 @@ export function readToastHostContext(): ToastHostContextValue {
   return context;
 }
 
+/**
+ * Reads the Toast Root Context; throws if called outside its provider.
+ */
 export function readToastRootContext(): ToastRootContextValue {
   const context = readScope(ToastRootContext);
 

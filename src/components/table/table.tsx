@@ -25,6 +25,11 @@ import type {
  * Semantic table primitive family.
  */
 export function Table(props: TableProps): JSX.Element;
+/**
+ * Renders a part of `table`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function Table(props: TableAsChildProps): JSX.Element;
 export function Table(props: TableProps | TableAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
@@ -41,6 +46,11 @@ export function Table(props: TableProps | TableAsChildProps) {
   return <table {...finalProps}>{children}</table>;
 }
 
+/**
+ * Renders a part of `table`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function TableCaption(props: TableCaptionProps): JSX.Element;
 export function TableCaption(props: TableCaptionAsChildProps): JSX.Element;
 export function TableCaption(
@@ -60,6 +70,11 @@ export function TableCaption(
   return <caption {...finalProps}>{children}</caption>;
 }
 
+/**
+ * Renders a part of `table`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function TableHead(props: TableHeadProps): JSX.Element;
 export function TableHead(props: TableHeadAsChildProps): JSX.Element;
 export function TableHead(props: TableHeadProps | TableHeadAsChildProps) {
@@ -77,6 +92,11 @@ export function TableHead(props: TableHeadProps | TableHeadAsChildProps) {
   return <thead {...finalProps}>{children}</thead>;
 }
 
+/**
+ * Renders a part of `table`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function TableBody(props: TableBodyProps): JSX.Element;
 export function TableBody(props: TableBodyAsChildProps): JSX.Element;
 export function TableBody(props: TableBodyProps | TableBodyAsChildProps) {
@@ -94,6 +114,11 @@ export function TableBody(props: TableBodyProps | TableBodyAsChildProps) {
   return <tbody {...finalProps}>{children}</tbody>;
 }
 
+/**
+ * Renders a part of `table`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function TableFoot(props: TableFootProps): JSX.Element;
 export function TableFoot(props: TableFootAsChildProps): JSX.Element;
 export function TableFoot(props: TableFootProps | TableFootAsChildProps) {
@@ -111,6 +136,11 @@ export function TableFoot(props: TableFootProps | TableFootAsChildProps) {
   return <tfoot {...finalProps}>{children}</tfoot>;
 }
 
+/**
+ * Renders a part of `table`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function TableRow(props: TableRowProps): JSX.Element;
 export function TableRow(props: TableRowAsChildProps): JSX.Element;
 export function TableRow(props: TableRowProps | TableRowAsChildProps) {
@@ -128,6 +158,11 @@ export function TableRow(props: TableRowProps | TableRowAsChildProps) {
   return <tr {...finalProps}>{children}</tr>;
 }
 
+/**
+ * Renders a part of `table`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function TableHeaderCell(props: TableHeaderCellProps): JSX.Element;
 export function TableHeaderCell(
   props: TableHeaderCellAsChildProps
@@ -149,6 +184,11 @@ export function TableHeaderCell(
   return <th {...finalProps}>{children}</th>;
 }
 
+/**
+ * Renders a part of `table`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function TableCell(props: TableCellProps): JSX.Element;
 export function TableCell(props: TableCellAsChildProps): JSX.Element;
 export function TableCell(props: TableCellProps | TableCellAsChildProps) {

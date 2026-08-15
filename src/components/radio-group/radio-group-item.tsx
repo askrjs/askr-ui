@@ -17,6 +17,11 @@ import type {
   RadioGroupItemProps,
 } from './radio-group.types';
 
+/**
+ * Renders the `radio-group-item` part of `radio-group` with `role="radio"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function RadioGroupItem(props: RadioGroupItemProps): JSX.Element;
 export function RadioGroupItem(props: RadioGroupItemAsChildProps): JSX.Element;
 export function RadioGroupItem(

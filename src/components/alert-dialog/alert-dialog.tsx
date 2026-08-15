@@ -31,6 +31,9 @@ import { Dialog } from '../dialog';
 import { resolveCompoundId } from '../_internal/id';
 import type { AlertDialogProps } from './alert-dialog.types';
 
+/**
+ * Renders a part of `alert-dialog`.
+ */
 export function AlertDialog(props: AlertDialogProps) {
   const { children, id, ...rest } = props;
   const alertDialogId = resolveCompoundId('alert-dialog', id, children);

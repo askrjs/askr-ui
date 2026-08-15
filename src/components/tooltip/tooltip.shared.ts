@@ -2,6 +2,7 @@ import { defineScope, readScope } from '@askrjs/askr';
 import { OVERLAY_Z_INDEX, type OverlayPortal } from '../_internal/overlay';
 import type { TooltipContentOwnProps } from './tooltip.types';
 
+/** Tooltip Position Options. */
 export type TooltipPositionOptions = {
   side: NonNullable<TooltipContentOwnProps['side']>;
   align: NonNullable<TooltipContentOwnProps['align']>;
@@ -9,6 +10,7 @@ export type TooltipPositionOptions = {
   zIndex: typeof OVERLAY_Z_INDEX.tooltip;
 };
 
+/** Shape of the Tooltip Root Context Value. */
 export type TooltipRootContextValue = {
   tooltipId: string;
   open: boolean;
@@ -26,6 +28,9 @@ export const TooltipRootContext = defineScope<TooltipRootContextValue | null>(
   null
 );
 
+/**
+ * Reads the Tooltip Root Context; throws if called outside its provider.
+ */
 export function readTooltipRootContext(): TooltipRootContextValue {
   const context = readScope(TooltipRootContext);
 
@@ -36,6 +41,9 @@ export function readTooltipRootContext(): TooltipRootContextValue {
   return context;
 }
 
+/**
+ * Builds overlay positioning options for Tooltip Position Options.
+ */
 export function resolveTooltipPositionOptions(
   options: Partial<Omit<TooltipPositionOptions, 'zIndex'>> = {}
 ): TooltipPositionOptions {

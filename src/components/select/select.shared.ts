@@ -6,6 +6,7 @@ import {
 } from '../_internal/menu';
 import type { OverlayPortal } from '../_internal/overlay';
 
+/** Select State Input. */
 export type SelectStateInput = {
   selectId: string;
   value: string;
@@ -15,12 +16,14 @@ export type SelectStateInput = {
   declaredItems: SelectItemMetadata[];
 };
 
+/** Select Item Metadata. */
 export type SelectItemMetadata = {
   disabled: boolean;
   value?: string;
   text: string;
 };
 
+/** Shape of the Select Root Context Value. */
 export type SelectRootContextValue = {
   selectId: string;
   overlayIdentity: object;
@@ -41,16 +44,19 @@ export type SelectRootContextValue = {
   handleTypeaheadKeyUp: (event: KeyboardEvent) => boolean;
 };
 
+/** Shape of the Select Render Context Value. */
 export type SelectRenderContextValue = {
   claimItemIndex: () => number;
   claimGroupIndex: () => number;
 };
 
+/** Shape of the Select Group Context Value. */
 export type SelectGroupContextValue = {
   groupId: string;
   labelId: string;
 };
 
+/** Select Resolved State. */
 export type SelectResolvedState = {
   items: SelectItemMetadata[];
   currentIndex: number;
@@ -68,6 +74,9 @@ export const SelectGroupContext = defineScope<SelectGroupContextValue | null>(
   null
 );
 
+/**
+ * Reads the Select Root Context; throws if called outside its provider.
+ */
 export function readSelectRootContext(): SelectRootContextValue {
   const context = readScope(SelectRootContext);
 
@@ -78,6 +87,9 @@ export function readSelectRootContext(): SelectRootContextValue {
   return context;
 }
 
+/**
+ * Reads the Select Render Context; throws if called outside its provider.
+ */
 export function readSelectRenderContext(): SelectRenderContextValue {
   const context = readScope(SelectRenderContext);
 
@@ -88,10 +100,16 @@ export function readSelectRenderContext(): SelectRenderContextValue {
   return context;
 }
 
+/**
+ * Reads the Select Group Context; throws if called outside its provider.
+ */
 export function readSelectGroupContext(): SelectGroupContextValue | null {
   return readScope(SelectGroupContext);
 }
 
+/**
+ * Creates a fresh Select Render Context instance.
+ */
 export function createSelectRenderContext(): SelectRenderContextValue {
   let nextItemIndex = 0;
   let nextGroupIndex = 0;
@@ -110,6 +128,9 @@ export function createSelectRenderContext(): SelectRenderContextValue {
   };
 }
 
+/**
+ * Returns the indexes of disabled items in the collection.
+ */
 export function getSelectDisabledIndexes(
   items: SelectItemMetadata[],
   disabled: boolean
@@ -119,6 +140,10 @@ export function getSelectDisabledIndexes(
     .filter((index) => index !== -1);
 }
 
+/**
+ * Computes the resolved Select State (collection items, current index,
+ * and disabled indexes) from root context input.
+ */
 export function resolveSelectState(
   root: SelectStateInput
 ): SelectResolvedState {

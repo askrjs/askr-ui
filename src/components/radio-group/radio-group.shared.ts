@@ -1,10 +1,12 @@
 import { defineScope, readScope } from '@askrjs/askr';
 
+/** Radio Group Item Metadata. */
 export type RadioGroupItemMetadata = {
   value: string;
   disabled: boolean;
 };
 
+/** Shape of the Radio Group Root Context Value. */
 export type RadioGroupRootContextValue = {
   groupId: string;
   value: string;
@@ -19,6 +21,7 @@ export type RadioGroupRootContextValue = {
   items: RadioGroupItemMetadata[];
 };
 
+/** Shape of the Radio Group Render Context Value. */
 export type RadioGroupRenderContextValue = {
   claimItemIndex: () => number;
 };
@@ -28,6 +31,9 @@ export const RadioGroupRootContext =
 export const RadioGroupRenderContext =
   defineScope<RadioGroupRenderContextValue | null>(null);
 
+/**
+ * Reads the Radio Group Root Context; throws if called outside its provider.
+ */
 export function readRadioGroupRootContext(): RadioGroupRootContextValue {
   const context = readScope(RadioGroupRootContext);
 
@@ -38,6 +44,9 @@ export function readRadioGroupRootContext(): RadioGroupRootContextValue {
   return context;
 }
 
+/**
+ * Reads the Radio Group Render Context; throws if called outside its provider.
+ */
 export function readRadioGroupRenderContext(): RadioGroupRenderContextValue {
   const context = readScope(RadioGroupRenderContext);
 
@@ -48,6 +57,9 @@ export function readRadioGroupRenderContext(): RadioGroupRenderContextValue {
   return context;
 }
 
+/**
+ * Creates a fresh Radio Group Render Context instance.
+ */
 export function createRadioGroupRenderContext(): RadioGroupRenderContextValue {
   let nextItemIndex = 0;
 

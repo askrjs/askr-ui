@@ -8,6 +8,11 @@ import type {
   DialogTriggerProps,
 } from './dialog.types';
 
+/**
+ * Renders the `dialog-trigger` part of `dialog`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function DialogTrigger(props: DialogTriggerProps): JSX.Element;
 export function DialogTrigger(props: DialogTriggerAsChildProps): JSX.Element;
 export function DialogTrigger(

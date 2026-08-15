@@ -7,6 +7,11 @@ import type {
   TextareaElementProps,
 } from './textarea.types';
 
+/**
+ * Renders the `textarea` part of `textarea`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function Textarea(props: TextareaElementProps): JSX.Element;
 export function Textarea(props: TextareaAsChildProps): JSX.Element;
 export function Textarea(props: TextareaElementProps | TextareaAsChildProps) {

@@ -35,6 +35,11 @@ function SelectGroupScopeView(props: {
   return <div {...props.finalProps}>{props.children}</div>;
 }
 
+/**
+ * Renders the `select-group` part of `select` with `role="group"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function SelectGroup(props: SelectGroupProps): JSX.Element;
 export function SelectGroup(props: SelectGroupAsChildProps): JSX.Element;
 export function SelectGroup(props: SelectGroupProps | SelectGroupAsChildProps) {
@@ -66,6 +71,11 @@ export function SelectGroup(props: SelectGroupProps | SelectGroupAsChildProps) {
   );
 }
 
+/**
+ * Renders the `select-label` part of `select`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function SelectLabel(props: SelectLabelProps): JSX.Element | null;
 export function SelectLabel(props: SelectLabelAsChildProps): JSX.Element | null;
 export function SelectLabel(props: SelectLabelProps | SelectLabelAsChildProps) {
@@ -86,6 +96,11 @@ export function SelectLabel(props: SelectLabelProps | SelectLabelAsChildProps) {
   return <div {...finalProps}>{children}</div>;
 }
 
+/**
+ * Renders the `select-separator` part of `select` with `role="separator"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function SelectSeparator(
   props: SelectSeparatorProps
 ): JSX.Element | null;

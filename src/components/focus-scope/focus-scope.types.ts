@@ -1,6 +1,7 @@
 import type { JSXElement } from '@askrjs/askr/foundations/structures';
 import type { Ref } from '@askrjs/askr/foundations/utilities';
 
+/** Own props for Focus Scope, before merging with native element attributes. */
 export type FocusScopeOwnProps = {
   children?: unknown;
   trapped?: boolean;
@@ -10,6 +11,7 @@ export type FocusScopeOwnProps = {
   tabIndex?: number;
 };
 
+/** Props for Focus Scope. */
 export type FocusScopeProps = Omit<
   JSX.IntrinsicElements['div'],
   'children' | 'ref'
@@ -19,6 +21,7 @@ export type FocusScopeProps = Omit<
     ref?: Ref<HTMLDivElement>;
   };
 
+/** Props for the `asChild` (polymorphic) rendering of Focus Scope. */
 export type FocusScopeAsChildProps = FocusScopeOwnProps & {
   asChild: true;
   children: JSXElement;

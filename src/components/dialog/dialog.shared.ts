@@ -1,12 +1,14 @@
 import { defineScope, readScope } from '@askrjs/askr';
 import { OVERLAY_Z_INDEX, type OverlayPortal } from '../_internal/overlay';
 
+/** Dialog Position Options. */
 export type DialogPositionOptions = {
   mode: 'centered';
   viewportPadding: 20;
   zIndex: typeof OVERLAY_Z_INDEX.modal;
 };
 
+/** Shape of the Dialog Root Context Value. */
 export type DialogRootContextValue = {
   dialogId: string;
   open: boolean;
@@ -30,6 +32,9 @@ export const DialogRootContext = defineScope<DialogRootContextValue | null>(
   null
 );
 
+/**
+ * Reads the Dialog Root Context; throws if called outside its provider.
+ */
 export function readDialogRootContext(): DialogRootContextValue {
   const context = readScope(DialogRootContext);
 
@@ -40,6 +45,9 @@ export function readDialogRootContext(): DialogRootContextValue {
   return context;
 }
 
+/**
+ * Builds overlay positioning options for Dialog Position Options.
+ */
 export function resolveDialogPositionOptions(): DialogPositionOptions {
   return {
     mode: 'centered',

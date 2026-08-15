@@ -21,6 +21,11 @@ import type {
   ToggleGroupItemProps,
 } from './toggle-group.types';
 
+/**
+ * Renders a part of `toggle-group`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function ToggleGroupItem(props: ToggleGroupItemProps): JSX.Element;
 export function ToggleGroupItem(
   props: ToggleGroupItemAsChildProps

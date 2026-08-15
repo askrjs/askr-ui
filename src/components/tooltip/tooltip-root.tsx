@@ -21,6 +21,9 @@ function scheduleTooltipPortalSync(callback: () => void) {
   queueMicrotask(callback);
 }
 
+/**
+ * Renders a part of `tooltip`.
+ */
 export function Tooltip(props: TooltipProps) {
   const { children, id, open, defaultOpen = false, onOpenChange } = props;
   const openState = controllableState({

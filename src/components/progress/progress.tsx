@@ -39,6 +39,9 @@ function readProgressRootContext(): ProgressRootContextValue {
   return context;
 }
 
+/**
+ * Renders the `progress` part of `progress` with `role="progressbar"`.
+ */
 export function Progress(props: ProgressProps) {
   const nonce = cspNonce();
   const {
@@ -109,6 +112,11 @@ export function Progress(props: ProgressProps) {
   );
 }
 
+/**
+ * Renders the `progress-indicator` part of `progress`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function ProgressIndicator(props: ProgressIndicatorProps): JSX.Element;
 export function ProgressIndicator(
   props: ProgressIndicatorAsChildProps

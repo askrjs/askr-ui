@@ -18,10 +18,13 @@ export type ToastHostOwnProps = {
   duration?: number;
 };
 
+/** Props for Toast Host. */
 export type ToastHostProps = BoxProps<'div', HTMLDivElement> &
   ToastHostOwnProps;
 
+/** Props for Toast Viewport. */
 export type ToastViewportProps = BoxProps<'div', HTMLDivElement>;
+/** Props for the `asChild` (polymorphic) rendering of Toast Viewport. */
 export type ToastViewportAsChildProps = BoxAsChildProps;
 
 /**
@@ -47,16 +50,25 @@ export type ToastOwnProps = {
   variant?: ToastVariant;
 };
 
+/** Props for Toast. */
 export type ToastProps = BoxProps<'div', HTMLDivElement> & ToastOwnProps;
 
+/** Props for Toast Title. */
 export type ToastTitleProps = BoxProps<'div', HTMLDivElement>;
+/** Props for the `asChild` (polymorphic) rendering of Toast Title. */
 export type ToastTitleAsChildProps = BoxAsChildProps;
 
+/** Props for Toast Description. */
 export type ToastDescriptionProps = BoxProps<'div', HTMLDivElement>;
+/** Props for the `asChild` (polymorphic) rendering of Toast Description. */
 export type ToastDescriptionAsChildProps = BoxAsChildProps;
 
+/** Props for Toast Action. */
 export type ToastActionProps = ButtonLikeProps<'button', HTMLButtonElement>;
+/** Props for the `asChild` (polymorphic) rendering of Toast Action. */
 export type ToastActionAsChildProps = ButtonLikeAsChildProps;
 
+/** Props for Toast Close. */
 export type ToastCloseProps = ButtonLikeProps<'button', HTMLButtonElement>;
+/** Props for the `asChild` (polymorphic) rendering of Toast Close. */
 export type ToastCloseAsChildProps = ButtonLikeAsChildProps;

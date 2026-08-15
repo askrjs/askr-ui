@@ -41,6 +41,11 @@ import type { ToggleButtonProps, ToggleAsChildProps } from './toggle.types';
  * ```
  */
 export function Toggle(props: ToggleButtonProps): JSX.Element;
+/**
+ * Renders the `toggle` part of `toggle`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function Toggle(props: ToggleAsChildProps): JSX.Element;
 export function Toggle(props: ToggleButtonProps | ToggleAsChildProps) {
   const {

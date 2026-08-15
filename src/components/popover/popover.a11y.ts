@@ -31,4 +31,5 @@ export const POPOVER_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Popover A11y Contract object. */
 export type PopoverA11yContract = typeof POPOVER_A11Y_CONTRACT;

@@ -5,6 +5,11 @@ import { runCancelablePress } from '../_internal/press';
 import { readDialogRootContext } from './dialog.shared';
 import type { DialogCloseAsChildProps, DialogCloseProps } from './dialog.types';
 
+/**
+ * Renders the `dialog-close` part of `dialog`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function DialogClose(props: DialogCloseProps): JSX.Element;
 export function DialogClose(props: DialogCloseAsChildProps): JSX.Element;
 export function DialogClose(props: DialogCloseProps | DialogCloseAsChildProps) {
