@@ -8,9 +8,13 @@ import {
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 async function advanceHoverCardTimers(milliseconds: number): Promise<void> {
+  flushScheduler();
+  await flushUpdates();
+  flushScheduler();
   await vi.advanceTimersByTimeAsync(milliseconds);
   flushScheduler();
   await flushUpdates();
+  flushScheduler();
 }
 
 async function waitForHoverCardState(
@@ -18,13 +22,15 @@ async function waitForHoverCardState(
   expected: 'open' | 'closed'
 ): Promise<HTMLElement> {
   for (let attempt = 0; attempt < 20; attempt += 1) {
+    flushScheduler();
+    await flushUpdates();
+    flushScheduler();
     const trigger = container.querySelector(
       '[data-slot="hover-card-trigger"]'
     ) as HTMLElement | null;
     if (trigger?.getAttribute('data-state') === expected) {
       return trigger;
     }
-    await flushUpdates();
   }
 
   throw new Error(`Expected HoverCard trigger to become ${expected}`);
