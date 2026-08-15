@@ -121,6 +121,38 @@ describe('Menubar - Behavior', () => {
     expect(document.body.textContent).not.toContain('New');
   });
 
+  it('should move actual focus between open menu items with vertical arrows', async () => {
+    container = mount(
+      <Menubar>
+        <MenubarMenu value="file">
+          <MenubarTrigger>File</MenubarTrigger>
+          <MenubarPortal>
+            <MenubarContent>
+              <MenubarItem>One</MenubarItem>
+              <MenubarItem disabled>Two</MenubarItem>
+              <MenubarItem>Three</MenubarItem>
+            </MenubarContent>
+          </MenubarPortal>
+        </MenubarMenu>
+      </Menubar>
+    );
+
+    getButtonByText('File').click();
+    await flushPortalUpdates();
+    const one = getButtonByText('One');
+    const three = getButtonByText('Three');
+    one.focus();
+
+    await userEvent.keyboard('{ArrowDown}');
+    await flushPortalUpdates();
+    expect(document.activeElement).toBe(three);
+    expect(three.getAttribute('tabindex')).toBe('0');
+
+    await userEvent.keyboard('{ArrowUp}');
+    await flushPortalUpdates();
+    expect(document.activeElement).toBe(one);
+  });
+
   it('should support typeahead, activation keys, submenus, and Tab dismissal', async () => {
     const onArchiveAction = vi.fn();
     container = mount(

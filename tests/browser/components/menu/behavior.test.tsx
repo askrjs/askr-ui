@@ -7,7 +7,7 @@ import {
   MenuLabel,
   MenuSeparator,
 } from '../../../../src/components/menu';
-import { mount, unmount } from '../../test-utils';
+import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Menu - Behavior', () => {
   let container: HTMLElement;
@@ -103,5 +103,34 @@ describe('Menu - Behavior', () => {
     expect(document.activeElement).toBe(
       container.querySelector('[data-testid="after-menu"]')
     );
+  });
+
+  it('should move actual focus with vertical arrow keys', async () => {
+    container = mount(
+      <Menu loop={false}>
+        <MenuContent>
+          <MenuItem>One</MenuItem>
+          <MenuItem disabled>Two</MenuItem>
+          <MenuItem>Three</MenuItem>
+        </MenuContent>
+      </Menu>
+    );
+    await flushUpdates();
+    await flushUpdates();
+
+    const items = Array.from(
+      container.querySelectorAll<HTMLElement>('[role="menuitem"]')
+    );
+    items[0]!.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await flushUpdates();
+
+    expect(document.activeElement).toBe(items[2]);
+    expect(items[2]!.getAttribute('tabindex')).toBe('0');
+    expect(items[2]!.getAttribute('data-roving-index')).toBe('2');
+
+    await userEvent.keyboard('{ArrowUp}');
+    await flushUpdates();
+    expect(document.activeElement).toBe(items[0]);
   });
 });
