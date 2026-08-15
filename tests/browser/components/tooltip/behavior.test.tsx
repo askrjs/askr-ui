@@ -1,4 +1,11 @@
+import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { Button } from '../../../../src/components/button';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '../../../../src/components/hover-card';
 import {
   Tooltip,
   TooltipContent,
@@ -8,7 +15,7 @@ import {
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Tooltip - Behavior', () => {
-  let container: HTMLElement;
+  let container: HTMLElement | undefined;
 
   afterEach(() => {
     vi.restoreAllMocks();
@@ -37,6 +44,134 @@ describe('Tooltip - Behavior', () => {
     trigger = container.querySelector('button') as HTMLButtonElement;
 
     expect(trigger.getAttribute('data-state')).toBe('closed');
+  });
+
+  it('should open once from native focus without exhausting the scheduler', async () => {
+    const onOpenChange = vi.fn();
+    const onHoverCardOpenChange = vi.fn();
+    container = mount(
+      <>
+        <button data-testid="before" tabIndex={0}>
+          Before
+        </button>
+        <Button data-testid="button-control">Button control</Button>
+        <HoverCard onOpenChange={onHoverCardOpenChange}>
+          <HoverCardTrigger>HoverCard control</HoverCardTrigger>
+          <HoverCardContent>HoverCard content</HoverCardContent>
+        </HoverCard>
+        <Tooltip onOpenChange={onOpenChange}>
+          <TooltipTrigger tabIndex={0}>Hover me</TooltipTrigger>
+          <TooltipPortal>
+            <TooltipContent>Helpful text</TooltipContent>
+          </TooltipPortal>
+        </Tooltip>
+      </>
+    );
+
+    const buttonControl = container.querySelector(
+      '[data-testid="button-control"]'
+    ) as HTMLButtonElement;
+    expect(() => buttonControl.focus()).not.toThrow();
+    expect(document.activeElement).toBe(buttonControl);
+
+    const hoverCardControl = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLButtonElement;
+    expect(() => hoverCardControl.focus()).not.toThrow();
+    await flushUpdates();
+    expect(onHoverCardOpenChange).toHaveBeenCalledTimes(1);
+
+    let trigger = container.querySelector(
+      '[data-slot="tooltip-trigger"]'
+    ) as HTMLButtonElement;
+    expect(() => trigger.focus()).not.toThrow();
+    await flushUpdates();
+
+    trigger = container.querySelector(
+      '[data-slot="tooltip-trigger"]'
+    ) as HTMLButtonElement;
+    expect(document.activeElement).toBe(trigger);
+    expect(trigger.getAttribute('data-state')).toBe('open');
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+  });
+
+  it('should open from a real keyboard Tab and preserve focus on the trigger', async () => {
+    const onOpenChange = vi.fn();
+    container = mount(
+      <>
+        <button data-testid="before" tabIndex={0}>
+          Before
+        </button>
+        <Tooltip onOpenChange={onOpenChange}>
+          <TooltipTrigger tabIndex={0}>Hover me</TooltipTrigger>
+          <TooltipPortal>
+            <TooltipContent>Helpful text</TooltipContent>
+          </TooltipPortal>
+        </Tooltip>
+      </>
+    );
+
+    const before = container.querySelector(
+      '[data-testid="before"]'
+    ) as HTMLButtonElement;
+    before.focus();
+    expect(document.activeElement).toBe(before);
+    await userEvent.tab();
+    await flushUpdates();
+
+    const trigger = container.querySelector(
+      '[data-slot="tooltip-trigger"]'
+    ) as HTMLButtonElement;
+    expect(onOpenChange.mock.calls).toEqual([[true]]);
+    expect(document.activeElement).toBe(trigger);
+    expect(trigger.getAttribute('data-state')).toBe('open');
+  });
+
+  it('should keep a controlled native-focus request bounded when the owner does not accept it', async () => {
+    const onOpenChange = vi.fn();
+    container = mount(
+      <Tooltip open={false} onOpenChange={onOpenChange}>
+        <TooltipTrigger>Hover me</TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>Helpful text</TooltipContent>
+        </TooltipPortal>
+      </Tooltip>
+    );
+
+    const trigger = container.querySelector(
+      '[data-slot="tooltip-trigger"]'
+    ) as HTMLButtonElement;
+    expect(() => trigger.focus()).not.toThrow();
+    await flushUpdates();
+
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+    expect(trigger.getAttribute('data-state')).toBe('closed');
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('should cancel pending focus-adoption work during teardown', async () => {
+    const cancelFrame = vi
+      .spyOn(window, 'cancelAnimationFrame')
+      .mockImplementation(() => {});
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 73);
+    container = mount(
+      <Tooltip>
+        <TooltipTrigger>Hover me</TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>Helpful text</TooltipContent>
+        </TooltipPortal>
+      </Tooltip>
+    );
+
+    const trigger = container.querySelector(
+      '[data-slot="tooltip-trigger"]'
+    ) as HTMLButtonElement;
+    trigger.focus();
+    await flushUpdates();
+    unmount(container);
+    container = undefined;
+
+    expect(cancelFrame).toHaveBeenCalledWith(73);
   });
 
   it('should keep custom content positioning through the post-open portal sync', async () => {

@@ -24,7 +24,7 @@ import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { runCancelablePress } from '../_internal/press';
-import { state } from '@askrjs/askr';
+import { For, state } from '@askrjs/askr';
 import { resource } from '@askrjs/askr/resources';
 import { DismissableLayer } from '../dismissable-layer';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
@@ -371,16 +371,17 @@ export function ToastViewport(
 ) {
   const { asChild, children, ref, ...rest } = props;
   const host = readToastHostContext();
-  const toastRegistrations = host.getToasts();
   const content = (
     <>
-      {toastRegistrations.map((registration) => (
-        <ToastRegistrationView
-          key={registration.toastId}
-          registration={registration}
-          host={host}
-        />
-      ))}
+      <For each={host.getToasts} by={(registration) => registration.toastId}>
+        {(registration) => (
+          <ToastRegistrationView
+            key={registration.toastId}
+            registration={registration}
+            host={host}
+          />
+        )}
+      </For>
       {children}
     </>
   );

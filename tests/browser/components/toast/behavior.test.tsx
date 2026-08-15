@@ -135,6 +135,35 @@ function ControlledToastPressButtonFixture() {
   );
 }
 
+function SiblingToastRegistrationFixture() {
+  const siblingOpen = state(false);
+
+  return (
+    <ToastHost duration={100}>
+      <button
+        id="open-sibling-toast"
+        onClick={() => {
+          siblingOpen.set(!siblingOpen());
+        }}
+      >
+        Open sibling
+      </button>
+      <ToastViewport />
+      <Toast id="original-toast" defaultOpen>
+        <ToastTitle>Original</ToastTitle>
+        <ToastClose>Dismiss original</ToastClose>
+      </Toast>
+      <Toast
+        id="sibling-toast"
+        open={siblingOpen()}
+        onOpenChange={(open) => siblingOpen.set(open)}
+      >
+        <ToastTitle>Sibling</ToastTitle>
+      </Toast>
+    </ToastHost>
+  );
+}
+
 function waitForScheduler(): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, 20);
@@ -231,6 +260,45 @@ describe('Toast - Behavior', () => {
     await flushUpdates();
 
     expect(container.querySelectorAll('[data-toast="true"]').length).toBe(0);
+  });
+
+  it('should preserve an unrelated toast identity and original deadline during sibling registration changes', async () => {
+    vi.useFakeTimers();
+    container = mount(<SiblingToastRegistrationFixture />);
+    await flushUpdates();
+
+    const original = container.querySelector(
+      '#original-toast'
+    ) as HTMLDivElement;
+    const originalClose = original.querySelector('button') as HTMLButtonElement;
+    originalClose.focus();
+
+    await vi.advanceTimersByTimeAsync(60);
+    const launcher = container.querySelector(
+      '#open-sibling-toast'
+    ) as HTMLButtonElement;
+    launcher.click();
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(container.querySelector('#original-toast')).toBe(original);
+    expect(document.activeElement).toBe(originalClose);
+    expect(container.querySelectorAll('#sibling-toast')).toHaveLength(1);
+
+    await vi.advanceTimersByTimeAsync(5);
+    launcher.click();
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(container.querySelector('#original-toast')).toBe(original);
+    expect(document.activeElement).toBe(originalClose);
+    expect(container.querySelectorAll('#sibling-toast')).toHaveLength(0);
+
+    await vi.advanceTimersByTimeAsync(40);
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(container.querySelector('#original-toast')).toBeNull();
   });
 
   it('should restore focus after closing a controlled toast', async () => {

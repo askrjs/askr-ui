@@ -1,5 +1,5 @@
 import { controllableState } from '@askrjs/askr/foundations/state';
-import { cspNonce, state } from '@askrjs/askr';
+import { cspNonce, getSignal, state } from '@askrjs/askr';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import {
   captureOverlayNonce,
@@ -33,30 +33,82 @@ export function Tooltip(props: TooltipProps) {
   });
   const tooltipId = resolveCompoundId('tooltip', id, children);
   const overlayIdentity = state(createOverlayIdentity())();
+  const focusEntry = state({
+    adoptTrigger: false,
+    generation: 0,
+    releaseFrame: null as number | null,
+  })();
   captureOverlayNonce(overlayIdentity, cspNonce());
   const contentId = resolvePartId(tooltipId, 'content');
   const portal = getPersistentPortal(overlayIdentity);
   const overlayNodes = getOverlayNodes(overlayIdentity);
   let contentPosition: TooltipPositionOptions = resolveTooltipPositionOptions();
+  const cleanupSignal = getSignal();
+
+  const releaseTriggerAdoption = () => {
+    const generation = focusEntry.generation + 1;
+    focusEntry.generation = generation;
+    if (focusEntry.releaseFrame !== null) {
+      cancelAnimationFrame(focusEntry.releaseFrame);
+    }
+    queueMicrotask(() => {
+      if (cleanupSignal.aborted) {
+        focusEntry.adoptTrigger = false;
+        return;
+      }
+      focusEntry.releaseFrame = requestAnimationFrame(() => {
+        focusEntry.releaseFrame = null;
+        if (focusEntry.generation === generation) {
+          focusEntry.adoptTrigger = false;
+        }
+      });
+    });
+  };
+
+  cleanupSignal.addEventListener(
+    'abort',
+    () => {
+      if (focusEntry.releaseFrame !== null) {
+        cancelAnimationFrame(focusEntry.releaseFrame);
+        focusEntry.releaseFrame = null;
+      }
+      focusEntry.adoptTrigger = false;
+      focusEntry.generation += 1;
+    },
+    { once: true }
+  );
+
+  const updateOpen = (nextOpen: boolean) => {
+    if (!nextOpen && focusEntry.adoptTrigger) {
+      return;
+    }
+    if (openState() === nextOpen) {
+      return;
+    }
+    openState.set(nextOpen);
+
+    if (!nextOpen) {
+      clearOverlayPosition(overlayIdentity);
+      return;
+    }
+
+    scheduleTooltipPortalSync(() => {
+      if (overlayNodes.content) {
+        syncOverlayPosition(overlayIdentity, tooltipId, contentPosition);
+      }
+    });
+  };
 
   const rootContext: TooltipRootContextValue = {
     tooltipId,
     get open() {
       return openState();
     },
-    setOpen: (nextOpen: boolean) => {
-      openState.set(nextOpen);
-
-      if (!nextOpen) {
-        clearOverlayPosition(overlayIdentity);
-        return;
-      }
-
-      scheduleTooltipPortalSync(() => {
-        if (overlayNodes.content) {
-          syncOverlayPosition(overlayIdentity, tooltipId, contentPosition);
-        }
-      });
+    setOpen: updateOpen,
+    openFromFocus: () => {
+      focusEntry.adoptTrigger = true;
+      updateOpen(true);
+      releaseTriggerAdoption();
     },
     contentId,
     portal,
@@ -65,6 +117,9 @@ export function Tooltip(props: TooltipProps) {
     },
     setTriggerNode: (node: HTMLElement | null) => {
       overlayNodes.trigger = node;
+      if (node && focusEntry.adoptTrigger && document.activeElement !== node) {
+        node.focus();
+      }
     },
     setContentNode: (node: HTMLElement | null) => {
       overlayNodes.content = node;

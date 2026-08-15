@@ -121,4 +121,61 @@ describe('Source layout', () => {
     expect(identitySource).toContain("addEventListener(\n    'abort'");
     expect(identitySource).not.toMatch(/Math\.random|randomUUID/);
   });
+
+  it('should keep async interaction families on lifecycle-specific browser guardrails', () => {
+    const componentsDirectory = join(process.cwd(), 'src', 'components');
+    const browserDirectory = join(
+      process.cwd(),
+      'tests',
+      'browser',
+      'components'
+    );
+    const hoverCardSuite = readFileSync(
+      join(browserDirectory, 'hover-card', 'behavior.test.tsx'),
+      'utf8'
+    );
+    expect(hoverCardSuite).toContain('pointer leaves immediately');
+    expect(hoverCardSuite).toContain('pointer re-enters before its deadline');
+    expect(hoverCardSuite).toContain('repeated timer churn');
+    expect(hoverCardSuite).toContain('both transition timers during teardown');
+    expect(hoverCardSuite).toContain('userEvent.hover(getPointerExitTarget())');
+
+    const hoverCardSource = readFileSync(
+      join(componentsDirectory, 'hover-card', 'hover-card.tsx'),
+      'utf8'
+    );
+    expect(hoverCardSource).toContain("addEventListener('pointerover'");
+    expect(hoverCardSource).toContain(
+      "removeEventListener(\n            'pointerover'"
+    );
+    expect(hoverCardSource).toContain('clearOpenTimer()');
+
+    const tooltipSuite = readFileSync(
+      join(browserDirectory, 'tooltip', 'behavior.test.tsx'),
+      'utf8'
+    );
+    expect(tooltipSuite).toContain('trigger.focus()');
+    expect(tooltipSuite).toContain('await userEvent.tab()');
+    expect(tooltipSuite).toContain('Button control');
+    expect(tooltipSuite).toContain('HoverCard control');
+    expect(tooltipSuite).toContain('controlled native-focus request bounded');
+    expect(tooltipSuite).toContain('focus-adoption work during teardown');
+
+    const toastSuite = readFileSync(
+      join(browserDirectory, 'toast', 'behavior.test.tsx'),
+      'utf8'
+    );
+    expect(toastSuite).toContain('original deadline during sibling');
+    expect(toastSuite).toContain('toBe(original)');
+    expect(toastSuite).toContain('toBe(originalClose)');
+
+    const toastSource = readFileSync(
+      join(componentsDirectory, 'toast', 'toast.tsx'),
+      'utf8'
+    );
+    expect(toastSource).toContain('<For each={host.getToasts}');
+    expect(toastSource).toContain(
+      'by={(registration) => registration.toastId}'
+    );
+  });
 });
