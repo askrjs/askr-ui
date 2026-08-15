@@ -234,12 +234,14 @@ describe('VirtualTable - Behavior', () => {
     api?.scrollToIndex(4_000, 'start');
     replaceRows?.();
     await flushUpdates();
+    await flushUpdates();
 
     const wrapper = container.querySelector(
       '[data-slot="virtual-table"]'
     ) as HTMLElement;
     const maximumScrollTop = 24 + (20 * 24 - (120 - 24));
 
+    expect(api?.getRowCount()).toBe(20);
     expect(api?.getScrollTop()).toBeLessThanOrEqual(maximumScrollTop);
 
     await nextAnimationFrame();
@@ -327,11 +329,16 @@ describe('VirtualTable - Behavior', () => {
     const firstCell = rows[0].querySelector<HTMLElement>(
       '[data-slot="virtual-table-cell"]'
     );
+    const firstCellContent = rows[0].querySelector<HTMLElement>(
+      '[data-slot="virtual-table-cell-content"]'
+    );
     const firstBox = rows[0].getBoundingClientRect();
     const secondBox = rows[1].getBoundingClientRect();
 
-    expect(getComputedStyle(rows[0]).overflowY).toBe('hidden');
     expect(firstCell && getComputedStyle(firstCell).overflowY).toBe('hidden');
+    expect(
+      firstCellContent && getComputedStyle(firstCellContent).overflowY
+    ).toBe('hidden');
     expect(firstBox.height).toBeCloseTo(24, 0);
     expect(secondBox.top - firstBox.top).toBeCloseTo(24, 0);
   });

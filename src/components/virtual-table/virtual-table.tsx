@@ -49,6 +49,7 @@ type VirtualTableEntry<Row> = {
   keyIndexMap: Map<string, number>;
   pendingScrollTop: number | null;
   pendingCommitFrame: number | null;
+  resizeCommitFrame: number | null;
   resizeObserver: ResizeObserver | null;
   windowResizeHandler: (() => void) | null;
   rootRef: (node: HTMLElement | null) => void;
@@ -96,13 +97,23 @@ function getVirtualTableEntry<Row>(
   const entry = {} as VirtualTableEntry<Row>;
 
   const applyPendingScrollTop = () => {
-    const nextScrollTop = entry.pendingScrollTop;
+    const pendingScrollTop = entry.pendingScrollTop;
     const node = entry.wrapperNode;
 
-    if (nextScrollTop === null || !node) {
+    if (pendingScrollTop === null || !node) {
       return;
     }
 
+    const viewportHeight =
+      entry.viewportHeightState() || entry.viewportHeightHint;
+    const bodyViewportHeight = Math.max(0, viewportHeight - entry.headerHeight);
+    const maxScrollTop =
+      entry.headerHeight +
+      resolveVirtualScrollTopForBottom(
+        resolveVirtualTotalHeight(entry.keys.length, entry.rowHeight),
+        bodyViewportHeight
+      );
+    const nextScrollTop = Math.min(Math.max(0, pendingScrollTop), maxScrollTop);
     entry.pendingScrollTop = null;
 
     if (node.scrollTop !== nextScrollTop) {
@@ -144,6 +155,14 @@ function getVirtualTableEntry<Row>(
     // Read the live scroll position from the wrapper so the table window math
     // stays aligned with the browser's actual scroll state.
     const nextScrollTop = node.scrollTop;
+
+    if (event && entry.pendingScrollTop !== null) {
+      entry.pendingScrollTop = null;
+      if (entry.pendingCommitFrame !== null) {
+        cancelAnimationFrame(entry.pendingCommitFrame);
+        entry.pendingCommitFrame = null;
+      }
+    }
 
     if (scrollTopState() !== nextScrollTop) {
       scrollTopState.set(nextScrollTop);
@@ -189,6 +208,29 @@ function getVirtualTableEntry<Row>(
         scrollTopState.set(maxScrollTop);
       }
     }
+  };
+
+  const scheduleResize = () => {
+    if (entry.resizeCommitFrame !== null) {
+      return;
+    }
+
+    if (typeof requestAnimationFrame !== 'function') {
+      entry.resizeCommitFrame = -1;
+      queueMicrotask(() => {
+        entry.resizeCommitFrame = null;
+        handleResize();
+      });
+      return;
+    }
+
+    // ResizeObserver callbacks are measurement-only. Defer every state/DOM
+    // write until the next frame so the observer delivery cannot feed back
+    // into the same browser resize cycle.
+    entry.resizeCommitFrame = requestAnimationFrame(() => {
+      entry.resizeCommitFrame = null;
+      handleResize();
+    });
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -258,6 +300,13 @@ function getVirtualTableEntry<Row>(
       entry.pendingCommitFrame = null;
     }
 
+    if (entry.resizeCommitFrame !== null) {
+      if (entry.resizeCommitFrame >= 0) {
+        cancelAnimationFrame(entry.resizeCommitFrame);
+      }
+      entry.resizeCommitFrame = null;
+    }
+
     entry.resizeObserver?.disconnect();
     entry.resizeObserver = null;
 
@@ -293,7 +342,7 @@ function getVirtualTableEntry<Row>(
 
       if (typeof ResizeObserver !== 'undefined') {
         entry.resizeObserver = new ResizeObserver(() => {
-          handleResize();
+          scheduleResize();
         });
         entry.resizeObserver.observe(node);
       } else {
@@ -418,12 +467,13 @@ function getVirtualTableEntry<Row>(
     getState() {
       const visibleRange = entry.visibleRange;
       const selectedKey = entry.selectedKeyState();
+      const scrollTop = entry.pendingScrollTop ?? scrollTopState();
 
       return {
         count: entry.keys.length,
         rowHeight: entry.rowHeight,
         headerHeight: entry.headerHeight,
-        scrollTop: scrollTopState(),
+        scrollTop,
         viewportHeight: viewportHeightState(),
         totalHeight:
           resolveVirtualTotalHeight(entry.keys.length, entry.rowHeight) +
@@ -445,7 +495,7 @@ function getVirtualTableEntry<Row>(
       return entry.keys.length;
     },
     getScrollTop() {
-      return scrollTopState();
+      return entry.pendingScrollTop ?? scrollTopState();
     },
     isAtTop() {
       return entry.visibleRange.isAtTop;
@@ -499,6 +549,7 @@ function getVirtualTableEntry<Row>(
   entry.keyIndexMap = entry.keyIndexMap ?? new Map<string, number>();
   entry.pendingScrollTop = entry.pendingScrollTop ?? null;
   entry.pendingCommitFrame = entry.pendingCommitFrame ?? null;
+  entry.resizeCommitFrame = entry.resizeCommitFrame ?? null;
   entry.visibleRange =
     entry.visibleRange ??
     resolveVirtualRange({
@@ -609,16 +660,16 @@ function syncVirtualTableRows<Row>(
     }
   }
 
-  if (entry.pendingScrollTop === null) {
-    const maxScrollTop =
-      entry.headerHeight +
-      resolveVirtualScrollTopForBottom(
-        nextBodyTotalHeight,
-        currentBodyViewportHeight
-      );
-
-    entry.pendingScrollTop = Math.min(currentScrollTop, maxScrollTop);
-  }
+  const maxScrollTop =
+    entry.headerHeight +
+    resolveVirtualScrollTopForBottom(
+      nextBodyTotalHeight,
+      currentBodyViewportHeight
+    );
+  entry.pendingScrollTop = Math.min(
+    Math.max(0, entry.pendingScrollTop ?? currentScrollTop),
+    maxScrollTop
+  );
 
   entry.keys = nextKeys;
   entry.keyIndexMap = nextKeyIndexMap;
@@ -743,7 +794,7 @@ function renderVirtualTableRows<Row>(
         data-selected={selected ? 'true' : 'false'}
         aria-rowindex={index + 1}
         aria-selected={selected ? 'true' : 'false'}
-        style={{ height: `${entry.rowHeight}px` }}
+        style={{ height: `${entry.rowHeight}px`, overflow: 'hidden' }}
         onClick={(event: MouseEvent) => {
           onRowClick(row, index, rowKey, event);
         }}
@@ -756,14 +807,30 @@ function renderVirtualTableRows<Row>(
               key={column.id}
               data-slot="virtual-table-cell"
               data-column-id={column.id}
+              style={{
+                boxSizing: 'border-box',
+                height: `${entry.rowHeight}px`,
+                maxHeight: `${entry.rowHeight}px`,
+                overflow: 'hidden',
+                position: 'relative',
+              }}
             >
-              <CellComponent
-                row={row}
-                rowIndex={index}
-                rowKey={rowKey}
-                column={column}
-                selected={selected}
-              />
+              <div
+                data-slot="virtual-table-cell-content"
+                style={{
+                  inset: 0,
+                  overflow: 'hidden',
+                  position: 'absolute',
+                }}
+              >
+                <CellComponent
+                  row={row}
+                  rowIndex={index}
+                  rowKey={rowKey}
+                  column={column}
+                  selected={selected}
+                />
+              </div>
             </td>
           );
         })}
@@ -992,7 +1059,14 @@ export function VirtualTable<Row>(
   );
 
   const tableBody = (
-    <table {...tableProps} style={{ tableLayout: 'fixed' }}>
+    <table
+      {...tableProps}
+      style={{
+        borderCollapse: 'collapse',
+        borderSpacing: 0,
+        tableLayout: 'fixed',
+      }}
+    >
       {columnsMarkup.length > 0 ? <colgroup>{columnsMarkup}</colgroup> : null}
       {headerMarkup}
       <tbody data-slot="virtual-table-body">{rowsMarkup}</tbody>
