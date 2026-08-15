@@ -1,5 +1,6 @@
 import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { state } from '@askrjs/askr';
 import {
   Accordion,
   AccordionContent,
@@ -194,6 +195,46 @@ describe('Accordion - Behavior', () => {
     ) as HTMLElement;
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
     expect(container.textContent).not.toContain('Body');
+  });
+
+  it('should move focus when the focused trigger becomes disabled', async () => {
+    let disabled!: ReturnType<typeof state<boolean>>;
+    function DynamicAccordion() {
+      disabled = state(false);
+      return (
+        <Accordion orientation="vertical">
+          <AccordionItem value="one">
+            <AccordionHeader>
+              <AccordionTrigger>One</AccordionTrigger>
+            </AccordionHeader>
+          </AccordionItem>
+          <AccordionItem value="two" disabled={disabled()}>
+            <AccordionHeader>
+              <AccordionTrigger>Two</AccordionTrigger>
+            </AccordionHeader>
+          </AccordionItem>
+          <AccordionItem value="three">
+            <AccordionHeader>
+              <AccordionTrigger>Three</AccordionTrigger>
+            </AccordionHeader>
+          </AccordionItem>
+        </Accordion>
+      );
+    }
+
+    container = mount(<DynamicAccordion />);
+    await flushUpdates();
+    await flushUpdates();
+    getButtonByText(container, 'Two').focus();
+
+    disabled.set(true);
+    await flushUpdates();
+    await flushUpdates();
+    expect(document.activeElement).toBe(getButtonByText(container, 'Three'));
+
+    await userEvent.keyboard('{ArrowUp}');
+    await flushUpdates();
+    expect(document.activeElement).toBe(getButtonByText(container, 'One'));
   });
 
   it('should keep controlled state props off the native root', () => {

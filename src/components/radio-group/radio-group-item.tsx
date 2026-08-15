@@ -2,7 +2,11 @@ import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
-import { focusSelectedCollectionItem } from '../_internal/focus';
+import {
+  compositeItemFocusProps,
+  focusSelectedCollectionItem,
+  repairFocusForDisabledItem,
+} from '../_internal/focus';
 import {
   disabledIndexes,
   getCompositeCollection,
@@ -63,6 +67,7 @@ export function RadioGroupItem(
     isNativeButton: !asChild,
   });
   const itemFocusProps = nav.item(itemIndex);
+  const focusRepairProps = compositeItemFocusProps();
   const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
     const changed = registerCompositeNode(
@@ -80,6 +85,14 @@ export function RadioGroupItem(
     if (changed) {
       root.scheduleItemsSync();
     }
+    repairFocusForDisabledItem({
+      collection,
+      disabled: isDisabled,
+      index: itemIndex,
+      loop: root.loop,
+      node,
+      setCurrentIndex: root.setCurrentIndex,
+    });
   };
   const refHandler = ref
     ? composeRefs(
@@ -94,6 +107,7 @@ export function RadioGroupItem(
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     ...itemFocusProps,
+    ...focusRepairProps,
     ref: refHandler,
     id: itemId,
     role: 'radio',

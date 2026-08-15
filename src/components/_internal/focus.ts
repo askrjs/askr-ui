@@ -331,3 +331,140 @@ export function restorePendingCollectionItemFocus(
     pendingFocus.index = null;
   }
 }
+
+export type CompositeItemFocusTracker = {
+  disabled: boolean;
+  focused: boolean;
+  repairQueued: boolean;
+};
+
+const compositeItemFocusTrackers = new WeakMap<
+  HTMLElement,
+  CompositeItemFocusTracker
+>();
+
+function getCompositeItemFocusTracker(
+  node: HTMLElement
+): CompositeItemFocusTracker {
+  const existing = compositeItemFocusTrackers.get(node);
+
+  if (existing) {
+    return existing;
+  }
+
+  const created = {
+    disabled: false,
+    focused: false,
+    repairQueued: false,
+  };
+  compositeItemFocusTrackers.set(node, created);
+  return created;
+}
+
+export function compositeItemFocusProps(): {
+  onBlur: (event: FocusEvent) => void;
+  onFocus: (event: FocusEvent) => void;
+} {
+  return {
+    onFocus: (event) => {
+      if (event.currentTarget instanceof HTMLElement) {
+        getCompositeItemFocusTracker(event.currentTarget).focused = true;
+      }
+    },
+    onBlur: (event) => {
+      const currentTarget = event.currentTarget;
+      if (!(currentTarget instanceof HTMLElement)) {
+        return;
+      }
+      const tracker = getCompositeItemFocusTracker(currentTarget);
+      if (event.relatedTarget instanceof HTMLElement) {
+        tracker.focused = false;
+        return;
+      }
+
+      queueMicrotask(() => {
+        const disabledDuringBlur =
+          currentTarget instanceof HTMLElement &&
+          (currentTarget.hasAttribute('disabled') ||
+            currentTarget.getAttribute('aria-disabled') === 'true');
+
+        if (!disabledDuringBlur) {
+          tracker.focused = false;
+        }
+      });
+    },
+  };
+}
+
+export function repairFocusForDisabledItem<
+  TMetadata extends { disabled: boolean; index: number },
+>(options: {
+  collection: Collection<HTMLElement, TMetadata>;
+  disabled: boolean;
+  index: number;
+  loop: boolean;
+  node: HTMLElement | null;
+  setCurrentIndex: (index: number) => void;
+}) {
+  const { collection, disabled, index, loop, node, setCurrentIndex } = options;
+
+  if (!node) {
+    return;
+  }
+
+  const tracker = getCompositeItemFocusTracker(node);
+  const becameDisabled = disabled && !tracker.disabled;
+  tracker.disabled = disabled;
+
+  if (!becameDisabled || !tracker.focused || tracker.repairQueued) {
+    return;
+  }
+
+  tracker.repairQueued = true;
+  queueMicrotask(() => {
+    tracker.repairQueued = false;
+
+    if (!tracker.disabled || !tracker.focused) {
+      return;
+    }
+
+    const items = collection
+      .items()
+      .slice()
+      .sort((left, right) => left.metadata.index - right.metadata.index);
+    const currentPosition = items.findIndex(
+      (item) => item.metadata.index === index
+    );
+    const following = items
+      .slice(currentPosition + 1)
+      .find((item) => !item.metadata.disabled);
+    const wrapped = loop
+      ? items
+          .slice(0, Math.max(currentPosition, 0))
+          .find((item) => !item.metadata.disabled)
+      : undefined;
+    const preceding = !loop
+      ? items
+          .slice(0, Math.max(currentPosition, 0))
+          .reverse()
+          .find((item) => !item.metadata.disabled)
+      : undefined;
+    const target = following ?? wrapped ?? preceding;
+
+    tracker.focused = false;
+
+    if (!target?.node.isConnected) {
+      const activeElement = document.activeElement;
+      if (
+        activeElement instanceof HTMLElement &&
+        activeElement.hasAttribute('disabled')
+      ) {
+        activeElement.blur();
+      }
+      return;
+    }
+
+    setCurrentIndex(target.metadata.index);
+    target.node.focus();
+  });
+}

@@ -1,3 +1,4 @@
+import { getSignal, state } from '@askrjs/askr';
 import { createCollection } from '@askrjs/askr/foundations/structures';
 
 export type CompositeCollectionMetadata = {
@@ -23,6 +24,55 @@ const compositeRegistrations = new Map<
     unregister: () => void;
   }
 >();
+const compositeObservers = new WeakMap<
+  ReturnType<typeof createCollection<HTMLElement, CompositeCollectionMetadata>>,
+  Map<
+    AbortSignal,
+    {
+      notify: () => void;
+      queued: boolean;
+      snapshot: Array<{
+        metadata: CompositeCollectionMetadata;
+        node: HTMLElement;
+      }>;
+    }
+  >
+>();
+
+function getCompositeSnapshot(
+  collection: ReturnType<
+    typeof createCollection<HTMLElement, CompositeCollectionMetadata>
+  >
+) {
+  return collection
+    .items()
+    .slice()
+    .sort((left, right) => left.metadata.index - right.metadata.index);
+}
+
+function isSameCompositeSnapshot(
+  left: ReturnType<typeof getCompositeSnapshot>,
+  right: ReturnType<typeof getCompositeSnapshot>
+) {
+  return (
+    left.length === right.length &&
+    left.every(
+      (item, index) =>
+        item.node === right[index]?.node &&
+        isSameCompositeMetadata(item.metadata, right[index]!.metadata)
+    )
+  );
+}
+
+function notifyCompositeObservers(
+  collection: ReturnType<
+    typeof createCollection<HTMLElement, CompositeCollectionMetadata>
+  >
+) {
+  for (const observer of compositeObservers.get(collection)?.values() ?? []) {
+    observer.notify();
+  }
+}
 
 export function getCompositeCollection(id: string) {
   const existing = compositeCollections.get(id);
@@ -34,6 +84,65 @@ export function getCompositeCollection(id: string) {
   const created = createCollection<HTMLElement, CompositeCollectionMetadata>();
   compositeCollections.set(id, created);
   return created;
+}
+
+export function observeCompositeCollection(id: string) {
+  const collection = getCompositeCollection(id);
+  const version = state(0);
+  version();
+  const signal = getSignal();
+  const observers = compositeObservers.get(collection) ?? new Map();
+  const existing = observers.get(signal);
+
+  if (existing) {
+    existing.snapshot = getCompositeSnapshot(collection);
+  }
+
+  if (!observers.has(signal)) {
+    const observer = {
+      queued: false,
+      snapshot: getCompositeSnapshot(collection),
+      notify: () => {},
+    };
+    observer.notify = () => {
+      if (observer.queued) {
+        return;
+      }
+
+      observer.queued = true;
+      queueMicrotask(() => {
+        observer.queued = false;
+
+        if (signal.aborted) {
+          return;
+        }
+
+        const nextSnapshot = getCompositeSnapshot(collection);
+
+        if (isSameCompositeSnapshot(observer.snapshot, nextSnapshot)) {
+          return;
+        }
+
+        observer.snapshot = nextSnapshot;
+        version.set((current) => current + 1);
+      });
+    };
+    observers.set(signal, observer);
+    compositeObservers.set(collection, observers);
+    signal.addEventListener(
+      'abort',
+      () => {
+        observers.delete(signal);
+
+        if (observers.size === 0) {
+          compositeObservers.delete(collection);
+        }
+      },
+      { once: true }
+    );
+  }
+
+  return collection;
 }
 
 export function getCompositeCollectionItems(
@@ -76,6 +185,9 @@ export function registerCompositeNode(
     }
     existing?.unregister();
     compositeRegistrations.delete(key);
+    if (existing) {
+      notifyCompositeObservers(existing.collection);
+    }
     return Boolean(existing);
   }
 
@@ -103,6 +215,7 @@ export function registerCompositeNode(
     owner,
     unregister,
   });
+  notifyCompositeObservers(collection);
 
   return true;
 }

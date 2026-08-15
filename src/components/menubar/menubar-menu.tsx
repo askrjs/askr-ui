@@ -2,7 +2,11 @@ import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
-import { focusSelectedCollectionItem } from '../_internal/focus';
+import {
+  compositeItemFocusProps,
+  focusSelectedCollectionItem,
+  repairFocusForDisabledItem,
+} from '../_internal/focus';
 import { resolvePartId } from '../_internal/id';
 import { pathIsOpen } from '../_internal/hierarchical-menu';
 import { resolveMenuItemText } from '../_internal/menu';
@@ -141,6 +145,7 @@ export function MenubarTrigger(
     },
     isNativeButton: false,
   });
+  const focusRepairProps = compositeItemFocusProps();
   const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
     getOverlayNodes(menu.overlayIdentity).trigger = node;
@@ -157,6 +162,14 @@ export function MenubarTrigger(
       registrationOwner
     );
     root.restoreTriggerFocus(menu.menuIndex, node);
+    repairFocusForDisabledItem({
+      collection,
+      disabled,
+      index: menu.menuIndex,
+      loop: root.loop,
+      node,
+      setCurrentIndex: root.setCurrentTriggerIndex,
+    });
   };
   const refHandler = ref
     ? composeRefs(
@@ -206,9 +219,11 @@ export function MenubarTrigger(
     'data-disabled': disabled ? 'true' : undefined,
     'data-state': isOpen() ? 'open' : 'closed',
     tabIndex: disabled ? -1 : itemFocusProps.tabIndex,
-    onFocus: () => {
+    onFocus: (event: FocusEvent) => {
+      focusRepairProps.onFocus(event);
       root.setCurrentTriggerIndex(menu.menuIndex);
     },
+    onBlur: focusRepairProps.onBlur,
     onPointerEnter: () => {
       if (!disabled && root.getOpenPath().length > 0) {
         root.setCurrentTriggerIndex(menu.menuIndex);

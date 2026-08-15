@@ -1,6 +1,6 @@
 import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
-import { For } from '@askrjs/askr';
+import { For, state } from '@askrjs/askr';
 import {
   ToggleGroup,
   ToggleGroupItem,
@@ -471,5 +471,32 @@ describe('ToggleGroup - Behavior', () => {
     expect(
       getToggleByText(container, 'Middle').getAttribute('aria-pressed')
     ).toBe('false');
+  });
+
+  it('should move focus when the focused item becomes disabled', async () => {
+    let disabled!: ReturnType<typeof state<boolean>>;
+    function DynamicToggleGroup() {
+      disabled = state(false);
+      return (
+        <ToggleGroup defaultValue="middle" orientation="vertical">
+          <ToggleGroupItem value="left">Left</ToggleGroupItem>
+          <ToggleGroupItem value="middle" disabled={disabled()}>
+            Middle
+          </ToggleGroupItem>
+          <ToggleGroupItem value="right">Right</ToggleGroupItem>
+        </ToggleGroup>
+      );
+    }
+
+    container = mount(<DynamicToggleGroup />);
+    await flushUpdates();
+    await flushUpdates();
+    getToggleByText(container, 'Middle').focus();
+
+    disabled.set(true);
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(document.activeElement).toBe(getToggleByText(container, 'Right'));
   });
 });

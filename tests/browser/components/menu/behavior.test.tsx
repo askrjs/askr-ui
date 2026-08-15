@@ -1,5 +1,6 @@
 import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { state } from '@askrjs/askr';
 import {
   Menu,
   MenuContent,
@@ -7,7 +8,7 @@ import {
   MenuLabel,
   MenuSeparator,
 } from '../../../../src/components/menu';
-import { mount, unmount } from '../../test-utils';
+import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Menu - Behavior', () => {
   let container: HTMLElement;
@@ -103,5 +104,64 @@ describe('Menu - Behavior', () => {
     expect(document.activeElement).toBe(
       container.querySelector('[data-testid="after-menu"]')
     );
+  });
+
+  it('should move actual focus with vertical arrow keys', async () => {
+    container = mount(
+      <Menu loop={false}>
+        <MenuContent>
+          <MenuItem>One</MenuItem>
+          <MenuItem disabled>Two</MenuItem>
+          <MenuItem>Three</MenuItem>
+        </MenuContent>
+      </Menu>
+    );
+    await flushUpdates();
+    await flushUpdates();
+
+    const items = Array.from(
+      container.querySelectorAll<HTMLElement>('[role="menuitem"]')
+    );
+    items[0]!.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await flushUpdates();
+
+    expect(document.activeElement).toBe(items[2]);
+    expect(items[2]!.getAttribute('tabindex')).toBe('0');
+    expect(items[2]!.getAttribute('data-roving-index')).toBe('2');
+
+    await userEvent.keyboard('{ArrowUp}');
+    await flushUpdates();
+    expect(document.activeElement).toBe(items[0]);
+  });
+
+  it('should move focus when the focused item becomes disabled', async () => {
+    let disabled!: ReturnType<typeof state<boolean>>;
+    function DynamicMenu() {
+      disabled = state(false);
+      return (
+        <Menu>
+          <MenuContent>
+            <MenuItem>One</MenuItem>
+            <MenuItem disabled={disabled()}>Two</MenuItem>
+            <MenuItem>Three</MenuItem>
+          </MenuContent>
+        </Menu>
+      );
+    }
+
+    container = mount(<DynamicMenu />);
+    await flushUpdates();
+    await flushUpdates();
+    const two = Array.from(
+      container.querySelectorAll<HTMLElement>('[role="menuitem"]')
+    ).find((item) => item.textContent === 'Two')!;
+    two.focus();
+
+    disabled.set(true);
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(document.activeElement?.textContent).toBe('Three');
   });
 });

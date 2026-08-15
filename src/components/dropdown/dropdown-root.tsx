@@ -11,7 +11,7 @@ import {
   restorePendingCollectionItemFocus,
   type PendingCollectionFocus,
 } from '../_internal/focus';
-import { getMenuCollection } from '../_internal/menu';
+import { observeMenuCollection } from '../_internal/menu';
 import {
   handleTypeaheadKeyDown,
   handleTypeaheadKeyUp,
@@ -54,7 +54,7 @@ export function Dropdown(props: DropdownProps) {
     currentIndexCandidate: currentIndexState(),
   };
   const resolvedState = resolveDropdownState(rootContextBase);
-  const collection = getMenuCollection(dropdownId);
+  const collection = observeMenuCollection(dropdownId);
   const focusItem = (index: number) => {
     const itemValue = resolveDropdownState({
       dropdownId,

@@ -1,5 +1,6 @@
 import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { state } from '@askrjs/askr';
 import {
   Dropdown,
   DropdownContent,
@@ -64,6 +65,35 @@ describe('Dropdown - Behavior', () => {
     await flushUpdates();
 
     expect(document.activeElement?.textContent).toBe('Archive');
+  });
+
+  it('should move focus when the focused item becomes disabled', async () => {
+    let disabled!: ReturnType<typeof state<boolean>>;
+    function DynamicDropdown() {
+      disabled = state(false);
+      return (
+        <Dropdown defaultOpen>
+          <DropdownTrigger>Open dropdown</DropdownTrigger>
+          <DropdownPortal>
+            <DropdownContent>
+              <DropdownItem disabled={disabled()}>Archive</DropdownItem>
+              <DropdownItem>Delete</DropdownItem>
+            </DropdownContent>
+          </DropdownPortal>
+        </Dropdown>
+      );
+    }
+
+    container = mount(<DynamicDropdown />);
+    await flushUpdates();
+    await flushUpdates();
+    expect(document.activeElement?.textContent).toBe('Archive');
+
+    disabled.set(true);
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(document.activeElement?.textContent).toBe('Delete');
   });
 
   it('should render typed trigger and item variants for themed menus', async () => {

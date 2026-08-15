@@ -1,5 +1,6 @@
 import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { state } from '@askrjs/askr';
 import {
   Select,
   SelectContent,
@@ -105,6 +106,39 @@ describe('Select - Behavior', () => {
     await flushUpdates();
 
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('should move focus when the focused option becomes disabled', async () => {
+    let disabled!: ReturnType<typeof state<boolean>>;
+    function DynamicSelect() {
+      disabled = state(false);
+      return (
+        <Select defaultOpen defaultValue="askr">
+          <SelectTrigger>
+            <SelectValue placeholder="Choose one" />
+          </SelectTrigger>
+          <SelectPortal>
+            <SelectContent>
+              <SelectItem value="askr" disabled={disabled()}>
+                Askr
+              </SelectItem>
+              <SelectItem value="solid">Solid</SelectItem>
+            </SelectContent>
+          </SelectPortal>
+        </Select>
+      );
+    }
+
+    container = mount(<DynamicSelect />);
+    await flushUpdates();
+    await flushUpdates();
+    expect(document.activeElement?.textContent).toBe('Askr');
+
+    disabled.set(true);
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(document.activeElement?.textContent).toBe('Solid');
   });
 
   it('should use explicit item text values for trigger rendering', () => {

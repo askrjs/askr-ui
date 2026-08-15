@@ -1,5 +1,6 @@
 import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { state } from '@askrjs/askr';
 import {
   RadioGroup,
   RadioGroupItem,
@@ -335,5 +336,103 @@ describe('RadioGroup - Behavior', () => {
     expect(
       getRadioByText(container, 'Large').getAttribute('aria-checked')
     ).toBe('false');
+  });
+
+  it('should isolate generated ids and roving focus between identical sibling groups', async () => {
+    container = mount(
+      <div>
+        <RadioGroup defaultValue="small" orientation="vertical">
+          <RadioGroupItem value="small">Small A</RadioGroupItem>
+          <RadioGroupItem value="medium">Medium A</RadioGroupItem>
+        </RadioGroup>
+        <RadioGroup defaultValue="small" orientation="vertical">
+          <RadioGroupItem value="small">Small A</RadioGroupItem>
+          <RadioGroupItem value="medium">Medium A</RadioGroupItem>
+        </RadioGroup>
+      </div>
+    );
+    await flushUpdates();
+    await flushUpdates();
+
+    const groups = Array.from(
+      container.querySelectorAll<HTMLElement>('[data-slot="radio-group"]')
+    );
+    const firstItems = Array.from(
+      groups[0]!.querySelectorAll<HTMLElement>('[data-slot="radio-group-item"]')
+    );
+    const secondItems = Array.from(
+      groups[1]!.querySelectorAll<HTMLElement>('[data-slot="radio-group-item"]')
+    );
+
+    expect(firstItems.map((item) => item.id)).not.toEqual(
+      secondItems.map((item) => item.id)
+    );
+
+    firstItems[0]!.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await flushUpdates();
+
+    expect(document.activeElement).toBe(firstItems[1]);
+    expect(firstItems[1]!.getAttribute('aria-checked')).toBe('true');
+    expect(secondItems[0]!.getAttribute('aria-checked')).toBe('true');
+  });
+
+  it('should repair focus when the focused item becomes disabled', async () => {
+    let disabled!: ReturnType<typeof state<boolean>>;
+    function DynamicRadioGroup() {
+      disabled = state(false);
+      return (
+        <RadioGroup defaultValue="medium" orientation="vertical">
+          <RadioGroupItem value="small">Small</RadioGroupItem>
+          <RadioGroupItem value="medium" disabled={disabled()}>
+            Medium
+          </RadioGroupItem>
+          <RadioGroupItem value="large">Large</RadioGroupItem>
+        </RadioGroup>
+      );
+    }
+
+    container = mount(<DynamicRadioGroup />);
+    await flushUpdates();
+    await flushUpdates();
+    getRadioByText(container, 'Medium').focus();
+
+    disabled.set(true);
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(document.activeElement).toBe(getRadioByText(container, 'Large'));
+    expect(getRadioByText(container, 'Medium').getAttribute('tabindex')).toBe(
+      '-1'
+    );
+  });
+
+  it('should leave no disabled item focused when every item becomes disabled', async () => {
+    let disabled!: ReturnType<typeof state<boolean>>;
+    function AllDisabledRadioGroup() {
+      disabled = state(false);
+      return (
+        <RadioGroup defaultValue="only">
+          <RadioGroupItem value="only" disabled={disabled()}>
+            Only
+          </RadioGroupItem>
+        </RadioGroup>
+      );
+    }
+
+    container = mount(<AllDisabledRadioGroup />);
+    await flushUpdates();
+    const only = getRadioByText(container, 'Only');
+    only.focus();
+
+    disabled.set(true);
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(document.activeElement).not.toBe(only);
+    expect(
+      document.activeElement instanceof HTMLElement &&
+        document.activeElement.hasAttribute('disabled')
+    ).toBe(false);
   });
 });

@@ -2,7 +2,11 @@ import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
-import { focusSelectedCollectionItem } from '../_internal/focus';
+import {
+  compositeItemFocusProps,
+  focusSelectedCollectionItem,
+  repairFocusForDisabledItem,
+} from '../_internal/focus';
 import { runCancelablePress } from '../_internal/press';
 import {
   getCompositeCollection,
@@ -80,6 +84,7 @@ export function ToggleGroupItem(
     isNativeButton: !asChild,
   });
   const itemFocusProps = nav.item(itemIndex);
+  const focusRepairProps = compositeItemFocusProps();
   const registrationOwner = {};
   const finalProps = mergeProps(rest, {
     ...interactionProps,
@@ -106,6 +111,14 @@ export function ToggleGroupItem(
         if (changed) {
           root.scheduleItemsSync();
         }
+        repairFocusForDisabledItem({
+          collection,
+          disabled: isDisabled,
+          index: itemIndex,
+          loop: root.loop,
+          node,
+          setCurrentIndex: root.setCurrentIndex,
+        });
       }
     ),
     id: itemId,
@@ -114,6 +127,7 @@ export function ToggleGroupItem(
     'data-state': pressed ? 'on' : 'off',
     'data-disabled': isDisabled ? 'true' : undefined,
     tabIndex: isDisabled ? -1 : itemFocusProps.tabIndex,
+    ...focusRepairProps,
   });
 
   if (asChild) {
