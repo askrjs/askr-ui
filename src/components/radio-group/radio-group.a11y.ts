@@ -30,4 +30,5 @@ export const RADIO_GROUP_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Radio Group A11y Contract object. */
 export type RadioGroupA11yContract = typeof RADIO_GROUP_A11Y_CONTRACT;

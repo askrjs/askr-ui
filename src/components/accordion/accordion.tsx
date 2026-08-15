@@ -39,6 +39,9 @@ import {
   type AccordionRootContextValue,
 } from './accordion.shared';
 
+/**
+ * Renders a part of `accordion`.
+ */
 export function Accordion(props: AccordionProps) {
   const {
     children,
@@ -192,6 +195,9 @@ export function Accordion(props: AccordionProps) {
   );
 }
 
+/**
+ * Renders the `accordion-item` part of `accordion`.
+ */
 export function AccordionItem(props: AccordionItemProps): JSX.Element {
   const { children, disabled = false, ref, value, ...rest } = props;
   const root = readAccordionRootContext();
@@ -227,6 +233,11 @@ export function AccordionItem(props: AccordionItemProps): JSX.Element {
   );
 }
 
+/**
+ * Renders the `accordion-header` part of `accordion`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function AccordionHeader(props: AccordionHeaderProps): JSX.Element;
 export function AccordionHeader(
   props: AccordionHeaderAsChildProps
@@ -248,6 +259,11 @@ export function AccordionHeader(
   return <h3 {...finalProps}>{children}</h3>;
 }
 
+/**
+ * Renders the `accordion-trigger` part of `accordion`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function AccordionTrigger(props: AccordionTriggerProps): JSX.Element;
 export function AccordionTrigger(
   props: AccordionTriggerAsChildProps
@@ -342,6 +358,11 @@ export function AccordionTrigger(
   );
 }
 
+/**
+ * Renders the `accordion-content` part of `accordion` with `role="region"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function AccordionContent(
   props: AccordionContentProps
 ): JSX.Element | null;

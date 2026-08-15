@@ -18,4 +18,5 @@ export const DIALOG_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Dialog A11y Contract object. */
 export type DialogA11yContract = typeof DIALOG_A11Y_CONTRACT;

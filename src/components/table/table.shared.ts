@@ -1,3 +1,4 @@
+/** Table Slots value. */
 export const TABLE_SLOTS = {
   table: 'table',
   caption: 'table-caption',
@@ -9,6 +10,7 @@ export const TABLE_SLOTS = {
   cell: 'table-cell',
 } as const;
 
+/** Table Data Attributes value. */
 export const TABLE_DATA_ATTRIBUTES = {
   table: 'data-table',
   caption: 'data-table-caption',

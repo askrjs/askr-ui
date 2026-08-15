@@ -10,6 +10,11 @@ import type {
   TooltipContentProps,
 } from './tooltip.types';
 
+/**
+ * Renders the `tooltip-content` part of `tooltip` with `role="tooltip"`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function TooltipContent(props: TooltipContentProps): JSX.Element | null;
 export function TooltipContent(
   props: TooltipContentAsChildProps

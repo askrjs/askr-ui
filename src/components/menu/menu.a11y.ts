@@ -13,4 +13,5 @@ export const MENU_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Menu A11y Contract object. */
 export type MenuA11yContract = typeof MENU_A11Y_CONTRACT;

@@ -30,6 +30,9 @@ import {
 } from './select.shared';
 import type { SelectProps } from './select.types';
 
+/**
+ * Renders a part of `select`.
+ */
 export function Select(props: SelectProps) {
   const {
     children,

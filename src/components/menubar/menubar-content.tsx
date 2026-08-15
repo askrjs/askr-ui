@@ -313,6 +313,9 @@ function renderMenubarSurfaceContent(
   );
 }
 
+/**
+ * Renders a part of `menubar`.
+ */
 export function MenubarContent(props: MenubarContentProps): JSX.Element | null;
 export function MenubarContent(
   props: MenubarContentAsChildProps
@@ -323,6 +326,9 @@ export function MenubarContent(
   return renderMenubarSurfaceContent(props, resolveMenubarContentOwner());
 }
 
+/**
+ * Renders a part of `menubar`.
+ */
 export function MenubarSubContent(
   props: MenubarSubContentProps
 ): JSX.Element | null;

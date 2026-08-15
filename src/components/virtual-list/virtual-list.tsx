@@ -651,6 +651,11 @@ function syncVirtualListItems<Item>(
   }
 }
 
+/**
+ * Renders a part of `virtual-list`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function VirtualList<Item>(props: VirtualListProps<Item>): JSX.Element;
 export function VirtualList<Item>(
   props: VirtualListAsChildProps<Item>

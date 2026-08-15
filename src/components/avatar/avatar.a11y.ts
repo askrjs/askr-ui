@@ -19,4 +19,5 @@ export const AVATAR_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Avatar A11y Contract object. */
 export type AvatarA11yContract = typeof AVATAR_A11Y_CONTRACT;

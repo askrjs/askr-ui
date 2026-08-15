@@ -15,4 +15,5 @@ export const TOOLTIP_A11Y_CONTRACT = {
   OPEN_STATE_ATTRIBUTE: 'data-state' as const,
 } as const;
 
+/** Type of the Tooltip A11y Contract object. */
 export type TooltipA11yContract = typeof TOOLTIP_A11Y_CONTRACT;

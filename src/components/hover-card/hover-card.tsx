@@ -21,6 +21,9 @@ function scheduleHoverCardPortalSync(callback: () => void) {
   queueMicrotask(callback);
 }
 
+/**
+ * Renders a part of `hover-card`.
+ */
 export function HoverCard(props: HoverCardProps) {
   const {
     children,

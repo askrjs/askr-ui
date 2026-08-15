@@ -19,6 +19,11 @@ import type {
   SelectItemTextProps,
 } from './select.types';
 
+/**
+ * Renders a part of `select`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function SelectItem(props: SelectItemProps): JSX.Element | null;
 export function SelectItem(props: SelectItemAsChildProps): JSX.Element | null;
 export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
@@ -140,6 +145,11 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
  * style the text slot directly.
  */
 export function SelectItemText(props: SelectItemTextProps): JSX.Element;
+/**
+ * Renders the `select-item-text` part of `select`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function SelectItemText(props: SelectItemTextAsChildProps): JSX.Element;
 export function SelectItemText(
   props: SelectItemTextProps | SelectItemTextAsChildProps

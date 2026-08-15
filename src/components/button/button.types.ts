@@ -13,6 +13,7 @@ export type PressEvent = {
   defaultPrevented?: boolean;
 };
 
+/** Button Variant. */
 export type ButtonVariant =
   | 'default'
   | 'primary'
@@ -22,6 +23,7 @@ export type ButtonVariant =
   | 'destructive'
   | 'link';
 
+/** Button Size. */
 export type ButtonSize =
   | 'xs'
   | 'sm'
@@ -32,8 +34,10 @@ export type ButtonSize =
   | 'icon-sm'
   | 'icon-lg';
 
+/** Button Width. */
 export type ButtonWidth = 'auto' | 'full';
 
+/** Button As Child Element. */
 export type ButtonAsChildElement = JSXElement | JSX.Element;
 
 /**

@@ -89,4 +89,5 @@ export const TOGGLE_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Toggle A11y Contract object. */
 export type ToggleA11yContract = typeof TOGGLE_A11Y_CONTRACT;

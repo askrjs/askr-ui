@@ -43,6 +43,9 @@ function syncDialogLabelAttributes(
   }
 }
 
+/**
+ * Renders a part of `dialog`.
+ */
 export function Dialog(props: DialogProps) {
   const {
     children,

@@ -17,6 +17,9 @@ import {
 } from './menu.shared';
 import type { MenuProps } from './menu.types';
 
+/**
+ * Renders a part of `menu`.
+ */
 export function Menu(props: MenuProps) {
   const { children, id, orientation = 'vertical', loop = true } = props;
   const menuId = resolveCompoundId('menu', id, children);

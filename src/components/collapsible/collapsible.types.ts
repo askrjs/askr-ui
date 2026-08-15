@@ -43,6 +43,7 @@ export interface CollapsibleTriggerProps extends Omit<
   ref?: Ref<HTMLButtonElement>;
 }
 
+/** Props for the `asChild` (polymorphic) rendering of Collapsible Trigger. */
 export interface CollapsibleTriggerAsChildProps {
   /** Render as child element instead of button */
   asChild: true;
@@ -69,6 +70,7 @@ export interface CollapsibleContentProps extends Omit<
   ref?: Ref<HTMLDivElement>;
 }
 
+/** Props for the `asChild` (polymorphic) rendering of Collapsible Content. */
 export interface CollapsibleContentAsChildProps {
   /** Render as child element instead of div */
   asChild: true;

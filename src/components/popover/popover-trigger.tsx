@@ -8,6 +8,11 @@ import type {
   PopoverTriggerProps,
 } from './popover.types';
 
+/**
+ * Renders the `popover-trigger` part of `popover`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function PopoverTrigger(props: PopoverTriggerProps): JSX.Element;
 export function PopoverTrigger(props: PopoverTriggerAsChildProps): JSX.Element;
 export function PopoverTrigger(

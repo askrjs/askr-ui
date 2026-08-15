@@ -4,6 +4,7 @@ import type {
   BoxProps,
 } from '../_internal/types';
 
+/** Toggle Group Orientation. */
 export type ToggleGroupOrientation = 'horizontal' | 'vertical';
 
 type ToggleGroupSharedOwnProps = {
@@ -15,6 +16,7 @@ type ToggleGroupSharedOwnProps = {
   disabled?: boolean;
 };
 
+/** Props for Toggle Group Single. */
 export type ToggleGroupSingleProps = BoxProps<'div', HTMLDivElement> &
   ToggleGroupSharedOwnProps & {
     type?: 'single';
@@ -23,6 +25,7 @@ export type ToggleGroupSingleProps = BoxProps<'div', HTMLDivElement> &
     onValueChange?: (value: string) => void;
   };
 
+/** Props for Toggle Group Multiple. */
 export type ToggleGroupMultipleProps = BoxProps<'div', HTMLDivElement> &
   ToggleGroupSharedOwnProps & {
     type: 'multiple';
@@ -31,20 +34,24 @@ export type ToggleGroupMultipleProps = BoxProps<'div', HTMLDivElement> &
     onValueChange?: (value: string[]) => void;
   };
 
+/** Props for Toggle Group. */
 export type ToggleGroupProps =
   | ToggleGroupSingleProps
   | ToggleGroupMultipleProps;
 
+/** Own props for Toggle Group Item, before merging with native element attributes. */
 export type ToggleGroupItemOwnProps = {
   value: string;
   disabled?: boolean;
   children?: unknown;
 };
 
+/** Props for Toggle Group Item. */
 export type ToggleGroupItemProps = ButtonLikeProps<
   'button',
   HTMLButtonElement
 > &
   ToggleGroupItemOwnProps;
+/** Props for the `asChild` (polymorphic) rendering of Toggle Group Item. */
 export type ToggleGroupItemAsChildProps = ButtonLikeAsChildProps &
   ToggleGroupItemOwnProps;

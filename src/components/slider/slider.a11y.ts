@@ -15,4 +15,5 @@ export const SLIDER_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Slider A11y Contract object. */
 export type SliderA11yContract = typeof SLIDER_A11Y_CONTRACT;

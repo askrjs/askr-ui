@@ -12,4 +12,5 @@ export const ALERT_DIALOG_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Alert Dialog A11y Contract object. */
 export type AlertDialogA11yContract = typeof ALERT_DIALOG_A11Y_CONTRACT;

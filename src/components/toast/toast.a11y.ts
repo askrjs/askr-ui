@@ -14,4 +14,5 @@ export const TOAST_A11Y_CONTRACT = {
   },
 } as const;
 
+/** Type of the Toast A11y Contract object. */
 export type ToastA11yContract = typeof TOAST_A11Y_CONTRACT;

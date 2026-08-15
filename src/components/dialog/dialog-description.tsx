@@ -6,6 +6,11 @@ import type {
   DialogDescriptionProps,
 } from './dialog.types';
 
+/**
+ * Renders the `dialog-description` part of `dialog`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function DialogDescription(props: DialogDescriptionProps): JSX.Element;
 export function DialogDescription(
   props: DialogDescriptionAsChildProps

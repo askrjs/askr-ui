@@ -146,6 +146,9 @@ function registerLayerCleanup(layerId: string, entry: LayerEntry) {
   );
 }
 
+/**
+ * Renders a part of `dismissable-layer`.
+ */
 export function dismissableLayerEntryCountForTests(): number {
   return layerEntries.size;
 }
@@ -212,6 +215,11 @@ function runDismissCallbacks(layerId: string, trigger: 'escape' | 'outside') {
   entry.onDismiss?.();
 }
 
+/**
+ * Renders a part of `dismissable-layer`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function DismissableLayer(props: DismissableLayerProps): JSX.Element;
 export function DismissableLayer(
   props: DismissableLayerAsChildProps

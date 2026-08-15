@@ -3,6 +3,11 @@ import { Slot } from '@askrjs/askr/foundations/structures';
 import { readDialogRootContext } from './dialog.shared';
 import type { DialogTitleAsChildProps, DialogTitleProps } from './dialog.types';
 
+/**
+ * Renders the `dialog-title` part of `dialog`.
+ *
+ * Supports polymorphic rendering via `asChild`.
+ */
 export function DialogTitle(props: DialogTitleProps): JSX.Element;
 export function DialogTitle(props: DialogTitleAsChildProps): JSX.Element;
 export function DialogTitle(props: DialogTitleProps | DialogTitleAsChildProps) {
