@@ -4,6 +4,9 @@ import { sharedVitestConfig } from './vitest.test.shared';
 
 export default defineConfig({
   ...sharedVitestConfig,
+  optimizeDeps: {
+    include: ['@askrjs/askr/testing'],
+  },
   test: {
     ...sharedVitestConfig.test,
     setupFiles: [

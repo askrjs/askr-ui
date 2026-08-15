@@ -46,6 +46,11 @@ export function HoverCard(props: HoverCardProps) {
     restoreFrame: null as number | null,
     restoreGeneration: 0,
   })();
+  const pointerEntry = state({
+    document: null as Document | null,
+    handler: null as ((event: PointerEvent) => void) | null,
+    sync: null as ((event: PointerEvent) => void) | null,
+  })();
   captureOverlayNonce(overlayIdentity, cspNonce());
   const triggerId = resolvePartId(hoverCardId, 'trigger');
   const contentId = resolvePartId(hoverCardId, 'content');
@@ -79,16 +84,21 @@ export function HoverCard(props: HoverCardProps) {
   let openTimer: ReturnType<typeof setTimeout> | undefined;
   let closeTimer: ReturnType<typeof setTimeout> | undefined;
 
-  const clearTimers = () => {
-    if (openTimer) {
+  const clearOpenTimer = () => {
+    if (openTimer !== undefined) {
       clearTimeout(openTimer);
       openTimer = undefined;
     }
-
-    if (closeTimer) {
+  };
+  const clearCloseTimer = () => {
+    if (closeTimer !== undefined) {
       clearTimeout(closeTimer);
       closeTimer = undefined;
     }
+  };
+  const clearTimers = () => {
+    clearOpenTimer();
+    clearCloseTimer();
   };
   const cleanupSignal = getSignal();
   cleanupSignal.addEventListener(
@@ -127,28 +137,28 @@ export function HoverCard(props: HoverCardProps) {
       });
     },
     scheduleOpen: () => {
-      if (openTimer) {
-        clearTimeout(openTimer);
-      }
+      clearCloseTimer();
+      clearOpenTimer();
 
       if (openState()) {
         return;
       }
 
       openTimer = setTimeout(() => {
+        openTimer = undefined;
         rootContext.setOpen(true);
       }, openDelay);
     },
     scheduleClose: () => {
-      if (closeTimer) {
-        clearTimeout(closeTimer);
-      }
+      clearOpenTimer();
+      clearCloseTimer();
 
       closeTimer = setTimeout(() => {
+        closeTimer = undefined;
         rootContext.setOpen(false);
       }, closeDelay);
     },
-    cancelClose: clearTimers,
+    cancelClose: clearCloseTimer,
     triggerId,
     contentId,
     portal,
@@ -188,6 +198,46 @@ export function HoverCard(props: HoverCardProps) {
     },
   };
   const PortalHost = portal;
+
+  pointerEntry.sync = (event: PointerEvent) => {
+    const target = event.target;
+    const isInside =
+      target instanceof Node &&
+      (overlayNodes.trigger?.contains(target) === true ||
+        overlayNodes.content?.contains(target) === true);
+    if (isInside) {
+      clearCloseTimer();
+      return;
+    }
+
+    clearOpenTimer();
+    if (openState() && closeTimer === undefined) {
+      rootContext.scheduleClose();
+    }
+  };
+
+  if (!pointerEntry.handler) {
+    pointerEntry.document = document;
+    pointerEntry.handler = (event: PointerEvent) => {
+      pointerEntry.sync?.(event);
+    };
+    pointerEntry.document.addEventListener('pointerover', pointerEntry.handler);
+    cleanupSignal.addEventListener(
+      'abort',
+      () => {
+        if (pointerEntry.document && pointerEntry.handler) {
+          pointerEntry.document.removeEventListener(
+            'pointerover',
+            pointerEntry.handler
+          );
+        }
+        pointerEntry.document = null;
+        pointerEntry.handler = null;
+        pointerEntry.sync = null;
+      },
+      { once: true }
+    );
+  }
 
   return (
     <HoverCardRootContext value={rootContext}>

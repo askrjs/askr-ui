@@ -15,6 +15,7 @@ export type TooltipRootContextValue = {
   tooltipId: string;
   open: boolean;
   setOpen: (open: boolean) => void;
+  openFromFocus: () => void;
   contentId: string;
   portal: OverlayPortal;
   registerContentPosition: (position: TooltipPositionOptions) => void;
