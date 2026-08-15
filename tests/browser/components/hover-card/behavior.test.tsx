@@ -6,6 +6,23 @@ import {
 } from '../../../../src/components/hover-card';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
+async function waitForHoverCardState(
+  container: HTMLElement,
+  expected: 'open' | 'closed'
+): Promise<HTMLElement> {
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    const trigger = container.querySelector(
+      '[data-slot="hover-card-trigger"]'
+    ) as HTMLElement | null;
+    if (trigger?.getAttribute('data-state') === expected) {
+      return trigger;
+    }
+    await flushUpdates();
+  }
+
+  throw new Error(`Expected HoverCard trigger to become ${expected}`);
+}
+
 describe('HoverCard - Behavior', () => {
   let container: HTMLElement | undefined;
 
@@ -18,9 +35,10 @@ describe('HoverCard - Behavior', () => {
 
   it('should open and close from hover and focus state changes', async () => {
     vi.useFakeTimers();
+    const onOpenChange = vi.fn();
 
     container = mount(
-      <HoverCard>
+      <HoverCard onOpenChange={onOpenChange}>
         <HoverCardTrigger>Preview</HoverCardTrigger>
         <HoverCardContent>Details</HoverCardContent>
       </HoverCard>
@@ -34,9 +52,7 @@ describe('HoverCard - Behavior', () => {
     await vi.advanceTimersByTimeAsync(1);
     await flushUpdates();
 
-    const openTrigger = container.querySelector(
-      '[data-slot="hover-card-trigger"]'
-    ) as HTMLElement;
+    const openTrigger = await waitForHoverCardState(container, 'open');
 
     expect(openTrigger.getAttribute('data-state')).toBe('open');
     expect(
@@ -47,16 +63,13 @@ describe('HoverCard - Behavior', () => {
       new PointerEvent('pointerleave', { bubbles: true })
     );
     await vi.runAllTimersAsync();
-    await flushUpdates();
-
-    const closedTrigger = container.querySelector(
-      '[data-slot="hover-card-trigger"]'
-    ) as HTMLElement;
+    const closedTrigger = await waitForHoverCardState(container, 'closed');
 
     expect(closedTrigger.getAttribute('data-state')).toBe('closed');
     expect(
       document.body.querySelector('[data-slot="hover-card-content"]')
     ).toBeNull();
+    expect(onOpenChange.mock.calls).toEqual([[true], [false]]);
   });
 
   it('should support asChild composition and ref forwarding', async () => {
