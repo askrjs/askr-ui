@@ -164,13 +164,14 @@ function resolveAlignedOffset(
   align: OverlayAlign,
   start: number,
   end: number,
-  size: number
+  size: number,
+  reverse: boolean = false
 ) {
   if (align === 'center') {
     return start + (end - start) / 2 - size / 2;
   }
 
-  if (align === 'end') {
+  if (align === (reverse ? 'start' : 'end')) {
     return end - size;
   }
 
@@ -189,6 +190,14 @@ function applyAnchoredPosition(
   const contentWidth = options.matchTriggerWidth
     ? Math.max(contentRect.width, triggerRect.width)
     : contentRect.width;
+  const availableWidth = Math.max(
+    0,
+    viewportWidth - options.viewportPadding * 2
+  );
+  const availableHeight = Math.max(
+    0,
+    viewportHeight - options.viewportPadding * 2
+  );
   const resolvedSide = resolveAnchoredSide(
     options.side,
     triggerRect,
@@ -207,7 +216,8 @@ function applyAnchoredPosition(
       options.align,
       triggerRect.left,
       triggerRect.right,
-      contentWidth
+      contentWidth,
+      window.getComputedStyle(trigger).direction === 'rtl'
     );
     top =
       resolvedSide === 'bottom'
@@ -241,6 +251,8 @@ function applyAnchoredPosition(
     position: 'fixed',
     inset: 'auto',
     margin: '0',
+    '--ak-overlay-available-width': `${Math.round(availableWidth)}px`,
+    '--ak-overlay-available-height': `${Math.round(availableHeight)}px`,
     left: `${Math.round(clamp(left, options.viewportPadding, maxLeft))}px`,
     top: `${Math.round(clamp(top, options.viewportPadding, maxTop))}px`,
     'min-width': options.matchTriggerWidth
@@ -281,6 +293,8 @@ function applyCenteredPosition(
     position: 'fixed',
     inset: 'auto',
     margin: '0',
+    '--ak-overlay-available-width': `${Math.round(maxWidth)}px`,
+    '--ak-overlay-available-height': `${Math.round(maxHeight)}px`,
     'max-width': `${Math.round(maxWidth)}px`,
     'max-height': `${Math.round(maxHeight)}px`,
     left: `${Math.round(
