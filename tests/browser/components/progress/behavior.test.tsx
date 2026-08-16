@@ -52,4 +52,22 @@ describe('Progress - Behavior', () => {
       unmount(container);
     }
   });
+
+  it.each([Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NaN])(
+    'should normalize non-finite max %s to the default ARIA maximum',
+    (max) => {
+      const container = mount(<Progress value={40} max={max} />);
+
+      try {
+        const root = container.querySelector(
+          `[role="${PROGRESS_A11Y_CONTRACT.ROLE}"]`
+        );
+        expect(
+          root?.getAttribute(PROGRESS_A11Y_CONTRACT.VALUE_MAX_ATTRIBUTE)
+        ).toBe('100');
+      } finally {
+        unmount(container);
+      }
+    }
+  );
 });

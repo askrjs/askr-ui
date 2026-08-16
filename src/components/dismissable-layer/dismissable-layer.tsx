@@ -1,6 +1,6 @@
 import { Slot, createLayer } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
-import { getSignal } from '@askrjs/askr';
+import { getSignal, state } from '@askrjs/askr';
 import { resolveCompoundId } from '../_internal/id';
 import type {
   DismissableLayerAsChildProps,
@@ -27,10 +27,10 @@ type LayerEntry = {
 };
 
 const layerManager = createLayer();
-const layerEntries = new Map<string, LayerEntry>();
+const layerEntries = new Map<object, LayerEntry>();
 
-function getLayerEntry(layerId: string): LayerEntry {
-  const existing = layerEntries.get(layerId);
+function getLayerEntry(identity: object): LayerEntry {
+  const existing = layerEntries.get(identity);
 
   if (existing) {
     return existing;
@@ -45,7 +45,7 @@ function getLayerEntry(layerId: string): LayerEntry {
         return;
       }
 
-      unregisterLayer(layerId);
+      unregisterLayer(created);
 
       if (!node) {
         return;
@@ -97,7 +97,7 @@ function getLayerEntry(layerId: string): LayerEntry {
 
       created.lastEscapeEvent = event;
       event.stopPropagation?.();
-      runDismissCallbacks(layerId, 'escape');
+      runDismissCallbacks(created, 'escape');
     },
     handlePointerDownCapture: (event: PointerEvent) => {
       if (created.disabled) {
@@ -113,7 +113,7 @@ function getLayerEntry(layerId: string): LayerEntry {
       }
 
       created.lastOutsidePointerEvent = event;
-      runDismissCallbacks(layerId, 'outside');
+      runDismissCallbacks(created, 'outside');
     },
     lastEscapeEvent: null,
     lastOutsidePointerEvent: null,
@@ -123,11 +123,11 @@ function getLayerEntry(layerId: string): LayerEntry {
     cleanupSignal: null,
   };
 
-  layerEntries.set(layerId, created);
+  layerEntries.set(identity, created);
   return created;
 }
 
-function registerLayerCleanup(layerId: string, entry: LayerEntry) {
+function registerLayerCleanup(identity: object, entry: LayerEntry) {
   const signal = getSignal();
   if (entry.cleanupSignal === signal) {
     return;
@@ -139,8 +139,8 @@ function registerLayerCleanup(layerId: string, entry: LayerEntry) {
       if (entry.cleanupSignal !== signal) {
         return;
       }
-      unregisterLayer(layerId);
-      layerEntries.delete(layerId);
+      unregisterLayer(entry);
+      layerEntries.delete(identity);
     },
     { once: true }
   );
@@ -153,10 +153,8 @@ export function dismissableLayerEntryCountForTests(): number {
   return layerEntries.size;
 }
 
-function unregisterLayer(layerId: string) {
-  const entry = layerEntries.get(layerId);
-
-  if (!entry?.unregister) {
+function unregisterLayer(entry: LayerEntry) {
+  if (!entry.unregister) {
     return;
   }
 
@@ -168,10 +166,8 @@ function unregisterLayer(layerId: string) {
   entry.node = null;
 }
 
-function runDismissCallbacks(layerId: string, trigger: 'escape' | 'outside') {
-  const entry = layerEntries.get(layerId);
-
-  if (!entry || entry.disabled || !entry.isTop?.()) {
+function runDismissCallbacks(entry: LayerEntry, trigger: 'escape' | 'outside') {
+  if (entry.disabled || !entry.isTop?.()) {
     return;
   }
 
@@ -241,9 +237,11 @@ export function DismissableLayer(
     ...rest
   } = props;
 
-  const layerId = resolveCompoundId('dismissable-layer', id, children);
-  const entry = getLayerEntry(layerId);
-  registerLayerCleanup(layerId, entry);
+  const identity = state<object>({
+    id: resolveCompoundId('dismissable-layer', id, children),
+  })();
+  const entry = getLayerEntry(identity);
+  registerLayerCleanup(identity, entry);
   entry.disabled = disabled;
   entry.disableOutsidePointerEvents = disableOutsidePointerEvents;
   entry.onEscapeKeyDown = onEscapeKeyDown;
