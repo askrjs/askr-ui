@@ -137,4 +137,31 @@ describe('DismissableLayer - Behavior', () => {
 
     expect(dismissableLayerEntryCountForTests()).toBe(baseline);
   });
+
+  it('should isolate layers with the same explicit ID across mount roots', () => {
+    const firstDismiss = vi.fn();
+    const secondDismiss = vi.fn();
+    const firstContainer = mount(
+      <DismissableLayer id="shared" onDismiss={firstDismiss}>
+        <div>First</div>
+      </DismissableLayer>
+    );
+    const secondContainer = mount(
+      <DismissableLayer id="shared" onDismiss={secondDismiss}>
+        <div>Second</div>
+      </DismissableLayer>
+    );
+
+    try {
+      unmount(secondContainer);
+      document.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' })
+      );
+
+      expect(firstDismiss).toHaveBeenCalledOnce();
+      expect(secondDismiss).not.toHaveBeenCalled();
+    } finally {
+      unmount(firstContainer);
+    }
+  });
 });
