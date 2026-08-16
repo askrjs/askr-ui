@@ -59,6 +59,34 @@ These are documentation groupings only.
 - `VirtualTable` is a fixed-height table windowing primitive with a sticky
   head, stable keys, selection, and keyboard navigation.
 
+## Overlay positioning and sizing
+
+Anchored overlay families (`Popover`, `HoverCard`, `Tooltip`, `Dropdown`,
+`Menu`, and `Select`) interpret `align="start"` and `align="end"` as logical
+inline edges. The shared positioning engine reads the trigger's computed text
+direction, so those alignments mirror in right-to-left layouts when the overlay
+is above or below its trigger.
+
+Viewport collision handling chooses and clamps the overlay position. Because
+this package is headless, it does not shrink anchored content whose intrinsic
+size is larger than the viewport. The content exposes the current padded
+viewport bounds as `--ak-overlay-available-width` and
+`--ak-overlay-available-height`; apply them with an appropriate wrapping and
+overflow policy for application content:
+
+```css
+.app-overlay-content {
+  max-width: var(--ak-overlay-available-width);
+  max-height: var(--ak-overlay-available-height);
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+```
+
+Without that consumer rule, a long unbroken URL, hash, or identifier can remain
+wider than a narrow viewport. The engine still clamps its position, but position
+clamping alone cannot make oversized content fit.
+
 ## Keyboard interaction
 
 Keyboard behavior follows the semantic role of each public component and is

@@ -231,6 +231,191 @@ describe('Popover - Behavior', () => {
     expect(getComputedStyle(content as Element).top).toBe('90px');
   });
 
+  it('should mirror start and end alignment for identical RTL trigger geometry', async () => {
+    container = mount(
+      <>
+        <div dir="ltr">
+          <Popover defaultOpen>
+            <PopoverTrigger
+              data-testid="ltr-start-trigger"
+              style={{
+                position: 'fixed',
+                left: '300px',
+                top: '80px',
+                boxSizing: 'border-box',
+                width: '80px',
+                height: '20px',
+              }}
+            >
+              LTR start
+            </PopoverTrigger>
+            <PopoverContent
+              data-testid="ltr-start"
+              align="start"
+              style={{
+                boxSizing: 'border-box',
+                width: '120px',
+                height: '30px',
+              }}
+            >
+              Details
+            </PopoverContent>
+          </Popover>
+        </div>
+        <div dir="ltr">
+          <Popover defaultOpen>
+            <PopoverTrigger
+              data-testid="ltr-end-trigger"
+              style={{
+                position: 'fixed',
+                left: '300px',
+                top: '160px',
+                boxSizing: 'border-box',
+                width: '80px',
+                height: '20px',
+              }}
+            >
+              LTR end
+            </PopoverTrigger>
+            <PopoverContent
+              data-testid="ltr-end"
+              align="end"
+              style={{
+                boxSizing: 'border-box',
+                width: '120px',
+                height: '30px',
+              }}
+            >
+              Details
+            </PopoverContent>
+          </Popover>
+        </div>
+        <div dir="rtl">
+          <Popover defaultOpen>
+            <PopoverTrigger
+              data-testid="rtl-start-trigger"
+              style={{
+                position: 'fixed',
+                left: '300px',
+                top: '240px',
+                boxSizing: 'border-box',
+                width: '80px',
+                height: '20px',
+              }}
+            >
+              RTL start
+            </PopoverTrigger>
+            <PopoverContent
+              data-testid="rtl-start"
+              align="start"
+              style={{
+                boxSizing: 'border-box',
+                width: '120px',
+                height: '30px',
+              }}
+            >
+              Details
+            </PopoverContent>
+          </Popover>
+        </div>
+        <div dir="rtl">
+          <Popover defaultOpen>
+            <PopoverTrigger
+              data-testid="rtl-end-trigger"
+              style={{
+                position: 'fixed',
+                left: '300px',
+                top: '320px',
+                boxSizing: 'border-box',
+                width: '80px',
+                height: '20px',
+              }}
+            >
+              RTL end
+            </PopoverTrigger>
+            <PopoverContent
+              data-testid="rtl-end"
+              align="end"
+              style={{
+                boxSizing: 'border-box',
+                width: '120px',
+                height: '30px',
+              }}
+            >
+              Details
+            </PopoverContent>
+          </Popover>
+        </div>
+      </>
+    );
+
+    await flushUpdates();
+    await flushUpdates();
+
+    const ltrStart = (
+      document.body.querySelector('[data-testid="ltr-start"]') as HTMLElement
+    ).getBoundingClientRect();
+    const ltrEnd = (
+      document.body.querySelector('[data-testid="ltr-end"]') as HTMLElement
+    ).getBoundingClientRect();
+    const rtlStart = (
+      document.body.querySelector('[data-testid="rtl-start"]') as HTMLElement
+    ).getBoundingClientRect();
+    const rtlEnd = (
+      document.body.querySelector('[data-testid="rtl-end"]') as HTMLElement
+    ).getBoundingClientRect();
+    const ltrTrigger = (
+      container.querySelector(
+        '[data-testid="ltr-start-trigger"]'
+      ) as HTMLElement
+    ).getBoundingClientRect();
+    const rtlTrigger = (
+      container.querySelector(
+        '[data-testid="rtl-start-trigger"]'
+      ) as HTMLElement
+    ).getBoundingClientRect();
+
+    expect(rtlTrigger.left).toBeCloseTo(ltrTrigger.left, 0);
+    expect(rtlTrigger.right).toBeCloseTo(ltrTrigger.right, 0);
+    expect(rtlTrigger.width).toBeCloseTo(ltrTrigger.width, 0);
+    expect(ltrStart.left).toBeCloseTo(rtlEnd.left, 0);
+    expect(ltrEnd.left).toBeCloseTo(rtlStart.left, 0);
+    expect(ltrStart.left).toBeGreaterThan(ltrEnd.left);
+  });
+
+  it('should expose the position-only clamp boundary for oversized content', async () => {
+    container = mount(
+      <div style={{ position: 'fixed', left: '120px', top: '80px' }}>
+        <Popover defaultOpen>
+          <PopoverTrigger>Open oversized popover</PopoverTrigger>
+          <PopoverContent
+            data-testid="oversized-content"
+            style={{ whiteSpace: 'nowrap' }}
+          >
+            {'W'.repeat(400)}
+          </PopoverContent>
+        </Popover>
+      </div>
+    );
+
+    await flushUpdates();
+    await flushUpdates();
+
+    const content = document.body.querySelector(
+      '[data-testid="oversized-content"]'
+    ) as HTMLElement;
+    const rect = content.getBoundingClientRect();
+
+    expect(rect.width).toBeGreaterThan(window.innerWidth);
+    expect(rect.left).toBeGreaterThanOrEqual(12);
+    expect(rect.right).toBeGreaterThan(window.innerWidth);
+    expect(
+      getComputedStyle(content)
+        .getPropertyValue('--ak-overlay-available-width')
+        .trim()
+    ).toBe(`${window.innerWidth - 24}px`);
+  });
+
   it('should close nested popover without closing parent dialog on Escape', async () => {
     container = mount(
       <Dialog defaultOpen>
