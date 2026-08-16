@@ -52,6 +52,7 @@ type VirtualListEntry<Item> = {
   pendingUnseenCount: number;
   pendingScrollTop: number | null;
   pendingCommitFrame: number | null;
+  resizeCommitFrame: number | null;
   resizeObserver: ResizeObserver | null;
   windowResizeHandler: (() => void) | null;
   rootRef: (node: HTMLElement | null) => void;
@@ -118,13 +119,19 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
   };
 
   const applyPendingScrollTop = () => {
-    const nextScrollTop = entry.pendingScrollTop;
+    const pendingScrollTop = entry.pendingScrollTop;
     const node = entry.node;
 
-    if (nextScrollTop === null || !node) {
+    if (pendingScrollTop === null || !node) {
       return;
     }
 
+    const viewportHeight = readViewportHeight() || entry.viewportHeightHint;
+    const maxScrollTop = resolveVirtualScrollTopForBottom(
+      resolveVirtualTotalHeight(entry.keys.length, entry.rowHeight),
+      viewportHeight
+    );
+    const nextScrollTop = Math.min(Math.max(0, pendingScrollTop), maxScrollTop);
     entry.pendingScrollTop = null;
 
     if (node.scrollTop !== nextScrollTop) {
@@ -176,6 +183,14 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
     // Read the live scroll position from the viewport so visible range math
     // stays aligned with the browser's actual scroll state.
     const nextScrollTop = node.scrollTop;
+
+    if (event && entry.pendingScrollTop !== null) {
+      entry.pendingScrollTop = null;
+      if (entry.pendingCommitFrame !== null) {
+        cancelAnimationFrame(entry.pendingCommitFrame);
+        entry.pendingCommitFrame = null;
+      }
+    }
 
     if (readScrollTop() !== nextScrollTop) {
       setScrollTop(nextScrollTop);
@@ -258,6 +273,29 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
     bumpRenderVersion();
   };
 
+  const scheduleResize = () => {
+    if (entry.resizeCommitFrame !== null) {
+      return;
+    }
+
+    if (typeof requestAnimationFrame !== 'function') {
+      entry.resizeCommitFrame = -1;
+      queueMicrotask(() => {
+        entry.resizeCommitFrame = null;
+        handleResize();
+      });
+      return;
+    }
+
+    // ResizeObserver callbacks are measurement-only. Defer every state/DOM
+    // write until the next frame so the observer delivery cannot feed back
+    // into the same browser resize cycle.
+    entry.resizeCommitFrame = requestAnimationFrame(() => {
+      entry.resizeCommitFrame = null;
+      handleResize();
+    });
+  };
+
   const rootRef = (node: HTMLElement | null) => {
     setRefValue(entry.userRef, node);
 
@@ -268,6 +306,13 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
     if (entry.pendingCommitFrame !== null) {
       cancelAnimationFrame(entry.pendingCommitFrame);
       entry.pendingCommitFrame = null;
+    }
+
+    if (entry.resizeCommitFrame !== null) {
+      if (entry.resizeCommitFrame >= 0) {
+        cancelAnimationFrame(entry.resizeCommitFrame);
+      }
+      entry.resizeCommitFrame = null;
     }
 
     entry.resizeObserver?.disconnect();
@@ -306,7 +351,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
 
       if (typeof ResizeObserver !== 'undefined') {
         entry.resizeObserver = new ResizeObserver(() => {
-          handleResize();
+          scheduleResize();
         });
         entry.resizeObserver.observe(node);
       } else {
@@ -447,6 +492,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
   entry.pendingUnseenCount = entry.pendingUnseenCount ?? 0;
   entry.pendingScrollTop = entry.pendingScrollTop ?? null;
   entry.pendingCommitFrame = entry.pendingCommitFrame ?? null;
+  entry.resizeCommitFrame = entry.resizeCommitFrame ?? null;
   entry.visibleRange =
     entry.visibleRange ??
     resolveVirtualRange({
@@ -508,6 +554,30 @@ function renderVirtualListRows<Item>(
 
   const RowHost = rendersSemanticListItems ? 'li' : 'div';
 
+  const pushSpacer = (position: 'before' | 'after', height: number) => {
+    if (height <= 0) {
+      return;
+    }
+
+    rows.push(
+      <RowHost
+        key={`virtual-list-spacer-${position}`}
+        aria-hidden="true"
+        data-slot="virtual-list-spacer"
+        data-position={position}
+        style={{
+          height: `${height}px`,
+          listStyle: 'none',
+          flex: '0 0 auto',
+          overflow: 'hidden',
+          pointerEvents: 'none',
+        }}
+      />
+    );
+  };
+
+  pushSpacer('before', visibleRange.beforeSpacerHeight);
+
   for (
     let index = visibleRange.renderStartIndex;
     index <= visibleRange.renderEndIndex;
@@ -534,6 +604,7 @@ function renderVirtualListRows<Item>(
           height: `${entry.rowHeight}px`,
           listStyle: 'none',
           flex: '0 0 auto',
+          overflow: 'hidden',
         }}
       >
         <RowComponent
@@ -545,6 +616,8 @@ function renderVirtualListRows<Item>(
       </RowHost>
     );
   }
+
+  pushSpacer('after', visibleRange.afterSpacerHeight);
 
   return rows;
 }
@@ -639,12 +712,14 @@ function syncVirtualListItems<Item>(
   entry.keyIndexMap = nextKeyIndexMap;
   entry.itemsRef = items;
 
-  if (entry.pendingScrollTop === null) {
-    entry.pendingScrollTop = Math.min(
-      currentScrollTop,
-      resolveVirtualScrollTopForBottom(nextTotalHeight, currentViewportHeight)
-    );
-  }
+  const maxScrollTop = resolveVirtualScrollTopForBottom(
+    nextTotalHeight,
+    currentViewportHeight
+  );
+  entry.pendingScrollTop = Math.min(
+    Math.max(0, entry.pendingScrollTop ?? currentScrollTop),
+    maxScrollTop
+  );
 
   if (entry.pendingScrollTop !== null) {
     entry.schedulePendingScrollTop();

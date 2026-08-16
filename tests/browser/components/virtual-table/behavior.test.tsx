@@ -1,3 +1,4 @@
+import { state } from '@askrjs/askr';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import {
   VirtualTable,
@@ -32,6 +33,12 @@ const columns: readonly VirtualTableColumn<Row>[] = [
     cellComponent: ({ row }) => <span>{row.email}</span>,
   },
 ];
+
+function nextAnimationFrame(): Promise<void> {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => resolve());
+  });
+}
 
 describe('VirtualTable - Behavior', () => {
   let container: HTMLElement | undefined;
@@ -187,5 +194,152 @@ describe('VirtualTable - Behavior', () => {
     // Firefox can expose a subpixel scroll offset after layout. The public
     // contract is the requested logical position, not engine-specific rounding.
     expect(api?.getScrollTop()).toBeCloseTo(72, 0);
+  });
+
+  it('should clamp a pending scroll commit when its dataset is replaced', async () => {
+    let api: VirtualTableApi<Row> | null = null;
+    let replaceRows: (() => void) | undefined;
+
+    const FilterableTable = () => {
+      const rowsState = state(createRows(5_000));
+      replaceRows = () => {
+        rowsState.set(
+          Array.from({ length: 20 }, (_, index) => ({
+            id: `filtered-row-${index}`,
+            name: `Filtered ${index}`,
+            email: `filtered-${index}@example.com`,
+          }))
+        );
+      };
+
+      return (
+        <VirtualTable
+          aria-label="Filterable users"
+          style={{ height: '120px', overflowY: 'auto' }}
+          rows={rowsState()}
+          rowHeight={24}
+          headerHeight={24}
+          getKey={(row) => row.id}
+          columns={columns}
+          apiRef={(next) => {
+            api = next;
+          }}
+        />
+      );
+    };
+
+    container = mount(<FilterableTable />);
+    await flushUpdates();
+
+    api?.scrollToIndex(4_000, 'start');
+    replaceRows?.();
+    await flushUpdates();
+    await flushUpdates();
+
+    const wrapper = container.querySelector(
+      '[data-slot="virtual-table"]'
+    ) as HTMLElement;
+    const maximumScrollTop = 24 + (20 * 24 - (120 - 24));
+
+    expect(api?.getRowCount()).toBe(20);
+    expect(api?.getScrollTop()).toBeLessThanOrEqual(maximumScrollTop);
+
+    await nextAnimationFrame();
+
+    expect(api?.getScrollTop()).toBeLessThanOrEqual(maximumScrollTop);
+    expect(wrapper.scrollTop).toBeLessThanOrEqual(maximumScrollTop);
+  });
+
+  it('should report no ResizeObserver loop errors during dynamic resize churn', async () => {
+    const resizeErrors: string[] = [];
+    const onWindowError = (event: ErrorEvent) => {
+      if (event.message.includes('ResizeObserver loop')) {
+        resizeErrors.push(event.message);
+        event.preventDefault();
+      }
+    };
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation((...values: unknown[]) => {
+        const message = values.map(String).join(' ');
+        if (message.includes('ResizeObserver loop')) resizeErrors.push(message);
+      });
+    window.addEventListener('error', onWindowError);
+
+    try {
+      container = mount(
+        <VirtualTable
+          aria-label="Resizable users"
+          style={{ height: '120px', overflowY: 'auto' }}
+          rows={createRows(1_000)}
+          rowHeight={24}
+          headerHeight={24}
+          getKey={(row) => row.id}
+          columns={columns}
+        />
+      );
+      await flushUpdates();
+
+      const wrapper = container.querySelector(
+        '[data-slot="virtual-table"]'
+      ) as HTMLElement;
+      wrapper.scrollTop = 10_000;
+      wrapper.dispatchEvent(new Event('scroll', { bubbles: true }));
+
+      for (const height of [0, 50, 400, 1, 10_000, 0, 300]) {
+        wrapper.style.height = `${height}px`;
+        await nextAnimationFrame();
+      }
+      await nextAnimationFrame();
+
+      expect(resizeErrors).toEqual([]);
+    } finally {
+      window.removeEventListener('error', onWindowError);
+      consoleError.mockRestore();
+    }
+  });
+
+  it('should contain content within its fixed row-height contract', async () => {
+    const overflowColumns: readonly VirtualTableColumn<Row>[] = [
+      {
+        id: 'name',
+        header: 'Name',
+        cellComponent: ({ row }) => (
+          <div style={{ height: '200px' }}>{row.name}</div>
+        ),
+      },
+    ];
+
+    container = mount(
+      <VirtualTable
+        aria-label="Overflowing users"
+        style={{ height: '72px', overflowY: 'auto' }}
+        rows={createRows(2)}
+        rowHeight={24}
+        headerHeight={24}
+        getKey={(row) => row.id}
+        columns={overflowColumns}
+      />
+    );
+    await flushUpdates();
+
+    const rows = Array.from(
+      container.querySelectorAll<HTMLElement>('[data-slot="virtual-table-row"]')
+    );
+    const firstCell = rows[0].querySelector<HTMLElement>(
+      '[data-slot="virtual-table-cell"]'
+    );
+    const firstCellContent = rows[0].querySelector<HTMLElement>(
+      '[data-slot="virtual-table-cell-content"]'
+    );
+    const firstBox = rows[0].getBoundingClientRect();
+    const secondBox = rows[1].getBoundingClientRect();
+
+    expect(firstCell && getComputedStyle(firstCell).overflowY).toBe('hidden');
+    expect(
+      firstCellContent && getComputedStyle(firstCellContent).overflowY
+    ).toBe('hidden');
+    expect(firstBox.height).toBeCloseTo(24, 0);
+    expect(secondBox.top - firstBox.top).toBeCloseTo(24, 0);
   });
 });
