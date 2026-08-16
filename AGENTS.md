@@ -26,6 +26,19 @@ theme composition belong in `@askrjs/themes`.
 6. Add public exports only with matching behavior, accessibility, determinism,
    type, documentation, and benchmark coverage.
 
+## Askr North Star
+
+Keep each component's state transition narratable from an explicit user event
+or prop change through the owning root to the resulting DOM. Enforce root,
+subcomponent, controlled-state, timer, and lifecycle invariants at runtime with
+errors that identify the misuse and correction. Define and test every new
+family's misuse, teardown, nesting, keyboard, focus, and async failure modes.
+Preserve the seam between headless behavior and `@askrjs/themes` styling.
+Prefer explicit composition over inferred structure, and add props, variants,
+or escape hatches only for demonstrated application needs. Performance work
+must not replace the narratable component-root model with hidden dependency
+graphs.
+
 Use existing neighboring families as the implementation template. Shared
 behavior belongs in `_internal`; public family barrels remain the only package
 entrypoints.
@@ -50,3 +63,23 @@ may change.
 
 Keep changes narrow, preserve public contracts unless a breaking change is
 explicitly requested, and do not rewrite unrelated files.
+
+## Optimization Gate
+
+A benchmark number is only half of an optimization's success criterion. The
+change must also preserve a causal path that a human or agent can narrate in one
+sentence.
+
+Every benchmark-driven change must include:
+
+1. the one-sentence causal description of the optimized path;
+2. the exact fallback trigger and proof that optimized and fallback paths have
+   identical observable behavior and error surfaces;
+3. an explicit legibility-cost statement, including `none` when no new path or
+   concept is introduced; and
+4. evidence that a measured bottleneck in a real application justifies the
+   optimization now.
+
+Prefer making the existing single path faster. New caches, inference,
+memoization, shortcuts, fast paths, or scheduler states require an explicit
+legibility decision; a speedup alone does not justify them.
