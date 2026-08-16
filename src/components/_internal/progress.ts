@@ -1,5 +1,5 @@
 export function normalizeProgressMax(max: number | undefined) {
-  if (typeof max !== 'number' || Number.isNaN(max) || max <= 0) {
+  if (typeof max !== 'number' || !Number.isFinite(max) || max <= 0) {
     return 100;
   }
 
