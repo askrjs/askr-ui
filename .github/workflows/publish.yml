@@ -11,7 +11,7 @@ jobs:
 
   publish:
     needs: ci
-    uses: askrjs/actions/.github/workflows/publish-package.yml@1ecd3e84c32b3ff9bb85111baabbd31f79c459dd
+    uses: askrjs/actions/.github/workflows/publish-package.yml@main
     with:
       install-playwright: true
     permissions:
