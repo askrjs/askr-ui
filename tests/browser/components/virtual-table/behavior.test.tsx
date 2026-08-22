@@ -1,4 +1,4 @@
-import { state } from '@askrjs/askr';
+import { CspNonceScope, state } from '@askrjs/askr';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import {
   VirtualTable,
@@ -46,6 +46,67 @@ describe('VirtualTable - Behavior', () => {
   afterEach(() => {
     unmount(container);
     container = undefined;
+  });
+
+  it('should release generated layout rules after unmount', async () => {
+    const nonce = 'dmlydHVhbC10YWJsZS1ub25jZQ';
+    container = mount(
+      <CspNonceScope value={nonce}>
+        <VirtualTable
+          aria-label="Users"
+          style={{ height: '129px', overflowY: 'auto' }}
+          rows={createRows(3)}
+          rowHeight={43}
+          headerHeight={43}
+          getKey={(row) => row.id}
+          columns={[
+            {
+              ...columns[0],
+              width: 173,
+            },
+          ]}
+        />
+      </CspNonceScope>
+    );
+    await flushUpdates();
+
+    const dynamicStyles = () =>
+      Array.from(
+        document.querySelectorAll<HTMLStyleElement>(
+          'style[data-askr-dynamic-styles]'
+        )
+      )
+        .map((style) => style.textContent ?? '')
+        .join('\n');
+
+    expect(dynamicStyles()).toContain(
+      'data-askr-virtual-table-row-height="43"'
+    );
+    expect(dynamicStyles()).toContain(
+      'data-askr-virtual-table-column-width="173px"'
+    );
+    expect(
+      Array.from(
+        document.querySelectorAll<HTMLStyleElement>(
+          'style[data-askr-dynamic-styles]'
+        )
+      ).some(
+        (style) =>
+          style.nonce === nonce &&
+          style.textContent?.includes('data-askr-virtual-table-row-height="43"')
+      )
+    ).toBe(true);
+
+    unmount(container);
+    container = undefined;
+    await Promise.resolve();
+
+    expect(dynamicStyles()).not.toContain(
+      'data-askr-virtual-table-row-height="43"'
+    );
+    expect(dynamicStyles()).not.toContain(
+      'data-askr-virtual-table-column-width="173px"'
+    );
   });
 
   it('should render a sticky-headed virtual table and support keyboard selection', async () => {

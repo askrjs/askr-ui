@@ -160,9 +160,6 @@ describe('HoverCard - Behavior', () => {
       </HoverCard>
     );
     await flushUpdates();
-    let trigger = container.querySelector(
-      '[data-slot="hover-card-trigger"]'
-    ) as HTMLElement;
     const content = document.body.querySelector(
       '[data-slot="hover-card-content"]'
     ) as HTMLElement;

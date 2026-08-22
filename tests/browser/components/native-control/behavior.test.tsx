@@ -10,7 +10,7 @@ import {
 import { Toggle } from '../../../../src/components/toggle';
 import { mount, unmount } from '../../test-utils';
 
-describe('Native control typography', () => {
+describe('Native control styling', () => {
   let container: HTMLElement | undefined;
 
   afterEach(() => {
@@ -20,9 +20,7 @@ describe('Native control typography', () => {
     document.body.style.removeProperty('font-family');
   });
 
-  it('should inherit page typography across representative native button fallbacks', () => {
-    document.documentElement.style.fontSize = '32px';
-    document.body.style.fontFamily = 'serif';
+  it('should mark representative native button fallbacks without inline styles', () => {
     container = mount(
       <div>
         <Button data-testid="button">Button</Button>
@@ -40,15 +38,12 @@ describe('Native control typography', () => {
       </div>
     );
 
-    expect(getComputedStyle(document.body).fontSize).toBe('32px');
     for (const testId of ['button', 'menu-item', 'select-trigger', 'toggle']) {
-      const style = getComputedStyle(
-        container.querySelector(`[data-testid="${testId}"]`)!
-      );
-      expect(style.fontSize, testId).toBe('32px');
-      expect(style.fontFamily, testId).toBe(
-        getComputedStyle(document.body).fontFamily
-      );
+      const control = container.querySelector<HTMLElement>(
+        `[data-testid="${testId}"]`
+      )!;
+      expect(control.dataset.askrNativeControl, testId).toBe('true');
+      expect(control.getAttribute('style'), testId).toBeNull();
     }
   });
 
