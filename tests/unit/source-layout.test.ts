@@ -28,7 +28,7 @@ describe('Source layout', () => {
     }
   });
 
-  it('should route every component-owned native button through the shared typography reset', () => {
+  it('should route every component-owned native button through the shared theme marker', () => {
     const componentsDirectory = join(process.cwd(), 'src', 'components');
     const rawNativeButtons: string[] = [];
 
@@ -54,7 +54,7 @@ describe('Source layout', () => {
       join(componentsDirectory, '_internal', 'native-control.ts'),
       'utf8'
     );
-    expect(sharedControl).toContain("font: 'inherit'");
+    expect(sharedControl).toContain("'data-askr-native-control': 'true'");
   });
 
   it('should keep roving composites on the shared identity and focus guardrails', () => {

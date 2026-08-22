@@ -1,4 +1,4 @@
-import { state } from '@askrjs/askr';
+import { CspNonceScope, state } from '@askrjs/askr';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import {
   VirtualList,
@@ -30,6 +30,53 @@ describe('VirtualList - Behavior', () => {
   afterEach(() => {
     unmount(container);
     container = undefined;
+  });
+
+  it('should release generated layout rules after unmount', async () => {
+    const nonce = 'dmlydHVhbC1saXN0LW5vbmNl';
+    container = mount(
+      <CspNonceScope value={nonce}>
+        <VirtualList
+          aria-label="Messages"
+          style={{ height: '74px', overflowY: 'auto' }}
+          items={createItems(3)}
+          rowHeight={37}
+          getKey={(item) => item.id}
+          rowComponent={({ item }) => <span>{item.label}</span>}
+        />
+      </CspNonceScope>
+    );
+    await flushUpdates();
+
+    const dynamicStyles = () =>
+      Array.from(
+        document.querySelectorAll<HTMLStyleElement>(
+          'style[data-askr-dynamic-styles]'
+        )
+      )
+        .map((style) => style.textContent ?? '')
+        .join('\n');
+
+    expect(dynamicStyles()).toContain('data-askr-virtual-list-row-height="37"');
+    expect(
+      Array.from(
+        document.querySelectorAll<HTMLStyleElement>(
+          'style[data-askr-dynamic-styles]'
+        )
+      ).some(
+        (style) =>
+          style.nonce === nonce &&
+          style.textContent?.includes('data-askr-virtual-list-row-height="37"')
+      )
+    ).toBe(true);
+
+    unmount(container);
+    container = undefined;
+    await Promise.resolve();
+
+    expect(dynamicStyles()).not.toContain(
+      'data-askr-virtual-list-row-height="37"'
+    );
   });
 
   it('should render a virtual window, scroll by index, and follow the bottom', async () => {

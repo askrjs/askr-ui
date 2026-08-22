@@ -187,10 +187,7 @@ function renderMenubarSurfaceContent(
         return;
       }
 
-      if (attempt >= 8) {
-        node.style.position = 'fixed';
-        return;
-      }
+      if (attempt >= 8) return;
 
       requestAnimationFrame(() => {
         syncPosition(attempt + 1);

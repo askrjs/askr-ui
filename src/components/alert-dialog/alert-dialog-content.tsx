@@ -37,6 +37,7 @@ export function AlertDialogContent(
   };
   const sharedProps = {
     ...(rest as Omit<AlertDialogContentProps, 'children'>),
+    role: rest.role ?? 'alertdialog',
     onEscapeKeyDown: handleEscapeKeyDown,
     onPointerDownOutside: handlePointerDownOutside,
     onInteractOutside,
