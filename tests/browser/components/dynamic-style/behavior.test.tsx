@@ -11,6 +11,38 @@ function settleMicrotask(): Promise<void> {
 }
 
 describe('dynamic style rules', () => {
+  it('should retain every mounted rule when the bounded cache is full', () => {
+    const nonce = 'YWN0aXZlLXJ1bGVzLXRlc3Q=';
+    const targets: HTMLElement[] = [];
+    const keys: string[] = [];
+
+    try {
+      for (let index = 0; index <= 512; index += 1) {
+        const key = `active-rule:${index}`;
+        const value = String(index);
+        const selector = dynamicAttributeSelector('data-active-rule', value);
+        const target = document.createElement('div');
+        target.setAttribute('data-active-rule', value);
+        document.body.appendChild(target);
+        targets.push(target);
+        keys.push(key);
+        setDynamicStyleRule(key, selector, { height: `${index + 1}px` }, nonce);
+      }
+
+      const rules = Array.from(
+        document.querySelectorAll<HTMLStyleElement>(
+          'style[data-askr-dynamic-styles]'
+        )
+      ).find((style) => style.nonce === nonce)?.textContent;
+
+      expect(rules).toContain('[data-active-rule="0"]');
+      expect(rules).toContain('[data-active-rule="512"]');
+    } finally {
+      for (const target of targets) target.remove();
+      for (const key of keys) removeDynamicStyleRule(key);
+    }
+  });
+
   it('should keep rules during ref swaps and remove them after unmount', async () => {
     const key = 'test:dynamic-style-ref-swap';
     const attr = 'data-dynamic-style-test';

@@ -1,4 +1,4 @@
-import { state } from '@askrjs/askr';
+import { cspNonce, state } from '@askrjs/askr';
 import type { JSXElement } from '@askrjs/askr/foundations/structures';
 import type { Ref } from '@askrjs/askr/foundations/utilities';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
@@ -20,6 +20,11 @@ import {
   type VirtualRange,
 } from '../_internal/virtualization';
 import { isJsxElement } from '../_internal/jsx';
+import {
+  dynamicAttributeSelector,
+  removeDynamicStyleRuleWhenUnused,
+  setDynamicStyleRule,
+} from '../_internal/dynamic-style';
 import type {
   VirtualListApi,
   VirtualListAsChildProps,
@@ -31,6 +36,41 @@ import type {
 type StateCell<T> = (() => T) & {
   set: (next: T | ((prev: T) => T)) => void;
 };
+
+function virtualListLayoutProps<Item>(
+  entry: VirtualListEntry<Item>,
+  kind: 'row' | 'spacer',
+  height: number
+): Record<string, string> {
+  const value = String(height);
+  const attribute = `data-askr-virtual-list-${kind}-height`;
+  const key = `virtual-list:${kind}:${value}`;
+  const selector = dynamicAttributeSelector(attribute, value);
+  setDynamicStyleRule(
+    key,
+    selector,
+    {
+      height: `${height}px`,
+      'list-style': 'none',
+      flex: '0 0 auto',
+      overflow: 'hidden',
+      ...(kind === 'spacer' ? { 'pointer-events': 'none' } : {}),
+    },
+    entry.layoutNonce
+  );
+  entry.nextLayoutRules.set(key, selector);
+  return { [attribute]: value };
+}
+
+function commitVirtualListLayoutRules<Item>(entry: VirtualListEntry<Item>) {
+  for (const [key, selector] of entry.layoutRules) {
+    if (!entry.nextLayoutRules.has(key)) {
+      removeDynamicStyleRuleWhenUnused(key, selector);
+    }
+  }
+  entry.layoutRules = entry.nextLayoutRules;
+  entry.nextLayoutRules = new Map();
+}
 
 type VirtualListEntry<Item> = {
   node: HTMLElement | null;
@@ -62,6 +102,9 @@ type VirtualListEntry<Item> = {
   api: VirtualListApi<Item>;
   visibleRange: VirtualRange;
   onScroll: ((event: Event) => void) | undefined;
+  layoutRules: Map<string, string>;
+  nextLayoutRules: Map<string, string>;
+  layoutNonce: string | undefined;
 };
 
 function cloneJsxElement(
@@ -87,6 +130,8 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
   }
 
   const entry = {} as VirtualListEntry<Item>;
+  entry.layoutRules = new Map();
+  entry.nextLayoutRules = new Map();
   const readScrollTop = () => entry.scrollTopState!();
   const setScrollTop = (nextScrollTop: number) => {
     entry.scrollTopState!.set(nextScrollTop);
@@ -301,6 +346,13 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
 
     if (entry.node === node) {
       return;
+    }
+
+    if (node === null) {
+      for (const [key, selector] of entry.layoutRules) {
+        removeDynamicStyleRuleWhenUnused(key, selector);
+      }
+      entry.layoutRules.clear();
     }
 
     if (entry.pendingCommitFrame !== null) {
@@ -565,13 +617,7 @@ function renderVirtualListRows<Item>(
         aria-hidden="true"
         data-slot="virtual-list-spacer"
         data-position={position}
-        style={{
-          height: `${height}px`,
-          listStyle: 'none',
-          flex: '0 0 auto',
-          overflow: 'hidden',
-          pointerEvents: 'none',
-        }}
+        {...virtualListLayoutProps(entry, 'spacer', height)}
       />
     );
   };
@@ -600,12 +646,7 @@ function renderVirtualListRows<Item>(
         data-index={String(index)}
         data-key={rowKey}
         data-visible={isVisible ? 'true' : 'false'}
-        style={{
-          height: `${entry.rowHeight}px`,
-          listStyle: 'none',
-          flex: '0 0 auto',
-          overflow: 'hidden',
-        }}
+        {...virtualListLayoutProps(entry, 'row', entry.rowHeight)}
       >
         <RowComponent
           item={item}
@@ -757,6 +798,7 @@ export function VirtualList<Item>(
   };
 
   const rowHeight = assertPositiveVirtualHeight(rowHeightProp, 'rowHeight');
+  const layoutNonce = cspNonce();
   const instanceState = state({}) as StateCell<object>;
   const entry = getVirtualListEntry<Item>(instanceState());
   const scrollTopState = state(0) as StateCell<number>;
@@ -771,6 +813,7 @@ export function VirtualList<Item>(
   entry.scrollTopState = scrollTopState;
   entry.viewportHeightState = viewportHeightState;
   entry.rowHeight = rowHeight;
+  entry.layoutNonce = layoutNonce;
   entry.viewportHeightHint = viewportHeightHint;
   entry.overscan = overscan;
   entry.rowComponent = RowComponent;
@@ -827,6 +870,7 @@ export function VirtualList<Item>(
       )}
     </>
   );
+  commitVirtualListLayoutRules(entry);
 
   if (asChild) {
     if (!isJsxElement(children)) {

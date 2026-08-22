@@ -18,6 +18,33 @@ describe('AlertDialog - Behavior', () => {
     unmount(container);
   });
 
+  it('should default content to alertdialog while allowing an explicit role', async () => {
+    container = mount(
+      <>
+        <AlertDialog defaultOpen>
+          <AlertDialogPortal>
+            <AlertDialogContent>Default role</AlertDialogContent>
+          </AlertDialogPortal>
+        </AlertDialog>
+        <AlertDialog defaultOpen>
+          <AlertDialogPortal>
+            <AlertDialogContent role="dialog">Explicit role</AlertDialogContent>
+          </AlertDialogPortal>
+        </AlertDialog>
+      </>
+    );
+
+    await flushUpdates();
+
+    const contents = Array.from(
+      document.body.querySelectorAll('[data-slot="dialog-content"]')
+    );
+    expect(contents.map((content) => content.getAttribute('role'))).toEqual([
+      'alertdialog',
+      'dialog',
+    ]);
+  });
+
   it('should keep trigger expansion state open after re-activation', async () => {
     container = mount(
       <AlertDialog>

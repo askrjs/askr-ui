@@ -1,9 +1,11 @@
+import { registerSSRStyle } from '@askrjs/askr';
+
 type StyleValue = number | string | null | undefined;
 
 const MAX_DYNAMIC_RULES = 512;
 type Registry = {
   element: HTMLStyleElement;
-  rules: Map<string, string>;
+  rules: Map<string, { rule: string; selector: string }>;
 };
 const registries = new WeakMap<Document, Map<string, Registry>>();
 
@@ -35,13 +37,18 @@ function getRegistry(nonce: string | undefined): Registry | null {
   created.setAttribute('data-askr-dynamic-styles', 'true');
   if (nonce !== undefined) created.nonce = nonce;
   document.head.appendChild(created);
-  const registry = { element: created, rules: new Map<string, string>() };
+  const registry = {
+    element: created,
+    rules: new Map<string, { rule: string; selector: string }>(),
+  };
   documentRegistries.set(key, registry);
   return registry;
 }
 
 function syncRegistry(registry: Registry) {
-  registry.element.textContent = Array.from(registry.rules.values()).join('\n');
+  registry.element.textContent = Array.from(registry.rules.values())
+    .map(({ rule }) => rule)
+    .join('\n');
 }
 
 function buildDynamicStyleRule(
@@ -107,17 +114,25 @@ export function setDynamicStyleRule(
     return;
   }
 
+  if (typeof document === 'undefined') {
+    registerSSRStyle(`askr-dynamic:${nonce ?? ''}:${key}`, rule);
+    return;
+  }
+
   const registry = getRegistry(nonce);
   if (!registry) return;
-  if (registry.rules.get(key) === rule && registry.element.isConnected) {
+  if (registry.rules.get(key)?.rule === rule && registry.element.isConnected) {
     return;
   }
 
   if (!registry.rules.has(key) && registry.rules.size >= MAX_DYNAMIC_RULES) {
-    const oldest = registry.rules.keys().next().value as string | undefined;
-    if (oldest !== undefined) registry.rules.delete(oldest);
+    for (const [candidateKey, candidate] of registry.rules) {
+      if (document.querySelector(candidate.selector)) continue;
+      registry.rules.delete(candidateKey);
+      break;
+    }
   }
-  registry.rules.set(key, rule);
+  registry.rules.set(key, { rule, selector });
   syncRegistry(registry);
 }
 

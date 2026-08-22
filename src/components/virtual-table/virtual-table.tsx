@@ -1,4 +1,4 @@
-import { state } from '@askrjs/askr';
+import { cspNonce, state } from '@askrjs/askr';
 import type { JSXElement } from '@askrjs/askr/foundations/structures';
 import type { Ref } from '@askrjs/askr/foundations/utilities';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
@@ -19,6 +19,11 @@ import {
   type VirtualScrollAlignment,
 } from '../_internal/virtualization';
 import { isJsxElement } from '../_internal/jsx';
+import {
+  dynamicAttributeSelector,
+  removeDynamicStyleRuleWhenUnused,
+  setDynamicStyleRule,
+} from '../_internal/dynamic-style';
 import type {
   VirtualTableApi,
   VirtualTableAsChildProps,
@@ -30,6 +35,31 @@ import type {
 type StateCell<T> = (() => T) & {
   set: (next: T | ((prev: T) => T)) => void;
 };
+
+function virtualTableLayoutProps<Row>(
+  entry: VirtualTableEntry<Row>,
+  kind: string,
+  value: string | undefined,
+  declarations: Record<string, string | number | undefined>
+): Record<string, string> {
+  if (value === undefined) return {};
+  const attribute = `data-askr-virtual-table-${kind}`;
+  const key = `virtual-table:${kind}:${value}`;
+  const selector = dynamicAttributeSelector(attribute, value);
+  setDynamicStyleRule(key, selector, declarations, entry.layoutNonce);
+  entry.nextLayoutRules.set(key, selector);
+  return { [attribute]: value };
+}
+
+function commitVirtualTableLayoutRules<Row>(entry: VirtualTableEntry<Row>) {
+  for (const [key, selector] of entry.layoutRules) {
+    if (!entry.nextLayoutRules.has(key)) {
+      removeDynamicStyleRuleWhenUnused(key, selector);
+    }
+  }
+  entry.layoutRules = entry.nextLayoutRules;
+  entry.nextLayoutRules = new Map();
+}
 
 type VirtualTableEntry<Row> = {
   wrapperNode: HTMLElement | null;
@@ -65,6 +95,9 @@ type VirtualTableEntry<Row> = {
     | undefined;
   getKey: ((row: Row, index: number) => string | number) | null;
   onScroll: ((event: Event) => void) | undefined;
+  layoutRules: Map<string, string>;
+  nextLayoutRules: Map<string, string>;
+  layoutNonce: string | undefined;
 };
 
 const virtualTableEntries = new WeakMap<object, VirtualTableEntry<unknown>>();
@@ -95,6 +128,8 @@ function getVirtualTableEntry<Row>(
   }
 
   const entry = {} as VirtualTableEntry<Row>;
+  entry.layoutRules = new Map();
+  entry.nextLayoutRules = new Map();
 
   const applyPendingScrollTop = () => {
     const pendingScrollTop = entry.pendingScrollTop;
@@ -293,6 +328,13 @@ function getVirtualTableEntry<Row>(
 
     if (entry.wrapperNode === node) {
       return;
+    }
+
+    if (node === null) {
+      for (const [key, selector] of entry.layoutRules) {
+        removeDynamicStyleRuleWhenUnused(key, selector);
+      }
+      entry.layoutRules.clear();
     }
 
     if (entry.pendingCommitFrame !== null) {
@@ -693,23 +735,34 @@ function getVirtualTableHostName(element: JSXElement | null): string {
 }
 
 function renderVirtualTableColumns<Row>(
+  entry: VirtualTableEntry<Row>,
   columns: readonly VirtualTableColumn<Row>[]
 ) {
   return columns.map((column) => {
     const width =
       typeof column.width === 'number' ? `${column.width}px` : column.width;
 
-    return <col key={column.id} style={{ width }} />;
+    return (
+      <col
+        key={column.id}
+        {...virtualTableLayoutProps(entry, 'column-width', width, { width })}
+      />
+    );
   });
 }
 
 function renderVirtualTableHeader<Row>(
+  entry: VirtualTableEntry<Row>,
   columns: readonly VirtualTableColumn<Row>[]
 ) {
   return (
     <thead
       data-slot="virtual-table-head"
-      style={{ position: 'sticky', top: 0, zIndex: 1 }}
+      {...virtualTableLayoutProps(entry, 'head-layout', 'sticky', {
+        position: 'sticky',
+        top: 0,
+        'z-index': 1,
+      })}
     >
       <tr data-slot="virtual-table-header-row">
         {columns.map((column) => {
@@ -724,7 +777,9 @@ function renderVirtualTableHeader<Row>(
               scope="col"
               data-slot="virtual-table-header-cell"
               data-column-id={column.id}
-              style={{ width }}
+              {...virtualTableLayoutProps(entry, 'column-width', width, {
+                width,
+              })}
             >
               {column.header}
             </th>
@@ -766,11 +821,16 @@ function renderVirtualTableRows<Row>(
       >
         <td
           colSpan={colSpan}
-          style={{
-            height: `${visibleRange.beforeSpacerHeight}px`,
-            padding: 0,
-            border: 0,
-          }}
+          {...virtualTableLayoutProps(
+            entry,
+            'spacer-height',
+            String(visibleRange.beforeSpacerHeight),
+            {
+              height: `${visibleRange.beforeSpacerHeight}px`,
+              padding: 0,
+              border: 0,
+            }
+          )}
         />
       </tr>
     );
@@ -794,7 +854,15 @@ function renderVirtualTableRows<Row>(
         data-selected={selected ? 'true' : 'false'}
         aria-rowindex={index + 1}
         aria-selected={selected ? 'true' : 'false'}
-        style={{ height: `${entry.rowHeight}px`, overflow: 'hidden' }}
+        {...virtualTableLayoutProps(
+          entry,
+          'row-height',
+          String(entry.rowHeight),
+          {
+            height: `${entry.rowHeight}px`,
+            overflow: 'hidden',
+          }
+        )}
         onClick={(event: MouseEvent) => {
           onRowClick(row, index, rowKey, event);
         }}
@@ -807,21 +875,31 @@ function renderVirtualTableRows<Row>(
               key={column.id}
               data-slot="virtual-table-cell"
               data-column-id={column.id}
-              style={{
-                boxSizing: 'border-box',
-                height: `${entry.rowHeight}px`,
-                maxHeight: `${entry.rowHeight}px`,
-                overflow: 'hidden',
-                position: 'relative',
-              }}
+              {...virtualTableLayoutProps(
+                entry,
+                'cell-height',
+                String(entry.rowHeight),
+                {
+                  'box-sizing': 'border-box',
+                  height: `${entry.rowHeight}px`,
+                  'max-height': `${entry.rowHeight}px`,
+                  overflow: 'hidden',
+                  position: 'relative',
+                }
+              )}
             >
               <div
                 data-slot="virtual-table-cell-content"
-                style={{
-                  inset: 0,
-                  overflow: 'hidden',
-                  position: 'absolute',
-                }}
+                {...virtualTableLayoutProps(
+                  entry,
+                  'cell-content-layout',
+                  'clipped',
+                  {
+                    inset: 0,
+                    overflow: 'hidden',
+                    position: 'absolute',
+                  }
+                )}
               >
                 <CellComponent
                   row={row}
@@ -847,11 +925,16 @@ function renderVirtualTableRows<Row>(
       >
         <td
           colSpan={colSpan}
-          style={{
-            height: `${visibleRange.afterSpacerHeight}px`,
-            padding: 0,
-            border: 0,
-          }}
+          {...virtualTableLayoutProps(
+            entry,
+            'spacer-height',
+            String(visibleRange.afterSpacerHeight),
+            {
+              height: `${visibleRange.afterSpacerHeight}px`,
+              padding: 0,
+              border: 0,
+            }
+          )}
         />
       </tr>
     );
@@ -903,6 +986,7 @@ export function VirtualTable<Row>(
   };
 
   const rowHeight = assertPositiveVirtualHeight(rowHeightProp, 'rowHeight');
+  const layoutNonce = cspNonce();
   const headerHeight = assertPositiveVirtualHeight(
     headerHeightProp,
     'headerHeight'
@@ -952,6 +1036,7 @@ export function VirtualTable<Row>(
   entry.scrollTopState = scrollTopState;
   entry.viewportHeightState = viewportHeightState;
   entry.rowHeight = rowHeight;
+  entry.layoutNonce = layoutNonce;
   entry.headerHeight = headerHeight;
   entry.overscan = overscan;
   entry.columns = columns;
@@ -1029,8 +1114,8 @@ export function VirtualTable<Row>(
     }
   );
 
-  const columnsMarkup = renderVirtualTableColumns(columns);
-  const headerMarkup = renderVirtualTableHeader(columns);
+  const columnsMarkup = renderVirtualTableColumns(entry, columns);
+  const headerMarkup = renderVirtualTableHeader(entry, columns);
 
   const rowsMarkup = renderVirtualTableRows(
     entry,
@@ -1061,17 +1146,18 @@ export function VirtualTable<Row>(
   const tableBody = (
     <table
       {...tableProps}
-      style={{
-        borderCollapse: 'collapse',
-        borderSpacing: 0,
-        tableLayout: 'fixed',
-      }}
+      {...virtualTableLayoutProps(entry, 'table-layout', 'fixed', {
+        'border-collapse': 'collapse',
+        'border-spacing': 0,
+        'table-layout': 'fixed',
+      })}
     >
       {columnsMarkup.length > 0 ? <colgroup>{columnsMarkup}</colgroup> : null}
       {headerMarkup}
       <tbody data-slot="virtual-table-body">{rowsMarkup}</tbody>
     </table>
   );
+  commitVirtualTableLayoutRules(entry);
 
   if (asChild) {
     if (!isJsxElement(children)) {
