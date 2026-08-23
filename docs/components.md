@@ -42,7 +42,11 @@ These are documentation groupings only.
 
 - AlertDialog is a Dialog specialization for blocking confirmations. Its action
   and cancel parts intentionally alias the same close behavior for
-  compatibility.
+  compatibility. Always render `AlertDialogOverlay` alongside
+  `AlertDialogContent` inside the portal.
+- `DialogOverlay` and `AlertDialogOverlay` are fully styled out of the box when
+  used with `@askrjs/themes/default`: the theme supplies the backdrop token,
+  blur, stacking, and fade animation. Standard usage needs no additional CSS.
 - Toast is a stacked notification family. `ToastHost` owns the registry,
   `ToastViewport` renders the stack, and `Toast` registers entries rather than
   rendering standalone DOM.
@@ -150,8 +154,12 @@ import { VirtualTable as VirtualTableSubpath } from '@askrjs/ui/virtual-table';
 ```
 
 `VirtualList` keeps list rendering headless while the caller supplies the row
-component. `VirtualTable` keeps the semantic table structure intact while the
-caller supplies column metadata and cell renderers.
+component. `VirtualTable` renders native table elements with interactive grid
+semantics while the caller supplies column metadata and cell renderers. Give a
+virtual table an accessible name and a bounded viewport. Keyboard row selection
+is handled only while the grid itself has focus; links, buttons, and form
+controls rendered inside cells retain their native click, focus, and keyboard
+behavior.
 
 ## See also
 

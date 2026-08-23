@@ -44,7 +44,18 @@ function syncDialogLabelAttributes(
 }
 
 /**
- * Renders a part of `dialog`.
+ * Coordinates the Dialog trigger, portal, overlay, and content.
+ *
+ * @example
+ * ```tsx
+ * <Dialog>
+ *   <DialogTrigger>Open dialog</DialogTrigger>
+ *   <DialogPortal>
+ *     <DialogOverlay />
+ *     <DialogContent>Confirm action</DialogContent>
+ *   </DialogPortal>
+ * </Dialog>
+ * ```
  */
 export function Dialog(props: DialogProps) {
   const {

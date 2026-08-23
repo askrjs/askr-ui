@@ -28,7 +28,22 @@ npm install @askrjs/ui @askrjs/askr
 ```
 
 ```tsx
-import { Button, Dialog, DialogContent, DialogTrigger } from '@askrjs/ui';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogOverlay,
+  DialogPortal,
+  DialogTrigger,
+} from '@askrjs/ui';
+
+<Dialog>
+  <DialogTrigger>Open dialog</DialogTrigger>
+  <DialogPortal>
+    <DialogOverlay />
+    <DialogContent>Confirm action</DialogContent>
+  </DialogPortal>
+</Dialog>;
 ```
 
 For larger surfaces, use grouped imports from the root package and direct

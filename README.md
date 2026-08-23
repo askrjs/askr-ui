@@ -22,7 +22,22 @@ npm install @askrjs/themes
 Import the root package when you want the full composition surface:
 
 ```tsx
-import { Button, Dialog, DialogTrigger, DialogContent } from '@askrjs/ui';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogOverlay,
+  DialogPortal,
+  DialogTrigger,
+} from '@askrjs/ui';
+
+<Dialog>
+  <DialogTrigger>Open dialog</DialogTrigger>
+  <DialogPortal>
+    <DialogOverlay />
+    <DialogContent>Confirm action</DialogContent>
+  </DialogPortal>
+</Dialog>;
 ```
 
 Use per-component subpaths when you want smaller bundles or direct entrypoints:

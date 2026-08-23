@@ -73,8 +73,13 @@ describe('virtualization SSR styles', () => {
     ));
 
     expect(html).toContain('data-askr-virtual-table-row-height="24"');
+    expect(html).toContain('data-askr-virtual-table-header-height="24"');
+    expect(html).toContain('data-row-key="three" data-terminal-row="true"');
     expect(styles).toContain(
       '[data-askr-virtual-table-row-height="24"] { height: 24px;'
+    );
+    expect(styles).toContain(
+      '[data-askr-virtual-table-header-height="24"] { box-sizing: border-box; height: 24px; max-height: 24px; overflow: hidden;'
     );
     expect(styles).toContain(
       '[data-askr-virtual-table-column-width="173px"] { width: 173px;'
