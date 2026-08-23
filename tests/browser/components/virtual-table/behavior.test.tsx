@@ -83,8 +83,16 @@ describe('VirtualTable - Behavior', () => {
       'data-askr-virtual-table-row-height="43"'
     );
     expect(dynamicStyles()).toContain(
+      'data-askr-virtual-table-header-height="43"'
+    );
+    expect(dynamicStyles()).toContain(
       'data-askr-virtual-table-column-width="173px"'
     );
+    expect(
+      container
+        .querySelector('[data-slot="virtual-table-header-cell"]')
+        ?.getBoundingClientRect().height
+    ).toBe(43);
     expect(
       Array.from(
         document.querySelectorAll<HTMLStyleElement>(
@@ -103,6 +111,9 @@ describe('VirtualTable - Behavior', () => {
 
     expect(dynamicStyles()).not.toContain(
       'data-askr-virtual-table-row-height="43"'
+    );
+    expect(dynamicStyles()).not.toContain(
+      'data-askr-virtual-table-header-height="43"'
     );
     expect(dynamicStyles()).not.toContain(
       'data-askr-virtual-table-column-width="173px"'
@@ -134,15 +145,43 @@ describe('VirtualTable - Behavior', () => {
     const table = container.querySelector(
       '[data-slot="virtual-table-table"]'
     ) as HTMLTableElement | null;
+    const root = container.querySelector(
+      '[data-slot="virtual-table"]'
+    ) as HTMLElement | null;
     const firstRow = container.querySelector(
       '[data-row-key="row-0"]'
     ) as HTMLTableRowElement | null;
 
-    expect(table?.getAttribute('aria-rowcount')).toBe('10');
+    expect(table?.getAttribute('role')).toBe('grid');
+    expect(table?.getAttribute('aria-rowcount')).toBe('11');
+    expect(
+      container
+        .querySelector('[data-slot="virtual-table-header-row"]')
+        ?.getAttribute('aria-rowindex')
+    ).toBe('1');
     expect(
       container.querySelectorAll('[data-slot="virtual-table-row"]')
     ).toHaveLength(4);
+    const mountedRows = Array.from(
+      container.querySelectorAll('[data-slot="virtual-table-row"]')
+    );
+    expect(mountedRows.at(-1)?.getAttribute('data-terminal-row')).toBeNull();
     expect(firstRow?.getAttribute('aria-selected')).toBe('false');
+    expect(firstRow?.getAttribute('aria-rowindex')).toBe('2');
+    expect(root?.getAttribute('data-at-top')).toBe('true');
+    expect(root?.getAttribute('data-at-bottom')).toBe('false');
+    expect(root?.getAttribute('data-empty')).toBe('false');
+
+    if (root) {
+      root.scrollTop = 1;
+      root.dispatchEvent(new Event('scroll'));
+      await flushUpdates();
+      expect(root.getAttribute('data-at-top')).toBe('false');
+
+      root.scrollTop = 0;
+      root.dispatchEvent(new Event('scroll'));
+      await flushUpdates();
+    }
 
     firstRow?.click();
     await flushUpdates();
@@ -167,7 +206,159 @@ describe('VirtualTable - Behavior', () => {
     await flushUpdates();
 
     expect(api?.isAtBottom()).toBe(true);
-    expect(container.querySelector('[data-row-key="row-9"]')).toBeTruthy();
+    expect(container.querySelector('[data-row-key="row-9"]')).toHaveAttribute(
+      'data-terminal-row',
+      'true'
+    );
+    expect(root?.getAttribute('data-at-bottom')).toBe('true');
+  });
+
+  it('should preserve nested interactive cell behavior without selecting its row', async () => {
+    let api: VirtualTableApi<Row> | null = null;
+    const onCellAction = vi.fn();
+
+    container = mount(
+      <VirtualTable
+        aria-label="Users"
+        style={{ height: '120px', overflowY: 'auto' }}
+        rows={createRows(4)}
+        rowHeight={40}
+        headerHeight={40}
+        getKey={(row) => row.id}
+        columns={[
+          ...columns,
+          {
+            id: 'actions',
+            header: 'Actions',
+            cellComponent: ({ row }) => (
+              <button type="button" onClick={() => onCellAction(row.id)}>
+                Open {row.id}
+              </button>
+            ),
+          },
+        ]}
+        apiRef={(next) => {
+          api = next;
+        }}
+      />
+    );
+    await flushUpdates();
+
+    const action = container.querySelector(
+      '[data-row-key="row-0"] button'
+    ) as HTMLButtonElement;
+    action.focus();
+    action.click();
+    await flushUpdates();
+
+    expect(onCellAction).toHaveBeenCalledWith('row-0');
+    expect(api?.getSelectedRowKey()).toBeNull();
+    expect(document.activeElement).toBe(action);
+
+    action.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
+    );
+    await flushUpdates();
+
+    expect(api?.getSelectedRowKey()).toBeNull();
+    expect(document.activeElement).toBe(action);
+  });
+
+  it('should honor default-prevented nested events before selecting a row', async () => {
+    let api: VirtualTableApi<Row> | null = null;
+
+    container = mount(
+      <VirtualTable
+        aria-label="Users"
+        style={{ height: '120px', overflowY: 'auto' }}
+        rows={createRows(4)}
+        rowHeight={40}
+        headerHeight={40}
+        getKey={(row) => row.id}
+        columns={[
+          {
+            id: 'name',
+            header: 'Name',
+            cellComponent: ({ row }) => (
+              <span
+                data-prevent-table-event="true"
+                onClick={(event: MouseEvent) => event.preventDefault()}
+                onKeyDown={(event: KeyboardEvent) => event.preventDefault()}
+              >
+                {row.name}
+              </span>
+            ),
+          },
+        ]}
+        apiRef={(next) => {
+          api = next;
+        }}
+      />
+    );
+    await flushUpdates();
+
+    const target = container.querySelector(
+      '[data-row-key="row-0"] [data-prevent-table-event]'
+    ) as HTMLElement;
+    const clickEvent = new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true,
+    });
+    target.dispatchEvent(clickEvent);
+    await flushUpdates();
+
+    expect(clickEvent.defaultPrevented).toBe(true);
+    expect(api?.getSelectedRowKey()).toBeNull();
+
+    const keyEvent = new KeyboardEvent('keydown', {
+      key: 'ArrowDown',
+      bubbles: true,
+      cancelable: true,
+    });
+    target.dispatchEvent(keyEvent);
+    await flushUpdates();
+
+    expect(keyEvent.defaultPrevented).toBe(true);
+    expect(api?.getSelectedRowKey()).toBeNull();
+  });
+
+  it('should let a caller prevent the table keyboard behavior', async () => {
+    let api: VirtualTableApi<Row> | null = null;
+    const onKeyDown = vi.fn((event: KeyboardEvent) => {
+      event.preventDefault();
+    });
+
+    container = mount(
+      <VirtualTable
+        aria-label="Users"
+        style={{ height: '120px', overflowY: 'auto' }}
+        rows={createRows(4)}
+        rowHeight={40}
+        headerHeight={40}
+        getKey={(row) => row.id}
+        columns={columns}
+        onKeyDown={onKeyDown}
+        apiRef={(next) => {
+          api = next;
+        }}
+      />
+    );
+    await flushUpdates();
+
+    const table = container.querySelector(
+      '[data-slot="virtual-table-table"]'
+    ) as HTMLTableElement;
+    const keyEvent = new KeyboardEvent('keydown', {
+      key: 'ArrowDown',
+      bubbles: true,
+      cancelable: true,
+    });
+    table.dispatchEvent(keyEvent);
+    await flushUpdates();
+
+    expect(onKeyDown).toHaveBeenCalledTimes(1);
+    expect(keyEvent.defaultPrevented).toBe(true);
+    expect(api?.getSelectedRowKey()).toBeNull();
   });
 
   it('should map typed viewport and table width affordances to stable data attributes', async () => {
@@ -190,6 +381,27 @@ describe('VirtualTable - Behavior', () => {
 
     expect(table?.getAttribute('data-viewport')).toBe('lg');
     expect(table?.getAttribute('data-table-width')).toBe('compact');
+  });
+
+  it('should expose the empty scroll-edge state to themes', async () => {
+    container = mount(
+      <VirtualTable
+        aria-label="Users"
+        style={{ height: '120px', overflowY: 'auto' }}
+        rows={[]}
+        rowHeight={24}
+        headerHeight={24}
+        getKey={(row: Row) => row.id}
+        columns={columns}
+      />
+    );
+    await flushUpdates();
+
+    const root = container.querySelector('[data-slot="virtual-table"]');
+
+    expect(root?.getAttribute('data-at-top')).toBe('true');
+    expect(root?.getAttribute('data-at-bottom')).toBe('true');
+    expect(root?.getAttribute('data-empty')).toBe('true');
   });
 
   it('should support asChild composition on the wrapper host', async () => {

@@ -15,6 +15,7 @@
  * <AlertDialog>
  *   <AlertDialogTrigger>Delete item</AlertDialogTrigger>
  *   <AlertDialogPortal>
+ *     <AlertDialogOverlay />
  *     <AlertDialogContent>
  *       <AlertDialogTitle>Delete item?</AlertDialogTitle>
  *       <AlertDialogDescription>
