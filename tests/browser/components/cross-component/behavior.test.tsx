@@ -1,3 +1,4 @@
+import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
 import { createIsland } from '@askrjs/askr/boot';
@@ -106,9 +107,17 @@ describe('Cross-component contracts', () => {
     const form = document.body.querySelector(
       '[data-slot="form"]'
     ) as HTMLFormElement;
-    form.dispatchEvent(
-      new Event('submit', { bubbles: true, cancelable: true })
-    );
+    const checkbox = document.body.querySelector(
+      '[data-slot="checkbox"]'
+    ) as HTMLButtonElement;
+    const submit = form.querySelector(
+      'button[type="submit"]'
+    ) as HTMLButtonElement;
+
+    checkbox.focus();
+    await userEvent.keyboard(' ');
+    submit.focus();
+    await userEvent.keyboard('{Enter}');
     await flushUpdates();
 
     expect(onSubmit).toHaveBeenCalledOnce();
@@ -119,7 +128,7 @@ describe('Cross-component contracts', () => {
       document.body
         .querySelector('[data-slot="checkbox"]')
         ?.getAttribute('data-state')
-    ).toBe('checked');
+    ).toBe('unchecked');
     expect(
       document.body.querySelector('[data-slot="dialog-content"]')
     ).not.toBeNull();
