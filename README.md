@@ -53,6 +53,7 @@ import { Dialog } from '@askrjs/ui/dialog';
 - [components reference](./docs/components.md)
 - [composition patterns](./docs/composition.md)
 - [foundations reference](./docs/foundations.md)
+- [changelog](./CHANGELOG.md)
 
 ## Package shape
 
