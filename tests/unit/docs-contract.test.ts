@@ -41,6 +41,36 @@ function extractDocumentedImports(docs: string) {
 }
 
 describe('Docs contract', () => {
+  it('should document the shipped dialog overlay in canonical examples and customization guidance', () => {
+    const read = (filename: string) =>
+      readFileSync(join(process.cwd(), filename), 'utf8');
+    const rootReadme = read('README.md');
+    const docsReadme = read('docs/README.md');
+    const components = read('docs/components.md');
+    const composition = read('docs/composition.md');
+    const dialogSource = read('src/components/dialog/dialog-root.tsx');
+    const alertDialogSource = read(
+      'src/components/alert-dialog/alert-dialog.tsx'
+    );
+    const overlaySource = read('src/components/dialog/dialog-overlay.tsx');
+
+    for (const canonicalExample of [
+      rootReadme,
+      docsReadme,
+      composition,
+      dialogSource,
+    ]) {
+      expect(canonicalExample).toContain('<DialogOverlay />');
+    }
+
+    expect(alertDialogSource).toContain('<AlertDialogOverlay />');
+    expect(components).toContain('fully styled out of the box');
+    expect(overlaySource).toContain('requires no additional overlay CSS');
+    expect(composition).toContain('--ak-color-backdrop');
+    expect(composition).toContain('--ak-z-modal-backdrop');
+    expect(composition).toContain('Incorrect:');
+  });
+
   it('should only references import paths that are published by package exports', () => {
     const packageJson = JSON.parse(
       readFileSync(join(process.cwd(), 'package.json'), 'utf8')

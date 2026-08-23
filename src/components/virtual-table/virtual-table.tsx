@@ -36,6 +36,81 @@ type StateCell<T> = (() => T) & {
   set: (next: T | ((prev: T) => T)) => void;
 };
 
+const VIRTUAL_TABLE_INTERACTIVE_TARGET_SELECTOR = [
+  'a[href]',
+  'area[href]',
+  'audio[controls]',
+  'button',
+  'embed',
+  'iframe',
+  'input',
+  'label',
+  'object',
+  'select',
+  'summary',
+  'textarea',
+  'video[controls]',
+  '[contenteditable]:not([contenteditable="false"])',
+  '[tabindex]',
+  '[role="button"]',
+  '[role="checkbox"]',
+  '[role="combobox"]',
+  '[role="grid"]',
+  '[role="gridcell"]',
+  '[role="link"]',
+  '[role="listbox"]',
+  '[role="menu"]',
+  '[role="menuitem"]',
+  '[role="menuitemcheckbox"]',
+  '[role="menuitemradio"]',
+  '[role="option"]',
+  '[role="radio"]',
+  '[role="scrollbar"]',
+  '[role="searchbox"]',
+  '[role="slider"]',
+  '[role="spinbutton"]',
+  '[role="switch"]',
+  '[role="tab"]',
+  '[role="textbox"]',
+  '[role="tree"]',
+  '[role="treegrid"]',
+  '[role="treeitem"]',
+].join(',');
+
+function isVirtualTableInteractiveEventTarget(
+  event: Event,
+  boundary: Element | null
+): boolean {
+  if (!boundary) {
+    return false;
+  }
+
+  const eventPath = event.composedPath();
+  const boundaryIndex = eventPath.indexOf(boundary);
+
+  if (boundaryIndex >= 0) {
+    return eventPath
+      .slice(0, boundaryIndex)
+      .some(
+        (target) =>
+          target instanceof Element &&
+          target.matches(VIRTUAL_TABLE_INTERACTIVE_TARGET_SELECTOR)
+      );
+  }
+
+  const target = event.target;
+  const interactiveTarget =
+    target instanceof Element
+      ? target.closest(VIRTUAL_TABLE_INTERACTIVE_TARGET_SELECTOR)
+      : null;
+
+  return Boolean(
+    interactiveTarget &&
+    interactiveTarget !== boundary &&
+    boundary.contains(interactiveTarget)
+  );
+}
+
 function virtualTableLayoutProps<Row>(
   entry: VirtualTableEntry<Row>,
   kind: string,
@@ -269,6 +344,13 @@ function getVirtualTableEntry<Row>(
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
+    if (
+      event.defaultPrevented ||
+      isVirtualTableInteractiveEventTarget(event, entry.tableNode)
+    ) {
+      return;
+    }
+
     if (event.altKey || event.ctrlKey || event.metaKey) {
       return;
     }
@@ -755,6 +837,19 @@ function renderVirtualTableHeader<Row>(
   entry: VirtualTableEntry<Row>,
   columns: readonly VirtualTableColumn<Row>[]
 ) {
+  const headerHeight = String(entry.headerHeight);
+  const headerHeightProps = virtualTableLayoutProps(
+    entry,
+    'header-height',
+    headerHeight,
+    {
+      'box-sizing': 'border-box',
+      height: `${entry.headerHeight}px`,
+      'max-height': `${entry.headerHeight}px`,
+      overflow: 'hidden',
+    }
+  );
+
   return (
     <thead
       data-slot="virtual-table-head"
@@ -764,7 +859,11 @@ function renderVirtualTableHeader<Row>(
         'z-index': 1,
       })}
     >
-      <tr data-slot="virtual-table-header-row">
+      <tr
+        aria-rowindex={1}
+        data-slot="virtual-table-header-row"
+        {...headerHeightProps}
+      >
         {columns.map((column) => {
           const width =
             typeof column.width === 'number'
@@ -777,6 +876,7 @@ function renderVirtualTableHeader<Row>(
               scope="col"
               data-slot="virtual-table-header-cell"
               data-column-id={column.id}
+              {...headerHeightProps}
               {...virtualTableLayoutProps(entry, 'column-width', width, {
                 width,
               })}
@@ -851,8 +951,9 @@ function renderVirtualTableRows<Row>(
         data-slot="virtual-table-row"
         data-row-index={String(index)}
         data-row-key={rowKey}
+        data-terminal-row={index === rows.length - 1 ? 'true' : undefined}
         data-selected={selected ? 'true' : 'false'}
-        aria-rowindex={index + 1}
+        aria-rowindex={index + 2}
         aria-selected={selected ? 'true' : 'false'}
         {...virtualTableLayoutProps(
           entry,
@@ -864,6 +965,16 @@ function renderVirtualTableRows<Row>(
           }
         )}
         onClick={(event: MouseEvent) => {
+          const rowNode =
+            event.currentTarget instanceof Element ? event.currentTarget : null;
+
+          if (
+            event.defaultPrevented ||
+            isVirtualTableInteractiveEventTarget(event, rowNode)
+          ) {
+            return;
+          }
+
           onRowClick(row, index, rowKey, event);
         }}
       >
@@ -1084,15 +1195,25 @@ export function VirtualTable<Row>(
     'data-virtual-table': 'true',
     'data-viewport': viewport,
     'data-table-width': tableWidth,
+    'data-at-top': effectiveScrollTop <= 0 ? 'true' : 'false',
+    'data-at-bottom': stateSnapshot.isAtBottom ? 'true' : 'false',
+    'data-empty': stateSnapshot.count === 0 ? 'true' : 'false',
   });
 
   const tableProps = mergeProps(
     {
+      ref: entry.tableRef,
+      'data-slot': 'virtual-table-table',
+      'data-virtual-table-table': 'true',
+      role: 'grid',
+      'aria-rowcount': String(stateSnapshot.count + 1),
+      'aria-colcount': String(columns.length),
+      onKeyDown: entry.handleKeyDown,
+    },
+    {
       'aria-label': ariaLabel,
       'aria-labelledby': ariaLabelledBy,
       'aria-describedby': ariaDescribedBy,
-      'aria-rowcount': String(stateSnapshot.count),
-      'aria-colcount': String(columns.length),
       tabIndex: (tabIndex ?? 0) as JSX.IntrinsicElements['table']['tabIndex'],
       ...(onKeyDown
         ? {
@@ -1105,12 +1226,6 @@ export function VirtualTable<Row>(
       ...(onBlur
         ? { onBlur: onBlur as JSX.IntrinsicElements['table']['onBlur'] }
         : {}),
-    },
-    {
-      ref: entry.tableRef,
-      'data-slot': 'virtual-table-table',
-      'data-virtual-table-table': 'true',
-      onKeyDown: entry.handleKeyDown,
     }
   );
 

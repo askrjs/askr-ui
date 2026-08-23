@@ -9,6 +9,11 @@ import type {
 /**
  * Renders the `dialog-overlay` part of `dialog`.
  *
+ * With `@askrjs/themes/default`, the overlay is fully styled out of the box
+ * with the shared backdrop token, blur, stacking, and fade animation. Standard
+ * Dialog and AlertDialog usage requires no additional overlay CSS; customize
+ * the theme tokens instead of applying a competing background class.
+ *
  * Supports polymorphic rendering via `asChild`.
  */
 export function DialogOverlay(props: DialogOverlayProps): JSX.Element | null;

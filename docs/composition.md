@@ -38,6 +38,29 @@ import {
 </Dialog>;
 ```
 
+The same portal structure applies to `AlertDialog`; use
+`AlertDialogOverlay` next to `AlertDialogContent`. With
+`@askrjs/themes/default`, both overlay variants already include the backdrop,
+blur, stacking, and animation treatment.
+
+#### Backdrop customization
+
+Customize the shared theme contract rather than passing a competing class to
+the overlay:
+
+```css
+/* Correct: all Dialog and AlertDialog overlays stay consistent. */
+:root {
+  --ak-color-backdrop: rgb(8 12 20 / 18%);
+  --ak-z-modal-backdrop: 1040;
+}
+```
+
+```tsx
+// Incorrect: bypasses the shipped backdrop, blur, and stacking treatment.
+<AlertDialogOverlay className="opaque-dialog-overlay" />
+```
+
 ### Form control pattern
 
 ```tsx
@@ -87,13 +110,20 @@ const columns = [
 />
 
 <VirtualTable
+  aria-label="People"
   rows={[{ id: '1', name: 'Ada' }]}
   rowHeight={32}
   headerHeight={32}
   getKey={(row) => row.id}
   columns={columns}
+  viewport="lg"
 />
 ```
+
+`VirtualTable` needs an accessible name and a bounded viewport so its grid and
+windowing contracts remain meaningful. Its row-navigation keys operate when the
+grid itself is focused; interactive controls rendered by a cell component keep
+their native behavior.
 
 Use the direct subpaths when you want a narrower family import surface; use
 the root export when you are already importing other askr-ui primitives in the
