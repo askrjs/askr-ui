@@ -1,6 +1,10 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
-import { moveFocusOutsideCompositeWithTab } from '../_internal/focus';
+import {
+  focusSelectedCollectionItem,
+  moveFocusOutsideCompositeWithTab,
+} from '../_internal/focus';
+import { getMenuCollection } from '../_internal/menu';
 import { readMenuRootContext } from './menu.shared';
 import type { MenuContentAsChildProps, MenuContentProps } from './menu.types';
 
@@ -24,6 +28,26 @@ export function MenuContent(props: MenuContentProps | MenuContentAsChildProps) {
     onKeyDown: (event: KeyboardEvent) => {
       if (root.handleTypeaheadKeyDown(event)) {
         return;
+      }
+
+      if (event.key === 'Home' || event.key === 'End') {
+        const enabledItems = root.resolvedState.items.filter(
+          (item) => !item.disabled
+        );
+        const item =
+          event.key === 'Home'
+            ? enabledItems[0]
+            : enabledItems[enabledItems.length - 1];
+
+        if (item) {
+          event.preventDefault();
+          root.setCurrentIndex(item.index);
+          focusSelectedCollectionItem(
+            getMenuCollection(root.menuId),
+            item.index
+          );
+          return;
+        }
       }
 
       root.navigation.container.onKeyDown?.(event);
