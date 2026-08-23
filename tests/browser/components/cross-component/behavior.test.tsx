@@ -1,7 +1,10 @@
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { userEvent } from '@vitest/browser/context';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
 import { createIsland } from '@askrjs/askr/boot';
 import { Checkbox } from '../../../../src/components/checkbox';
+import { Form } from '../../../../src/components/form';
+import { Input } from '../../../../src/components/input';
 import {
   Dialog,
   DialogContent,
@@ -73,6 +76,59 @@ describe('Cross-component contracts', () => {
       </Dialog>
     );
     await flushUpdates();
+    expect(
+      document.body.querySelector('[data-slot="dialog-content"]')
+    ).not.toBeNull();
+    expect(
+      document.body.querySelector('[data-slot="popover-content"]')
+    ).not.toBeNull();
+  });
+
+  it('should preserve form state and nested overlays given mixed controls inside a modal when the form submits', async () => {
+    const onSubmit = vi.fn((event: Event) => event.preventDefault());
+    container = mount(
+      <Dialog defaultOpen>
+        <DialogContent>
+          <DialogTitle>Workspace settings</DialogTitle>
+          <Form onSubmit={onSubmit}>
+            <Input name="workspace" value="Production" />
+            <Checkbox name="alerts" defaultChecked />
+            <Popover defaultOpen>
+              <PopoverTrigger>Choose owner</PopoverTrigger>
+              <PopoverContent>Platform team</PopoverContent>
+            </Popover>
+            <button type="submit">Save settings</button>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    );
+    await flushUpdates();
+
+    const form = document.body.querySelector(
+      '[data-slot="form"]'
+    ) as HTMLFormElement;
+    const checkbox = document.body.querySelector(
+      '[data-slot="checkbox"]'
+    ) as HTMLButtonElement;
+    const submit = form.querySelector(
+      'button[type="submit"]'
+    ) as HTMLButtonElement;
+
+    checkbox.focus();
+    await userEvent.keyboard(' ');
+    submit.focus();
+    await userEvent.keyboard('{Enter}');
+    await flushUpdates();
+
+    expect(onSubmit).toHaveBeenCalledOnce();
+    expect(
+      (form.elements.namedItem('workspace') as HTMLInputElement).value
+    ).toBe('Production');
+    expect(
+      document.body
+        .querySelector('[data-slot="checkbox"]')
+        ?.getAttribute('data-state')
+    ).toBe('unchecked');
     expect(
       document.body.querySelector('[data-slot="dialog-content"]')
     ).not.toBeNull();
