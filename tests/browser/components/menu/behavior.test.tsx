@@ -5,6 +5,9 @@ import {
   Menu,
   MenuContent,
   MenuItem,
+  MenuItemDescription,
+  MenuItemIcon,
+  MenuItemLabel,
   MenuLabel,
   MenuSeparator,
 } from '../../../../src/components/menu';
@@ -33,6 +36,45 @@ describe('Menu - Behavior', () => {
 
     expect(items[0].getAttribute('tabindex')).toBe('0');
     expect(items[1].getAttribute('tabindex')).toBe('-1');
+  });
+
+  it('should support standalone navigation links with structured item content', async () => {
+    container = mount(
+      <Menu>
+        <MenuContent aria-label="Workspaces">
+          <MenuItem asChild textValue="Alpha workspace">
+            <a href="#alpha">
+              <MenuItemIcon aria-hidden="true">A</MenuItemIcon>
+              <MenuItemLabel>Alpha</MenuItemLabel>
+              <MenuItemDescription>Production workspace</MenuItemDescription>
+            </a>
+          </MenuItem>
+          <MenuItem asChild textValue="Beta workspace">
+            <a href="#beta">
+              <MenuItemLabel>Beta</MenuItemLabel>
+              <MenuItemDescription>Staging workspace</MenuItemDescription>
+            </a>
+          </MenuItem>
+        </MenuContent>
+      </Menu>
+    );
+
+    const links = Array.from(
+      container.querySelectorAll<HTMLAnchorElement>('a')
+    );
+    links[0]!.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    expect(document.activeElement).toBe(links[1]);
+    await userEvent.keyboard('a');
+    expect(document.activeElement).toBe(links[0]);
+    await userEvent.keyboard('{End}');
+    expect(document.activeElement).toBe(links[1]);
+    await userEvent.keyboard('{Home}');
+    expect(document.activeElement).toBe(links[0]);
+    expect(
+      links[0]!.querySelector('[data-slot="menu-item-description"]')
+        ?.textContent
+    ).toBe('Production workspace');
   });
 
   it('should support nested menu item composition without direct child injection', () => {
