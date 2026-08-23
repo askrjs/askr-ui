@@ -38,6 +38,9 @@ import {
   MenuContent,
   MenuGroup,
   MenuItem,
+  MenuItemDescription,
+  MenuItemIcon,
+  MenuItemLabel,
   MenuLabel,
   MenuSeparator,
   Popover,
@@ -110,6 +113,8 @@ import {
   type MenuContentAsChildProps,
   type MenuContentProps,
   type MenuItemAsChildProps,
+  type MenuItemPartAsChildProps,
+  type MenuItemPartProps,
   type MenuItemProps,
   type PopoverCloseAsChildProps,
   type PopoverCloseProps,
@@ -383,6 +388,11 @@ const menuItemAsChildProps: MenuItemAsChildProps = {
   children: slotChild,
   textValue: 'Menu item',
 };
+const menuItemPartProps: MenuItemPartProps = { children: 'Menu item' };
+const menuItemPartAsChildProps: MenuItemPartAsChildProps = {
+  asChild: true,
+  children: slotChild,
+};
 
 const dropdownContentProps: DropdownContentProps = {};
 const dropdownContentAsChildProps: DropdownContentAsChildProps = {
@@ -545,6 +555,9 @@ void [
   MenuContent,
   MenuGroup,
   MenuItem,
+  MenuItemDescription,
+  MenuItemIcon,
+  MenuItemLabel,
   MenuLabel,
   MenuSeparator,
   PopoverClose,
@@ -628,6 +641,8 @@ void [
   menuContentAsChildProps,
   menuItemProps,
   menuItemAsChildProps,
+  menuItemPartProps,
+  menuItemPartAsChildProps,
   dropdownTriggerVariant,
   dropdownTriggerSize,
   dropdownTriggerProps,

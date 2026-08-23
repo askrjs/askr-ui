@@ -122,6 +122,33 @@ HoverCard is a non-modal interactive preview. Pointer opening does not move
 focus. Tab can enter its content from the trigger, Escape restores the trigger,
 and leaving its final control continues after the trigger.
 
+### Standalone navigation menus
+
+`Menu` is also the supported accessible primitive for an always-visible list
+of navigation choices; it does not require a popover or trigger. Compose links
+through `MenuItem asChild` so native navigation is preserved while arrow keys,
+Home/End, and typeahead remain available without consumer event wiring.
+
+```tsx
+<Menu>
+  <MenuContent aria-label="Choose a workspace">
+    <MenuItem asChild textValue="Acme production">
+      <a href="/workspaces/acme">
+        <MenuItemIcon aria-hidden="true">
+          <BuildingIcon />
+        </MenuItemIcon>
+        <MenuItemLabel>Acme</MenuItemLabel>
+        <MenuItemDescription>Production workspace</MenuItemDescription>
+      </a>
+    </MenuItem>
+  </MenuContent>
+</Menu>
+```
+
+The default theme styles the content surface, item dividers, leading icon,
+primary label, description, and hover/focus states. Use `textValue` whenever
+structured children do not provide the intended typeahead phrase directly.
+
 ## Dynamic descendants
 
 Dynamic descendants are a supported composition contract for

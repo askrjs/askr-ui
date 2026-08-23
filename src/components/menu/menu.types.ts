@@ -44,6 +44,11 @@ export type MenuItemProps = Omit<
 export type MenuItemAsChildProps = Omit<ButtonLikeAsChildProps, 'onPress'> &
   MenuItemOwnProps;
 
+/** Props for a presentational part within a Menu Item. */
+export type MenuItemPartProps = BoxProps<'span', HTMLSpanElement>;
+/** Props for a polymorphic presentational part within a Menu Item. */
+export type MenuItemPartAsChildProps = BoxAsChildProps;
+
 /** Props for Menu Group. */
 export type MenuGroupProps = BoxProps<'div', HTMLDivElement>;
 /** Props for the `asChild` (polymorphic) rendering of Menu Group. */
