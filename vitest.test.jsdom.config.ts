@@ -9,6 +9,7 @@ export default defineConfig({
     include: [
       'tests/jsdom/components/button/**/*.test.tsx',
       'tests/jsdom/components/icon/**/*.test.tsx',
+      'tests/jsdom/components/toast/**/*.test.tsx',
       'tests/jsdom/components/consistency-reset/**/*.test.tsx',
     ],
   },

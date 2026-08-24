@@ -165,7 +165,7 @@ describe('Source layout', () => {
       join(browserDirectory, 'toast', 'behavior.test.tsx'),
       'utf8'
     );
-    expect(toastSuite).toContain('original deadline during sibling');
+    expect(toastSuite).toContain('unrelated paused toast through sibling');
     expect(toastSuite).toContain('toBe(original)');
     expect(toastSuite).toContain('toBe(originalClose)');
 

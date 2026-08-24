@@ -7,6 +7,7 @@ export const TOAST_A11Y_CONTRACT = {
   LIVE_REGION_ATTRIBUTE: 'aria-live' as const,
   LIVE_REGION_VALUE: 'polite' as const,
   VIEWPORT_LABEL: 'Notifications' as const,
+  AUTO_DISMISS_PAUSE: 'pointer-or-focus' as const,
   DATA_ATTRIBUTES: {
     slot: 'data-slot' as const,
     state: 'data-state' as const,

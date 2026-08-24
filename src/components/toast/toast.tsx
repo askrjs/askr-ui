@@ -56,6 +56,10 @@ import {
 type ToastLifecycleEntry = {
   node: HTMLElement | null;
   timer: ReturnType<typeof setTimeout> | null;
+  deadline: number;
+  remainingDuration: number;
+  pointerInside: boolean;
+  focusInside: boolean;
   previousFocused: HTMLElement | null;
   focusWasInside: boolean;
 };
@@ -114,11 +118,44 @@ function ToastRegistrationView(props: {
   const entryState = state<ToastLifecycleEntry>({
     node: null,
     timer: null,
+    deadline: 0,
+    remainingDuration: 0,
+    pointerInside: false,
+    focusInside: false,
     previousFocused: null,
     focusWasInside: false,
   });
   const entry = entryState();
   const resolvedDuration = duration ?? props.host.duration;
+  const armTimer = (delay: number) => {
+    entry.remainingDuration = Math.max(0, delay);
+    if (!Number.isFinite(entry.remainingDuration)) {
+      entry.deadline = Number.POSITIVE_INFINITY;
+      entry.timer = null;
+      return;
+    }
+    entry.deadline = Date.now() + entry.remainingDuration;
+    const timeoutId = setTimeout(() => {
+      if (entry.timer === timeoutId) entry.timer = null;
+      rootContext.setOpen(false);
+    }, entry.remainingDuration);
+    entry.timer = timeoutId;
+  };
+  const pauseTimer = () => {
+    if (entry.timer === null) return;
+    entry.remainingDuration = Math.max(0, entry.deadline - Date.now());
+    clearToastTimer(entry);
+  };
+  const resumeTimer = () => {
+    if (
+      rootContext.open &&
+      entry.timer === null &&
+      !entry.pointerInside &&
+      !entry.focusInside
+    ) {
+      armTimer(entry.remainingDuration);
+    }
+  };
   const setOpen = (nextOpen: boolean) => {
     if (
       !nextOpen &&
@@ -140,6 +177,14 @@ function ToastRegistrationView(props: {
       entry.focusWasInside = true;
     }
     entry.node = node;
+    if (
+      node !== null &&
+      openState() &&
+      entry.timer === null &&
+      entry.remainingDuration === 0
+    ) {
+      armTimer(resolvedDuration);
+    }
   };
   const rootContext: ToastRootContextValue = {
     hostId: props.host.hostId,
@@ -169,22 +214,12 @@ function ToastRegistrationView(props: {
 
       clearToastTimer(entry);
 
-      const timeoutId = setTimeout(() => {
-        if (entry.timer === timeoutId) {
-          entry.timer = null;
-        }
-
-        rootContext.setOpen(false);
-      }, resolvedDuration);
-
-      entry.timer = timeoutId;
+      entry.remainingDuration = resolvedDuration;
+      armTimer(resolvedDuration);
       signal.addEventListener(
         'abort',
         () => {
-          if (entry.timer === timeoutId) {
-            clearTimeout(timeoutId);
-            entry.timer = null;
-          }
+          clearToastTimer(entry);
         },
         { once: true }
       );
@@ -242,6 +277,8 @@ function ToastRegistrationView(props: {
     'data-toast': 'true',
     'data-variant': variant && variant !== 'default' ? variant : undefined,
     onFocusIn: (event: FocusEvent) => {
+      entry.focusInside = true;
+      pauseTimer();
       const previousFocused = event.relatedTarget;
       if (
         previousFocused instanceof HTMLElement &&
@@ -250,6 +287,24 @@ function ToastRegistrationView(props: {
       ) {
         entry.previousFocused = previousFocused;
       }
+    },
+    onFocusOut: (event: FocusEvent) => {
+      const nextFocused = event.relatedTarget;
+      if (
+        !(nextFocused instanceof Node) ||
+        !entry.node?.contains(nextFocused)
+      ) {
+        entry.focusInside = false;
+        resumeTimer();
+      }
+    },
+    onPointerEnter: () => {
+      entry.pointerInside = true;
+      pauseTimer();
+    },
+    onPointerLeave: () => {
+      entry.pointerInside = false;
+      resumeTimer();
     },
   });
 
