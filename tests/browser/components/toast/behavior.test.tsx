@@ -239,6 +239,73 @@ describe('Toast - Behavior', () => {
     expect(container.querySelector('[data-toast="true"]')).toBeNull();
   });
 
+  it('should keep an infinite-duration toast open without scheduling overflow', async () => {
+    vi.useFakeTimers();
+    container = mount(
+      <ToastHost duration={Number.POSITIVE_INFINITY}>
+        <ToastViewport />
+        <Toast defaultOpen>
+          <ToastTitle>Persistent</ToastTitle>
+        </Toast>
+      </ToastHost>
+    );
+    await flushUpdates();
+    await vi.runAllTimersAsync();
+    await flushUpdates();
+    expect(container.querySelector('[data-toast="true"]')).not.toBeNull();
+  });
+
+  it('should pause and resume the remaining dismiss duration while hovered', async () => {
+    vi.useFakeTimers();
+    container = mount(
+      <ToastHost duration={100}>
+        <ToastViewport />
+        <Toast defaultOpen>
+          <ToastTitle>Hover timed</ToastTitle>
+        </Toast>
+      </ToastHost>
+    );
+    await flushUpdates();
+    const toast = container.querySelector('[data-toast="true"]') as HTMLElement;
+    await vi.advanceTimersByTimeAsync(40);
+    toast.dispatchEvent(new PointerEvent('pointerenter'));
+    await vi.advanceTimersByTimeAsync(100);
+    expect(container.querySelector('[data-toast="true"]')).toBe(toast);
+    toast.dispatchEvent(new PointerEvent('pointerleave'));
+    await vi.advanceTimersByTimeAsync(59);
+    expect(container.querySelector('[data-toast="true"]')).toBe(toast);
+    await vi.advanceTimersByTimeAsync(1);
+    await flushUpdates();
+    expect(container.querySelector('[data-toast="true"]')).toBeNull();
+  });
+
+  it('should pause until focus leaves the toast subtree', async () => {
+    vi.useFakeTimers();
+    container = mount(
+      <ToastHost duration={100}>
+        <button id="outside">Outside</button>
+        <ToastViewport />
+        <Toast defaultOpen>
+          <ToastTitle>Focus timed</ToastTitle>
+          <ToastClose>Close</ToastClose>
+        </Toast>
+      </ToastHost>
+    );
+    await flushUpdates();
+    const toast = container.querySelector('[data-toast="true"]') as HTMLElement;
+    const close = toast.querySelector('button') as HTMLButtonElement;
+    await vi.advanceTimersByTimeAsync(30);
+    close.focus();
+    await vi.advanceTimersByTimeAsync(100);
+    expect(container.querySelector('[data-toast="true"]')).toBe(toast);
+    (container.querySelector('#outside') as HTMLButtonElement).focus();
+    await vi.advanceTimersByTimeAsync(69);
+    expect(container.querySelector('[data-toast="true"]')).toBe(toast);
+    await vi.advanceTimersByTimeAsync(1);
+    await flushUpdates();
+    expect(container.querySelector('[data-toast="true"]')).toBeNull();
+  });
+
   it('should dismiss multiple open toasts when timers expire at the same time', async () => {
     vi.useFakeTimers();
     container = mount(
@@ -262,7 +329,7 @@ describe('Toast - Behavior', () => {
     expect(container.querySelectorAll('[data-toast="true"]').length).toBe(0);
   });
 
-  it('should preserve an unrelated toast identity and original deadline during sibling registration changes', async () => {
+  it('should preserve an unrelated paused toast through sibling registration changes', async () => {
     vi.useFakeTimers();
     container = mount(<SiblingToastRegistrationFixture />);
     await flushUpdates();
@@ -295,6 +362,12 @@ describe('Toast - Behavior', () => {
     expect(container.querySelectorAll('#sibling-toast')).toHaveLength(0);
 
     await vi.advanceTimersByTimeAsync(40);
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(container.querySelector('#original-toast')).toBe(original);
+    launcher.focus();
+    await vi.advanceTimersByTimeAsync(100);
     await flushUpdates();
     await flushUpdates();
 
