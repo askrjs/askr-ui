@@ -12,6 +12,19 @@ import {
   DialogTrigger,
 } from '../../../../src/components/dialog';
 import { flushUpdates, mount, unmount } from '../../test-utils';
+import {
+  Toast,
+  ToastHost,
+  ToastTitle,
+  ToastViewport,
+} from '../../../../src/components/toast';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectPortal,
+  SelectTrigger,
+} from '../../../../src/components/select';
 
 describe('Dialog - Behavior', () => {
   let container: HTMLElement;
@@ -349,5 +362,59 @@ describe('Dialog - Behavior', () => {
     expect(style.top).toBe('20px');
     expect(style.maxWidth).toBe('350px');
     expect(style.maxHeight).toBe('804px');
+  });
+
+  it('should keep modal dismissal and nested overlay stacking correct with other families', async () => {
+    container = mount(
+      <ToastHost duration={Number.POSITIVE_INFINITY}>
+        <ToastViewport />
+        <Dialog defaultOpen>
+          <DialogPortal>
+            <DialogOverlay />
+            <DialogContent>
+              <Select defaultOpen defaultValue="one">
+                <SelectTrigger>Choose</SelectTrigger>
+                <SelectPortal>
+                  <SelectContent>
+                    <SelectItem value="one">One</SelectItem>
+                  </SelectContent>
+                </SelectPortal>
+              </Select>
+            </DialogContent>
+          </DialogPortal>
+        </Dialog>
+        <Toast defaultOpen>
+          <ToastTitle>Saved</ToastTitle>
+        </Toast>
+      </ToastHost>
+    );
+    await flushUpdates();
+    await flushUpdates();
+
+    const dialog = document.body.querySelector(
+      '[data-slot="dialog-content"]'
+    ) as HTMLElement;
+    const select = document.body.querySelector(
+      '[data-slot="select-content"]'
+    ) as HTMLElement;
+    expect(Number(getComputedStyle(select).zIndex)).toBeGreaterThan(
+      Number(getComputedStyle(dialog).zIndex)
+    );
+    Array.from(document.body.querySelectorAll<HTMLElement>('[role="option"]'))
+      .find((option) => option.textContent === 'One')
+      ?.click();
+    await flushUpdates();
+
+    document.body
+      .querySelector('[data-slot="dialog-overlay"]')
+      ?.dispatchEvent(
+        new PointerEvent('pointerdown', { bubbles: true, cancelable: true })
+      );
+    await flushUpdates();
+
+    expect(
+      document.body.querySelector('[data-slot="dialog-content"]')
+    ).toBeNull();
+    expect(container.querySelector('[data-slot="toast"]')).not.toBeNull();
   });
 });

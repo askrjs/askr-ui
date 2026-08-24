@@ -1,6 +1,6 @@
 import { state } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations/state';
-import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { rovingFocus } from '@askrjs/askr/foundations/interactions';
 import { focusSelectedCollectionItem } from '../_internal/focus';
 import {
@@ -18,6 +18,7 @@ import {
   type RadioGroupRootContextValue,
 } from './radio-group.shared';
 import type { RadioGroupProps } from './radio-group.types';
+import { formResetRef } from '../_internal/form-reset';
 
 function RadioGroupRootView(props: {
   children?: unknown;
@@ -89,6 +90,11 @@ export function RadioGroup(props: RadioGroupProps) {
     onChange: onValueChange,
   });
   const currentValue = valueState();
+  const resetRef = formResetRef(() => {
+    if (value === undefined && valueState() !== defaultValue) {
+      valueState.set(defaultValue);
+    }
+  });
   const items = getCompositeCollectionItems(collection).map((item) => ({
     value: String(item.value ?? ''),
     disabled: item.disabled,
@@ -151,7 +157,7 @@ export function RadioGroup(props: RadioGroupProps) {
   };
   const renderContext = createRadioGroupRenderContext();
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: composeRefs(ref, resetRef),
     role: 'radiogroup',
     'data-slot': 'radio-group',
     'data-disabled': disabled ? 'true' : undefined,

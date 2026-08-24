@@ -192,7 +192,7 @@ describe('RadioGroup - Behavior', () => {
     expect(host.getAttribute('data-state')).toBe('checked');
   });
 
-  it('should activate asChild items with Enter and Space', async () => {
+  it('should ignore Enter and activate native and asChild items with Space', async () => {
     container = mount(
       <RadioGroup defaultValue="small">
         <RadioGroupItem value="small">Small</RadioGroupItem>
@@ -206,24 +206,59 @@ describe('RadioGroup - Behavior', () => {
 
     let medium = getRadioByText(container, 'Medium');
     medium.focus();
+    await userEvent.keyboard('{Enter}');
+    await flushUpdates();
+
+    expect(
+      getRadioByText(container, 'Medium').getAttribute('aria-checked')
+    ).toBe('false');
+
+    medium = getRadioByText(container, 'Medium');
+    medium.focus();
     await userEvent.keyboard(' ');
     await flushUpdates();
 
     medium = getRadioByText(container, 'Medium');
     expect(medium.getAttribute('aria-checked')).toBe('true');
 
-    const small = getRadioByText(container, 'Small');
-    small.click();
-    await flushUpdates();
-
-    medium = getRadioByText(container, 'Medium');
-    medium.focus();
+    const nativeSmall = getRadioByText(container, 'Small');
+    nativeSmall.focus();
     await userEvent.keyboard('{Enter}');
     await flushUpdates();
 
     expect(
+      getRadioByText(container, 'Small').getAttribute('aria-checked')
+    ).toBe('false');
+    expect(
       getRadioByText(container, 'Medium').getAttribute('aria-checked')
     ).toBe('true');
+  });
+
+  it('should restore its uncontrolled value when its native form resets', async () => {
+    const onValueChange = vi.fn();
+    container = mount(
+      <form>
+        <RadioGroup
+          defaultValue="small"
+          name="size"
+          onValueChange={onValueChange}
+        >
+          <RadioGroupItem value="small">Small</RadioGroupItem>
+          <RadioGroupItem value="medium">Medium</RadioGroupItem>
+        </RadioGroup>
+      </form>
+    );
+    await flushUpdates();
+    getRadioByText(container, 'Medium').click();
+    await flushUpdates();
+
+    (container.querySelector('form') as HTMLFormElement).reset();
+    await flushUpdates();
+
+    expect(
+      getRadioByText(container, 'Small').getAttribute('aria-checked')
+    ).toBe('true');
+    expect(onValueChange.mock.calls).toEqual([['medium'], ['small']]);
   });
 
   it('should forward refs to the group container and item hosts', () => {

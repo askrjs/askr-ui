@@ -5,6 +5,11 @@ import {
   VirtualTable,
   type VirtualTableColumn,
 } from '../../src/components/virtual-table';
+import {
+  buildVirtualKeyIndexMap,
+  createVirtualAnchor,
+  resolveVirtualScrollTopFromAnchor,
+} from '../../src/components/_internal/virtualization';
 
 type Row = { id: string; name: string };
 
@@ -41,6 +46,24 @@ function renderWithStyles(component: () => JSX.Element) {
 }
 
 describe('virtualization SSR styles', () => {
+  it('should anchor to the first retained visible key when the top key is removed', () => {
+    const anchor = createVirtualAnchor(
+      'row-21',
+      ['row-20', 'row-21', 'row-22'],
+      20,
+      800,
+      40
+    );
+    const nextKeys = buildVirtualKeyIndexMap([
+      ...Array.from({ length: 20 }, (_, index) => `row-${index}`),
+      'row-21',
+      'row-22',
+    ]);
+
+    expect(anchor).toEqual({ key: 'row-21', offset: -40 });
+    expect(resolveVirtualScrollTopFromAnchor(anchor!, nextKeys, 40)).toBe(760);
+  });
+
   it('should register virtual-list geometry before hydration', () => {
     const { html, styles } = renderWithStyles(() => (
       <VirtualList

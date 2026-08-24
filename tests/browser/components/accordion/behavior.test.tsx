@@ -10,6 +10,7 @@ import {
 } from '../../../../src/components/accordion';
 import { ACCORDION_A11Y_CONTRACT } from '../../../../src/components/accordion/accordion.a11y';
 import { flushUpdates, mount, unmount } from '../../test-utils';
+import { VirtualList } from '../../../../src/components/virtual-list';
 
 function getButtonByText(
   container: HTMLElement,
@@ -289,5 +290,71 @@ describe('Accordion - Behavior', () => {
         </Accordion>
       );
     }).toThrow('Accordion parts must be used within <AccordionItem>');
+  });
+
+  it('should preserve dataset indices and advance focus through a virtualized window', async () => {
+    const items = Array.from({ length: 100 }, (_, index) => ({
+      id: `item-${index}`,
+      label: `Item ${index}`,
+    }));
+    container = mount(
+      <Accordion>
+        <VirtualList
+          style={{ height: '60px', overflowY: 'auto' }}
+          items={items}
+          rowHeight={20}
+          getKey={(item) => item.id}
+          rowComponent={({ item }) => (
+            <AccordionItem value={item.id}>
+              <AccordionHeader>
+                <AccordionTrigger>{item.label}</AccordionTrigger>
+              </AccordionHeader>
+              <AccordionContent>Details</AccordionContent>
+            </AccordionItem>
+          )}
+        />
+      </Accordion>
+    );
+    const viewport = container.querySelector(
+      '[data-slot="virtual-list"]'
+    ) as HTMLElement;
+    await flushUpdates();
+    viewport.scrollTop = 800;
+    viewport.dispatchEvent(new Event('scroll'));
+    await flushUpdates();
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(viewport.dataset.virtualVisibleStartIndex).toBe('40');
+    expect(
+      Array.from(container.querySelectorAll('button')).some(
+        (button) => button.textContent?.trim() === 'Item 43'
+      )
+    ).toBe(false);
+    let item42 = getButtonByText(container, 'Item 42');
+    item42.click();
+    await flushUpdates();
+    item42 = getButtonByText(container, 'Item 42');
+    item42.focus({ preventScroll: true });
+    expect(
+      item42
+        .closest('[data-slot="virtual-list-row"]')
+        ?.getAttribute('data-askr-virtual-list-row-height')
+    ).toBe('20');
+    const arrowDown = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'ArrowDown',
+    });
+    item42.dispatchEvent(arrowDown);
+    expect(arrowDown.defaultPrevented).toBe(true);
+    await flushUpdates();
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(Number(viewport.dataset.virtualVisibleStartIndex)).toBeGreaterThan(
+      40
+    );
+    expect(document.activeElement?.textContent).toBe('Item 43');
   });
 });

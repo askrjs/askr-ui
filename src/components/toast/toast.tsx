@@ -26,7 +26,6 @@ import { pressable } from '@askrjs/askr/foundations/interactions';
 import { runCancelablePress } from '../_internal/press';
 import { For, state } from '@askrjs/askr';
 import { resource } from '@askrjs/askr/resources';
-import { DismissableLayer } from '../dismissable-layer';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import { collectJsxElements, serializeForId } from '../_internal/jsx';
 import type {
@@ -306,21 +305,18 @@ function ToastRegistrationView(props: {
       entry.pointerInside = false;
       resumeTimer();
     },
+    onKeyDown: (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        rootContext.setOpen(false);
+      }
+    },
   });
 
   return (
     <ToastRootContext value={rootContext}>
       <Presence present={rootContext.open}>
-        <DismissableLayer
-          onEscapeKeyDown={() => {
-            rootContext.setOpen(false);
-          }}
-          onDismiss={() => {
-            rootContext.setOpen(false);
-          }}
-        >
-          <div {...finalProps}>{children}</div>
-        </DismissableLayer>
+        <div {...finalProps}>{children}</div>
       </Presence>
     </ToastRootContext>
   );

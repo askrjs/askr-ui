@@ -27,6 +27,8 @@ import {
   readSliderRootContext,
   type SliderRootContextValue,
 } from './slider.shared';
+import { resolveTextDirection } from '../_internal/direction';
+import { formResetRef } from '../_internal/form-reset';
 
 type SliderEntry = {
   track: HTMLElement | null;
@@ -113,7 +115,11 @@ function updateSliderValueFromPointer(
       entry.track.getBoundingClientRect(),
       root.min,
       root.max,
-      root.orientation
+      root.orientation,
+      entry.track.ownerDocument.defaultView?.getComputedStyle(entry.track)
+        .direction === 'rtl'
+        ? 'rtl'
+        : 'ltr'
     ),
     root.min,
     root.max,
@@ -209,6 +215,12 @@ export function Slider(props: SliderProps) {
     onChange: onValueChange,
   });
   const normalizedValue = snapRangeValue(valueState(), min, max, step);
+  const resetValue = snapRangeValue(defaultValue ?? min, min, max, step);
+  const resetRef = formResetRef(() => {
+    if (value === undefined && valueState() !== resetValue) {
+      valueState.set(resetValue as never);
+    }
+  });
   const percentage = rangePercentage(normalizedValue, min, max);
   const rootContext = getSliderRootContext(identity, sliderId);
   rootContext.sliderId = sliderId;
@@ -243,6 +255,7 @@ export function Slider(props: SliderProps) {
         | { current: HTMLElement | null }
         | null
         | undefined,
+      resetRef,
       (node: HTMLElement | null) => {
         if (!node) {
           removeDynamicStyleRuleWhenUnused(sliderRuleKey, sliderSelector);
@@ -407,10 +420,17 @@ export function SliderThumb(props: SliderThumbProps | SliderThumbAsChildProps) {
         return;
       }
 
+      const direction = resolveTextDirection(event);
+      const increasesHorizontally =
+        (event.key === 'ArrowRight' && direction === 'ltr') ||
+        (event.key === 'ArrowLeft' && direction === 'rtl');
+      const decreasesHorizontally =
+        (event.key === 'ArrowLeft' && direction === 'ltr') ||
+        (event.key === 'ArrowRight' && direction === 'rtl');
       const nextValue =
-        event.key === 'ArrowRight' || event.key === 'ArrowUp'
+        increasesHorizontally || event.key === 'ArrowUp'
           ? liveRoot.value + liveRoot.step
-          : event.key === 'ArrowLeft' || event.key === 'ArrowDown'
+          : decreasesHorizontally || event.key === 'ArrowDown'
             ? liveRoot.value - liveRoot.step
             : event.key === 'Home'
               ? liveRoot.min

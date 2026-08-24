@@ -29,7 +29,8 @@ export function valueFromPointer(
   rect: DOMRect,
   min: number,
   max: number,
-  orientation: 'horizontal' | 'vertical'
+  orientation: 'horizontal' | 'vertical',
+  direction: 'ltr' | 'rtl' = 'ltr'
 ) {
   if (orientation === 'vertical') {
     const distance = rect.bottom - event.clientY;
@@ -37,7 +38,10 @@ export function valueFromPointer(
     return min + ratio * (max - min);
   }
 
-  const distance = event.clientX - rect.left;
+  const distance =
+    direction === 'rtl'
+      ? rect.right - event.clientX
+      : event.clientX - rect.left;
   const ratio = rect.width <= 0 ? 0 : distance / rect.width;
   return min + ratio * (max - min);
 }

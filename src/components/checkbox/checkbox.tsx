@@ -2,7 +2,8 @@ import { Slot } from '@askrjs/askr/foundations/structures';
 import { state } from '@askrjs/askr';
 import { runCancelablePress } from '../_internal/press';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
-import { pressable } from '@askrjs/askr/foundations/interactions';
+import { checkablePress } from '../_internal/checkable-press';
+import { formResetRef } from '../_internal/form-reset';
 import type {
   CheckboxInputProps,
   CheckboxAsChildProps,
@@ -88,6 +89,12 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
       setChecked(!currentChecked);
     });
   };
+  const resetRef = formResetRef<Element>(() => {
+    if (!isControlled && internalChecked() !== defaultChecked) {
+      internalChecked.set(defaultChecked);
+      onCheckedChange?.(defaultChecked);
+    }
+  });
 
   const ariaChecked = indeterminate
     ? 'mixed'
@@ -101,10 +108,9 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
       : 'unchecked';
 
   if (asChild) {
-    const interactionProps = pressable({
+    const interactionProps = checkablePress({
       disabled,
-      onPress: toggleChecked,
-      isNativeButton: false,
+      onPress: (event) => toggleChecked(event as PressEvent),
     });
 
     const finalProps = mergeProps(rest, {
@@ -114,18 +120,33 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
       'data-slot': 'checkbox',
       'data-disabled': disabled ? 'true' : undefined,
       'data-state': dataState,
-      ref,
+      ref: composeRefs(
+        ref as
+          | ((value: Element | null) => void)
+          | { current: Element | null }
+          | null
+          | undefined,
+        resetRef
+      ),
     });
 
     return <Slot asChild {...finalProps} children={children} />;
   }
 
   const finalProps = mergeProps(rest, {
-    ref: composeRefs(ref, (node: HTMLInputElement | null) => {
-      if (node) {
-        node.indeterminate = indeterminate;
+    ref: composeRefs(
+      ref as
+        | ((value: Element | null) => void)
+        | { current: Element | null }
+        | null
+        | undefined,
+      resetRef,
+      (node: Element | null) => {
+        if (node instanceof HTMLInputElement) {
+          node.indeterminate = indeterminate;
+        }
       }
-    }),
+    ),
     onClick: (e: Event) => {
       toggleChecked(e as PressEvent);
 

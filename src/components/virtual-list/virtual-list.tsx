@@ -723,6 +723,7 @@ function syncVirtualListItems<Item>(
 
     if (anchorKey) {
       const anchor = createVirtualAnchor(
+        anchorKey,
         previousVisibleKeys,
         entry.visibleRange.visibleStartIndex,
         currentScrollTop,

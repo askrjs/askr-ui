@@ -1,5 +1,5 @@
 import { nativeButtonProps } from '../_internal/native-control';
-import { defineScope, readScope } from '@askrjs/askr';
+import { defineScope, readScope, state } from '@askrjs/askr';
 import { Slot, Presence } from '@askrjs/askr/foundations/structures';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
@@ -23,8 +23,6 @@ type CollapsibleRootContextValue = {
 const CollapsibleRootContext = defineScope<CollapsibleRootContextValue | null>(
   null
 );
-
-let pendingFocusRestoreId: string | null = null;
 
 function resolveCollapsibleContentId(props: CollapsibleProps): string {
   return resolveCompoundId('collapsible-content', props.id, [
@@ -98,9 +96,10 @@ export function CollapsibleTrigger(
 ) {
   const { asChild, children, ref, ...rest } = props;
   const root = readCollapsibleRootContext();
+  const focusRestore = state({ pending: false })();
   const restoreFocusRef = (node: HTMLElement | null) => {
-    if (node && pendingFocusRestoreId === root.contentId) {
-      pendingFocusRestoreId = null;
+    if (node && focusRestore.pending) {
+      focusRestore.pending = false;
       node.focus();
     }
   };
@@ -110,7 +109,7 @@ export function CollapsibleTrigger(
       'currentTarget' in event &&
       event.currentTarget === document.activeElement
     ) {
-      pendingFocusRestoreId = root.contentId;
+      focusRestore.pending = true;
     }
     root.setOpen(!root.open);
     if (event && 'currentTarget' in event) {

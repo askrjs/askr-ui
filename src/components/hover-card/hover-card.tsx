@@ -81,19 +81,21 @@ export function HoverCard(props: HoverCardProps) {
   };
   let contentPosition: HoverCardPositionOptions =
     resolveHoverCardPositionOptions();
-  let openTimer: ReturnType<typeof setTimeout> | undefined;
-  let closeTimer: ReturnType<typeof setTimeout> | undefined;
+  const timers = state<{
+    open: ReturnType<typeof setTimeout> | undefined;
+    close: ReturnType<typeof setTimeout> | undefined;
+  }>({ open: undefined, close: undefined })();
 
   const clearOpenTimer = () => {
-    if (openTimer !== undefined) {
-      clearTimeout(openTimer);
-      openTimer = undefined;
+    if (timers.open !== undefined) {
+      clearTimeout(timers.open);
+      timers.open = undefined;
     }
   };
   const clearCloseTimer = () => {
-    if (closeTimer !== undefined) {
-      clearTimeout(closeTimer);
-      closeTimer = undefined;
+    if (timers.close !== undefined) {
+      clearTimeout(timers.close);
+      timers.close = undefined;
     }
   };
   const clearTimers = () => {
@@ -144,8 +146,8 @@ export function HoverCard(props: HoverCardProps) {
         return;
       }
 
-      openTimer = setTimeout(() => {
-        openTimer = undefined;
+      timers.open = setTimeout(() => {
+        timers.open = undefined;
         rootContext.setOpen(true);
       }, openDelay);
     },
@@ -153,8 +155,8 @@ export function HoverCard(props: HoverCardProps) {
       clearOpenTimer();
       clearCloseTimer();
 
-      closeTimer = setTimeout(() => {
-        closeTimer = undefined;
+      timers.close = setTimeout(() => {
+        timers.close = undefined;
         rootContext.setOpen(false);
       }, closeDelay);
     },
@@ -211,7 +213,7 @@ export function HoverCard(props: HoverCardProps) {
     }
 
     clearOpenTimer();
-    if (openState() && closeTimer === undefined) {
+    if (openState() && timers.close === undefined) {
       rootContext.scheduleClose();
     }
   };

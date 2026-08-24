@@ -66,6 +66,71 @@ describe('Slider - Behavior', () => {
     expect(container.querySelector('input[type="hidden"]')?.value).toBe('81');
   });
 
+  it('should reverse horizontal pointer and arrow semantics in RTL', async () => {
+    container = mount(
+      <div dir="rtl">
+        <Slider defaultValue={50} name="volume">
+          <SliderTrack>
+            <SliderRange />
+            <SliderThumb />
+          </SliderTrack>
+        </Slider>
+      </div>
+    );
+    const track = container.querySelector('[data-slider-track]') as HTMLElement;
+    track.getBoundingClientRect = () =>
+      ({
+        left: 0,
+        right: 100,
+        top: 0,
+        bottom: 10,
+        width: 100,
+        height: 10,
+      }) as DOMRect;
+    track.dispatchEvent(
+      new PointerEvent('pointerdown', {
+        bubbles: true,
+        clientX: 80,
+        clientY: 5,
+      })
+    );
+    window.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+    await flushUpdates();
+    expect(container.querySelector('input')?.value).toBe('20');
+
+    const thumb = container.querySelector('[role="slider"]') as HTMLElement;
+    thumb.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowLeft' })
+    );
+    await flushUpdates();
+    expect(container.querySelector('input')?.value).toBe('21');
+  });
+
+  it('should restore its uncontrolled value when its native form resets', async () => {
+    const onValueChange = vi.fn();
+    container = mount(
+      <form>
+        <Slider defaultValue={20} name="volume" onValueChange={onValueChange}>
+          <SliderTrack>
+            <SliderRange />
+            <SliderThumb />
+          </SliderTrack>
+        </Slider>
+      </form>
+    );
+    let thumb = container.querySelector('[role="slider"]') as HTMLElement;
+    thumb.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowRight' })
+    );
+    await flushUpdates();
+    expect(container.querySelector('input')?.value).toBe('21');
+
+    (container.querySelector('form') as HTMLFormElement).reset();
+    await flushUpdates();
+    expect(container.querySelector('input')?.value).toBe('20');
+    expect(onValueChange.mock.calls).toEqual([[21], [20]]);
+  });
+
   it('should expose --ak-slider-percentage without an inline style attribute', () => {
     container = mount(
       <Slider defaultValue={25} min={0} max={100}>

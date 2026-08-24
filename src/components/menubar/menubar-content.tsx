@@ -43,6 +43,7 @@ import type {
   MenubarSubContentAsChildProps,
   MenubarSubContentProps,
 } from './menubar.types';
+import { resolveTextDirection } from '../_internal/direction';
 
 function renderMenubarSurfaceContent(
   props:
@@ -262,7 +263,9 @@ function renderMenubarSurfaceContent(
         root.setOpenPath(contentContext.path.slice(0, -1));
       }
 
-      if (event.key === 'ArrowLeft' && contentContext.path.length > 1) {
+      const closeKey =
+        resolveTextDirection(event) === 'rtl' ? 'ArrowRight' : 'ArrowLeft';
+      if (event.key === closeKey && contentContext.path.length > 1) {
         event.preventDefault();
         root.setOpenPath(contentContext.path.slice(0, -1));
       }
