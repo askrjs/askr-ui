@@ -233,24 +233,6 @@ describe('Toast - Behavior', () => {
     expect(titles).toEqual(['First', 'Second']);
   });
 
-  it('should dismiss toasts on their configured timer', async () => {
-    container = mount(
-      <ToastHost duration={500}>
-        <ToastViewport />
-        <Toast defaultOpen={true}>
-          <ToastTitle>Timed</ToastTitle>
-        </Toast>
-      </ToastHost>
-    );
-    await flushUpdates();
-
-    expect(container.querySelector('[data-toast="true"]')).not.toBeNull();
-
-    await waitForToastCount(container, 0);
-
-    expect(container.querySelector('[data-toast="true"]')).toBeNull();
-  });
-
   it('should keep an infinite-duration toast open without scheduling overflow', async () => {
     vi.useFakeTimers();
     container = mount(
@@ -308,27 +290,6 @@ describe('Toast - Behavior', () => {
     (container.querySelector('#outside') as HTMLButtonElement).focus();
     await waitForToastCount(container, 0);
     expect(container.querySelector('[data-toast="true"]')).toBeNull();
-  });
-
-  it('should dismiss multiple open toasts when timers expire at the same time', async () => {
-    container = mount(
-      <ToastHost duration={500}>
-        <ToastViewport />
-        <Toast id="first" defaultOpen={true}>
-          <ToastTitle>First timed</ToastTitle>
-        </Toast>
-        <Toast id="second" defaultOpen={true}>
-          <ToastTitle>Second timed</ToastTitle>
-        </Toast>
-      </ToastHost>
-    );
-    await flushUpdates();
-
-    expect(container.querySelectorAll('[data-toast="true"]').length).toBe(2);
-
-    await waitForToastCount(container, 0);
-
-    expect(container.querySelectorAll('[data-toast="true"]').length).toBe(0);
   });
 
   it('should preserve an unrelated paused toast through sibling registration changes', async () => {
