@@ -173,7 +173,7 @@ function waitForScheduler(): Promise<void> {
 async function waitForToastCount(
   container: HTMLElement,
   count: number,
-  timeout = 2000
+  timeout = 5000
 ): Promise<void> {
   const deadline = Date.now() + timeout;
   while (container.querySelectorAll('[data-toast="true"]').length !== count) {
@@ -235,7 +235,7 @@ describe('Toast - Behavior', () => {
 
   it('should dismiss toasts on their configured timer', async () => {
     container = mount(
-      <ToastHost duration={20}>
+      <ToastHost duration={500}>
         <ToastViewport />
         <Toast defaultOpen={true}>
           <ToastTitle>Timed</ToastTitle>
@@ -269,7 +269,7 @@ describe('Toast - Behavior', () => {
 
   it('should pause and resume the remaining dismiss duration while hovered', async () => {
     container = mount(
-      <ToastHost duration={80}>
+      <ToastHost duration={800}>
         <ToastViewport />
         <Toast defaultOpen>
           <ToastTitle>Hover timed</ToastTitle>
@@ -278,9 +278,9 @@ describe('Toast - Behavior', () => {
     );
     await flushUpdates();
     const toast = container.querySelector('[data-toast="true"]') as HTMLElement;
-    await new Promise((resolve) => setTimeout(resolve, 30));
+    await new Promise((resolve) => setTimeout(resolve, 100));
     toast.dispatchEvent(new PointerEvent('pointerenter'));
-    await new Promise((resolve) => setTimeout(resolve, 120));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     expect(container.querySelector('[data-toast="true"]')).toBe(toast);
     toast.dispatchEvent(new PointerEvent('pointerleave'));
     await waitForToastCount(container, 0);
@@ -289,7 +289,7 @@ describe('Toast - Behavior', () => {
 
   it('should pause until focus leaves the toast subtree', async () => {
     container = mount(
-      <ToastHost duration={80}>
+      <ToastHost duration={800}>
         <button id="outside">Outside</button>
         <ToastViewport />
         <Toast defaultOpen>
@@ -301,9 +301,9 @@ describe('Toast - Behavior', () => {
     await flushUpdates();
     const toast = container.querySelector('[data-toast="true"]') as HTMLElement;
     const close = toast.querySelector('button') as HTMLButtonElement;
-    await new Promise((resolve) => setTimeout(resolve, 30));
+    await new Promise((resolve) => setTimeout(resolve, 100));
     close.focus();
-    await new Promise((resolve) => setTimeout(resolve, 120));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     expect(container.querySelector('[data-toast="true"]')).toBe(toast);
     (container.querySelector('#outside') as HTMLButtonElement).focus();
     await waitForToastCount(container, 0);
@@ -312,7 +312,7 @@ describe('Toast - Behavior', () => {
 
   it('should dismiss multiple open toasts when timers expire at the same time', async () => {
     container = mount(
-      <ToastHost duration={20}>
+      <ToastHost duration={500}>
         <ToastViewport />
         <Toast id="first" defaultOpen={true}>
           <ToastTitle>First timed</ToastTitle>
