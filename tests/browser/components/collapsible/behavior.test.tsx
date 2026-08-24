@@ -8,6 +8,7 @@ import {
 } from '../../../../src/components/collapsible/collapsible';
 import { createIsland } from '@askrjs/askr/boot';
 import { state } from '@askrjs/askr';
+import { VirtualList } from '../../../../src/components/virtual-list';
 
 function mount(element: JSX.Element): HTMLElement {
   const container = document.createElement('div');
@@ -35,18 +36,27 @@ describe('Collapsible — Behavior', () => {
   });
 
   describe('State Management', () => {
-    it('should not transfer pending focus to a newly keyed disclosure', async () => {
+    it('should not transfer pending focus to a recycled virtual row', async () => {
       function Fixture() {
-        const row = state('row-a');
+        const rows = state([{ id: 'row-a' }, { id: 'row-b' }, { id: 'row-c' }]);
         return (
-          <Collapsible
-            key={row()}
-            open={false}
-            onOpenChange={() => row.set('row-b')}
-          >
-            <CollapsibleTrigger>{row()}</CollapsibleTrigger>
-            <CollapsibleContent>Content</CollapsibleContent>
-          </Collapsible>
+          <VirtualList
+            style={{ height: '20px', overflowY: 'auto' }}
+            items={rows()}
+            rowHeight={20}
+            getKey={(row) => row.id}
+            rowComponent={({ item }) => (
+              <div data-row-id={item.id}>
+                <Collapsible
+                  open={false}
+                  onOpenChange={() => rows.set(rows().slice(1))}
+                >
+                  <CollapsibleTrigger>Toggle</CollapsibleTrigger>
+                  <CollapsibleContent>Content</CollapsibleContent>
+                </Collapsible>
+              </div>
+            )}
+          />
         );
       }
       container = mount(<Fixture />);
@@ -58,7 +68,9 @@ describe('Collapsible — Behavior', () => {
       const replacement = container.querySelector(
         'button'
       ) as HTMLButtonElement;
-      expect(replacement.textContent).toBe('row-b');
+      expect(
+        replacement.closest('[data-row-id]')?.getAttribute('data-row-id')
+      ).toBe('row-b');
       expect(document.activeElement).not.toBe(replacement);
     });
 
