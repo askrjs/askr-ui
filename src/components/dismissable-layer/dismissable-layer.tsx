@@ -95,8 +95,10 @@ function getLayerEntry(identity: object): LayerEntry {
         return;
       }
 
+      if (created.lastEscapeEvent === event) {
+        return;
+      }
       created.lastEscapeEvent = event;
-      event.stopPropagation?.();
       runDismissCallbacks(created, 'escape');
     },
     handlePointerDownCapture: (event: PointerEvent) => {
@@ -263,8 +265,6 @@ export function DismissableLayer(
   const finalProps = mergeProps(rest, {
     ref: refHandler,
     'data-dismissable-layer': 'true',
-    onKeyDown: entry.handleKeyDown,
-    onPointerDownCapture: entry.handlePointerDownCapture,
   });
 
   if (asChild) {

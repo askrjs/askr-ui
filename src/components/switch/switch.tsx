@@ -1,9 +1,10 @@
 import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { controllableState } from '@askrjs/askr/foundations/state';
-import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import type { SwitchAsChildProps, SwitchButtonProps } from './switch.types';
+import { formResetRef } from '../_internal/form-reset';
 
 /**
  * Renders the `switch` part of `switch` with `role="switch"`.
@@ -34,6 +35,11 @@ export function Switch(props: SwitchButtonProps | SwitchAsChildProps) {
     onChange: onCheckedChange,
   });
   const currentChecked = checkedState();
+  const resetRef = formResetRef<Element>(() => {
+    if (checked === undefined && checkedState() !== defaultChecked) {
+      checkedState.set(defaultChecked);
+    }
+  });
 
   const interactionProps = pressable({
     disabled,
@@ -43,7 +49,14 @@ export function Switch(props: SwitchButtonProps | SwitchAsChildProps) {
 
   const finalProps = mergeProps(rest, {
     ...interactionProps,
-    ref,
+    ref: composeRefs(
+      ref as
+        | ((value: Element | null) => void)
+        | { current: Element | null }
+        | null
+        | undefined,
+      resetRef
+    ),
     role: 'switch',
     'aria-checked': currentChecked ? 'true' : 'false',
     'data-slot': 'switch',

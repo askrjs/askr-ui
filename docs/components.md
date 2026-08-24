@@ -98,14 +98,19 @@ preserved through `asChild` composition.
 
 | Surface                             | Keyboard contract                                                                                                                                                                                                           |
 | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Pressable controls                  | `Enter` activates on keydown, `Space` activates on keyup, disabled controls do not activate, and caller cancellation still suppresses the component's default action.                                                       |
-| Roving composites                   | Arrow keys move the single active tab stop and skip disabled items. `Tab` leaves the composite or dismisses an open popup and continues to the next page control.                                                           |
+| Button-like pressable controls      | `Enter` activates on keydown, `Space` activates on keyup, disabled controls do not activate, and caller cancellation still suppresses the component's default action.                                                       |
+| Checkbox and RadioGroupItem         | Native and `asChild` hosts activate with `Space`, not `Enter`. Radio-group arrows continue to move both focus and selection.                                                                                                |
+| Roving composites                   | Arrow keys move the single active tab stop and skip disabled items. Horizontal movement follows computed text direction; `Tab` leaves the composite or dismisses an open popup and continues to the next page control.      |
 | Menu, Dropdown, Menubar, and Select | Printable keys perform case-insensitive prefix matching against `textValue` (or rendered text), skip disabled items, wrap to the next match, and cycle when the same character is repeated. The buffer resets after 500 ms. |
 | Select                              | Typeahead works while either the closed trigger or open listbox has focus. Closed-trigger matches update the value; open-listbox matches move focus.                                                                        |
 | Accordion                           | Every enabled trigger remains in the page Tab sequence. Orientation arrows and Home/End provide optional direct navigation.                                                                                                 |
 | RadioGroup                          | Arrows skip disabled radios and move focus and selection.                                                                                                                                                                   |
 | ToggleGroup                         | Arrows move focus only; Enter or Space activates the focused toggle.                                                                                                                                                        |
 | ScrollArea                          | Its enabled scrollbar uses arrows for 40 CSS-pixel steps, PageUp/PageDown for one viewport, and Home/End for the boundaries.                                                                                                |
+
+Horizontal Slider arrows and Menubar submenu open/close arrows also follow the
+nearest computed text direction. ScrollArea arrows remain physical scrolling
+controls, so their left/right meaning does not mirror.
 
 Spaces typed after a typeahead prefix can match multiword values; a standalone
 `Space` remains an activation key. Typeahead only moves focus or selection. A
@@ -121,6 +126,10 @@ Menu-item links preserve native Enter navigation, while Space maps to one click.
 HoverCard is a non-modal interactive preview. Pointer opening does not move
 focus. Tab can enter its content from the trigger, Escape restores the trigger,
 and leaving its final control continues after the trigger.
+
+Uncontrolled Checkbox, RadioGroup, Switch, and Slider state returns to its
+declared default when the nearest native form resets. Controlled values remain
+owned by the caller.
 
 ### Standalone navigation menus
 
@@ -187,6 +196,11 @@ virtual table an accessible name and a bounded viewport. Keyboard row selection
 is handled only while the grid itself has focus; links, buttons, and form
 controls rendered inside cells retain their native click, focus, and keyboard
 behavior.
+
+Accordion items may be rendered as VirtualList or VirtualTable rows. Their
+roving-focus positions use the full dataset indices exposed by the virtual row,
+so navigation can scroll to and restore focus on an item outside the current
+mounted window.
 
 ## See also
 

@@ -116,9 +116,11 @@ export function ToggleGroup(props: ToggleGroupProps) {
   const currentIndexState = state(initialCurrentIndex);
   const currentIndexCandidate = currentIndexState();
   const currentIndex =
-    items[currentIndexCandidate] && !items[currentIndexCandidate]?.disabled
-      ? currentIndexCandidate
-      : firstEnabledCompositeIndex(items);
+    selectedIndex >= 0 && !items[selectedIndex]?.disabled
+      ? selectedIndex
+      : items[currentIndexCandidate] && !items[currentIndexCandidate]?.disabled
+        ? currentIndexCandidate
+        : firstEnabledCompositeIndex(items);
   const disabledItemIndexes = disabledIndexes(items);
   const rootContext: ToggleGroupRootContextValue = {
     groupId,

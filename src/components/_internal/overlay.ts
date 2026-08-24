@@ -14,7 +14,8 @@ export type OverlayPortal = {
 export type OverlayIdentity = object;
 
 export const OVERLAY_Z_INDEX = {
-  dropdown: 'var(--ak-z-dropdown, 1000)',
+  dropdown:
+    'max(var(--ak-z-dropdown, 1000), calc(var(--ak-z-modal, 1400) + 1))',
   modalBackdrop: 'var(--ak-z-modal-backdrop, 1300)',
   modal: 'var(--ak-z-modal, 1400)',
   popover: 'var(--ak-z-popover, 1500)',

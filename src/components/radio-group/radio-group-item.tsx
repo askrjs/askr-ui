@@ -1,7 +1,8 @@
 import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
-import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
+import { rovingFocus } from '@askrjs/askr/foundations/interactions';
+import { checkablePress } from '../_internal/checkable-press';
 import {
   compositeItemFocusProps,
   focusSelectedCollectionItem,
@@ -58,13 +59,12 @@ export function RadioGroupItem(
     },
   });
   const checked = root.value === value;
-  const interactionProps = pressable({
+  const interactionProps = checkablePress({
     disabled: isDisabled,
     onPress: () => {
       root.setValue(value);
       root.setCurrentIndex(itemIndex);
     },
-    isNativeButton: !asChild,
   });
   const itemFocusProps = nav.item(itemIndex);
   const focusRepairProps = compositeItemFocusProps();
@@ -111,6 +111,7 @@ export function RadioGroupItem(
     ref: refHandler,
     id: itemId,
     role: 'radio',
+    disabled: isDisabled && !asChild ? true : undefined,
     'aria-checked': checked ? 'true' : 'false',
     'data-slot': 'radio-group-item',
     'data-disabled': isDisabled ? 'true' : undefined,

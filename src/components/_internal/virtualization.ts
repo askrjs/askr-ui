@@ -262,20 +262,20 @@ export function resolveVirtualRetainedAnchorKey(
 }
 
 export function createVirtualAnchor(
+  key: string,
   visibleKeys: readonly string[],
   visibleStartIndex: number,
   scrollTop: number,
   rowHeight: number
 ): VirtualAnchor | null {
-  const key = visibleKeys[0];
-
-  if (!key || visibleStartIndex < 0) {
+  const anchorOffset = visibleKeys.indexOf(key);
+  if (anchorOffset < 0 || visibleStartIndex < 0) {
     return null;
   }
 
   return {
     key,
-    offset: scrollTop - visibleStartIndex * rowHeight,
+    offset: scrollTop - (visibleStartIndex + anchorOffset) * rowHeight,
   };
 }
 

@@ -765,6 +765,7 @@ function syncVirtualTableRows<Row>(
 
   if (anchorKey) {
     const anchor = createVirtualAnchor(
+      anchorKey,
       previousVisibleKeys,
       entry.visibleRange.visibleStartIndex,
       currentBodyScrollTop,

@@ -90,6 +90,46 @@ describe('Menubar - Behavior', () => {
     expect(document.body.textContent).toContain('Email');
   });
 
+  it('should mirror submenu open and close keys in RTL', async () => {
+    container = mount(
+      <div dir="rtl">
+        <Menubar>
+          <MenubarMenu value="file">
+            <MenubarTrigger>File</MenubarTrigger>
+            <MenubarPortal>
+              <MenubarContent>
+                <MenubarSub value="share">
+                  <MenubarSubTrigger>Share</MenubarSubTrigger>
+                  <MenubarSubContent>
+                    <MenubarItem>Email</MenubarItem>
+                  </MenubarSubContent>
+                </MenubarSub>
+              </MenubarContent>
+            </MenubarPortal>
+          </MenubarMenu>
+        </Menubar>
+      </div>
+    );
+    getButtonByText('File').click();
+    await flushPortalUpdates();
+    getButtonByText('Share').dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowLeft' })
+    );
+    await flushPortalUpdates();
+    expect(document.body.textContent).toContain('Email');
+
+    const subContent = Array.from(
+      document.body.querySelectorAll<HTMLElement>(
+        '[data-slot="menubar-content"]'
+      )
+    ).at(-1)!;
+    subContent.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowRight' })
+    );
+    await flushPortalUpdates();
+    expect(document.body.textContent).not.toContain('Email');
+  });
+
   it('should support keyboard opening and escape dismissal', async () => {
     container = mount(
       <Menubar>

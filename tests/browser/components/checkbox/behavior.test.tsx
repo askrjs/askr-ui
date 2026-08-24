@@ -140,30 +140,86 @@ describe('Checkbox - Behavior', () => {
     expect(refNode).toBe(div);
   });
 
-  it('should toggle an asChild host with Enter and Space', async () => {
+  it('should ignore Enter and toggle native and asChild hosts with Space', async () => {
+    const onNativeCheckedChange = vi.fn();
     const onCheckedChange = vi.fn();
     container = mount(
-      <Checkbox asChild onCheckedChange={onCheckedChange}>
-        <span>Remember me</span>
-      </Checkbox>
+      <div>
+        <Checkbox
+          data-testid="native-checkbox"
+          onCheckedChange={onNativeCheckedChange}
+        />
+        <Checkbox asChild onCheckedChange={onCheckedChange}>
+          <span>Remember me</span>
+        </Checkbox>
+      </div>
     );
 
+    let nativeCheckbox = container.querySelector(
+      '[data-testid="native-checkbox"]'
+    ) as HTMLInputElement;
+    nativeCheckbox.focus();
+    await userEvent.keyboard('{Enter}');
+    await flushUpdates();
+
+    nativeCheckbox = container.querySelector(
+      '[data-testid="native-checkbox"]'
+    ) as HTMLInputElement;
+    expect(nativeCheckbox.checked).toBe(false);
+    expect(onNativeCheckedChange).not.toHaveBeenCalled();
+
+    nativeCheckbox.focus();
+    await userEvent.keyboard(' ');
+    await flushUpdates();
+
+    nativeCheckbox = container.querySelector(
+      '[data-testid="native-checkbox"]'
+    ) as HTMLInputElement;
+    expect(nativeCheckbox.checked).toBe(true);
+    expect(onNativeCheckedChange.mock.calls).toEqual([[true]]);
+
     let checkbox = container.querySelector(
-      '[data-slot="checkbox"]'
+      '[data-slot="checkbox"]:not(input)'
     ) as HTMLElement;
     checkbox.focus();
     await userEvent.keyboard('{Enter}');
     await flushUpdates();
 
-    checkbox = container.querySelector('[data-slot="checkbox"]') as HTMLElement;
-    expect(checkbox.getAttribute('aria-checked')).toBe('true');
+    checkbox = container.querySelector(
+      '[data-slot="checkbox"]:not(input)'
+    ) as HTMLElement;
+    expect(checkbox.getAttribute('aria-checked')).toBe('false');
+    expect(onCheckedChange).not.toHaveBeenCalled();
 
     checkbox.focus();
     await userEvent.keyboard(' ');
     await flushUpdates();
 
-    checkbox = container.querySelector('[data-slot="checkbox"]') as HTMLElement;
-    expect(checkbox.getAttribute('aria-checked')).toBe('false');
+    checkbox = container.querySelector(
+      '[data-slot="checkbox"]:not(input)'
+    ) as HTMLElement;
+    expect(checkbox.getAttribute('aria-checked')).toBe('true');
+    expect(onCheckedChange.mock.calls).toEqual([[true]]);
+  });
+
+  it('should restore uncontrolled state when its native form resets', async () => {
+    const onCheckedChange = vi.fn();
+    container = mount(
+      <form>
+        <Checkbox defaultChecked={false} onCheckedChange={onCheckedChange} />
+      </form>
+    );
+    const form = container.querySelector('form') as HTMLFormElement;
+    let input = container.querySelector('input') as HTMLInputElement;
+
+    input.click();
+    await flushUpdates();
+    expect(input.checked).toBe(true);
+
+    form.reset();
+    await flushUpdates();
+    input = container.querySelector('input') as HTMLInputElement;
+    expect(input.checked).toBe(false);
     expect(onCheckedChange.mock.calls).toEqual([[true], [false]]);
   });
 

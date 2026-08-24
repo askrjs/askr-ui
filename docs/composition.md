@@ -43,6 +43,11 @@ The same portal structure applies to `AlertDialog`; use
 `@askrjs/themes/default`, both overlay variants already include the backdrop,
 blur, stacking, and animation treatment.
 
+Anchored menus and selects opened from a modal are stacked above that modal.
+Toasts remain independent notifications: their Escape handling is local to a
+focused toast and does not enter the modal dismissal stack or block backdrop
+dismissal.
+
 #### Backdrop customization
 
 Customize the shared theme contract rather than passing a competing class to
