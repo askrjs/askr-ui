@@ -177,6 +177,14 @@ function ToastRegistrationView(props: {
       entry.focusWasInside = true;
     }
     entry.node = node;
+    if (
+      node !== null &&
+      openState() &&
+      entry.timer === null &&
+      entry.remainingDuration === 0
+    ) {
+      armTimer(resolvedDuration);
+    }
   };
   const rootContext: ToastRootContextValue = {
     hostId: props.host.hostId,
