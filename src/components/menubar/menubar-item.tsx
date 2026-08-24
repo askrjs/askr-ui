@@ -33,6 +33,7 @@ import type {
   MenubarSubTriggerAsChildProps,
   MenubarSubTriggerProps,
 } from './menubar.types';
+import { resolveTextDirection } from '../_internal/direction';
 
 function MenubarSubScopeView(props: { children?: unknown }) {
   return <>{props.children}</>;
@@ -300,7 +301,9 @@ export function MenubarSubTrigger(
 
     interactionProps.onKeyDown?.(event);
 
-    if (!event.defaultPrevented && event.key === 'ArrowRight') {
+    const openKey =
+      resolveTextDirection(event) === 'rtl' ? 'ArrowLeft' : 'ArrowRight';
+    if (!event.defaultPrevented && event.key === openKey) {
       event.preventDefault();
       content.setCurrentIndex(sub.surfaceIndex);
       root.setOpenPath(sub.path);

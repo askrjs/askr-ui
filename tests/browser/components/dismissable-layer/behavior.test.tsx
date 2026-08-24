@@ -43,6 +43,37 @@ describe('DismissableLayer - Behavior', () => {
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
+  it('should let an unconsumed Escape reach unrelated document handlers', () => {
+    const globalEscape = vi.fn();
+    const onDismiss = vi.fn();
+    const handleGlobalKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') globalEscape();
+    };
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    try {
+      container = mount(
+        <DismissableLayer
+          onEscapeKeyDown={(event) => event.preventDefault()}
+          onDismiss={onDismiss}
+        >
+          <button>Layer control</button>
+        </DismissableLayer>
+      );
+      container.querySelector('button')?.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          bubbles: true,
+          cancelable: true,
+          key: 'Escape',
+        })
+      );
+
+      expect(onDismiss).not.toHaveBeenCalled();
+      expect(globalEscape).toHaveBeenCalledOnce();
+    } finally {
+      document.removeEventListener('keydown', handleGlobalKeyDown);
+    }
+  });
+
   it('should dismiss on outside pointer down', () => {
     const onDismiss = vi.fn();
 

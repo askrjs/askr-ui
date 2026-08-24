@@ -7,6 +7,7 @@ import {
   CollapsibleContent,
 } from '../../../../src/components/collapsible/collapsible';
 import { createIsland } from '@askrjs/askr/boot';
+import { state } from '@askrjs/askr';
 
 function mount(element: JSX.Element): HTMLElement {
   const container = document.createElement('div');
@@ -34,6 +35,33 @@ describe('Collapsible — Behavior', () => {
   });
 
   describe('State Management', () => {
+    it('should not transfer pending focus to a newly keyed disclosure', async () => {
+      function Fixture() {
+        const row = state('row-a');
+        return (
+          <Collapsible
+            key={row()}
+            open={false}
+            onOpenChange={() => row.set('row-b')}
+          >
+            <CollapsibleTrigger>{row()}</CollapsibleTrigger>
+            <CollapsibleContent>Content</CollapsibleContent>
+          </Collapsible>
+        );
+      }
+      container = mount(<Fixture />);
+      const first = container.querySelector('button') as HTMLButtonElement;
+      first.focus();
+      first.click();
+      await Promise.resolve();
+
+      const replacement = container.querySelector(
+        'button'
+      ) as HTMLButtonElement;
+      expect(replacement.textContent).toBe('row-b');
+      expect(document.activeElement).not.toBe(replacement);
+    });
+
     it('should start closed given no defaultOpen', () => {
       container = mount(
         <Collapsible>

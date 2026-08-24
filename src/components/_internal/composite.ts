@@ -3,6 +3,7 @@ import { createCollection } from '@askrjs/askr/foundations/structures';
 
 export type CompositeCollectionMetadata = {
   index: number;
+  setSize?: number;
   disabled: boolean;
   value?: string;
   text?: string;
@@ -162,6 +163,7 @@ function isSameCompositeMetadata(
 ): boolean {
   return (
     left.index === right.index &&
+    left.setSize === right.setSize &&
     left.disabled === right.disabled &&
     left.value === right.value &&
     left.text === right.text

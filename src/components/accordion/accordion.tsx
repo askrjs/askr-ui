@@ -7,11 +7,11 @@ import {
   compositeItemFocusProps,
   focusSelectedCollectionItem,
   repairFocusForDisabledItem,
+  restorePendingCollectionItemFocus,
+  type PendingCollectionFocus,
 } from '../_internal/focus';
 import { runCancelablePress } from '../_internal/press';
 import {
-  disabledIndexes,
-  firstEnabledCompositeIndex,
   getCompositeCollectionItems,
   observeCompositeCollection,
   registerCompositeNode,
@@ -43,6 +43,75 @@ import {
   readAccordionRootContext,
   type AccordionRootContextValue,
 } from './accordion.shared';
+
+function resolveVirtualAccordionPlacement(node: HTMLElement): {
+  index: number;
+  setSize?: number;
+} | null {
+  const listRow = node.closest<HTMLElement>(
+    '[data-slot="virtual-list-row"][data-index]'
+  );
+  if (listRow) {
+    const index = Number(listRow.dataset.index);
+    const setSize = Number(listRow.getAttribute('aria-setsize'));
+    return Number.isInteger(index)
+      ? { index, setSize: Number.isInteger(setSize) ? setSize : undefined }
+      : null;
+  }
+
+  const tableRow = node.closest<HTMLElement>(
+    '[data-slot="virtual-table-row"][data-row-index]'
+  );
+  if (!tableRow) {
+    return null;
+  }
+  const index = Number(tableRow.dataset.rowIndex);
+  const rowCount = Number(
+    tableRow
+      .closest('[data-slot="virtual-table"]')
+      ?.querySelector('[role="grid"]')
+      ?.getAttribute('aria-rowcount')
+  );
+  return Number.isInteger(index)
+    ? {
+        index,
+        setSize: Number.isInteger(rowCount)
+          ? Math.max(0, rowCount - 1)
+          : undefined,
+      }
+    : null;
+}
+
+function focusAccordionItem(
+  collection: AccordionRootContextValue['collection'],
+  pendingFocus: PendingCollectionFocus,
+  index: number
+) {
+  if (focusSelectedCollectionItem(collection, index)) {
+    pendingFocus.index = null;
+    return;
+  }
+
+  pendingFocus.index = index;
+  const active =
+    document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+  const row = active?.closest<HTMLElement>(
+    '[data-slot="virtual-list-row"], [data-slot="virtual-table-row"]'
+  );
+  const viewport = row?.closest<HTMLElement>(
+    '[data-slot="virtual-list"], [data-slot="virtual-table"]'
+  );
+  const rowHeight = Number(
+    row?.getAttribute('data-askr-virtual-list-row-height') ??
+      row?.getAttribute('data-askr-virtual-table-row-height')
+  );
+  if (viewport && Number.isFinite(rowHeight) && rowHeight > 0) {
+    viewport.scrollTop = index * rowHeight;
+    viewport.dispatchEvent(new Event('scroll'));
+  }
+}
 
 /**
  * Renders a part of `accordion`.
@@ -143,19 +212,28 @@ export function Accordion(props: AccordionProps) {
     (item): item is typeof item & { value: string } =>
       typeof item.value === 'string'
   );
-  const currentOpenIndex = items.findIndex((item) =>
+  const currentOpenItem = items.find((item) =>
     isDisclosureValueOpen(type, valueState(), item.value)
   );
   const currentIndexState = state(0);
-  const fallbackIndex = firstEnabledCompositeIndex(items);
+  const fallbackItem = items.find((item) => !item.disabled);
+  const fallbackIndex = fallbackItem?.index ?? 0;
   const candidateIndex = currentIndexState();
+  const candidateItem = items.find((item) => item.index === candidateIndex);
   const currentIndex =
-    currentOpenIndex >= 0 && !items[currentOpenIndex]?.disabled
-      ? currentOpenIndex
-      : items[candidateIndex] && !items[candidateIndex]?.disabled
+    currentOpenItem && !currentOpenItem.disabled
+      ? currentOpenItem.index
+      : candidateItem && !candidateItem.disabled
         ? candidateIndex
         : fallbackIndex;
-  const disabledIndexList = disabledIndexes(items);
+  const disabledIndexList = items
+    .filter((item) => item.disabled)
+    .map((item) => item.index);
+  const itemCount = items.reduce(
+    (count, item) => Math.max(count, item.setSize ?? item.index + 1),
+    items.length
+  );
+  const pendingFocus = state<PendingCollectionFocus>({ index: null })();
   const currentValue = valueState();
   const setValue: AccordionRootContextValue['setValue'] = (nextValue) => {
     if (type === 'multiple') {
@@ -180,8 +258,9 @@ export function Accordion(props: AccordionProps) {
     currentIndex,
     setCurrentIndex: currentIndexState.set,
     disabledIndexes: disabledIndexList,
-    itemCount: items.length,
+    itemCount,
     collection,
+    pendingFocus,
   };
   const renderContext = createAccordionRenderContext();
   const finalProps = mergeProps(rest, {
@@ -192,13 +271,13 @@ export function Accordion(props: AccordionProps) {
   });
   const nav = rovingFocus({
     currentIndex,
-    itemCount: Math.max(items.length, 1),
+    itemCount: Math.max(itemCount, 1),
     orientation,
     loop,
     isDisabled: (index) => disabledIndexList.includes(index),
     onNavigate: (index) => {
+      focusAccordionItem(collection, pendingFocus, index);
       currentIndexState.set(index);
-      focusSelectedCollectionItem(collection, index);
     },
   });
   const mergedProps = mergeProps(finalProps, nav.container);
@@ -219,7 +298,13 @@ export function AccordionItem(props: AccordionItemProps): JSX.Element {
   const { children, disabled = false, ref, value, ...rest } = props;
   const root = readAccordionRootContext();
   const renderContext = readAccordionRenderContext();
-  const itemIndex = renderContext.claimItemIndex();
+  const placement = state<{ index: number; setSize?: number }>({
+    index: -1,
+  })();
+  if (placement.index < 0) {
+    placement.index = renderContext.claimItemIndex();
+  }
+  const itemIndex = placement.index;
   const itemId = resolvePartId(root.accordionId, `item-${value}`);
   const triggerId = resolvePartId(itemId, 'trigger');
   const contentId = resolvePartId(itemId, 'content');
@@ -228,6 +313,7 @@ export function AccordionItem(props: AccordionItemProps): JSX.Element {
   const itemContext = {
     accordionId: root.accordionId,
     itemIndex,
+    itemSetSize: placement.setSize,
     itemValue: value,
     itemDisabled,
     itemId,
@@ -235,7 +321,16 @@ export function AccordionItem(props: AccordionItemProps): JSX.Element {
     contentId,
   };
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: composeRefs(ref, (node: HTMLDivElement | null) => {
+      if (!node) {
+        return;
+      }
+      const nextPlacement = resolveVirtualAccordionPlacement(node);
+      if (nextPlacement) {
+        placement.index = nextPlacement.index;
+        placement.setSize = nextPlacement.setSize;
+      }
+    }),
     id: itemId,
     'data-slot': 'accordion-item',
     'data-state': open ? 'open' : 'closed',
@@ -307,8 +402,8 @@ export function AccordionTrigger(
     loop: root.loop,
     isDisabled: (index) => root.disabledIndexes.includes(index),
     onNavigate: (index) => {
+      focusAccordionItem(collection, root.pendingFocus, index);
       root.setCurrentIndex(index);
-      focusSelectedCollectionItem(collection, index);
     },
   });
   const open = isDisclosureValueOpen(root.type, root.value, item.itemValue);
@@ -343,12 +438,20 @@ export function AccordionTrigger(
         | null
         | undefined,
       (node: HTMLElement | null) => {
+        const nextPlacement = node
+          ? resolveVirtualAccordionPlacement(node)
+          : null;
+        if (nextPlacement) {
+          item.itemIndex = nextPlacement.index;
+          item.itemSetSize = nextPlacement.setSize;
+        }
         registerCompositeNode(
           item.triggerId,
           collection,
           node,
           {
             index: item.itemIndex,
+            setSize: item.itemSetSize,
             disabled: isDisabled,
             value: item.itemValue,
           },
@@ -362,6 +465,11 @@ export function AccordionTrigger(
           node,
           setCurrentIndex: root.setCurrentIndex,
         });
+        restorePendingCollectionItemFocus(
+          root.pendingFocus,
+          item.itemIndex,
+          node
+        );
       }
     ),
     id: item.triggerId,

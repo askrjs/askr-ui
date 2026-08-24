@@ -1,5 +1,6 @@
 import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { state } from '@askrjs/askr';
 import { flush as flushScheduler } from '@askrjs/askr/testing';
 import {
   HoverCard,
@@ -195,6 +196,39 @@ describe('HoverCard - Behavior', () => {
     expect(
       document.body.querySelector('[data-slot="hover-card-content"]')
     ).toBeNull();
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it('should cancel the original pending timer after an unrelated re-render', async () => {
+    vi.useFakeTimers();
+    let rerender = () => undefined;
+    const onOpenChange = vi.fn();
+    function Fixture() {
+      const revision = state(0);
+      rerender = () => revision.set((value) => value + 1);
+      return (
+        <div data-revision={revision()}>
+          <HoverCard openDelay={100} onOpenChange={onOpenChange}>
+            <HoverCardTrigger>Preview</HoverCardTrigger>
+            <HoverCardContent>Details</HoverCardContent>
+          </HoverCard>
+        </div>
+      );
+    }
+    container = mount(<Fixture />);
+    await userEvent.hover(
+      container.querySelector('[data-slot="hover-card-trigger"]') as HTMLElement
+    );
+    rerender();
+    await flushUpdates();
+    await userEvent.hover(getPointerExitTarget());
+    await advanceHoverCardTimers(110);
+
+    expect(
+      container
+        .querySelector('[data-slot="hover-card-trigger"]')
+        ?.getAttribute('data-state')
+    ).toBe('closed');
     expect(onOpenChange).not.toHaveBeenCalled();
   });
 

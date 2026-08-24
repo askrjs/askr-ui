@@ -1,5 +1,6 @@
 import { defineScope, readScope } from '@askrjs/askr';
 import type { getCompositeCollection } from '../_internal/composite';
+import type { PendingCollectionFocus } from '../_internal/focus';
 import type { AccordionOrientation } from './accordion.types';
 
 /** Shape of the Accordion Root Context Value. */
@@ -16,6 +17,7 @@ export type AccordionRootContextValue = {
   disabledIndexes: number[];
   itemCount: number;
   collection: ReturnType<typeof getCompositeCollection>;
+  pendingFocus: PendingCollectionFocus;
 };
 
 /** Shape of the Accordion Render Context Value. */
@@ -27,6 +29,7 @@ export type AccordionRenderContextValue = {
 export type AccordionItemContextValue = {
   accordionId: string;
   itemIndex: number;
+  itemSetSize?: number;
   itemValue: string;
   itemDisabled: boolean;
   itemId: string;

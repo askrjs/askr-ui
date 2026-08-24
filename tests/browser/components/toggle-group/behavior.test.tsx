@@ -499,4 +499,27 @@ describe('ToggleGroup - Behavior', () => {
 
     expect(document.activeElement).toBe(getToggleByText(container, 'Right'));
   });
+
+  it('should move the roving tab stop with a controlled value change', async () => {
+    let selectRight = () => undefined;
+    function Fixture() {
+      const value = state('left');
+      selectRight = () => value.set('right');
+      return (
+        <ToggleGroup value={value()} onValueChange={value.set}>
+          <ToggleGroupItem value="left">Left</ToggleGroupItem>
+          <ToggleGroupItem value="right">Right</ToggleGroupItem>
+        </ToggleGroup>
+      );
+    }
+    container = mount(<Fixture />);
+    await flushUpdates();
+    selectRight();
+    await flushUpdates();
+
+    const items = container.querySelectorAll('[data-slot="toggle-group-item"]');
+    expect(items[0]?.getAttribute('tabindex')).toBe('-1');
+    expect(items[1]?.getAttribute('tabindex')).toBe('0');
+    expect(items[1]?.getAttribute('aria-pressed')).toBe('true');
+  });
 });

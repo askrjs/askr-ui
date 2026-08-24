@@ -174,6 +174,27 @@ describe('Switch - Behavior', () => {
     expect(onCheckedChange.mock.calls).toEqual([[true], [false]]);
   });
 
+  it('should restore uncontrolled state when its native form resets', async () => {
+    const onCheckedChange = vi.fn();
+    container = mount(
+      <form>
+        <Switch defaultChecked={false} onCheckedChange={onCheckedChange}>
+          Power
+        </Switch>
+      </form>
+    );
+    let host = container.querySelector('[role="switch"]') as HTMLButtonElement;
+    host.click();
+    await flushUpdates();
+    expect(host.getAttribute('aria-checked')).toBe('true');
+
+    (container.querySelector('form') as HTMLFormElement).reset();
+    await flushUpdates();
+    host = container.querySelector('[role="switch"]') as HTMLButtonElement;
+    expect(host.getAttribute('aria-checked')).toBe('false');
+    expect(onCheckedChange.mock.calls).toEqual([[true], [false]]);
+  });
+
   it('should apply disabled semantics to asChild hosts', () => {
     const onCheckedChange = vi.fn();
 
