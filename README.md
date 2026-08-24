@@ -74,3 +74,18 @@ The package exports components directly from the root and per-component subpaths
 Prefer the per-component subpaths when you want a smaller surface area.
 
 For the full surface and composition examples, start with the docs above.
+
+## Themes catalog boundary
+
+`@askrjs/themes` also publishes styling-only compatibility anatomy for Tabs,
+Combobox, Calendar/DatePicker, Command, NavigationMenu, Carousel,
+ResizablePanelGroup, and InputOTP. Those names are not `@askrjs/ui`
+primitives and do not provide widget state, keyboard interaction, focus
+management, or ARIA relationships. Applications must not treat those themed
+slots as behavioral widgets.
+
+When Askr adds behavior for one of these families, the implementation belongs
+in this package first and must meet the same controlled/uncontrolled state,
+keyboard, focus, disabled, RTL, forced-colors, misuse, determinism, and browser
+coverage requirements as every existing public family. Themes may then compose
+that public primitive rather than reproducing its state.

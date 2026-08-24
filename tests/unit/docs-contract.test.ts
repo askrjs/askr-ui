@@ -183,4 +183,26 @@ describe('Docs contract', () => {
       ).toBe(true);
     }
   });
+
+  it('should document styling-only themes catalog families as outside the behavioral surface', () => {
+    const readme = readFileSync(join(process.cwd(), 'README.md'), 'utf8');
+
+    for (const family of [
+      'Tabs',
+      'Combobox',
+      'Calendar/DatePicker',
+      'Command',
+      'NavigationMenu',
+      'Carousel',
+      'ResizablePanelGroup',
+      'InputOTP',
+    ]) {
+      expect(readme, family).toContain(family);
+    }
+
+    expect(readme).toContain('styling-only compatibility anatomy');
+    expect(readme).toContain('do not provide widget state');
+    expect(readme).toContain('Themes may then compose');
+    expect(readme).toContain('rather than reproducing its state');
+  });
 });
