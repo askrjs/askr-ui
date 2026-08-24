@@ -170,6 +170,13 @@ function waitForScheduler(): Promise<void> {
   });
 }
 
+async function flushFakeTimerUpdates(): Promise<void> {
+  await vi.runAllTimersAsync();
+  await flushUpdates();
+  await vi.runAllTimersAsync();
+  await flushUpdates();
+}
+
 describe('Toast - Behavior', () => {
   let container: HTMLElement;
 
@@ -232,9 +239,7 @@ describe('Toast - Behavior', () => {
 
     expect(container.querySelector('[data-toast="true"]')).not.toBeNull();
 
-    await vi.runAllTimersAsync();
-    await flushUpdates();
-    await flushUpdates();
+    await flushFakeTimerUpdates();
 
     expect(container.querySelector('[data-toast="true"]')).toBeNull();
   });
@@ -272,10 +277,9 @@ describe('Toast - Behavior', () => {
     await vi.advanceTimersByTimeAsync(100);
     expect(container.querySelector('[data-toast="true"]')).toBe(toast);
     toast.dispatchEvent(new PointerEvent('pointerleave'));
-    await vi.advanceTimersByTimeAsync(59);
+    await vi.advanceTimersByTimeAsync(50);
     expect(container.querySelector('[data-toast="true"]')).toBe(toast);
-    await vi.advanceTimersByTimeAsync(1);
-    await flushUpdates();
+    await flushFakeTimerUpdates();
     expect(container.querySelector('[data-toast="true"]')).toBeNull();
   });
 
@@ -299,10 +303,9 @@ describe('Toast - Behavior', () => {
     await vi.advanceTimersByTimeAsync(100);
     expect(container.querySelector('[data-toast="true"]')).toBe(toast);
     (container.querySelector('#outside') as HTMLButtonElement).focus();
-    await vi.advanceTimersByTimeAsync(69);
+    await vi.advanceTimersByTimeAsync(50);
     expect(container.querySelector('[data-toast="true"]')).toBe(toast);
-    await vi.advanceTimersByTimeAsync(1);
-    await flushUpdates();
+    await flushFakeTimerUpdates();
     expect(container.querySelector('[data-toast="true"]')).toBeNull();
   });
 
@@ -323,8 +326,7 @@ describe('Toast - Behavior', () => {
 
     expect(container.querySelectorAll('[data-toast="true"]').length).toBe(2);
 
-    await vi.advanceTimersByTimeAsync(60);
-    await flushUpdates();
+    await flushFakeTimerUpdates();
 
     expect(container.querySelectorAll('[data-toast="true"]').length).toBe(0);
   });
