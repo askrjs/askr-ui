@@ -12,7 +12,7 @@ function sourceFiles(directory: string): string[] {
 
 describe('Component style contract', () => {
   it('should not emit or mutate inline styles', () => {
-    const components = path.resolve(__dirname, '../../src/components');
+    const components = path.resolve(__dirname, '../../../src/components');
     const violations = sourceFiles(components).flatMap((file) => {
       const relative = path.relative(components, file);
       return fs

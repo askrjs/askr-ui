@@ -8,7 +8,9 @@ theme composition belong in `@askrjs/themes`.
 - `src/components/<family>/index.ts` is the public barrel for a component
   family.
 - `src/components/_internal/` contains shared implementation helpers only.
-- `tests/unit/` protects exports, package structure, docs, and type contracts.
+- `tests/unit/` covers focused runtime, SSR, and type-level behavior.
+- `tests/integrity/` protects exports, package structure, docs, source layout,
+  benchmark coverage, and test-suite conventions.
 - `tests/jsdom/` covers DOM-backed internal behavior.
 - `tests/browser/components/` owns public behavior, accessibility, and
   determinism coverage.

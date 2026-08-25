@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
-import * as api from '../../src';
+import * as api from '../../../src';
 
 const FORBIDDEN_NAME = /^(?:use[A-Z].*|.*Provider|defineContext|readContext)$/;
 const FORBIDDEN_TEXT =
