@@ -12,8 +12,8 @@
  * - role: 'checkbox' (when not native input)
  *
  * ## Keyboard Support
- * - Enter: Activates checkbox (on non-input elements)
  * - Space: Activates checkbox
+ * - Enter: Does not activate checkbox
  *
  * ## Focus Management
  * - Checkbox is focusable when not disabled
@@ -43,10 +43,10 @@ export const CHECKBOX_A11Y_CONTRACT = {
   /**
    * Keyboard activation keys
    *
-   * Both Enter and Space must activate checkbox.
-   * Native inputs get this from host semantics. The `asChild` path applies it.
+   * Space activates checkbox. Enter retains native checkbox behavior and does
+   * not toggle the checked state.
    */
-  KEYBOARD_ACTIVATION: ['Enter', 'Space'] as const,
+  KEYBOARD_ACTIVATION: ['Space'] as const,
 
   /**
    * Checked state attribute

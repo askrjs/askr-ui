@@ -206,4 +206,30 @@ describe('Menu - Behavior', () => {
 
     expect(document.activeElement?.textContent).toBe('Three');
   });
+  it('should reverse horizontal arrow navigation under dir="rtl"', async () => {
+    container = mount(
+      <div dir="rtl">
+        <Menu orientation="horizontal" loop={false}>
+          <MenuContent>
+            <MenuItem>One</MenuItem>
+            <MenuItem>Two</MenuItem>
+            <MenuItem>Three</MenuItem>
+          </MenuContent>
+        </Menu>
+      </div>
+    );
+    await flushUpdates();
+
+    const items = Array.from(
+      container.querySelectorAll<HTMLElement>('[role="menuitem"]')
+    );
+    items[0]?.focus();
+    await userEvent.keyboard('{ArrowLeft}');
+    await flushUpdates();
+    expect(document.activeElement).toBe(items[1]);
+
+    await userEvent.keyboard('{ArrowRight}');
+    await flushUpdates();
+    expect(document.activeElement).toBe(items[0]);
+  });
 });

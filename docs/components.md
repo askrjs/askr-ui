@@ -96,17 +96,17 @@ clamping alone cannot make oversized content fit.
 Keyboard behavior follows the semantic role of each public component and is
 preserved through `asChild` composition.
 
-| Surface                             | Keyboard contract                                                                                                                                                                                                           |
-| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Button-like pressable controls      | `Enter` activates on keydown, `Space` activates on keyup, disabled controls do not activate, and caller cancellation still suppresses the component's default action.                                                       |
-| Checkbox and RadioGroupItem         | Native and `asChild` hosts activate with `Space`, not `Enter`. Radio-group arrows continue to move both focus and selection.                                                                                                |
-| Roving composites                   | Arrow keys move the single active tab stop and skip disabled items. Horizontal movement follows computed text direction; `Tab` leaves the composite or dismisses an open popup and continues to the next page control.      |
-| Menu, Dropdown, Menubar, and Select | Printable keys perform case-insensitive prefix matching against `textValue` (or rendered text), skip disabled items, wrap to the next match, and cycle when the same character is repeated. The buffer resets after 500 ms. |
-| Select                              | Typeahead works while either the closed trigger or open listbox has focus. Closed-trigger matches update the value; open-listbox matches move focus.                                                                        |
-| Accordion                           | Every enabled trigger remains in the page Tab sequence. Orientation arrows and Home/End provide optional direct navigation.                                                                                                 |
-| RadioGroup                          | Arrows skip disabled radios and move focus and selection.                                                                                                                                                                   |
-| ToggleGroup                         | Arrows move focus only; Enter or Space activates the focused toggle.                                                                                                                                                        |
-| ScrollArea                          | Its enabled scrollbar uses arrows for 40 CSS-pixel steps, PageUp/PageDown for one viewport, and Home/End for the boundaries.                                                                                                |
+| Surface                              | Keyboard contract                                                                                                                                                                                                           |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Button-like pressable controls       | `Enter` activates on keydown, `Space` activates on keyup, disabled controls do not activate, and caller cancellation still suppresses the component's default action.                                                       |
+| Checkbox, Switch, and RadioGroupItem | Native and `asChild` hosts activate with `Space`, not `Enter`. Radio-group arrows continue to move both focus and selection.                                                                                                |
+| Roving composites                    | Arrow keys move the single active tab stop and skip disabled items. Horizontal movement follows computed text direction; `Tab` leaves the composite or dismisses an open popup and continues to the next page control.      |
+| Menu, Dropdown, Menubar, and Select  | Printable keys perform case-insensitive prefix matching against `textValue` (or rendered text), skip disabled items, wrap to the next match, and cycle when the same character is repeated. The buffer resets after 500 ms. |
+| Select                               | Typeahead works while either the closed trigger or open listbox has focus. Closed-trigger matches update the value; open-listbox matches move focus.                                                                        |
+| Accordion                            | Every enabled trigger remains in the page Tab sequence. Orientation arrows and Home/End provide optional direct navigation.                                                                                                 |
+| RadioGroup                           | Arrows skip disabled radios and move focus and selection.                                                                                                                                                                   |
+| ToggleGroup                          | Arrows move focus only; Enter or Space activates the focused toggle.                                                                                                                                                        |
+| ScrollArea                           | Its enabled scrollbar uses arrows for 40 CSS-pixel steps, PageUp/PageDown for one viewport, and Home/End for the boundaries.                                                                                                |
 
 Horizontal Slider arrows and Menubar submenu open/close arrows also follow the
 nearest computed text direction. ScrollArea arrows remain physical scrolling
@@ -127,8 +127,8 @@ HoverCard is a non-modal interactive preview. Pointer opening does not move
 focus. Tab can enter its content from the trigger, Escape restores the trigger,
 and leaving its final control continues after the trigger.
 
-Uncontrolled Checkbox, RadioGroup, Switch, and Slider state returns to its
-declared default when the nearest native form resets. Controlled values remain
+Uncontrolled Checkbox, RadioGroup, Select, Switch, and Slider state returns to
+its declared default when the nearest native form resets. Controlled values remain
 owned by the caller.
 
 ### Standalone navigation menus

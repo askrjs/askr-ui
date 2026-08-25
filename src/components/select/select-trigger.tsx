@@ -2,7 +2,7 @@ import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
-import { getOverlayNodes } from '../_internal/overlay';
+import { registerOverlayNode } from '../_internal/overlay';
 import { runCancelablePress } from '../_internal/press';
 import { readSelectRootContext } from './select.shared';
 import type {
@@ -36,7 +36,7 @@ export function SelectTrigger(
     ...rest
   } = props;
   const root = readSelectRootContext();
-  const overlayNodes = getOverlayNodes(root.overlayIdentity);
+  const overlayNodeOwner = {};
   const isDisabled = root.disabled || disabled;
   const interactionProps = pressable({
     disabled: isDisabled,
@@ -82,7 +82,13 @@ export function SelectTrigger(
         | null
         | undefined,
       (node: HTMLElement | null) => {
-        overlayNodes.trigger = node;
+        registerOverlayNode(
+          root.overlayIdentity,
+          'trigger',
+          node,
+          overlayNodeOwner
+        );
+        root.bindFormReset(node);
       }
     ),
     'aria-haspopup': 'listbox',

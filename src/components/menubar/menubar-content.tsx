@@ -1,15 +1,17 @@
 import { getSignal, state } from '@askrjs/askr';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
-import { rovingFocus } from '@askrjs/askr/foundations/interactions';
+import { rovingFocus } from '../_internal/roving-focus';
 import { DismissableLayer } from '../dismissable-layer';
 import { FocusScope } from '../focus-scope';
 import {
+  claimOpenAutoFocus,
   dismissPopupWithTab,
   focusCollectionItemWithRestore,
   restorePendingCollectionItemFocus,
   type PendingCollectionFocus,
 } from '../_internal/focus';
+import { VirtualCompositeOwnerContext } from '../_internal/virtual-composite';
 import { pathIsOpen } from '../_internal/hierarchical-menu';
 import {
   getCompositeCollection,
@@ -25,6 +27,8 @@ import {
   getOverlayNodes,
   OVERLAY_Z_INDEX,
   primeOverlayPosition,
+  registerOverlayNode,
+  setOverlayStackActive,
   syncOverlayPosition,
 } from '../_internal/overlay';
 import {
@@ -69,10 +73,11 @@ function renderMenubarSurfaceContent(
     sideOffset = 0,
     ...rest
   } = props;
+  const cleanupSignal = getSignal();
   const currentIndexState = state(0);
   const typeaheadIdentity = state<object>({})();
   const pendingFocus = state<PendingCollectionFocus>({ index: null })();
-  registerTypeaheadCleanup(typeaheadIdentity, getSignal());
+  registerTypeaheadCleanup(typeaheadIdentity, cleanupSignal);
   const setCurrentIndex = (index: number) => {
     if (currentIndexState() !== index) {
       currentIndexState.set(index);
@@ -84,11 +89,16 @@ function renderMenubarSurfaceContent(
   };
   function handleContentTypeaheadKeyDown(event: KeyboardEvent) {
     const liveState = resolveMenubarContentState(contentContext);
+    const currentItemIndex = liveState.items.findIndex(
+      (item) => item.index === liveState.currentIndex
+    );
 
     return handleTypeaheadKeyDown(typeaheadIdentity, event, {
-      currentIndex: liveState.currentIndex,
+      currentIndex: currentItemIndex,
       items: liveState.items,
-      onMatch: (index) => {
+      onMatch: (matchIndex) => {
+        const index = liveState.items[matchIndex]?.index;
+        if (index === undefined) return;
         contentContext.setCurrentIndex(index);
         contentContext.focusItem(index);
       },
@@ -118,10 +128,13 @@ function renderMenubarSurfaceContent(
     return null;
   }
 
-  const { items, currentIndex, disabledItemIndexes } =
+  const { currentIndex, disabledItemIndexes, itemCount } =
     resolveMenubarContentState(contentContext);
   const open = pathIsOpen(root.openPath, contentContext.path);
+  claimOpenAutoFocus(contentContext.overlayIdentity, open, null);
+  setOverlayStackActive(contentContext.overlayIdentity, open, cleanupSignal);
   const overlayNodes = getOverlayNodes(contentContext.overlayIdentity);
+  const overlayNodeOwner = {};
 
   if (open) {
     primeOverlayPosition(
@@ -133,7 +146,7 @@ function renderMenubarSurfaceContent(
 
   const nav = rovingFocus({
     currentIndex,
-    itemCount: Math.max(items.length, 1),
+    itemCount: Math.max(itemCount, 1),
     orientation: 'vertical',
     loop: true,
     isDisabled: (index) => disabledItemIndexes.includes(index),
@@ -143,7 +156,20 @@ function renderMenubarSurfaceContent(
     },
   });
   const setNode = (node: HTMLElement | null) => {
-    overlayNodes.content = node;
+    registerOverlayNode(
+      contentContext.overlayIdentity,
+      'content',
+      node,
+      overlayNodeOwner
+    );
+    if (!node) {
+      registerOverlayNode(
+        contentContext.overlayIdentity,
+        'trigger',
+        null,
+        overlayNodeOwner
+      );
+    }
     const ensureTriggerRegistered = () => {
       if (overlayNodes.trigger) {
         return overlayNodes.trigger;
@@ -152,7 +178,12 @@ function renderMenubarSurfaceContent(
       const fallbackTrigger = document.getElementById(contentContext.triggerId);
 
       if (fallbackTrigger) {
-        overlayNodes.trigger = fallbackTrigger as HTMLElement;
+        registerOverlayNode(
+          contentContext.overlayIdentity,
+          'trigger',
+          fallbackTrigger as HTMLElement,
+          overlayNodeOwner
+        );
       }
 
       return overlayNodes.trigger;
@@ -203,7 +234,7 @@ function renderMenubarSurfaceContent(
       clearOverlayPosition(contentContext.overlayIdentity);
     }
 
-    if (node && open) {
+    if (claimOpenAutoFocus(contentContext.overlayIdentity, open, node)) {
       queueMicrotask(() => {
         queueMicrotask(() => {
           if (
@@ -284,7 +315,6 @@ function renderMenubarSurfaceContent(
         ),
         () => {
           root.setOpenPath([]);
-          queueMicrotask(root.syncPortals);
         }
       );
     },
@@ -293,23 +323,25 @@ function renderMenubarSurfaceContent(
     <Presence present={forceMount || open}>
       <MenubarContentContext value={contentContext}>
         <MenubarContentRenderContext value={runtimeRenderContext}>
-          <FocusScope restoreFocus>
-            <DismissableLayer
-              onDismiss={() => {
-                root.setOpenPath(contentContext.path.slice(0, -1));
-              }}
-            >
-              {asChild ? (
-                <Slot
-                  asChild
-                  {...finalProps}
-                  children={children as JSX.Element}
-                />
-              ) : (
-                <div {...finalProps}>{children}</div>
-              )}
-            </DismissableLayer>
-          </FocusScope>
+          <VirtualCompositeOwnerContext value>
+            <FocusScope autoFocus={false} restoreFocus>
+              <DismissableLayer
+                onDismiss={() => {
+                  root.setOpenPath(contentContext.path.slice(0, -1));
+                }}
+              >
+                {asChild ? (
+                  <Slot
+                    asChild
+                    {...finalProps}
+                    children={children as JSX.Element}
+                  />
+                ) : (
+                  <div {...finalProps}>{children}</div>
+                )}
+              </DismissableLayer>
+            </FocusScope>
+          </VirtualCompositeOwnerContext>
         </MenubarContentRenderContext>
       </MenubarContentContext>
     </Presence>

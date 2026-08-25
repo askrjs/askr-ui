@@ -1,8 +1,11 @@
 import { defineScope, readScope } from '@askrjs/askr';
 import type { ToggleGroupOrientation } from './toggle-group.types';
+import { readVirtualCompositeIdentity } from '../_internal/virtual-composite';
 
 /** Toggle Group Root Item. */
 export type ToggleGroupRootItem = {
+  index: number;
+  setSize?: number;
   value: string;
   disabled: boolean;
 };
@@ -22,12 +25,16 @@ export type ToggleGroupRootContextValue = {
   currentIndex: number;
   setCurrentIndex: (index: number) => void;
   items: ToggleGroupRootItem[];
+  itemCount: number;
   disabledItemIndexes: number[];
+  focusItem: (index: number) => void;
+  restoreItemFocus: (index: number, node: HTMLElement | null) => void;
 };
 
 /** Shape of the Toggle Group Render Context Value. */
 export type ToggleGroupRenderContextValue = {
   claimItemIndex: () => number;
+  virtualIdentity: string | null;
 };
 
 export const ToggleGroupRootContext =
@@ -69,6 +76,7 @@ export function createToggleGroupRenderContext(): ToggleGroupRenderContextValue 
   let itemIndex = 0;
 
   return {
+    virtualIdentity: readVirtualCompositeIdentity(),
     claimItemIndex: () => itemIndex++,
   };
 }

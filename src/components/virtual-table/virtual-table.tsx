@@ -24,6 +24,13 @@ import {
   removeDynamicStyleRuleWhenUnused,
   setDynamicStyleRule,
 } from '../_internal/dynamic-style';
+import {
+  extendVirtualCompositeIdentity,
+  readVirtualCompositeIdentity,
+  readVirtualCompositeOwner,
+  type VirtualCompositeScopeValue,
+  VirtualCompositeIdentityContext,
+} from '../_internal/virtual-composite';
 import type {
   VirtualTableApi,
   VirtualTableAsChildProps,
@@ -152,6 +159,7 @@ type VirtualTableEntry<Row> = {
   rowsRef: readonly Row[] | null;
   keys: string[];
   keyIndexMap: Map<string, number>;
+  placements: Map<string, VirtualCompositeScopeValue>;
   pendingScrollTop: number | null;
   pendingCommitFrame: number | null;
   resizeCommitFrame: number | null;
@@ -174,6 +182,40 @@ type VirtualTableEntry<Row> = {
   nextLayoutRules: Map<string, string>;
   layoutNonce: string | undefined;
 };
+
+function resolveVirtualTableScope<Row>(
+  entry: VirtualTableEntry<Row>,
+  parentIdentity: string | null,
+  rowKey: string,
+  columnId: string,
+  index: number,
+  placementEnabled: boolean
+): VirtualCompositeScopeValue {
+  const identity = extendVirtualCompositeIdentity(
+    parentIdentity,
+    'table-cell',
+    rowKey,
+    columnId
+  );
+  const placementKey = JSON.stringify([rowKey, columnId]);
+  const existing = entry.placements.get(placementKey);
+  if (
+    existing?.identity === identity &&
+    existing.index === index &&
+    existing.setSize === entry.keys.length &&
+    existing.placementEnabled === placementEnabled
+  ) {
+    return existing;
+  }
+  const scope = {
+    identity,
+    index,
+    setSize: entry.keys.length,
+    placementEnabled,
+  };
+  entry.placements.set(placementKey, scope);
+  return scope;
+}
 
 const virtualTableEntries = new WeakMap<object, VirtualTableEntry<unknown>>();
 
@@ -671,6 +713,8 @@ function getVirtualTableEntry<Row>(
   entry.rowsRef = entry.rowsRef ?? null;
   entry.keys = entry.keys ?? [];
   entry.keyIndexMap = entry.keyIndexMap ?? new Map<string, number>();
+  entry.placements =
+    entry.placements ?? new Map<string, VirtualCompositeScopeValue>();
   entry.pendingScrollTop = entry.pendingScrollTop ?? null;
   entry.pendingCommitFrame = entry.pendingCommitFrame ?? null;
   entry.resizeCommitFrame = entry.resizeCommitFrame ?? null;
@@ -730,6 +774,7 @@ function syncVirtualTableRows<Row>(
   }
 
   const nextKeys = rows.map((row, index) => String(getKey(row, index)));
+  entry.placements.clear();
   const nextKeyIndexMap = buildVirtualKeyIndexMap(nextKeys);
   const previousVisibleKeys =
     entry.visibleRange.visibleStartIndex < 0
@@ -903,7 +948,9 @@ function renderVirtualTableRows<Row>(
     rowIndex: number,
     rowKey: string,
     event: MouseEvent
-  ) => void | undefined
+  ) => void | undefined,
+  parentVirtualIdentity: string | null,
+  placementEnabled: boolean
 ) {
   const renderedRows: JSXElement[] = [];
 
@@ -953,6 +1000,7 @@ function renderVirtualTableRows<Row>(
         data-row-index={String(index)}
         data-row-key={rowKey}
         data-terminal-row={index === rows.length - 1 ? 'true' : undefined}
+        data-askr-virtual-composite={placementEnabled ? 'true' : 'false'}
         data-selected={selected ? 'true' : 'false'}
         aria-rowindex={index + 2}
         aria-selected={selected ? 'true' : 'false'}
@@ -1013,13 +1061,24 @@ function renderVirtualTableRows<Row>(
                   }
                 )}
               >
-                <CellComponent
-                  row={row}
-                  rowIndex={index}
-                  rowKey={rowKey}
-                  column={column}
-                  selected={selected}
-                />
+                <VirtualCompositeIdentityContext
+                  value={resolveVirtualTableScope(
+                    entry,
+                    parentVirtualIdentity,
+                    rowKey,
+                    column.id,
+                    index,
+                    placementEnabled
+                  )}
+                >
+                  <CellComponent
+                    row={row}
+                    rowIndex={index}
+                    rowKey={rowKey}
+                    column={column}
+                    selected={selected}
+                  />
+                </VirtualCompositeIdentityContext>
               </div>
             </td>
           );
@@ -1098,6 +1157,8 @@ export function VirtualTable<Row>(
   };
 
   const rowHeight = assertPositiveVirtualHeight(rowHeightProp, 'rowHeight');
+  const parentVirtualIdentity = readVirtualCompositeIdentity();
+  const virtualCompositeOwner = readVirtualCompositeOwner();
   const layoutNonce = cspNonce();
   const headerHeight = assertPositiveVirtualHeight(
     headerHeightProp,
@@ -1256,7 +1317,9 @@ export function VirtualTable<Row>(
       }
 
       onRowClick?.(row, rowIndex, rowKey, event);
-    }
+    },
+    parentVirtualIdentity,
+    virtualCompositeOwner
   );
 
   const tableBody = (

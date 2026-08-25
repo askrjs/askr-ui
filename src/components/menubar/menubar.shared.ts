@@ -1,14 +1,20 @@
 import { defineScope, readScope } from '@askrjs/askr';
 import {
-  disabledIndexes,
-  firstEnabledCompositeIndex,
   getCompositeCollection,
   getCompositeCollectionItems,
 } from '../_internal/composite';
+import {
+  compositeItemCount,
+  disabledCompositeItemIndexes,
+  firstEnabledCompositeItemIndex,
+  readVirtualCompositeIdentity,
+  type CompositePlacement,
+} from '../_internal/virtual-composite';
 
 /** Menubar Trigger Metadata. */
 export type MenubarTriggerMetadata = {
   index: number;
+  setSize?: number;
   disabled: boolean;
   menuKey?: string;
   text: string;
@@ -17,6 +23,7 @@ export type MenubarTriggerMetadata = {
 /** Menubar Surface Metadata. */
 export type MenubarSurfaceMetadata = {
   index: number;
+  setSize?: number;
   disabled: boolean;
   text: string;
 };
@@ -24,16 +31,18 @@ export type MenubarSurfaceMetadata = {
 /** Shape of the Menubar Root Context Value. */
 export type MenubarRootContextValue = {
   menubarId: string;
-  ensureMenuPortal: (menuKey: string) => MenubarPortalRecord;
+  ensureMenuPortal: (
+    menuKey: string,
+    signal: AbortSignal
+  ) => MenubarPortalRecord;
   openPath: string[];
   getOpenPath: () => string[];
   setOpenPath: (path: string[]) => void;
   loop: boolean;
-  portalEpoch: number;
-  syncPortals: () => void;
   currentTriggerIndexCandidate: number;
   setCurrentTriggerIndex: (index: number) => void;
   restoreTriggerFocus: (index: number, node: HTMLElement | null) => void;
+  focusTrigger: (index: number) => void;
   resolvedState: MenubarRootResolvedState;
   handleTypeaheadKeyDown: (event: KeyboardEvent) => boolean;
   handleTypeaheadKeyUp: (event: KeyboardEvent) => boolean;
@@ -54,12 +63,14 @@ export type MenubarRootStateInput = {
 /** Shape of the Menubar Root Render Context Value. */
 export type MenubarRootRenderContextValue = {
   claimMenuIndex: () => number;
+  virtualIdentity: string | null;
 };
 
 /** Shape of the Menubar Menu Context Value. */
 export type MenubarMenuContextValue = {
   menuKey: string;
   menuIndex: number;
+  placement: CompositePlacement;
   triggerId: string;
   contentId: string;
   portalId: string;
@@ -85,11 +96,13 @@ export type MenubarContentContextValue = {
 /** Shape of the Menubar Content Render Context Value. */
 export type MenubarContentRenderContextValue = {
   claimSurfaceIndex: () => number;
+  virtualIdentity: string | null;
 };
 
 /** Shape of the Menubar Sub Context Value. */
 export type MenubarSubContextValue = {
   surfaceIndex: number;
+  placement: CompositePlacement;
   triggerId: string;
   contentId: string;
   path: string[];
@@ -101,6 +114,7 @@ export type MenubarRootResolvedState = {
   items: MenubarTriggerMetadata[];
   currentTriggerIndex: number;
   disabledTriggerIndexes: number[];
+  itemCount: number;
 };
 
 /** Menubar Content Resolved State. */
@@ -108,6 +122,7 @@ export type MenubarContentResolvedState = {
   items: MenubarSurfaceMetadata[];
   currentIndex: number;
   disabledItemIndexes: number[];
+  itemCount: number;
 };
 
 export const MenubarRootContext = defineScope<MenubarRootContextValue | null>(
@@ -220,6 +235,7 @@ export function createMenubarRootRenderContext(): MenubarRootRenderContextValue 
   let nextMenuIndex = 0;
 
   return {
+    virtualIdentity: readVirtualCompositeIdentity(),
     claimMenuIndex: () => {
       const index = nextMenuIndex;
       nextMenuIndex += 1;
@@ -235,6 +251,7 @@ export function createMenubarContentRenderContext(): MenubarContentRenderContext
   let nextSurfaceIndex = 0;
 
   return {
+    virtualIdentity: readVirtualCompositeIdentity(),
     claimSurfaceIndex: () => {
       const index = nextSurfaceIndex;
       nextSurfaceIndex += 1;
@@ -254,21 +271,22 @@ export function resolveMenubarRootState(
     getCompositeCollection(root.menubarId)
   ).map((item) => ({
     index: item.index,
+    setSize: item.setSize,
     disabled: item.disabled,
     menuKey: item.value,
     text: item.text ?? '',
   }));
-  const fallbackIndex = firstEnabledCompositeIndex(items);
+  const fallbackIndex = firstEnabledCompositeItemIndex(items);
   const candidateIndex = root.currentTriggerIndexCandidate;
+  const candidate = items.find((item) => item.index === candidateIndex);
   const currentTriggerIndex =
-    items[candidateIndex] && !items[candidateIndex]?.disabled
-      ? candidateIndex
-      : fallbackIndex;
+    candidate && !candidate.disabled ? candidateIndex : fallbackIndex;
 
   return {
     items,
     currentTriggerIndex,
-    disabledTriggerIndexes: disabledIndexes(items),
+    disabledTriggerIndexes: disabledCompositeItemIndexes(items),
+    itemCount: compositeItemCount(items),
   };
 }
 
@@ -283,20 +301,21 @@ export function resolveMenubarContentState(
     getCompositeCollection(content.contentId)
   ).map((item) => ({
     index: item.index,
+    setSize: item.setSize,
     disabled: item.disabled,
     text: item.text ?? '',
   }));
-  const fallbackIndex = firstEnabledCompositeIndex(items);
+  const fallbackIndex = firstEnabledCompositeItemIndex(items);
   const candidateIndex = content.currentIndexCandidate;
+  const candidate = items.find((item) => item.index === candidateIndex);
   const currentIndex =
-    items[candidateIndex] && !items[candidateIndex]?.disabled
-      ? candidateIndex
-      : fallbackIndex;
+    candidate && !candidate.disabled ? candidateIndex : fallbackIndex;
 
   return {
     items,
     currentIndex,
-    disabledItemIndexes: disabledIndexes(items),
+    disabledItemIndexes: disabledCompositeItemIndexes(items),
+    itemCount: compositeItemCount(items),
   };
 }
 

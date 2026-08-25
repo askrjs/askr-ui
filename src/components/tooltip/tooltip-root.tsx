@@ -7,6 +7,8 @@ import {
   createOverlayIdentity,
   getOverlayNodes,
   getPersistentPortal,
+  registerOverlayNode,
+  setOverlayStackActive,
   syncOverlayPosition,
 } from '../_internal/overlay';
 import {
@@ -33,6 +35,8 @@ export function Tooltip(props: TooltipProps) {
   });
   const tooltipId = resolveCompoundId('tooltip', id, children);
   const overlayIdentity = state(createOverlayIdentity())();
+  const cleanupSignal = getSignal();
+  setOverlayStackActive(overlayIdentity, openState(), cleanupSignal);
   const focusEntry = state({
     adoptTrigger: false,
     generation: 0,
@@ -42,9 +46,9 @@ export function Tooltip(props: TooltipProps) {
   const contentId = resolvePartId(tooltipId, 'content');
   const portal = getPersistentPortal(overlayIdentity);
   const overlayNodes = getOverlayNodes(overlayIdentity);
+  const triggerNodeOwner = {};
+  const contentNodeOwner = {};
   let contentPosition: TooltipPositionOptions = resolveTooltipPositionOptions();
-  const cleanupSignal = getSignal();
-
   const releaseTriggerAdoption = () => {
     const generation = focusEntry.generation + 1;
     focusEntry.generation = generation;
@@ -116,13 +120,13 @@ export function Tooltip(props: TooltipProps) {
       contentPosition = nextPosition;
     },
     setTriggerNode: (node: HTMLElement | null) => {
-      overlayNodes.trigger = node;
+      registerOverlayNode(overlayIdentity, 'trigger', node, triggerNodeOwner);
       if (node && focusEntry.adoptTrigger && document.activeElement !== node) {
         node.focus();
       }
     },
     setContentNode: (node: HTMLElement | null) => {
-      overlayNodes.content = node;
+      registerOverlayNode(overlayIdentity, 'content', node, contentNodeOwner);
     },
     syncPosition: () => {
       if (overlayNodes.content) {
