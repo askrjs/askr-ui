@@ -1,5 +1,6 @@
 import { cspNonce, getSignal, state } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations/state';
+import { formResetRef } from '../_internal/form-reset';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import { collectJsxElements } from '../_internal/jsx';
 import {
@@ -7,13 +8,18 @@ import {
   createOverlayIdentity,
   getOverlayNodes,
   getPersistentPortal,
+  setOverlayStackActive,
 } from '../_internal/overlay';
 import {
   focusCollectionItemWithRestore,
   restorePendingCollectionItemFocus,
   type PendingCollectionFocus,
 } from '../_internal/focus';
-import { getMenuCollection, resolveMenuItemText } from '../_internal/menu';
+import { VirtualCompositeOwnerContext } from '../_internal/virtual-composite';
+import {
+  observeMenuCollectionCount,
+  resolveMenuItemText,
+} from '../_internal/menu';
 import {
   handleTypeaheadKeyDown,
   handleTypeaheadKeyUp,
@@ -48,8 +54,9 @@ export function Select(props: SelectProps) {
   } = props;
   const selectId = resolveCompoundId('select', id, children);
   const overlayIdentity = state(createOverlayIdentity())();
+  const cleanupSignal = getSignal();
   captureOverlayNonce(overlayIdentity, cspNonce());
-  registerTypeaheadCleanup(overlayIdentity, getSignal());
+  registerTypeaheadCleanup(overlayIdentity, cleanupSignal);
   const valueState = controllableState({
     value,
     defaultValue,
@@ -60,10 +67,17 @@ export function Select(props: SelectProps) {
     defaultValue: defaultOpen,
     onChange: onOpenChange,
   });
+  const resetRef = formResetRef<Element>(() => {
+    if (value === undefined && valueState() !== defaultValue) {
+      valueState.set(defaultValue);
+    }
+  });
+  setOverlayStackActive(overlayIdentity, openState(), cleanupSignal);
   const declaredItems = collectJsxElements(
     children,
     (element) => element.type === SelectItem
-  ).map((element) => ({
+  ).map((element, index) => ({
+    index,
     disabled: Boolean(element.props?.disabled),
     value:
       typeof element.props?.value === 'string'
@@ -93,23 +107,35 @@ export function Select(props: SelectProps) {
     open: openState(),
     currentIndexCandidate: currentIndexState(),
     disabled,
+    bindFormReset: resetRef,
     declaredItems,
   };
+  const collection = observeMenuCollectionCount(selectId);
   const resolvedState = resolveSelectState(rootContextBase);
-  const collection = getMenuCollection(selectId);
   const focusItem = (index: number) => {
-    const itemValue = resolvedState.items[index]?.value;
-    focusCollectionItemWithRestore(
-      pendingFocus,
-      collection,
-      index,
+    const itemValue = resolvedState.items.find(
+      (item) => item.index === index
+    )?.value;
+    const resolveNode =
       itemValue === undefined
         ? undefined
         : () =>
             document.getElementById(
               resolvePartId(selectId, `item-${itemValue}`)
-            )
-    );
+            );
+    const focus = () => {
+      focusCollectionItemWithRestore(
+        pendingFocus,
+        collection,
+        index,
+        resolveNode
+      );
+    };
+    const mounted =
+      resolveNode?.() ??
+      collection.items().find((item) => item.metadata.index === index)?.node;
+    if (mounted) focus();
+    else queueMicrotask(focus);
   };
   const setOpen = (nextOpen: boolean) => {
     resetTypeahead(overlayIdentity);
@@ -141,10 +167,14 @@ export function Select(props: SelectProps) {
     resolvedState,
     handleTypeaheadKeyDown: (event) =>
       handleTypeaheadKeyDown(overlayIdentity, event, {
-        currentIndex: resolvedState.currentIndex,
+        currentIndex: resolvedState.items.findIndex(
+          (item) => item.index === resolvedState.currentIndex
+        ),
         items: resolvedState.items,
-        onMatch: (index) => {
-          const item = resolvedState.items[index];
+        onMatch: (matchIndex) => {
+          const item = resolvedState.items[matchIndex];
+          const index = item?.index;
+          if (index === undefined) return;
           setCurrentIndex(index);
 
           if (openState()) {
@@ -176,18 +206,20 @@ export function Select(props: SelectProps) {
   return (
     <SelectRootContext value={rootContext}>
       <SelectRenderContext value={runtimeRenderContext}>
-        <>
-          {children}
-          {PortalHost ? <PortalHost key="select-root-portal" /> : null}
-          {name ? (
-            <input
-              type="hidden"
-              name={name}
-              value={rootContext.value}
-              disabled={disabled}
-            />
-          ) : null}
-        </>
+        <VirtualCompositeOwnerContext value>
+          <>
+            {children as JSX.Element}
+            <PortalHost key="select-root-portal" />
+            {name ? (
+              <input
+                type="hidden"
+                name={name}
+                value={rootContext.value}
+                disabled={disabled}
+              />
+            ) : null}
+          </>
+        </VirtualCompositeOwnerContext>
       </SelectRenderContext>
     </SelectRootContext>
   );

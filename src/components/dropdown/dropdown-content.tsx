@@ -1,14 +1,15 @@
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
-import { rovingFocus } from '@askrjs/askr/foundations/interactions';
+import { rovingFocus } from '../_internal/roving-focus';
 import { DismissableLayer } from '../dismissable-layer';
 import { FocusScope } from '../focus-scope';
-import { dismissPopupWithTab } from '../_internal/focus';
+import { claimOpenAutoFocus, dismissPopupWithTab } from '../_internal/focus';
 import { getMenuCollection, getMenuCollectionItems } from '../_internal/menu';
 import {
   clearOverlayPosition,
   getOverlayNodes,
   OVERLAY_Z_INDEX,
+  registerOverlayNode,
   syncOverlayPosition,
 } from '../_internal/overlay';
 import { readDropdownRootContext } from './dropdown.shared';
@@ -42,15 +43,17 @@ export function DropdownContent(
     ...rest
   } = props;
   const root = readDropdownRootContext();
+  claimOpenAutoFocus(root.overlayIdentity, root.open, null);
   const { items, currentIndex, disabledIndexes } = root.resolvedState;
   const hasEnabledItems = items.some(
     (_item, index) => !disabledIndexes.includes(index)
   );
   const overlayNodes = getOverlayNodes(root.overlayIdentity);
   const collection = getMenuCollection(root.dropdownId);
+  const overlayNodeOwner = {};
   const nav = rovingFocus({
     currentIndex,
-    itemCount: Math.max(items.length, 1),
+    itemCount: Math.max(root.resolvedState.itemCount, 1),
     orientation: 'vertical',
     loop: true,
     isDisabled: (index) => disabledIndexes.includes(index),
@@ -64,7 +67,12 @@ export function DropdownContent(
     },
   });
   const setNode = (node: HTMLElement | null) => {
-    overlayNodes.content = node;
+    registerOverlayNode(
+      root.overlayIdentity,
+      'content',
+      node,
+      overlayNodeOwner
+    );
 
     if (node && root.open) {
       syncOverlayPosition(root.overlayIdentity, root.dropdownId, {
@@ -77,7 +85,7 @@ export function DropdownContent(
       clearOverlayPosition(root.overlayIdentity);
     }
 
-    if (node && root.open) {
+    if (claimOpenAutoFocus(root.overlayIdentity, root.open, node)) {
       queueMicrotask(() => {
         if (
           overlayNodes.content !== node ||

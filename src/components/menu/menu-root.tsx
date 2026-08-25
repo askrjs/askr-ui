@@ -1,7 +1,12 @@
 import { getSignal, state } from '@askrjs/askr';
-import { rovingFocus } from '@askrjs/askr/foundations/interactions';
+import { rovingFocus } from '../_internal/roving-focus';
 import { resolveCompoundId } from '../_internal/id';
-import { focusSelectedCollectionItem } from '../_internal/focus';
+import {
+  focusCollectionItemWithRestore,
+  restorePendingCollectionItemFocus,
+  type PendingCollectionFocus,
+} from '../_internal/focus';
+import { VirtualCompositeOwnerContext } from '../_internal/virtual-composite';
 import {
   getMenuCollectionItems,
   observeMenuCollection,
@@ -40,15 +45,18 @@ export function Menu(props: MenuProps) {
   };
   const resolvedState = resolveMenuState(rootContextBase);
   const collection = observeMenuCollection(menuId);
+  const pendingFocus = state<PendingCollectionFocus>({ index: null })();
+  const focusItem = (index: number) =>
+    focusCollectionItemWithRestore(pendingFocus, collection, index);
   const navigation = rovingFocus({
     currentIndex: resolvedState.currentIndex,
-    itemCount: Math.max(resolvedState.items.length, 1),
+    itemCount: Math.max(resolvedState.itemCount, 1),
     orientation,
     loop,
     isDisabled: (index) => resolvedState.disabledIndexes.includes(index),
     onNavigate: (index) => {
       setCurrentIndex(index);
-      focusSelectedCollectionItem(collection, index);
+      focusItem(index);
     },
   });
   const rootContext: MenuRootContextValue = {
@@ -58,15 +66,23 @@ export function Menu(props: MenuProps) {
     setCurrentIndex,
     resolvedState,
     navigation,
+    focusItem,
+    restoreItemFocus: (index, node) =>
+      restorePendingCollectionItemFocus(pendingFocus, index, node),
     handleTypeaheadKeyDown: (event) => {
       const items = getMenuCollectionItems(collection);
 
+      const currentItemIndex = items.findIndex(
+        (item) => item.index === currentIndexState()
+      );
       return handleTypeaheadKeyDown(typeaheadIdentity, event, {
-        currentIndex: currentIndexState(),
+        currentIndex: currentItemIndex,
         items,
-        onMatch: (index) => {
+        onMatch: (matchIndex) => {
+          const index = items[matchIndex]?.index;
+          if (index === undefined) return;
           setCurrentIndex(index);
-          focusSelectedCollectionItem(collection, index);
+          focusItem(index);
         },
       });
     },
@@ -78,7 +94,9 @@ export function Menu(props: MenuProps) {
   return (
     <MenuRootContext value={rootContext}>
       <MenuRenderContext value={renderContext}>
-        {children as JSX.Element}
+        <VirtualCompositeOwnerContext value>
+          {children as JSX.Element}
+        </VirtualCompositeOwnerContext>
       </MenuRenderContext>
     </MenuRootContext>
   );

@@ -31,6 +31,7 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
     children,
     trapped = false,
     loop = false,
+    autoFocus = true,
     restoreFocus = true,
     id,
     ref,
@@ -53,6 +54,7 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
 
       if (pendingDetachedNode) {
         if (
+          trapped &&
           pendingDetachedNode !== node &&
           !(
             document.activeElement instanceof HTMLElement &&
@@ -72,6 +74,7 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
           : null;
 
       if (
+        autoFocus &&
         !(
           document.activeElement instanceof HTMLElement &&
           node.contains(document.activeElement)

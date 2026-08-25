@@ -469,4 +469,46 @@ describe('Menubar - Behavior', () => {
 
     expect(fileTrigger.getAttribute('aria-expanded')).toBe('false');
   });
+  it('should reverse top-level trigger navigation under dir="rtl"', async () => {
+    container = mount(
+      <div dir="rtl">
+        <Menubar loop={false}>
+          <MenubarMenu value="file">
+            <MenubarTrigger>File</MenubarTrigger>
+            <MenubarPortal>
+              <MenubarContent>
+                <MenubarItem>New</MenubarItem>
+              </MenubarContent>
+            </MenubarPortal>
+          </MenubarMenu>
+          <MenubarMenu value="edit">
+            <MenubarTrigger>Edit</MenubarTrigger>
+            <MenubarPortal>
+              <MenubarContent>
+                <MenubarItem>Undo</MenubarItem>
+              </MenubarContent>
+            </MenubarPortal>
+          </MenubarMenu>
+          <MenubarMenu value="view">
+            <MenubarTrigger>View</MenubarTrigger>
+            <MenubarPortal>
+              <MenubarContent>
+                <MenubarItem>Zoom</MenubarItem>
+              </MenubarContent>
+            </MenubarPortal>
+          </MenubarMenu>
+        </Menubar>
+      </div>
+    );
+    await flushPortalUpdates();
+
+    getButtonByText('File').focus();
+    await userEvent.keyboard('{ArrowLeft}');
+    await flushPortalUpdates();
+    expect(document.activeElement).toBe(getButtonByText('Edit'));
+
+    await userEvent.keyboard('{ArrowRight}');
+    await flushPortalUpdates();
+    expect(document.activeElement).toBe(getButtonByText('File'));
+  });
 });

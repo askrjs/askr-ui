@@ -417,4 +417,74 @@ describe('Dialog - Behavior', () => {
     ).toBeNull();
     expect(container.querySelector('[data-slot="toast"]')).not.toBeNull();
   });
+
+  it('should stack a later dialog and its backdrop above an already-open select', async () => {
+    function Fixture() {
+      const secondOpen = state(false);
+
+      return (
+        <>
+          <Dialog id="first-dialog" defaultOpen>
+            <DialogPortal>
+              <DialogOverlay />
+              <DialogContent>
+                First dialog
+                <Select
+                  open
+                  defaultValue="one"
+                  onValueChange={() => secondOpen.set(true)}
+                >
+                  <SelectTrigger>Choose</SelectTrigger>
+                  <SelectPortal>
+                    <SelectContent>
+                      <SelectItem value="one">One</SelectItem>
+                      <SelectItem value="two">Open second dialog</SelectItem>
+                    </SelectContent>
+                  </SelectPortal>
+                </Select>
+              </DialogContent>
+            </DialogPortal>
+          </Dialog>
+          <Dialog id="second-dialog" open={secondOpen()}>
+            <DialogPortal>
+              <DialogOverlay data-second-overlay="true" />
+              <DialogContent>Second dialog</DialogContent>
+            </DialogPortal>
+          </Dialog>
+        </>
+      );
+    }
+
+    container = mount(<Fixture />);
+    await flushUpdates();
+    await flushUpdates();
+    Array.from(document.body.querySelectorAll<HTMLElement>('[role="option"]'))
+      .find((option) => option.textContent === 'Open second dialog')
+      ?.click();
+    await flushUpdates();
+    await flushUpdates();
+
+    const select = document.body.querySelector(
+      '[data-slot="select-content"]'
+    ) as HTMLElement;
+    const secondDialog = Array.from(
+      document.body.querySelectorAll<HTMLElement>(
+        '[data-slot="dialog-content"]'
+      )
+    ).find((content) => content.textContent === 'Second dialog') as HTMLElement;
+    const secondOverlay = document.body.querySelector(
+      '[data-second-overlay="true"]'
+    ) as HTMLElement;
+    const selectZIndex = Number(getComputedStyle(select).zIndex);
+
+    expect(
+      secondOverlay.getAttribute('data-askr-overlay-stack-id')
+    ).not.toBeNull();
+    expect(Number(getComputedStyle(secondOverlay).zIndex)).toBeGreaterThan(
+      selectZIndex
+    );
+    expect(Number(getComputedStyle(secondDialog).zIndex)).toBeGreaterThan(
+      Number(getComputedStyle(secondOverlay).zIndex)
+    );
+  });
 });

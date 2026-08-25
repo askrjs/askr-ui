@@ -7,6 +7,8 @@ import {
   createOverlayIdentity,
   getOverlayNodes,
   getPersistentPortal,
+  registerOverlayNode,
+  setOverlayStackActive,
   syncOverlayPosition,
 } from '../_internal/overlay';
 import {
@@ -41,6 +43,8 @@ export function HoverCard(props: HoverCardProps) {
   });
   const hoverCardId = resolveCompoundId('hover-card', id, children);
   const overlayIdentity = state(createOverlayIdentity())();
+  const cleanupSignal = getSignal();
+  setOverlayStackActive(overlayIdentity, openState(), cleanupSignal);
   const focusEntry = state({
     restoreTrigger: false,
     restoreFrame: null as number | null,
@@ -56,6 +60,8 @@ export function HoverCard(props: HoverCardProps) {
   const contentId = resolvePartId(hoverCardId, 'content');
   const portal = getPersistentPortal(overlayIdentity);
   const overlayNodes = getOverlayNodes(overlayIdentity);
+  const triggerNodeOwner = {};
+  const contentNodeOwner = {};
   const focusTrigger = (trigger: HTMLElement | null) => {
     if (!trigger) {
       return;
@@ -102,7 +108,6 @@ export function HoverCard(props: HoverCardProps) {
     clearOpenTimer();
     clearCloseTimer();
   };
-  const cleanupSignal = getSignal();
   cleanupSignal.addEventListener(
     'abort',
     () => {
@@ -168,13 +173,13 @@ export function HoverCard(props: HoverCardProps) {
       contentPosition = nextPosition;
     },
     setTriggerNode: (node: HTMLElement | null) => {
-      overlayNodes.trigger = node;
+      registerOverlayNode(overlayIdentity, 'trigger', node, triggerNodeOwner);
       if (node && focusEntry.restoreTrigger) {
         node.focus();
       }
     },
     setContentNode: (node: HTMLElement | null) => {
-      overlayNodes.content = node;
+      registerOverlayNode(overlayIdentity, 'content', node, contentNodeOwner);
     },
     getTriggerNode: () => overlayNodes.trigger,
     getContentNode: () => overlayNodes.content,

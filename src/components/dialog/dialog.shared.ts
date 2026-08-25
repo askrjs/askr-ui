@@ -20,6 +20,7 @@ export type DialogRootContextValue = {
   hasTitle: boolean;
   hasDescription: boolean;
   portal: OverlayPortal;
+  backdropStackId: string;
   setTitleNode: (node: HTMLElement | null) => void;
   setDescriptionNode: (node: HTMLElement | null) => void;
   setTriggerNode: (node: HTMLElement | null) => void;

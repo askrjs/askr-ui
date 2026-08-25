@@ -1,7 +1,10 @@
 import { defineScope, readScope } from '@askrjs/askr';
+import { readVirtualCompositeIdentity } from '../_internal/virtual-composite';
 
 /** Radio Group Item Metadata. */
 export type RadioGroupItemMetadata = {
+  index: number;
+  setSize?: number;
   value: string;
   disabled: boolean;
 };
@@ -19,11 +22,16 @@ export type RadioGroupRootContextValue = {
   currentIndex: number;
   setCurrentIndex: (index: number) => void;
   items: RadioGroupItemMetadata[];
+  itemCount: number;
+  disabledIndexes: number[];
+  focusItem: (index: number) => void;
+  restoreItemFocus: (index: number, node: HTMLElement | null) => void;
 };
 
 /** Shape of the Radio Group Render Context Value. */
 export type RadioGroupRenderContextValue = {
   claimItemIndex: () => number;
+  virtualIdentity: string | null;
 };
 
 export const RadioGroupRootContext =
@@ -64,6 +72,7 @@ export function createRadioGroupRenderContext(): RadioGroupRenderContextValue {
   let nextItemIndex = 0;
 
   return {
+    virtualIdentity: readVirtualCompositeIdentity(),
     claimItemIndex: () => {
       const index = nextItemIndex;
       nextItemIndex += 1;

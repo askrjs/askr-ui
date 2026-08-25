@@ -1,4 +1,5 @@
 import type { Collection } from '@askrjs/askr/foundations/structures';
+import { scrollVirtualCompositeToIndex } from './virtual-composite';
 
 let keyboardModality = true;
 
@@ -275,7 +276,11 @@ export function focusLastDescendant(root: HTMLElement): boolean {
 
 export function focusSelectedCollectionItem<
   TMetadata extends { index: number },
->(collection: Collection<HTMLElement, TMetadata>, index: number): boolean {
+>(
+  collection: Collection<HTMLElement, TMetadata>,
+  index: number,
+  preventScroll = false
+): boolean {
   const match = collection
     .items()
     .find((item) => item.metadata.index === index)?.node;
@@ -284,13 +289,51 @@ export function focusSelectedCollectionItem<
     return false;
   }
 
-  match.focus();
+  match.focus({ preventScroll });
   return true;
 }
 
 export type PendingCollectionFocus = {
   index: number | null;
 };
+
+type OpenAutoFocusClaim = {
+  open: boolean;
+  node: HTMLElement | null;
+};
+
+const openAutoFocusClaims = new WeakMap<object, OpenAutoFocusClaim>();
+
+export function claimOpenAutoFocus(
+  identity: object,
+  open: boolean,
+  node: HTMLElement | null
+): node is HTMLElement {
+  const claim = openAutoFocusClaims.get(identity) ?? {
+    open: false,
+    node: null,
+  };
+
+  if (!open) {
+    claim.open = false;
+    claim.node = null;
+    openAutoFocusClaims.set(identity, claim);
+    return false;
+  }
+
+  if (!node) {
+    return false;
+  }
+
+  if (claim.open && claim.node === node) {
+    return false;
+  }
+
+  claim.open = true;
+  claim.node = node;
+  openAutoFocusClaims.set(identity, claim);
+  return true;
+}
 
 export function focusCollectionItemWithRestore<
   TMetadata extends { index: number },
@@ -300,25 +343,65 @@ export function focusCollectionItemWithRestore<
   index: number,
   resolveNode?: () => HTMLElement | null
 ) {
-  const focusItem = () => {
-    const resolvedNode = resolveNode?.();
+  const resolveFocusNode = () =>
+    resolveNode?.() ??
+    collection.items().find((item) => item.metadata.index === index)?.node ??
+    null;
+  const focusItem = (preventScroll = false) => {
+    const resolvedNode = resolveFocusNode();
 
     if (resolvedNode) {
-      resolvedNode.focus();
+      resolvedNode.focus({ preventScroll });
       return true;
     }
 
-    return focusSelectedCollectionItem(collection, index);
+    return false;
+  };
+  const settleFocus = (attemptsRemaining: number) => {
+    const schedule =
+      typeof requestAnimationFrame === 'function'
+        ? requestAnimationFrame
+        : (callback: FrameRequestCallback) => setTimeout(callback, 0);
+    schedule(() => {
+      if (pendingFocus.index !== index) return;
+      const target = resolveFocusNode();
+      const active =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null;
+      if (
+        active &&
+        active !== document.body &&
+        active !== target &&
+        !target?.contains(active)
+      ) {
+        pendingFocus.index = null;
+        return;
+      }
+      if (focusItem(true)) {
+        pendingFocus.index = null;
+        return;
+      }
+      if (attemptsRemaining > 1) {
+        settleFocus(attemptsRemaining - 1);
+      } else {
+        pendingFocus.index = null;
+      }
+    });
   };
 
   pendingFocus.index = index;
-  focusItem();
+  if (focusItem()) {
+    settleFocus(3);
+    return;
+  }
+  scrollVirtualCompositeToIndex(index);
   queueMicrotask(() => {
     queueMicrotask(() => {
-      focusItem();
-      pendingFocus.index = null;
+      if (pendingFocus.index === index) focusItem(true);
     });
   });
+  settleFocus(3);
 }
 
 export function restorePendingCollectionItemFocus(
@@ -327,8 +410,19 @@ export function restorePendingCollectionItemFocus(
   node: HTMLElement | null
 ) {
   if (node && pendingFocus.index === index) {
-    node.focus();
-    pendingFocus.index = null;
+    if (node.isConnected) {
+      node.focus({ preventScroll: true });
+    } else {
+      queueMicrotask(() => {
+        if (
+          pendingFocus.index === index &&
+          node.isConnected &&
+          document.activeElement === document.body
+        ) {
+          node.focus({ preventScroll: true });
+        }
+      });
+    }
   }
 }
 

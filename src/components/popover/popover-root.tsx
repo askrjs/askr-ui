@@ -1,5 +1,5 @@
 import { controllableState } from '@askrjs/askr/foundations/state';
-import { cspNonce, state } from '@askrjs/askr';
+import { cspNonce, getSignal, state } from '@askrjs/askr';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import {
   captureOverlayNonce,
@@ -7,6 +7,8 @@ import {
   createOverlayIdentity,
   getOverlayNodes,
   getPersistentPortal,
+  registerOverlayNode,
+  setOverlayStackActive,
   syncOverlayPosition,
 } from '../_internal/overlay';
 import {
@@ -33,11 +35,14 @@ export function Popover(props: PopoverProps) {
   });
   const popoverId = resolveCompoundId('popover', id, children);
   const overlayIdentity = state(createOverlayIdentity())();
+  setOverlayStackActive(overlayIdentity, openState(), getSignal());
   captureOverlayNonce(overlayIdentity, cspNonce());
   const triggerId = resolvePartId(popoverId, 'trigger');
   const contentId = resolvePartId(popoverId, 'content');
   const portal = getPersistentPortal(overlayIdentity);
   const overlayNodes = getOverlayNodes(overlayIdentity);
+  const triggerNodeOwner = {};
+  const contentNodeOwner = {};
   let contentPosition: PopoverPositionOptions = resolvePopoverPositionOptions();
 
   const rootContext: PopoverRootContextValue = {
@@ -66,10 +71,10 @@ export function Popover(props: PopoverProps) {
       contentPosition = nextPosition;
     },
     setTriggerNode: (node: HTMLElement | null) => {
-      overlayNodes.trigger = node;
+      registerOverlayNode(overlayIdentity, 'trigger', node, triggerNodeOwner);
     },
     setContentNode: (node: HTMLElement | null) => {
-      overlayNodes.content = node;
+      registerOverlayNode(overlayIdentity, 'content', node, contentNodeOwner);
     },
     syncPosition: () => {
       if (overlayNodes.content) {

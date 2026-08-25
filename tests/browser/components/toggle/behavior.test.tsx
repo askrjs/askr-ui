@@ -1,7 +1,7 @@
 import { userEvent } from '@vitest/browser/context';
 import { describe, it, expect, vi, afterEach } from 'vite-plus/test';
 import { Toggle } from '../../../../src/components/toggle/toggle';
-import { mount, unmount } from '../../test-utils';
+import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Toggle - Behavior', () => {
   let container: HTMLElement | undefined;
@@ -112,21 +112,36 @@ describe('Toggle - Behavior', () => {
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it('should activate an asChild host with Enter and Space', async () => {
-    const onPress = vi.fn();
+  it('should retain button Enter and Space activation for native and asChild hosts', async () => {
+    const onNativePress = vi.fn();
+    const onChildPress = vi.fn();
     container = mount(
-      <Toggle asChild onPress={onPress}>
-        <span>Mute</span>
-      </Toggle>
+      <div>
+        <Toggle onPress={onNativePress}>Native mute</Toggle>
+        <Toggle asChild onPress={onChildPress}>
+          <span>Mute</span>
+        </Toggle>
+      </div>
     );
 
-    const host = container.querySelector('[role="button"]') as HTMLElement;
-    host.focus();
+    const focusFresh = async (selector: string) => {
+      await flushUpdates();
+      (container.querySelector(selector) as HTMLElement).focus();
+    };
+
+    await focusFresh('button');
     await userEvent.keyboard('{Enter}');
-    host.focus();
+    await focusFresh('button');
     await userEvent.keyboard(' ');
 
-    expect(onPress).toHaveBeenCalledTimes(2);
+    await focusFresh('[role="button"]');
+    await userEvent.keyboard('{Enter}');
+    await focusFresh('[role="button"]');
+    await userEvent.keyboard(' ');
+    await flushUpdates();
+
+    expect(onNativePress).toHaveBeenCalledTimes(2);
+    expect(onChildPress).toHaveBeenCalledTimes(2);
   });
 
   it('should apply disabled semantics to asChild hosts', () => {

@@ -1,7 +1,9 @@
 import { nativeButtonProps } from '../_internal/native-control';
+import { state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
-import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
+import { pressable } from '@askrjs/askr/foundations/interactions';
+import { rovingFocus } from '../_internal/roving-focus';
 import {
   compositeItemFocusProps,
   repairFocusForDisabledItem,
@@ -12,6 +14,10 @@ import {
   resolveMenuItemText,
 } from '../_internal/menu';
 import { resolvePartId } from '../_internal/id';
+import {
+  claimVirtualCompositePlacement,
+  resolveVirtualCompositePlacement,
+} from '../_internal/virtual-composite';
 import { runCancelablePress } from '../_internal/press';
 import {
   readDropdownRenderContext,
@@ -48,19 +54,23 @@ export function DropdownItem(
   } = props;
   const root = readDropdownRootContext();
   const renderContext = readDropdownRenderContext();
-  const itemIndex = renderContext.claimItemIndex();
+  const placement = state<{ index: number; setSize?: number }>({ index: -1 })();
+  const scopedVirtualPlacement = claimVirtualCompositePlacement(
+    placement,
+    renderContext.claimItemIndex,
+    renderContext.virtualIdentity
+  );
+  const itemIndex = scopedVirtualPlacement?.index ?? placement.index;
   const stableItemKey =
     typeof value === 'string' && value.length > 0 ? value : String(itemIndex);
   const itemId = resolvePartId(root.dropdownId, `item-${stableItemKey}`);
   const itemText = resolveMenuItemText(children, textValue);
   const { items, currentIndex, disabledIndexes } = root.resolvedState;
-  const hasEnabledItems = items.some(
-    (_item, index) => !disabledIndexes.includes(index)
-  );
+  const hasEnabledItems = items.some((item) => !item.disabled);
   const collection = getMenuCollection(root.dropdownId);
   const nav = rovingFocus({
     currentIndex,
-    itemCount: Math.max(items.length, 1),
+    itemCount: Math.max(root.resolvedState.itemCount, 1),
     orientation: 'vertical',
     loop: true,
     isDisabled: (index) => disabledIndexes.includes(index),
@@ -100,23 +110,32 @@ export function DropdownItem(
   };
   const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
+    const virtualPlacement =
+      scopedVirtualPlacement ??
+      (node ? resolveVirtualCompositePlacement(node) : null);
+    if (virtualPlacement && !scopedVirtualPlacement) {
+      placement.index = virtualPlacement.index;
+      placement.setSize = virtualPlacement.setSize;
+    }
+    const resolvedIndex = virtualPlacement?.index ?? itemIndex;
     registerCollectionNode(
       itemId,
       collection,
       node,
       {
-        index: itemIndex,
+        index: resolvedIndex,
+        setSize: virtualPlacement?.setSize ?? placement.setSize,
         disabled,
         value: stableItemKey,
         text: itemText,
       },
       registrationOwner
     );
-    root.restoreItemFocus(itemIndex, node);
+    root.restoreItemFocus(resolvedIndex, node);
     repairFocusForDisabledItem({
       collection,
       disabled,
-      index: itemIndex,
+      index: resolvedIndex,
       loop: true,
       node,
       setCurrentIndex: root.setCurrentIndex,

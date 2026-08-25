@@ -155,6 +155,7 @@ describe('Checkbox - Behavior', () => {
       </div>
     );
 
+    await flushUpdates();
     let nativeCheckbox = container.querySelector(
       '[data-testid="native-checkbox"]'
     ) as HTMLInputElement;

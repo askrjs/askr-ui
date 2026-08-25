@@ -2,7 +2,7 @@ import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
-import { getOverlayNodes } from '../_internal/overlay';
+import { registerOverlayNode } from '../_internal/overlay';
 import { runCancelablePress } from '../_internal/press';
 import { readDropdownRootContext } from './dropdown.shared';
 import type {
@@ -37,7 +37,7 @@ export function DropdownTrigger(
     ...rest
   } = props;
   const root = readDropdownRootContext();
-  const overlayNodes = getOverlayNodes(root.overlayIdentity);
+  const overlayNodeOwner = {};
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
@@ -60,7 +60,12 @@ export function DropdownTrigger(
     }
   };
   const setNode = (node: HTMLElement | null) => {
-    overlayNodes.trigger = node;
+    registerOverlayNode(
+      root.overlayIdentity,
+      'trigger',
+      node,
+      overlayNodeOwner
+    );
   };
   const refHandler = ref
     ? composeRefs(

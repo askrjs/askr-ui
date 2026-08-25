@@ -27,6 +27,73 @@ export type OverlayZIndex =
   | number
   | (typeof OVERLAY_Z_INDEX)[keyof typeof OVERLAY_Z_INDEX];
 
+type OverlayStackEntry = {
+  active: boolean;
+  order: number;
+};
+
+const overlayStackEntries = new WeakMap<OverlayIdentity, OverlayStackEntry>();
+const overlayStackSignals = new WeakMap<OverlayIdentity, AbortSignal>();
+let nextOverlayStackOrder = 0;
+let activeOverlayStackEntries = 0;
+
+function deactivateOverlayStackEntry(identity: OverlayIdentity) {
+  const entry = overlayStackEntries.get(identity);
+  if (!entry?.active) return;
+  entry.active = false;
+  activeOverlayStackEntries = Math.max(0, activeOverlayStackEntries - 1);
+  if (activeOverlayStackEntries === 0) nextOverlayStackOrder = 0;
+}
+
+export function setOverlayStackActive(
+  identity: OverlayIdentity,
+  active: boolean,
+  signal?: AbortSignal
+) {
+  const entry = overlayStackEntries.get(identity) ?? {
+    active: false,
+    order: 0,
+  };
+
+  if (active && !entry.active) {
+    nextOverlayStackOrder += 1;
+    entry.order = nextOverlayStackOrder;
+    entry.active = true;
+    activeOverlayStackEntries += 1;
+  }
+  overlayStackEntries.set(identity, entry);
+
+  if (!active) {
+    deactivateOverlayStackEntry(identity);
+  }
+
+  if (signal && overlayStackSignals.get(identity) !== signal) {
+    overlayStackSignals.set(identity, signal);
+    signal.addEventListener(
+      'abort',
+      () => {
+        if (overlayStackSignals.get(identity) === signal) {
+          deactivateOverlayStackEntry(identity);
+          removeDynamicStyleRule(`${overlayStyleKey(identity)}:stack:backdrop`);
+        }
+      },
+      { once: true }
+    );
+  }
+}
+
+export function resolveOverlayStackZIndex(
+  identity: OverlayIdentity,
+  requested: OverlayZIndex,
+  layer: 'backdrop' | 'content' = 'content'
+): string {
+  const order = overlayStackEntries.get(identity)?.order ?? 0;
+  const offset = order * 2 + (layer === 'content' ? 1 : 0);
+  const fallback =
+    typeof requested === 'number' ? Math.max(requested, 1600) : 1600;
+  return `calc(var(--ak-z-overlay-stack-base, var(--ak-z-tooltip, ${fallback})) + ${offset})`;
+}
+
 type OverlayNodes = {
   trigger: HTMLElement | null;
   content: HTMLElement | null;
@@ -35,7 +102,13 @@ type OverlayNodes = {
   cleanup?: () => void;
 };
 
+export type OverlayNodePart = 'trigger' | 'content' | 'title' | 'description';
+
 const overlayNodes = new WeakMap<OverlayIdentity, OverlayNodes>();
+const overlayNodeOwners = new WeakMap<
+  OverlayIdentity,
+  Partial<Record<OverlayNodePart, object>>
+>();
 const overlayNonces = new WeakMap<OverlayIdentity, string | undefined>();
 
 export function captureOverlayNonce(
@@ -104,6 +177,42 @@ export function getOverlayNodes(identity: OverlayIdentity): OverlayNodes {
 
   overlayNodes.set(identity, created);
   return created;
+}
+
+export function registerOverlayNode(
+  identity: OverlayIdentity,
+  part: OverlayNodePart,
+  node: HTMLElement | null,
+  owner: object
+) {
+  const nodes = getOverlayNodes(identity);
+  const owners = overlayNodeOwners.get(identity) ?? {};
+
+  if (node) {
+    owners[part] = owner;
+    nodes[part] = node;
+  } else if (owners[part] === owner) {
+    delete owners[part];
+    nodes[part] = null;
+  }
+
+  overlayNodeOwners.set(identity, owners);
+}
+
+export function primeOverlayStackNode(
+  identity: OverlayIdentity,
+  part: 'backdrop',
+  domId: string,
+  requested: OverlayZIndex
+) {
+  const attribute = 'data-askr-overlay-stack-id';
+  const styleKey = `${overlayStyleKey(identity)}:stack:${part}`;
+  setDynamicStyleRule(
+    styleKey,
+    dynamicAttributeSelector(attribute, domId),
+    { 'z-index': resolveOverlayStackZIndex(identity, requested, part) },
+    overlayNonces.get(identity)
+  );
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -315,7 +424,7 @@ function applyCenteredPosition(
   };
 }
 
-export function clearOverlayPosition(identity: OverlayIdentity) {
+function clearOverlayPositionEffects(identity: OverlayIdentity) {
   const nodes = overlayNodes.get(identity);
 
   if (!nodes?.cleanup) {
@@ -326,11 +435,23 @@ export function clearOverlayPosition(identity: OverlayIdentity) {
   nodes.cleanup = undefined;
 }
 
+export function clearOverlayPosition(identity: OverlayIdentity) {
+  const nodes = overlayNodes.get(identity);
+  if (nodes && !nodes.content) {
+    queueMicrotask(() => {
+      if (!nodes.content) clearOverlayPositionEffects(identity);
+    });
+    return;
+  }
+  clearOverlayPositionEffects(identity);
+}
+
 export function primeOverlayPosition(
   identity: OverlayIdentity,
   domId: string,
   zIndex: OverlayZIndex
 ) {
+  const resolvedZIndex = resolveOverlayStackZIndex(identity, zIndex);
   setDynamicStyleRule(
     overlayStyleKey(identity),
     dynamicAttributeSelector('data-askr-overlay-id', domId),
@@ -338,7 +459,7 @@ export function primeOverlayPosition(
       position: 'fixed',
       inset: 'auto',
       margin: '0',
-      'z-index': zIndex,
+      'z-index': resolvedZIndex,
     },
     overlayNonces.get(identity)
   );
@@ -354,12 +475,19 @@ export function syncOverlayPosition(
   }
 
   const nodes = getOverlayNodes(identity);
-  clearOverlayPosition(identity);
+  clearOverlayPositionEffects(identity);
 
   if (!nodes.content) {
     return;
   }
-
+  const positionedContent = nodes.content;
+  const selectorAttribute = positionedContent.id
+    ? { name: 'id', value: positionedContent.id }
+    : { name: 'data-askr-overlay-id', value: domId };
+  const selector = dynamicAttributeSelector(
+    selectorAttribute.name,
+    selectorAttribute.value
+  );
   const mode = options.mode ?? 'anchored';
   const resolvedOptions: Required<OverlayPositionOptions> = {
     mode,
@@ -377,14 +505,16 @@ export function syncOverlayPosition(
   let resizeObserver: ResizeObserver | null = null;
 
   const update = () => {
-    const { trigger, content } = nodes;
+    const { trigger } = nodes;
 
-    if (!content) {
+    if (nodes.content !== positionedContent) {
       return;
     }
 
-    content.setAttribute('data-askr-overlay-id', domId);
-    const selector = dynamicAttributeSelector('data-askr-overlay-id', domId);
+    const content = positionedContent;
+    if (selectorAttribute.name === 'data-askr-overlay-id') {
+      content.setAttribute(selectorAttribute.name, selectorAttribute.value);
+    }
 
     const position =
       resolvedOptions.mode === 'centered'
@@ -399,7 +529,10 @@ export function syncOverlayPosition(
         selector,
         {
           ...position,
-          'z-index': resolvedOptions.zIndex,
+          'z-index': resolveOverlayStackZIndex(
+            identity,
+            resolvedOptions.zIndex
+          ),
         },
         overlayNonces.get(identity)
       );
@@ -431,7 +564,7 @@ export function syncOverlayPosition(
       resizeObserver.observe(nodes.trigger);
     }
 
-    resizeObserver.observe(nodes.content);
+    resizeObserver.observe(positionedContent);
   }
 
   nodes.cleanup = () => {
@@ -444,7 +577,9 @@ export function syncOverlayPosition(
     window.removeEventListener('scroll', scheduleUpdate, true);
     resizeObserver?.disconnect();
     resizeObserver = null;
-    nodes.content?.removeAttribute('data-askr-overlay-id');
+    if (selectorAttribute.name === 'data-askr-overlay-id') {
+      positionedContent.removeAttribute(selectorAttribute.name);
+    }
     removeDynamicStyleRule(overlayStyleKey(identity));
   };
 }

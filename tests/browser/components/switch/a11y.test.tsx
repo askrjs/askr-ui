@@ -63,10 +63,7 @@ describe('Switch - Accessibility', () => {
   it('should match the documented switch accessibility contract', () => {
     expect(SWITCH_A11Y_CONTRACT.ROLE).toBe('switch');
     expect(SWITCH_A11Y_CONTRACT.CHECKED_ATTRIBUTE).toBe('aria-checked');
-    expect(SWITCH_A11Y_CONTRACT.KEYBOARD_ACTIVATION).toEqual([
-      'Enter',
-      'Space',
-    ]);
+    expect(SWITCH_A11Y_CONTRACT.KEYBOARD_ACTIVATION).toEqual(['Space']);
     expect(SWITCH_A11Y_CONTRACT.DATA_ATTRIBUTES).toEqual({
       slot: 'data-slot',
       state: 'data-state',

@@ -5,13 +5,15 @@ import {
   captureOverlayNonce,
   createOverlayIdentity,
   getPersistentPortal,
+  setOverlayStackActive,
 } from '../_internal/overlay';
 import {
   focusCollectionItemWithRestore,
   restorePendingCollectionItemFocus,
   type PendingCollectionFocus,
 } from '../_internal/focus';
-import { observeMenuCollection } from '../_internal/menu';
+import { VirtualCompositeOwnerContext } from '../_internal/virtual-composite';
+import { observeMenuCollectionCount } from '../_internal/menu';
 import {
   handleTypeaheadKeyDown,
   handleTypeaheadKeyUp,
@@ -39,8 +41,10 @@ export function Dropdown(props: DropdownProps) {
   });
   const dropdownId = resolveCompoundId('dropdown', id, children);
   const overlayIdentity = state(createOverlayIdentity())();
+  const cleanupSignal = getSignal();
+  setOverlayStackActive(overlayIdentity, openState(), cleanupSignal);
   captureOverlayNonce(overlayIdentity, cspNonce());
-  registerTypeaheadCleanup(overlayIdentity, getSignal());
+  registerTypeaheadCleanup(overlayIdentity, cleanupSignal);
   const currentIndexState = state(0);
   const pendingFocus = state<PendingCollectionFocus>({ index: null })();
   const setCurrentIndex = (index: number) => {
@@ -54,23 +58,32 @@ export function Dropdown(props: DropdownProps) {
     currentIndexCandidate: currentIndexState(),
   };
   const resolvedState = resolveDropdownState(rootContextBase);
-  const collection = observeMenuCollection(dropdownId);
+  const collection = observeMenuCollectionCount(dropdownId);
   const focusItem = (index: number) => {
     const itemValue = resolveDropdownState({
       dropdownId,
       currentIndexCandidate: currentIndexState(),
-    }).items[index]?.value;
-    focusCollectionItemWithRestore(
-      pendingFocus,
-      collection,
-      index,
+    }).items.find((item) => item.index === index)?.value;
+    const resolveNode =
       itemValue === undefined
         ? undefined
         : () =>
             document.getElementById(
               resolvePartId(dropdownId, `item-${itemValue}`)
-            )
-    );
+            );
+    const focus = () => {
+      focusCollectionItemWithRestore(
+        pendingFocus,
+        collection,
+        index,
+        resolveNode
+      );
+    };
+    const mounted =
+      resolveNode?.() ??
+      collection.items().find((item) => item.metadata.index === index)?.node;
+    if (mounted) focus();
+    else queueMicrotask(focus);
   };
   const setOpen = (nextOpen: boolean) => {
     resetTypeahead(overlayIdentity);
@@ -94,10 +107,15 @@ export function Dropdown(props: DropdownProps) {
         currentIndexCandidate: currentIndexState(),
       });
 
+      const currentItemIndex = liveState.items.findIndex(
+        (item) => item.index === liveState.currentIndex
+      );
       return handleTypeaheadKeyDown(overlayIdentity, event, {
-        currentIndex: liveState.currentIndex,
+        currentIndex: currentItemIndex,
         items: liveState.items,
-        onMatch: (index) => {
+        onMatch: (matchIndex) => {
+          const index = liveState.items[matchIndex]?.index;
+          if (index === undefined) return;
           setCurrentIndex(index);
           focusItem(index);
         },
@@ -108,12 +126,13 @@ export function Dropdown(props: DropdownProps) {
   };
   const runtimeRenderContext = createDropdownRenderContext();
   const PortalHost = rootContext.portal;
-
   return (
     <DropdownRootContext value={rootContext}>
       <DropdownRenderContext value={runtimeRenderContext}>
-        {children as JSX.Element}
-        {PortalHost ? <PortalHost key="dropdown-root-portal" /> : null}
+        <VirtualCompositeOwnerContext value>
+          {children as JSX.Element}
+          <PortalHost key="dropdown-root-portal" />
+        </VirtualCompositeOwnerContext>
       </DropdownRenderContext>
     </DropdownRootContext>
   );

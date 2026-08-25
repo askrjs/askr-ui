@@ -149,29 +149,59 @@ describe('Switch - Behavior', () => {
     expect(host?.getAttribute('data-state')).toBe('checked');
   });
 
-  it('should toggle an asChild host with Enter and Space', async () => {
+  it('should ignore Enter and toggle native and asChild hosts with Space', async () => {
+    const onNativeCheckedChange = vi.fn();
     const onCheckedChange = vi.fn();
     container = mount(
-      <Switch asChild onCheckedChange={onCheckedChange}>
-        <span>Power</span>
-      </Switch>
+      <div>
+        <Switch
+          data-testid="native-switch"
+          onCheckedChange={onNativeCheckedChange}
+        >
+          Native power
+        </Switch>
+        <Switch asChild onCheckedChange={onCheckedChange}>
+          <span>Power</span>
+        </Switch>
+      </div>
     );
 
-    let host = container.querySelector('[role="switch"]') as HTMLElement;
+    let nativeHost = container.querySelector(
+      '[data-testid="native-switch"]'
+    ) as HTMLElement;
+    nativeHost.focus();
+    await userEvent.keyboard('{Enter}');
+    await flushUpdates();
+    nativeHost = container.querySelector(
+      '[data-testid="native-switch"]'
+    ) as HTMLElement;
+    expect(nativeHost.getAttribute('aria-checked')).toBe('false');
+    expect(onNativeCheckedChange).not.toHaveBeenCalled();
+
+    nativeHost.focus();
+    await userEvent.keyboard(' ');
+    await flushUpdates();
+    nativeHost = container.querySelector(
+      '[data-testid="native-switch"]'
+    ) as HTMLElement;
+    expect(nativeHost.getAttribute('aria-checked')).toBe('true');
+    expect(onNativeCheckedChange.mock.calls).toEqual([[true]]);
+
+    let host = container.querySelectorAll('[role="switch"]')[1] as HTMLElement;
     host.focus();
     await userEvent.keyboard('{Enter}');
     await flushUpdates();
 
-    host = container.querySelector('[role="switch"]') as HTMLElement;
-    expect(host.getAttribute('aria-checked')).toBe('true');
+    host = container.querySelectorAll('[role="switch"]')[1] as HTMLElement;
+    expect(host.getAttribute('aria-checked')).toBe('false');
 
     host.focus();
     await userEvent.keyboard(' ');
     await flushUpdates();
 
-    host = container.querySelector('[role="switch"]') as HTMLElement;
-    expect(host.getAttribute('aria-checked')).toBe('false');
-    expect(onCheckedChange.mock.calls).toEqual([[true], [false]]);
+    host = container.querySelectorAll('[role="switch"]')[1] as HTMLElement;
+    expect(host.getAttribute('aria-checked')).toBe('true');
+    expect(onCheckedChange.mock.calls).toEqual([[true]]);
   });
 
   it('should restore uncontrolled state when its native form resets', async () => {

@@ -522,4 +522,73 @@ describe('ToggleGroup - Behavior', () => {
     expect(items[1]?.getAttribute('tabindex')).toBe('0');
     expect(items[1]?.getAttribute('aria-pressed')).toBe('true');
   });
+  it('should reverse horizontal arrow navigation under dir="rtl"', async () => {
+    container = mount(
+      <div dir="rtl">
+        <ToggleGroup
+          orientation="horizontal"
+          loop={false}
+          defaultValue="middle"
+        >
+          <ToggleGroupItem value="left">Left</ToggleGroupItem>
+          <ToggleGroupItem value="middle">Middle</ToggleGroupItem>
+          <ToggleGroupItem value="right">Right</ToggleGroupItem>
+        </ToggleGroup>
+      </div>
+    );
+    await flushUpdates();
+
+    getToggleByText(container, 'Middle').focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await flushUpdates();
+    expect(document.activeElement).toBe(getToggleByText(container, 'Left'));
+
+    await userEvent.keyboard('{ArrowLeft}');
+    await flushUpdates();
+    expect(document.activeElement).toBe(getToggleByText(container, 'Middle'));
+
+    await userEvent.keyboard('{ArrowLeft}');
+    await flushUpdates();
+    expect(document.activeElement).toBe(getToggleByText(container, 'Right'));
+  });
+
+  it('should keep advancing the roving tab stop across repeated arrow presses', async () => {
+    container = mount(
+      <ToggleGroup defaultValue="left">
+        <ToggleGroupItem value="left">Left</ToggleGroupItem>
+        <ToggleGroupItem value="middle">Middle</ToggleGroupItem>
+        <ToggleGroupItem value="right">Right</ToggleGroupItem>
+      </ToggleGroup>
+    );
+    await flushUpdates();
+    const tabStopText = () =>
+      Array.from(
+        container.querySelectorAll<HTMLElement>(
+          '[data-slot="toggle-group-item"]'
+        )
+      )
+        .find((item) => item.tabIndex === 0)
+        ?.textContent?.trim();
+
+    getToggleByText(container, 'Left').focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await flushUpdates();
+    expect(document.activeElement).toBe(getToggleByText(container, 'Middle'));
+    expect(tabStopText()).toBe('Middle');
+
+    await userEvent.keyboard('{ArrowRight}');
+    await flushUpdates();
+    expect(document.activeElement).toBe(getToggleByText(container, 'Right'));
+    expect(tabStopText()).toBe('Right');
+
+    await userEvent.keyboard('{ArrowLeft}');
+    await flushUpdates();
+    expect(document.activeElement).toBe(getToggleByText(container, 'Middle'));
+    expect(tabStopText()).toBe('Middle');
+
+    // Navigation alone never changes the selected value.
+    expect(
+      getToggleByText(container, 'Left').getAttribute('aria-pressed')
+    ).toBe('true');
+  });
 });

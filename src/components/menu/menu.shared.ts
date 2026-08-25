@@ -1,12 +1,17 @@
 import { defineScope, readScope } from '@askrjs/askr';
 import type { RovingFocusResult } from '@askrjs/askr/foundations/interactions';
 import {
-  firstEnabledIndex,
   getMenuCollection,
   getMenuCollectionItems,
   type MenuItemMetadata,
 } from '../_internal/menu';
 import type { MenuOwnProps } from './menu.types';
+import {
+  compositeItemCount,
+  disabledCompositeItemIndexes,
+  firstEnabledCompositeItemIndex,
+  readVirtualCompositeIdentity,
+} from '../_internal/virtual-composite';
 
 /** Menu State Input. */
 export type MenuStateInput = {
@@ -25,11 +30,14 @@ export type MenuRootContextValue = {
   navigation: RovingFocusResult;
   handleTypeaheadKeyDown: (event: KeyboardEvent) => boolean;
   handleTypeaheadKeyUp: (event: KeyboardEvent) => boolean;
+  focusItem: (index: number) => void;
+  restoreItemFocus: (index: number, node: HTMLElement | null) => void;
 };
 
 /** Shape of the Menu Render Context Value. */
 export type MenuRenderContextValue = {
   claimItemIndex: () => number;
+  virtualIdentity: string | null;
 };
 
 /** Menu Resolved State. */
@@ -37,6 +45,7 @@ export type MenuResolvedState = {
   items: MenuItemMetadata[];
   currentIndex: number;
   disabledIndexes: number[];
+  itemCount: number;
 };
 
 export const MenuRootContext = defineScope<MenuRootContextValue | null>(null);
@@ -77,6 +86,7 @@ export function createMenuRenderContext(): MenuRenderContextValue {
   let nextItemIndex = 0;
 
   return {
+    virtualIdentity: readVirtualCompositeIdentity(),
     claimItemIndex: () => {
       const index = nextItemIndex;
       nextItemIndex += 1;
@@ -91,18 +101,16 @@ export function createMenuRenderContext(): MenuRenderContextValue {
  */
 export function resolveMenuState(root: MenuStateInput): MenuResolvedState {
   const items = getMenuCollectionItems(getMenuCollection(root.menuId));
-  const fallbackIndex = firstEnabledIndex(items);
+  const fallbackIndex = firstEnabledCompositeItemIndex(items);
   const candidateIndex = root.currentIndexCandidate;
+  const candidate = items.find((item) => item.index === candidateIndex);
   const currentIndex =
-    items[candidateIndex] && !items[candidateIndex]?.disabled
-      ? candidateIndex
-      : fallbackIndex;
+    candidate && !candidate.disabled ? candidateIndex : fallbackIndex;
 
   return {
     items,
     currentIndex,
-    disabledIndexes: items
-      .map((item, index) => (item.disabled ? index : -1))
-      .filter((index) => index !== -1),
+    disabledIndexes: disabledCompositeItemIndexes(items),
+    itemCount: compositeItemCount(items),
   };
 }

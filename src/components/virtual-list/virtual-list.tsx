@@ -25,6 +25,13 @@ import {
   removeDynamicStyleRuleWhenUnused,
   setDynamicStyleRule,
 } from '../_internal/dynamic-style';
+import {
+  extendVirtualCompositeIdentity,
+  readVirtualCompositeIdentity,
+  readVirtualCompositeOwner,
+  type VirtualCompositeScopeValue,
+  VirtualCompositeIdentityContext,
+} from '../_internal/virtual-composite';
 import type {
   VirtualListApi,
   VirtualListAsChildProps,
@@ -86,6 +93,7 @@ type VirtualListEntry<Item> = {
   itemsRef: readonly Item[] | null;
   keys: string[];
   keyIndexMap: Map<string, number>;
+  placements: Map<string, VirtualCompositeScopeValue>;
   followBottomEnabled: boolean;
   followBottomActive: boolean;
   followBottomThreshold: number;
@@ -106,6 +114,37 @@ type VirtualListEntry<Item> = {
   nextLayoutRules: Map<string, string>;
   layoutNonce: string | undefined;
 };
+
+function resolveVirtualListScope<Item>(
+  entry: VirtualListEntry<Item>,
+  parentIdentity: string | null,
+  rowKey: string,
+  index: number,
+  placementEnabled: boolean
+): VirtualCompositeScopeValue {
+  const identity = extendVirtualCompositeIdentity(
+    parentIdentity,
+    'list-row',
+    rowKey
+  );
+  const existing = entry.placements.get(rowKey);
+  if (
+    existing?.identity === identity &&
+    existing.index === index &&
+    existing.setSize === entry.keys.length &&
+    existing.placementEnabled === placementEnabled
+  ) {
+    return existing;
+  }
+  const scope = {
+    identity,
+    index,
+    setSize: entry.keys.length,
+    placementEnabled,
+  };
+  entry.placements.set(rowKey, scope);
+  return scope;
+}
 
 function cloneJsxElement(
   element: JSXElement,
@@ -538,6 +577,8 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
   entry.itemsRef = entry.itemsRef ?? null;
   entry.keys = entry.keys ?? [];
   entry.keyIndexMap = entry.keyIndexMap ?? new Map<string, number>();
+  entry.placements =
+    entry.placements ?? new Map<string, VirtualCompositeScopeValue>();
   entry.followBottomEnabled = entry.followBottomEnabled ?? false;
   entry.followBottomActive = entry.followBottomActive ?? false;
   entry.followBottomThreshold = entry.followBottomThreshold ?? 0;
@@ -596,7 +637,9 @@ function renderVirtualListRows<Item>(
   items: readonly Item[],
   getKey: (item: Item, index: number) => string | number,
   visibleRange: VirtualRange,
-  rendersSemanticListItems: boolean
+  rendersSemanticListItems: boolean,
+  parentVirtualIdentity: string | null,
+  placementEnabled: boolean
 ) {
   const rows: JSXElement[] = [];
 
@@ -646,14 +689,25 @@ function renderVirtualListRows<Item>(
         data-index={String(index)}
         data-key={rowKey}
         data-visible={isVisible ? 'true' : 'false'}
+        data-askr-virtual-composite={placementEnabled ? 'true' : 'false'}
         {...virtualListLayoutProps(entry, 'row', entry.rowHeight)}
       >
-        <RowComponent
-          item={item}
-          index={index}
-          rowKey={rowKey}
-          isVisible={isVisible}
-        />
+        <VirtualCompositeIdentityContext
+          value={resolveVirtualListScope(
+            entry,
+            parentVirtualIdentity,
+            rowKey,
+            index,
+            placementEnabled
+          )}
+        >
+          <RowComponent
+            item={item}
+            index={index}
+            rowKey={rowKey}
+            isVisible={isVisible}
+          />
+        </VirtualCompositeIdentityContext>
       </RowHost>
     );
   }
@@ -676,6 +730,10 @@ function syncVirtualListItems<Item>(
   }
 
   const nextKeys = items.map((item, index) => String(getKey(item, index)));
+  const nextKeySet = new Set(nextKeys);
+  for (const key of entry.placements.keys()) {
+    if (!nextKeySet.has(key)) entry.placements.delete(key);
+  }
   const nextKeyIndexMap = buildVirtualKeyIndexMap(nextKeys);
   const previousVisibleKeys =
     entry.visibleRange.visibleStartIndex < 0
@@ -799,6 +857,8 @@ export function VirtualList<Item>(
   };
 
   const rowHeight = assertPositiveVirtualHeight(rowHeightProp, 'rowHeight');
+  const parentVirtualIdentity = readVirtualCompositeIdentity();
+  const virtualCompositeOwner = readVirtualCompositeOwner();
   const layoutNonce = cspNonce();
   const instanceState = state({}) as StateCell<object>;
   const entry = getVirtualListEntry<Item>(instanceState());
@@ -867,7 +927,9 @@ export function VirtualList<Item>(
         items,
         getKey,
         visibleRange,
-        rendersSemanticListItems
+        rendersSemanticListItems,
+        parentVirtualIdentity,
+        virtualCompositeOwner
       )}
     </>
   );

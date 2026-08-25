@@ -88,10 +88,7 @@ describe('Checkbox - Accessibility', () => {
 
   it('should match the documented checkbox accessibility contract', () => {
     expect(CHECKBOX_A11Y_CONTRACT.ROLE).toBe('checkbox');
-    expect(CHECKBOX_A11Y_CONTRACT.KEYBOARD_ACTIVATION).toEqual([
-      'Enter',
-      'Space',
-    ]);
+    expect(CHECKBOX_A11Y_CONTRACT.KEYBOARD_ACTIVATION).toEqual(['Space']);
     expect(CHECKBOX_A11Y_CONTRACT.CHECKED_ATTRIBUTE).toBe('aria-checked');
     expect(CHECKBOX_A11Y_CONTRACT.INDETERMINATE_VALUE).toBe('mixed');
     expect(CHECKBOX_A11Y_CONTRACT.DISABLED_ATTRIBUTES).toEqual({

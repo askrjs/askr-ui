@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 import * as askrUi from '../../src';
 import {
@@ -39,5 +41,19 @@ describe('Public API', () => {
     for (const removedExport of removedPublicExports) {
       expect(removedExport in askrUi).toBe(false);
     }
+  });
+  it('should only advertise capabilities that the package actually exports', () => {
+    const capabilities = JSON.parse(
+      readFileSync(join(process.cwd(), 'capabilities.json'), 'utf8')
+    ) as {
+      capabilities: { exports?: string[]; import: string }[];
+    };
+    const advertised = Array.from(
+      new Set(capabilities.capabilities.flatMap((entry) => entry.exports ?? []))
+    ).sort();
+    const missing = advertised.filter((name) => !(name in askrUi));
+
+    expect(missing).toEqual([]);
+    expect(advertised.length).toBeGreaterThan(0);
   });
 });

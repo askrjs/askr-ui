@@ -342,4 +342,37 @@ describe('Dropdown - Behavior', () => {
       mount(<DropdownTrigger>Orphan</DropdownTrigger>);
     }).toThrow('Dropdown components must be used within <Dropdown>');
   });
+  it('should keep vertical item navigation stable under dir="rtl"', async () => {
+    container = mount(
+      <div dir="rtl">
+        <Dropdown defaultOpen>
+          <DropdownTrigger>Open dropdown</DropdownTrigger>
+          <DropdownPortal>
+            <DropdownContent>
+              <DropdownItem>Archive</DropdownItem>
+              <DropdownItem>Duplicate</DropdownItem>
+            </DropdownContent>
+          </DropdownPortal>
+        </Dropdown>
+      </div>
+    );
+    await flushUpdates();
+    await flushUpdates();
+
+    const focusedText = () => document.activeElement?.textContent?.trim();
+    const item = (text: string) =>
+      Array.from(
+        document.body.querySelectorAll<HTMLElement>('[role="menuitem"]')
+      ).find((node) => node.textContent?.trim() === text);
+
+    item('Archive')?.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await flushUpdates();
+    expect(focusedText()).toBe('Duplicate');
+
+    await userEvent.keyboard('{ArrowRight}');
+    await userEvent.keyboard('{ArrowLeft}');
+    await flushUpdates();
+    expect(focusedText()).toBe('Duplicate');
+  });
 });

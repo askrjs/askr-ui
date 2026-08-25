@@ -2,7 +2,7 @@ import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
-import { pressable } from '@askrjs/askr/foundations/interactions';
+import { checkablePress } from '../_internal/checkable-press';
 import type { SwitchAsChildProps, SwitchButtonProps } from './switch.types';
 import { formResetRef } from '../_internal/form-reset';
 
@@ -41,10 +41,9 @@ export function Switch(props: SwitchButtonProps | SwitchAsChildProps) {
     }
   });
 
-  const interactionProps = pressable({
+  const interactionProps = checkablePress({
     disabled,
     onPress: () => checkedState.set(!currentChecked),
-    isNativeButton: !asChild,
   });
 
   const finalProps = mergeProps(rest, {

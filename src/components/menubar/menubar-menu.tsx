@@ -1,17 +1,22 @@
 import { nativeButtonProps } from '../_internal/native-control';
+import { getSignal, state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
-import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
+import { pressable } from '@askrjs/askr/foundations/interactions';
+import { rovingFocus } from '../_internal/roving-focus';
 import {
   compositeItemFocusProps,
-  focusSelectedCollectionItem,
   repairFocusForDisabledItem,
 } from '../_internal/focus';
 import { resolvePartId } from '../_internal/id';
 import { pathIsOpen } from '../_internal/hierarchical-menu';
 import { resolveMenuItemText } from '../_internal/menu';
-import { getOverlayNodes, getPersistentPortal } from '../_internal/overlay';
+import { getPersistentPortal, registerOverlayNode } from '../_internal/overlay';
 import { runCancelablePress } from '../_internal/press';
+import {
+  readVirtualCompositePlacement,
+  resolveVirtualCompositePlacement,
+} from '../_internal/virtual-composite';
 import {
   getCompositeCollection,
   registerCompositeNode,
@@ -34,12 +39,6 @@ import type {
 
 function MenubarMenuScopeView(props: { children?: unknown }) {
   return <>{props.children}</>;
-}
-
-function scheduleMenubarPortalSync(root: { syncPortals: () => void }) {
-  queueMicrotask(() => {
-    root.syncPortals();
-  });
 }
 
 function MenubarPortalMenuScopeView(props: {
@@ -73,12 +72,21 @@ function MenubarPortalRuntimeView(props: {
 export function MenubarMenu(props: MenubarMenuProps) {
   const root = readMenubarRootContext();
   const renderContext = readMenubarRootRenderContext();
-  const menuIndex = renderContext.claimMenuIndex();
+  const scopedVirtualPlacement = readVirtualCompositePlacement(
+    renderContext.virtualIdentity
+  );
+  const placement = state<{ index: number; setSize?: number }>({ index: -1 })();
+  if (!scopedVirtualPlacement && placement.index < 0) {
+    placement.index = renderContext.claimMenuIndex();
+  }
+  const resolvedPlacement = scopedVirtualPlacement ?? placement;
+  const menuIndex = resolvedPlacement.index;
   const menuKey = props.value ?? `menu-${menuIndex}`;
-  const portalRecord = root.ensureMenuPortal(menuKey);
+  const portalRecord = root.ensureMenuPortal(menuKey, getSignal());
   const menuContext: MenubarMenuContextValue = {
     menuKey,
     menuIndex,
+    placement: resolvedPlacement,
     triggerId: resolvePartId(root.menubarId, `trigger-${menuKey}`),
     contentId: resolvePartId(root.menubarId, `content-${menuKey}`),
     portalId: resolvePartId(root.menubarId, `portal-${portalRecord.ordinal}`),
@@ -117,19 +125,19 @@ export function MenubarTrigger(
   } = props;
   const root = readMenubarRootContext();
   const menu = readMenubarMenuContext();
+  const scopedVirtualPlacement = menu.placement;
 
-  const { items, currentTriggerIndex, disabledTriggerIndexes } =
-    root.resolvedState;
+  const { currentTriggerIndex, disabledTriggerIndexes } = root.resolvedState;
   const collection = getCompositeCollection(root.menubarId);
   const nav = rovingFocus({
     currentIndex: currentTriggerIndex,
-    itemCount: Math.max(items.length, 1),
+    itemCount: Math.max(root.resolvedState.itemCount, 1),
     orientation: 'horizontal',
     loop: root.loop,
     isDisabled: (index) => disabledTriggerIndexes.includes(index),
     onNavigate: (index) => {
       root.setCurrentTriggerIndex(index);
-      focusSelectedCollectionItem(collection, index);
+      root.focusTrigger(index);
     },
   });
   const isOpen = () => pathIsOpen(root.getOpenPath(), menu.path);
@@ -140,7 +148,6 @@ export function MenubarTrigger(
       runCancelablePress(event, onPress, () => {
         root.setCurrentTriggerIndex(menu.menuIndex);
         root.setOpenPath(isOpen() ? [] : menu.path);
-        scheduleMenubarPortalSync(root);
       });
     },
     isNativeButton: false,
@@ -148,24 +155,38 @@ export function MenubarTrigger(
   const focusRepairProps = compositeItemFocusProps();
   const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
-    getOverlayNodes(menu.overlayIdentity).trigger = node;
+    const virtualPlacement =
+      scopedVirtualPlacement ??
+      (node ? resolveVirtualCompositePlacement(node) : null);
+    if (virtualPlacement && !scopedVirtualPlacement) {
+      menu.placement.index = virtualPlacement.index;
+      menu.placement.setSize = virtualPlacement.setSize;
+    }
+    const resolvedIndex = virtualPlacement?.index ?? menu.menuIndex;
+    registerOverlayNode(
+      menu.overlayIdentity,
+      'trigger',
+      node,
+      registrationOwner
+    );
     registerCompositeNode(
       menu.triggerId,
       collection,
       node,
       {
-        index: menu.menuIndex,
+        index: resolvedIndex,
+        setSize: virtualPlacement?.setSize ?? menu.placement.setSize,
         disabled,
         value: menu.menuKey,
         text: itemText,
       },
       registrationOwner
     );
-    root.restoreTriggerFocus(menu.menuIndex, node);
+    root.restoreTriggerFocus(resolvedIndex, node);
     repairFocusForDisabledItem({
       collection,
       disabled,
-      index: menu.menuIndex,
+      index: resolvedIndex,
       loop: root.loop,
       node,
       setCurrentIndex: root.setCurrentTriggerIndex,
@@ -192,7 +213,6 @@ export function MenubarTrigger(
       event.preventDefault();
       root.setCurrentTriggerIndex(menu.menuIndex);
       root.setOpenPath(menu.path);
-      scheduleMenubarPortalSync(root);
     }
   };
   const handleKeyUp = (event: KeyboardEvent) => {
@@ -228,7 +248,6 @@ export function MenubarTrigger(
       if (!disabled && root.getOpenPath().length > 0) {
         root.setCurrentTriggerIndex(menu.menuIndex);
         root.setOpenPath(menu.path);
-        scheduleMenubarPortalSync(root);
       }
     },
   });

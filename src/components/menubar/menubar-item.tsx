@@ -2,16 +2,16 @@ import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { state } from '@askrjs/askr';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
-import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
+import { pressable } from '@askrjs/askr/foundations/interactions';
+import { rovingFocus } from '../_internal/roving-focus';
 import {
   compositeItemFocusProps,
-  focusSelectedCollectionItem,
   repairFocusForDisabledItem,
 } from '../_internal/focus';
 import { resolvePartId } from '../_internal/id';
 import { pathIsOpen } from '../_internal/hierarchical-menu';
 import { resolveMenuItemText } from '../_internal/menu';
-import { getOverlayNodes } from '../_internal/overlay';
+import { registerOverlayNode } from '../_internal/overlay';
 import { runCancelablePress } from '../_internal/press';
 import {
   getCompositeCollection,
@@ -34,15 +34,13 @@ import type {
   MenubarSubTriggerProps,
 } from './menubar.types';
 import { resolveTextDirection } from '../_internal/direction';
+import {
+  readVirtualCompositePlacement,
+  resolveVirtualCompositePlacement,
+} from '../_internal/virtual-composite';
 
 function MenubarSubScopeView(props: { children?: unknown }) {
   return <>{props.children}</>;
-}
-
-function scheduleMenubarPortalSync(root: { syncPortals: () => void }) {
-  queueMicrotask(() => {
-    root.syncPortals();
-  });
 }
 
 /**
@@ -65,7 +63,14 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
   } = props;
   const content = readMenubarContentContext();
   const renderContext = readMenubarContentRenderContext();
-  const surfaceIndex = renderContext.claimSurfaceIndex();
+  const scopedVirtualPlacement = readVirtualCompositePlacement(
+    renderContext.virtualIdentity
+  );
+  const placement = state<{ index: number; setSize?: number }>({ index: -1 })();
+  if (!scopedVirtualPlacement && placement.index < 0) {
+    placement.index = renderContext.claimSurfaceIndex();
+  }
+  const surfaceIndex = scopedVirtualPlacement?.index ?? placement.index;
 
   const root = readOptionalMenubarRootContext();
 
@@ -75,18 +80,18 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
 
   const surfaceId = resolvePartId(content.contentId, `item-${surfaceIndex}`);
   const itemText = resolveMenuItemText(children, textValue);
-  const { items, currentIndex, disabledItemIndexes } =
+  const { currentIndex, disabledItemIndexes, itemCount } =
     resolveMenubarContentState(content);
   const collection = getCompositeCollection(content.contentId);
   const nav = rovingFocus({
     currentIndex,
-    itemCount: Math.max(items.length, 1),
+    itemCount: Math.max(itemCount, 1),
     orientation: 'vertical',
     loop: true,
     isDisabled: (index) => disabledItemIndexes.includes(index),
     onNavigate: (index) => {
       content.setCurrentIndex(index);
-      focusSelectedCollectionItem(collection, index);
+      content.focusItem(index);
     },
   });
   const interactionProps = pressable({
@@ -94,7 +99,6 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
     onPress: (event) => {
       runCancelablePress(event, onPress, () => {
         root.setOpenPath([]);
-        scheduleMenubarPortalSync(root);
       });
     },
     isNativeButton: false,
@@ -117,22 +121,31 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
   };
   const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
+    const virtualPlacement =
+      scopedVirtualPlacement ??
+      (node ? resolveVirtualCompositePlacement(node) : null);
+    if (virtualPlacement && !scopedVirtualPlacement) {
+      placement.index = virtualPlacement.index;
+      placement.setSize = virtualPlacement.setSize;
+    }
+    const resolvedIndex = virtualPlacement?.index ?? surfaceIndex;
     registerCompositeNode(
       surfaceId,
       collection,
       node,
       {
-        index: surfaceIndex,
+        index: resolvedIndex,
+        setSize: virtualPlacement?.setSize ?? placement.setSize,
         disabled,
         text: itemText,
       },
       registrationOwner
     );
-    content.restoreItemFocus(surfaceIndex, node);
+    content.restoreItemFocus(resolvedIndex, node);
     repairFocusForDisabledItem({
       collection,
       disabled,
-      index: surfaceIndex,
+      index: resolvedIndex,
       loop: true,
       node,
       setCurrentIndex: content.setCurrentIndex,
@@ -181,11 +194,20 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
 export function MenubarSub(props: MenubarSubProps) {
   const content = readMenubarContentContext();
   const renderContext = readMenubarContentRenderContext();
-  const surfaceIndex = renderContext.claimSurfaceIndex();
+  const scopedVirtualPlacement = readVirtualCompositePlacement(
+    renderContext.virtualIdentity
+  );
+  const placement = state<{ index: number; setSize?: number }>({ index: -1 })();
+  if (!scopedVirtualPlacement && placement.index < 0) {
+    placement.index = renderContext.claimSurfaceIndex();
+  }
+  const resolvedPlacement = scopedVirtualPlacement ?? placement;
+  const surfaceIndex = resolvedPlacement.index;
   const subKey = props.value ?? `sub-${surfaceIndex}`;
   const overlayIdentity = state<object>({})();
   const subContext: MenubarSubContextValue = {
     surfaceIndex,
+    placement: resolvedPlacement,
     triggerId: resolvePartId(content.contentId, `sub-trigger-${surfaceIndex}`),
     contentId: resolvePartId(content.contentId, `sub-content-${surfaceIndex}`),
     path: [...content.path, subKey],
@@ -225,6 +247,7 @@ export function MenubarSubTrigger(
   } = props;
   const content = readMenubarContentContext();
   const sub = readMenubarSubContext();
+  const scopedTriggerPlacement = sub.placement;
 
   const root = readOptionalMenubarRootContext();
 
@@ -232,19 +255,19 @@ export function MenubarSubTrigger(
     return null;
   }
 
-  const { items, currentIndex, disabledItemIndexes } =
+  const { currentIndex, disabledItemIndexes, itemCount } =
     resolveMenubarContentState(content);
   const itemText = resolveMenuItemText(children, textValue);
   const collection = getCompositeCollection(content.contentId);
   const nav = rovingFocus({
     currentIndex,
-    itemCount: Math.max(items.length, 1),
+    itemCount: Math.max(itemCount, 1),
     orientation: 'vertical',
     loop: true,
     isDisabled: (index) => disabledItemIndexes.includes(index),
     onNavigate: (index) => {
       content.setCurrentIndex(index);
-      focusSelectedCollectionItem(collection, index);
+      content.focusItem(index);
     },
   });
   const isOpen = () => pathIsOpen(root.getOpenPath(), sub.path);
@@ -254,7 +277,6 @@ export function MenubarSubTrigger(
       runCancelablePress(event, onPress, () => {
         content.setCurrentIndex(sub.surfaceIndex);
         root.setOpenPath(isOpen() ? content.path : sub.path);
-        scheduleMenubarPortalSync(root);
       });
     },
     isNativeButton: false,
@@ -262,23 +284,37 @@ export function MenubarSubTrigger(
   const focusRepairProps = compositeItemFocusProps();
   const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
-    getOverlayNodes(sub.overlayIdentity).trigger = node;
+    const virtualPlacement =
+      scopedTriggerPlacement ??
+      (node ? resolveVirtualCompositePlacement(node) : null);
+    if (virtualPlacement && !scopedTriggerPlacement) {
+      sub.placement.index = virtualPlacement.index;
+      sub.placement.setSize = virtualPlacement.setSize;
+    }
+    const resolvedIndex = virtualPlacement?.index ?? sub.surfaceIndex;
+    registerOverlayNode(
+      sub.overlayIdentity,
+      'trigger',
+      node,
+      registrationOwner
+    );
     registerCompositeNode(
       sub.triggerId,
       collection,
       node,
       {
-        index: sub.surfaceIndex,
+        index: resolvedIndex,
+        setSize: virtualPlacement?.setSize ?? sub.placement.setSize,
         disabled,
         text: itemText,
       },
       registrationOwner
     );
-    content.restoreItemFocus(sub.surfaceIndex, node);
+    content.restoreItemFocus(resolvedIndex, node);
     repairFocusForDisabledItem({
       collection,
       disabled,
-      index: sub.surfaceIndex,
+      index: resolvedIndex,
       loop: true,
       node,
       setCurrentIndex: content.setCurrentIndex,
@@ -307,7 +343,6 @@ export function MenubarSubTrigger(
       event.preventDefault();
       content.setCurrentIndex(sub.surfaceIndex);
       root.setOpenPath(sub.path);
-      scheduleMenubarPortalSync(root);
     }
   };
   const handleKeyUp = (event: KeyboardEvent) => {
@@ -339,7 +374,6 @@ export function MenubarSubTrigger(
       if (!disabled) {
         content.setCurrentIndex(sub.surfaceIndex);
         root.setOpenPath(sub.path);
-        scheduleMenubarPortalSync(root);
       }
     },
   });
