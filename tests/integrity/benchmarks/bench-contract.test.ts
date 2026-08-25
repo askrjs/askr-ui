@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
-import { componentSurface } from './fixtures/public-surface';
+import { componentSurface } from '../../fixtures/public-surface';
 
 function toPascalCase(componentName: string): string {
   return componentName

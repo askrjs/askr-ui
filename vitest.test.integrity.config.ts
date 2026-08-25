@@ -6,10 +6,6 @@ export default defineConfig({
   test: {
     ...sharedVitestConfig.test,
     environment: 'node',
-    include: [
-      'tests/unit/composite-id.test.tsx',
-      'tests/unit/overlay-stack.test.ts',
-      'tests/unit/virtualization-ssr.test.tsx',
-    ],
+    include: ['tests/integrity/**/*.test.{ts,tsx}'],
   },
 });

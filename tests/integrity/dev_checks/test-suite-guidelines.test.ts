@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 function readAllTestFiles(dir: string): string[] {
-  if (dir.includes(path.join('tests', 'unit', 'dev_checks'))) return [];
+  if (dir.includes(path.join('tests', 'integrity', 'dev_checks'))) return [];
 
   const results: string[] = [];
   const entries = fs.readdirSync(dir, { withFileTypes: true });

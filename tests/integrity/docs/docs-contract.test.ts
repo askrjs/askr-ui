@@ -1,12 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
-import * as askrUi from '../../src';
+import * as askrUi from '../../../src';
 import {
   componentSurface,
   publicValueExports,
   removedPublicExports,
-} from './fixtures/public-surface';
+} from '../../fixtures/public-surface';
 
 type PackageExports = Record<string, unknown>;
 
