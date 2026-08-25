@@ -239,9 +239,9 @@
     "test:integrity": "vp test run -c vitest.test.integrity.config.ts"
   },
   "devDependencies": {
-    "@askrjs/askr": ">=0.2.2 <0.3.0",
-    "@askrjs/vite": ">=0.2.0 <0.3.0",
-    "@types/node": "^26.2.0",
+    "@askrjs/askr": ">=0.2.3 <0.3.0",
+    "@askrjs/vite": ">=0.2.1 <0.3.0",
+    "@types/node": "^26.3.0",
     "@vitest/browser-playwright": "4.1.10",
     "axe-core": "^4.13.0",
     "cross-env": "^10.1.0",
@@ -253,7 +253,7 @@
     "vite-plus": "^0.2.9"
   },
   "peerDependencies": {
-    "@askrjs/askr": ">=0.2.0 <0.3.0"
+    "@askrjs/askr": ">=0.2.3 <0.3.0"
   },
   "engines": {
     "node": ">=24.0.0"
