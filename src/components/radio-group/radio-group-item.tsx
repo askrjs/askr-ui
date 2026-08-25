@@ -1,19 +1,22 @@
 import { nativeButtonProps } from '../_internal/native-control';
+import { state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
-import { rovingFocus } from '@askrjs/askr/foundations/interactions';
+import { rovingFocus } from '../_internal/roving-focus';
 import { checkablePress } from '../_internal/checkable-press';
 import {
   compositeItemFocusProps,
-  focusSelectedCollectionItem,
   repairFocusForDisabledItem,
 } from '../_internal/focus';
 import {
-  disabledIndexes,
   getCompositeCollection,
   registerCompositeNode,
 } from '../_internal/composite';
 import { resolvePartId } from '../_internal/id';
+import {
+  claimVirtualCompositePlacement,
+  resolveVirtualCompositePlacement,
+} from '../_internal/virtual-composite';
 import {
   readRadioGroupRenderContext,
   readRadioGroupRootContext,
@@ -36,22 +39,27 @@ export function RadioGroupItem(
   const { asChild, children, value, disabled = false, ref, ...rest } = props;
   const root = readRadioGroupRootContext();
   const renderContext = readRadioGroupRenderContext();
-  const itemIndex = renderContext.claimItemIndex();
+  const placement = state<{ index: number; setSize?: number }>({ index: -1 })();
+  const scopedVirtualPlacement = claimVirtualCompositePlacement(
+    placement,
+    renderContext.claimItemIndex,
+    renderContext.virtualIdentity
+  );
+  const itemIndex = scopedVirtualPlacement?.index ?? placement.index;
   const itemId = resolvePartId(root.groupId, `item-${itemIndex}`);
   const collection = getCompositeCollection(root.groupId);
   const isDisabled = root.disabled || disabled;
-  const disabledItemIndexes = disabledIndexes(root.items);
   const nav = rovingFocus({
     currentIndex: root.currentIndex,
-    itemCount: Math.max(root.items.length, 1),
+    itemCount: Math.max(root.itemCount, 1),
     orientation: root.orientation,
     loop: root.loop,
-    isDisabled: (index) => disabledItemIndexes.includes(index),
+    isDisabled: (index) => root.disabledIndexes.includes(index),
     onNavigate: (index) => {
-      const next = root.items[index]?.value;
+      const next = root.items.find((item) => item.index === index)?.value;
 
       root.setCurrentIndex(index);
-      focusSelectedCollectionItem(collection, index);
+      root.focusItem(index);
 
       if (next) {
         root.setValue(next);
@@ -70,12 +78,21 @@ export function RadioGroupItem(
   const focusRepairProps = compositeItemFocusProps();
   const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
+    const virtualPlacement =
+      scopedVirtualPlacement ??
+      (node ? resolveVirtualCompositePlacement(node) : null);
+    if (virtualPlacement && !scopedVirtualPlacement) {
+      placement.index = virtualPlacement.index;
+      placement.setSize = virtualPlacement.setSize;
+    }
+    const resolvedIndex = virtualPlacement?.index ?? itemIndex;
     const changed = registerCompositeNode(
       itemId,
       collection,
       node,
       {
-        index: itemIndex,
+        index: resolvedIndex,
+        setSize: virtualPlacement?.setSize ?? placement.setSize,
         disabled: isDisabled,
         value,
       },
@@ -85,10 +102,11 @@ export function RadioGroupItem(
     if (changed) {
       root.scheduleItemsSync();
     }
+    root.restoreItemFocus(resolvedIndex, node);
     repairFocusForDisabledItem({
       collection,
       disabled: isDisabled,
-      index: itemIndex,
+      index: resolvedIndex,
       loop: root.loop,
       node,
       setCurrentIndex: root.setCurrentIndex,

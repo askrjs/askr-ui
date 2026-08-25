@@ -2,7 +2,8 @@ import { nativeButtonProps } from '../_internal/native-control';
 import { state } from '@askrjs/askr';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
-import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
+import { pressable } from '@askrjs/askr/foundations/interactions';
+import { rovingFocus } from '../_internal/roving-focus';
 import {
   compositeItemFocusProps,
   focusSelectedCollectionItem,
@@ -43,44 +44,11 @@ import {
   readAccordionRootContext,
   type AccordionRootContextValue,
 } from './accordion.shared';
-
-function resolveVirtualAccordionPlacement(node: HTMLElement): {
-  index: number;
-  setSize?: number;
-} | null {
-  const listRow = node.closest<HTMLElement>(
-    '[data-slot="virtual-list-row"][data-index]'
-  );
-  if (listRow) {
-    const index = Number(listRow.dataset.index);
-    const setSize = Number(listRow.getAttribute('aria-setsize'));
-    return Number.isInteger(index)
-      ? { index, setSize: Number.isInteger(setSize) ? setSize : undefined }
-      : null;
-  }
-
-  const tableRow = node.closest<HTMLElement>(
-    '[data-slot="virtual-table-row"][data-row-index]'
-  );
-  if (!tableRow) {
-    return null;
-  }
-  const index = Number(tableRow.dataset.rowIndex);
-  const rowCount = Number(
-    tableRow
-      .closest('[data-slot="virtual-table"]')
-      ?.querySelector('[role="grid"]')
-      ?.getAttribute('aria-rowcount')
-  );
-  return Number.isInteger(index)
-    ? {
-        index,
-        setSize: Number.isInteger(rowCount)
-          ? Math.max(0, rowCount - 1)
-          : undefined,
-      }
-    : null;
-}
+import {
+  claimVirtualCompositePlacement,
+  resolveVirtualCompositePlacement,
+  VirtualCompositeOwnerContext,
+} from '../_internal/virtual-composite';
 
 function focusAccordionItem(
   collection: AccordionRootContextValue['collection'],
@@ -285,7 +253,9 @@ export function Accordion(props: AccordionProps) {
   return (
     <AccordionRootContext value={rootContext}>
       <AccordionRenderContext value={renderContext}>
-        <div {...mergedProps}>{children}</div>
+        <VirtualCompositeOwnerContext value>
+          <div {...mergedProps}>{children}</div>
+        </VirtualCompositeOwnerContext>
       </AccordionRenderContext>
     </AccordionRootContext>
   );
@@ -301,10 +271,12 @@ export function AccordionItem(props: AccordionItemProps): JSX.Element {
   const placement = state<{ index: number; setSize?: number }>({
     index: -1,
   })();
-  if (placement.index < 0) {
-    placement.index = renderContext.claimItemIndex();
-  }
-  const itemIndex = placement.index;
+  const scopedVirtualPlacement = claimVirtualCompositePlacement(
+    placement,
+    renderContext.claimItemIndex,
+    renderContext.virtualIdentity
+  );
+  const itemIndex = scopedVirtualPlacement?.index ?? placement.index;
   const itemId = resolvePartId(root.accordionId, `item-${value}`);
   const triggerId = resolvePartId(itemId, 'trigger');
   const contentId = resolvePartId(itemId, 'content');
@@ -313,7 +285,7 @@ export function AccordionItem(props: AccordionItemProps): JSX.Element {
   const itemContext = {
     accordionId: root.accordionId,
     itemIndex,
-    itemSetSize: placement.setSize,
+    itemSetSize: scopedVirtualPlacement?.setSize ?? placement.setSize,
     itemValue: value,
     itemDisabled,
     itemId,
@@ -325,7 +297,8 @@ export function AccordionItem(props: AccordionItemProps): JSX.Element {
       if (!node) {
         return;
       }
-      const nextPlacement = resolveVirtualAccordionPlacement(node);
+      const nextPlacement =
+        scopedVirtualPlacement ?? resolveVirtualCompositePlacement(node);
       if (nextPlacement) {
         placement.index = nextPlacement.index;
         placement.setSize = nextPlacement.setSize;
@@ -439,7 +412,7 @@ export function AccordionTrigger(
         | undefined,
       (node: HTMLElement | null) => {
         const nextPlacement = node
-          ? resolveVirtualAccordionPlacement(node)
+          ? resolveVirtualCompositePlacement(node)
           : null;
         if (nextPlacement) {
           item.itemIndex = nextPlacement.index;

@@ -1,10 +1,12 @@
 import { defineScope, readScope } from '@askrjs/askr';
-import {
-  firstEnabledIndex,
-  getMenuCollection,
-  getMenuCollectionItems,
-} from '../_internal/menu';
+import { getMenuCollection, getMenuCollectionItems } from '../_internal/menu';
 import type { OverlayPortal } from '../_internal/overlay';
+import {
+  compositeItemCount,
+  disabledCompositeItemIndexes,
+  firstEnabledCompositeItemIndex,
+  readVirtualCompositeIdentity,
+} from '../_internal/virtual-composite';
 
 /** Select State Input. */
 export type SelectStateInput = {
@@ -13,11 +15,14 @@ export type SelectStateInput = {
   open: boolean;
   currentIndexCandidate: number;
   disabled: boolean;
+  bindFormReset: (node: Element | null) => void;
   declaredItems: SelectItemMetadata[];
 };
 
 /** Select Item Metadata. */
 export type SelectItemMetadata = {
+  index: number;
+  setSize?: number;
   disabled: boolean;
   value?: string;
   text: string;
@@ -38,6 +43,7 @@ export type SelectRootContextValue = {
   focusItem: (index: number) => void;
   restoreItemFocus: (index: number, node: HTMLElement | null) => void;
   disabled: boolean;
+  bindFormReset: (node: Element | null) => void;
   declaredItems: SelectItemMetadata[];
   resolvedState: SelectResolvedState;
   handleTypeaheadKeyDown: (event: KeyboardEvent) => boolean;
@@ -48,6 +54,7 @@ export type SelectRootContextValue = {
 export type SelectRenderContextValue = {
   claimItemIndex: () => number;
   claimGroupIndex: () => number;
+  virtualIdentity: string | null;
 };
 
 /** Shape of the Select Group Context Value. */
@@ -62,6 +69,7 @@ export type SelectResolvedState = {
   currentIndex: number;
   selectedText: string;
   disabledIndexes: number[];
+  itemCount: number;
 };
 
 export const SelectRootContext = defineScope<SelectRootContextValue | null>(
@@ -115,6 +123,7 @@ export function createSelectRenderContext(): SelectRenderContextValue {
   let nextGroupIndex = 0;
 
   return {
+    virtualIdentity: readVirtualCompositeIdentity(),
     claimItemIndex: () => {
       const index = nextItemIndex;
       nextItemIndex += 1;
@@ -135,9 +144,9 @@ export function getSelectDisabledIndexes(
   items: SelectItemMetadata[],
   disabled: boolean
 ): number[] {
-  return items
-    .map((item, index) => (disabled || item.disabled ? index : -1))
-    .filter((index) => index !== -1);
+  return disabledCompositeItemIndexes(
+    items.map((item) => ({ ...item, disabled: disabled || item.disabled }))
+  );
 }
 
 /**
@@ -150,6 +159,8 @@ export function resolveSelectState(
   const registeredItems = getMenuCollectionItems(
     getMenuCollection(root.selectId)
   ).map((item) => ({
+    index: item.index,
+    setSize: item.setSize,
     disabled: item.disabled,
     value: item.value,
     text: item.text,
@@ -157,22 +168,31 @@ export function resolveSelectState(
   const items =
     registeredItems.length > 0 ? registeredItems : root.declaredItems;
   const effectiveItems = items.map((item) => ({
+    index: item.index,
+    setSize: item.setSize,
     disabled: root.disabled || item.disabled,
   }));
-  const selectedIndex = items.findIndex((item) => item.value === root.value);
-  const fallbackIndex = firstEnabledIndex(effectiveItems);
+  const selectedIndex = items.find((item) => item.value === root.value)?.index;
+  const fallbackIndex = firstEnabledCompositeItemIndex(effectiveItems);
+  const itemCount = compositeItemCount(items);
   const allItemsDisabled =
-    items.length > 0 && effectiveItems.every((item) => item.disabled);
+    items.length > 0 &&
+    itemCount <= items.length &&
+    effectiveItems.every((item) => item.disabled);
   const candidateIndex = root.currentIndexCandidate;
+  const candidate = effectiveItems.find(
+    (item) => item.index === candidateIndex
+  );
+  const selected = effectiveItems.find((item) => item.index === selectedIndex);
+  const candidateInRange =
+    candidateIndex >= 0 && candidateIndex < Math.max(itemCount, 1);
+  const candidateEnabled = candidate ? !candidate.disabled : candidateInRange;
   const currentIndex =
-    root.open &&
-    effectiveItems[candidateIndex] &&
-    !effectiveItems[candidateIndex]?.disabled
+    root.open && candidateEnabled
       ? candidateIndex
-      : selectedIndex >= 0 && !effectiveItems[selectedIndex]?.disabled
+      : selectedIndex !== undefined && selected && !selected.disabled
         ? selectedIndex
-        : effectiveItems[candidateIndex] &&
-            !effectiveItems[candidateIndex]?.disabled
+        : candidateEnabled
           ? candidateIndex
           : allItemsDisabled
             ? -1
@@ -183,5 +203,6 @@ export function resolveSelectState(
     currentIndex,
     selectedText: items.find((item) => item.value === root.value)?.text ?? '',
     disabledIndexes: getSelectDisabledIndexes(items, root.disabled),
+    itemCount,
   };
 }

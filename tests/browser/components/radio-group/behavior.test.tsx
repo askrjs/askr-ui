@@ -470,4 +470,25 @@ describe('RadioGroup - Behavior', () => {
         document.activeElement.hasAttribute('disabled')
     ).toBe(false);
   });
+  it('should reverse horizontal arrow navigation under dir="rtl"', async () => {
+    container = mount(
+      <div dir="rtl">
+        <RadioGroup orientation="horizontal" defaultValue="middle">
+          <RadioGroupItem value="left">Left</RadioGroupItem>
+          <RadioGroupItem value="middle">Middle</RadioGroupItem>
+          <RadioGroupItem value="right">Right</RadioGroupItem>
+        </RadioGroup>
+      </div>
+    );
+    await flushUpdates();
+
+    getRadioByText(container, 'Middle').focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await flushUpdates();
+    expect(document.activeElement).toBe(getRadioByText(container, 'Left'));
+
+    await userEvent.keyboard('{ArrowLeft}');
+    await flushUpdates();
+    expect(document.activeElement).toBe(getRadioByText(container, 'Middle'));
+  });
 });

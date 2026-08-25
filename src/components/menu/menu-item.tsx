@@ -1,4 +1,5 @@
 import { nativeButtonProps } from '../_internal/native-control';
+import { state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
@@ -12,6 +13,10 @@ import {
   resolveMenuItemText,
 } from '../_internal/menu';
 import { resolvePartId } from '../_internal/id';
+import {
+  claimVirtualCompositePlacement,
+  resolveVirtualCompositePlacement,
+} from '../_internal/virtual-composite';
 import { runCancelablePress } from '../_internal/press';
 import { readMenuRenderContext, readMenuRootContext } from './menu.shared';
 import type { MenuItemAsChildProps, MenuItemProps } from './menu.types';
@@ -36,7 +41,13 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
   } = props;
   const root = readMenuRootContext();
   const renderContext = readMenuRenderContext();
-  const itemIndex = renderContext.claimItemIndex();
+  const placement = state<{ index: number; setSize?: number }>({ index: -1 })();
+  const scopedVirtualPlacement = claimVirtualCompositePlacement(
+    placement,
+    renderContext.claimItemIndex,
+    renderContext.virtualIdentity
+  );
+  const itemIndex = scopedVirtualPlacement?.index ?? placement.index;
   const itemId = resolvePartId(root.menuId, `item-${itemIndex}`);
   const itemText = resolveMenuItemText(children, textValue);
   const collection = getMenuCollection(root.menuId);
@@ -78,21 +89,31 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
         | null
         | undefined,
       (node: HTMLElement | null) => {
+        const virtualPlacement =
+          scopedVirtualPlacement ??
+          (node ? resolveVirtualCompositePlacement(node) : null);
+        if (virtualPlacement && !scopedVirtualPlacement) {
+          placement.index = virtualPlacement.index;
+          placement.setSize = virtualPlacement.setSize;
+        }
+        const resolvedIndex = virtualPlacement?.index ?? itemIndex;
         registerCollectionNode(
           itemId,
           collection,
           node,
           {
-            index: itemIndex,
+            index: resolvedIndex,
+            setSize: virtualPlacement?.setSize ?? placement.setSize,
             disabled,
             text: itemText,
           },
           registrationOwner
         );
+        root.restoreItemFocus(resolvedIndex, node);
         repairFocusForDisabledItem({
           collection,
           disabled,
-          index: itemIndex,
+          index: resolvedIndex,
           loop: root.loop,
           node,
           setCurrentIndex: root.setCurrentIndex,

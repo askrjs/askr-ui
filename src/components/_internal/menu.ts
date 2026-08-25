@@ -4,6 +4,7 @@ import { extractTextContent } from './jsx';
 
 export type MenuItemMetadata = {
   index: number;
+  setSize?: number;
   disabled: boolean;
   value?: string;
   text: string;
@@ -11,6 +12,7 @@ export type MenuItemMetadata = {
 
 export type MenuCollectionMetadata = {
   index: number;
+  setSize?: number;
   disabled: boolean;
   value?: string;
   text?: string;
@@ -37,6 +39,7 @@ const menuCollectionObservers = new WeakMap<
   Map<
     AbortSignal,
     {
+      mode: 'count' | 'full';
       notify: () => void;
       queued: boolean;
       snapshot: Array<{ metadata: MenuCollectionMetadata; node: HTMLElement }>;
@@ -61,11 +64,19 @@ function isSameMenuCollectionSnapshot(
 ) {
   return (
     left.length === right.length &&
-    left.every(
-      (item, index) =>
-        item.node === right[index]?.node &&
-        isSameMenuCollectionMetadata(item.metadata, right[index]!.metadata)
+    left.every((item, index) =>
+      isSameMenuCollectionMetadata(item.metadata, right[index]!.metadata)
     )
+  );
+}
+
+function menuCollectionSnapshotCount(
+  snapshot: ReturnType<typeof getMenuCollectionSnapshot>
+) {
+  return snapshot.reduce(
+    (count, item) =>
+      Math.max(count, item.metadata.setSize ?? item.metadata.index + 1),
+    0
   );
 }
 
@@ -92,7 +103,10 @@ export function getMenuCollection(id: string) {
   return created;
 }
 
-export function observeMenuCollection(id: string) {
+export function observeMenuCollection(
+  id: string,
+  mode: 'count' | 'full' = 'full'
+) {
   const collection = getMenuCollection(id);
   const version = state(0);
   version();
@@ -101,11 +115,13 @@ export function observeMenuCollection(id: string) {
   const existing = observers.get(signal);
 
   if (existing) {
+    existing.mode = mode;
     existing.snapshot = getMenuCollectionSnapshot(collection);
   }
 
   if (!observers.has(signal)) {
     const observer = {
+      mode,
       queued: false,
       snapshot: getMenuCollectionSnapshot(collection),
       notify: () => {},
@@ -125,7 +141,13 @@ export function observeMenuCollection(id: string) {
 
         const nextSnapshot = getMenuCollectionSnapshot(collection);
 
-        if (isSameMenuCollectionSnapshot(observer.snapshot, nextSnapshot)) {
+        const unchanged =
+          observer.mode === 'count'
+            ? menuCollectionSnapshotCount(observer.snapshot) ===
+              menuCollectionSnapshotCount(nextSnapshot)
+            : isSameMenuCollectionSnapshot(observer.snapshot, nextSnapshot);
+
+        if (unchanged) {
           return;
         }
 
@@ -151,12 +173,17 @@ export function observeMenuCollection(id: string) {
   return collection;
 }
 
+export function observeMenuCollectionCount(id: string) {
+  return observeMenuCollection(id, 'count');
+}
+
 function isSameMenuCollectionMetadata(
   left: MenuCollectionMetadata,
   right: MenuCollectionMetadata
 ) {
   return (
     left.index === right.index &&
+    left.setSize === right.setSize &&
     left.disabled === right.disabled &&
     left.value === right.value &&
     left.text === right.text
@@ -172,6 +199,7 @@ export function getMenuCollectionItems(
     .items()
     .map((item) => ({
       index: item.metadata.index,
+      setSize: item.metadata.setSize,
       disabled: item.metadata.disabled,
       value: item.metadata.value,
       text: item.metadata.text ?? '',
@@ -188,9 +216,10 @@ export function resolveMenuItemText(
     : extractTextContent(children).trim();
 }
 
-export function firstEnabledIndex(items: Array<{ disabled: boolean }>): number {
-  const enabledIndex = items.findIndex((item) => !item.disabled);
-  return enabledIndex === -1 ? 0 : enabledIndex;
+export function firstEnabledIndex(
+  items: Array<{ index: number; disabled: boolean }>
+): number {
+  return items.find((item) => !item.disabled)?.index ?? 0;
 }
 
 export function registerCollectionNode(

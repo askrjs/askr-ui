@@ -9,6 +9,7 @@ import {
 import { createIsland } from '@askrjs/askr/boot';
 import { state } from '@askrjs/askr';
 import { VirtualList } from '../../../../src/components/virtual-list';
+import { flushUpdates } from '../../test-utils';
 
 function mount(element: JSX.Element): HTMLElement {
   const container = document.createElement('div');
@@ -61,6 +62,8 @@ describe('Collapsible — Behavior', () => {
       }
       container = mount(<Fixture />);
       const first = container.querySelector('button') as HTMLButtonElement;
+      const firstContentId = first.getAttribute('aria-controls');
+      expect(firstContentId).not.toBeNull();
       first.focus();
       first.click();
       await Promise.resolve();
@@ -71,6 +74,9 @@ describe('Collapsible — Behavior', () => {
       expect(
         replacement.closest('[data-row-id]')?.getAttribute('data-row-id')
       ).toBe('row-b');
+      expect(replacement.getAttribute('aria-controls')).not.toBe(
+        firstContentId
+      );
       expect(document.activeElement).not.toBe(replacement);
     });
 
@@ -197,9 +203,11 @@ describe('Collapsible — Behavior', () => {
         </Collapsible>
       );
 
+      await flushUpdates();
       let trigger = container.querySelector('button') as HTMLButtonElement;
       trigger.focus();
       await userEvent.keyboard('{Enter}');
+      await flushUpdates();
 
       expect(onNativeOpenChange).toHaveBeenCalledTimes(1);
       expect(onNativeOpenChange).toHaveBeenLastCalledWith(true);
@@ -208,6 +216,7 @@ describe('Collapsible — Behavior', () => {
       trigger = container.querySelector('button') as HTMLButtonElement;
       trigger.focus();
       await userEvent.keyboard(' ');
+      await flushUpdates();
 
       expect(onNativeOpenChange).toHaveBeenCalledTimes(2);
       expect(onNativeOpenChange).toHaveBeenLastCalledWith(false);
@@ -225,11 +234,13 @@ describe('Collapsible — Behavior', () => {
         </Collapsible>
       );
 
+      await flushUpdates();
       let childTrigger = container.querySelector(
         '[data-collapsible-trigger="true"]'
       ) as HTMLElement;
       childTrigger.focus();
       await userEvent.keyboard('{Enter}');
+      await flushUpdates();
 
       expect(onChildOpenChange).toHaveBeenCalledTimes(1);
       expect(onChildOpenChange).toHaveBeenLastCalledWith(true);
@@ -240,6 +251,7 @@ describe('Collapsible — Behavior', () => {
       ) as HTMLElement;
       childTrigger.focus();
       await userEvent.keyboard(' ');
+      await flushUpdates();
 
       expect(onChildOpenChange).toHaveBeenCalledTimes(2);
       expect(onChildOpenChange).toHaveBeenLastCalledWith(false);

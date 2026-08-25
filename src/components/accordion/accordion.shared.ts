@@ -1,6 +1,7 @@
 import { defineScope, readScope } from '@askrjs/askr';
 import type { getCompositeCollection } from '../_internal/composite';
 import type { PendingCollectionFocus } from '../_internal/focus';
+import { readVirtualCompositeIdentity } from '../_internal/virtual-composite';
 import type { AccordionOrientation } from './accordion.types';
 
 /** Shape of the Accordion Root Context Value. */
@@ -23,6 +24,7 @@ export type AccordionRootContextValue = {
 /** Shape of the Accordion Render Context Value. */
 export type AccordionRenderContextValue = {
   claimItemIndex: () => number;
+  virtualIdentity: string | null;
 };
 
 /** Shape of the Accordion Item Context Value. */
@@ -90,6 +92,7 @@ export function createAccordionRenderContext(): AccordionRenderContextValue {
   let nextItemIndex = 0;
 
   return {
+    virtualIdentity: readVirtualCompositeIdentity(),
     claimItemIndex: () => {
       const index = nextItemIndex;
       nextItemIndex += 1;

@@ -1,14 +1,22 @@
 import { state } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
-import { rovingFocus } from '@askrjs/askr/foundations/interactions';
-import { focusSelectedCollectionItem } from '../_internal/focus';
+import { rovingFocus } from '../_internal/roving-focus';
 import {
-  disabledIndexes,
-  firstEnabledCompositeIndex,
+  focusCollectionItemWithRestore,
+  restorePendingCollectionItemFocus,
+  type PendingCollectionFocus,
+} from '../_internal/focus';
+import {
   getCompositeCollection,
   getCompositeCollectionItems,
 } from '../_internal/composite';
+import {
+  compositeItemCount,
+  disabledCompositeItemIndexes,
+  firstEnabledCompositeItemIndex,
+  VirtualCompositeOwnerContext,
+} from '../_internal/virtual-composite';
 import { resolveCompoundId } from '../_internal/id';
 import {
   createRadioGroupRenderContext,
@@ -28,19 +36,17 @@ function RadioGroupRootView(props: {
 }) {
   const { name, disabled, value } = props;
   const root = readRadioGroupRootContext();
-  const collection = getCompositeCollection(root.groupId);
-  const disabledItemIndexes = disabledIndexes(root.items);
   const nav = rovingFocus({
     currentIndex: root.currentIndex,
-    itemCount: Math.max(root.items.length, 1),
+    itemCount: Math.max(root.itemCount, 1),
     orientation: root.orientation,
     loop: root.loop,
-    isDisabled: (index) => disabledItemIndexes.includes(index),
+    isDisabled: (index) => root.disabledIndexes.includes(index),
     onNavigate: (index) => {
-      const next = root.items[index]?.value;
+      const next = root.items.find((item) => item.index === index)?.value;
 
       root.setCurrentIndex(index);
-      focusSelectedCollectionItem(collection, index);
+      root.focusItem(index);
 
       if (next) {
         root.setValue(next);
@@ -96,6 +102,8 @@ export function RadioGroup(props: RadioGroupProps) {
     }
   });
   const items = getCompositeCollectionItems(collection).map((item) => ({
+    index: item.index,
+    setSize: item.setSize,
     value: String(item.value ?? ''),
     disabled: item.disabled,
   }));
@@ -112,6 +120,8 @@ export function RadioGroup(props: RadioGroupProps) {
     queueMicrotask(() => {
       itemsSyncQueued = false;
       const nextItems = getCompositeCollectionItems(collection).map((item) => ({
+        index: item.index,
+        setSize: item.setSize,
         value: String(item.value ?? ''),
         disabled: item.disabled,
       }));
@@ -119,6 +129,8 @@ export function RadioGroup(props: RadioGroupProps) {
         nextItems.length !== items.length ||
         nextItems.some(
           (item, index) =>
+            item.index !== items[index]?.index ||
+            item.setSize !== items[index]?.setSize ||
             item.value !== items[index]?.value ||
             item.disabled !== items[index]?.disabled
         );
@@ -128,20 +140,32 @@ export function RadioGroup(props: RadioGroupProps) {
       }
     });
   };
-  const selectedIndex = items.findIndex((item) => item.value === currentValue);
-  const fallbackIndex = firstEnabledCompositeIndex(items);
+  const selectedIndex = items.find(
+    (item) => item.value === currentValue
+  )?.index;
+  const fallbackIndex = firstEnabledCompositeItemIndex(items);
   const currentIndexState = state(
-    selectedIndex >= 0 && !items[selectedIndex]?.disabled
+    selectedIndex !== undefined &&
+      !items.find((item) => item.index === selectedIndex)?.disabled
       ? selectedIndex
       : fallbackIndex
   );
   const currentIndexCandidate = currentIndexState();
+  const currentItem = items.find(
+    (item) => item.index === currentIndexCandidate
+  );
   const currentIndex =
-    selectedIndex >= 0 && !items[selectedIndex]?.disabled
+    selectedIndex !== undefined &&
+    !items.find((item) => item.index === selectedIndex)?.disabled
       ? selectedIndex
-      : items[currentIndexCandidate] && !items[currentIndexCandidate]?.disabled
+      : currentItem && !currentItem.disabled
         ? currentIndexCandidate
         : fallbackIndex;
+  const itemCount = compositeItemCount(items);
+  const disabledItemIndexes = disabledCompositeItemIndexes(items);
+  const pendingFocus = state<PendingCollectionFocus>({ index: null })();
+  const focusItem = (index: number) =>
+    focusCollectionItemWithRestore(pendingFocus, collection, index);
   const rootContext: RadioGroupRootContextValue = {
     groupId,
     value: valueState(),
@@ -154,6 +178,11 @@ export function RadioGroup(props: RadioGroupProps) {
     currentIndex,
     setCurrentIndex: currentIndexState.set,
     items,
+    itemCount,
+    disabledIndexes: disabledItemIndexes,
+    focusItem,
+    restoreItemFocus: (index, node) =>
+      restorePendingCollectionItemFocus(pendingFocus, index, node),
   };
   const renderContext = createRadioGroupRenderContext();
   const finalProps = mergeProps(rest, {
@@ -168,12 +197,14 @@ export function RadioGroup(props: RadioGroupProps) {
   return (
     <RadioGroupRootContext value={rootContext}>
       <RadioGroupRenderContext value={renderContext}>
-        <RadioGroupRootView
-          children={<div {...finalProps}>{children}</div>}
-          name={name}
-          disabled={disabled}
-          value={currentValue}
-        />
+        <VirtualCompositeOwnerContext value>
+          <RadioGroupRootView
+            children={<div {...finalProps}>{children}</div>}
+            name={name}
+            disabled={disabled}
+            value={currentValue}
+          />
+        </VirtualCompositeOwnerContext>
       </RadioGroupRenderContext>
     </RadioGroupRootContext>
   );

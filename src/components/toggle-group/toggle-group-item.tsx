@@ -1,10 +1,11 @@
 import { nativeButtonProps } from '../_internal/native-control';
+import { state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
-import { pressable, rovingFocus } from '@askrjs/askr/foundations/interactions';
+import { pressable } from '@askrjs/askr/foundations/interactions';
+import { rovingFocus } from '../_internal/roving-focus';
 import {
   compositeItemFocusProps,
-  focusSelectedCollectionItem,
   repairFocusForDisabledItem,
 } from '../_internal/focus';
 import { runCancelablePress } from '../_internal/press';
@@ -17,6 +18,10 @@ import {
   toggleDisclosureValue,
 } from '../_internal/disclosure';
 import { resolvePartId } from '../_internal/id';
+import {
+  claimVirtualCompositePlacement,
+  resolveVirtualCompositePlacement,
+} from '../_internal/virtual-composite';
 import {
   readToggleGroupRenderContext,
   readToggleGroupRootContext,
@@ -50,19 +55,25 @@ export function ToggleGroupItem(
   } = props;
   const root = readToggleGroupRootContext();
   const renderContext = readToggleGroupRenderContext();
-  const itemIndex = renderContext.claimItemIndex();
+  const placement = state<{ index: number; setSize?: number }>({ index: -1 })();
+  const scopedVirtualPlacement = claimVirtualCompositePlacement(
+    placement,
+    renderContext.claimItemIndex,
+    renderContext.virtualIdentity
+  );
+  const itemIndex = scopedVirtualPlacement?.index ?? placement.index;
   const itemId = resolvePartId(root.groupId, `item-${itemIndex}`);
   const collection = getCompositeCollection(root.groupId);
   const isDisabled = root.disabled || disabled;
   const nav = rovingFocus({
     currentIndex: root.currentIndex,
-    itemCount: Math.max(root.items.length, 1),
+    itemCount: Math.max(root.itemCount, 1),
     orientation: root.orientation,
     loop: root.loop,
     isDisabled: (index) => root.disabledItemIndexes.includes(index),
     onNavigate: (index) => {
       root.setCurrentIndex(index);
-      focusSelectedCollectionItem(collection, index);
+      root.focusItem(index);
     },
   });
   const currentValue = root.getValue();
@@ -96,12 +107,21 @@ export function ToggleGroupItem(
         | null
         | undefined,
       (node: HTMLElement | null) => {
+        const virtualPlacement =
+          scopedVirtualPlacement ??
+          (node ? resolveVirtualCompositePlacement(node) : null);
+        if (virtualPlacement && !scopedVirtualPlacement) {
+          placement.index = virtualPlacement.index;
+          placement.setSize = virtualPlacement.setSize;
+        }
+        const resolvedIndex = virtualPlacement?.index ?? itemIndex;
         const changed = registerCompositeNode(
           itemId,
           collection,
           node,
           {
-            index: itemIndex,
+            index: resolvedIndex,
+            setSize: virtualPlacement?.setSize ?? placement.setSize,
             disabled: isDisabled,
             value,
           },
@@ -111,10 +131,11 @@ export function ToggleGroupItem(
         if (changed) {
           root.scheduleItemsSync();
         }
+        root.restoreItemFocus(resolvedIndex, node);
         repairFocusForDisabledItem({
           collection,
           disabled: isDisabled,
-          index: itemIndex,
+          index: resolvedIndex,
           loop: root.loop,
           node,
           setCurrentIndex: root.setCurrentIndex,

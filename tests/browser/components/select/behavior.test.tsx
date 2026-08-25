@@ -626,4 +626,96 @@ describe('Select - Behavior', () => {
       mount(<SelectTrigger>Orphan</SelectTrigger>);
     }).toThrow('Select components must be used within <Select>');
   });
+
+  it('should keep vertical option navigation stable under dir="rtl"', async () => {
+    container = mount(
+      <div dir="rtl">
+        <Select defaultValue="askr">
+          <SelectTrigger>
+            <SelectValue placeholder="Choose one" />
+          </SelectTrigger>
+          <SelectPortal>
+            <SelectContent>
+              <SelectItem value="askr">Askr</SelectItem>
+              <SelectItem value="solid">Solid</SelectItem>
+            </SelectContent>
+          </SelectPortal>
+        </Select>
+      </div>
+    );
+    await flushUpdates();
+    await flushUpdates();
+
+    const focusedText = () => document.activeElement?.textContent?.trim();
+    const option = (text: string) =>
+      Array.from(
+        document.body.querySelectorAll<HTMLElement>('[role="option"]')
+      ).find((node) => node.textContent?.trim() === text);
+
+    (
+      container.querySelector('[data-slot="select-trigger"]') as HTMLElement
+    ).focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await flushUpdates();
+    await flushUpdates();
+    expect(focusedText()).toBe('Askr');
+    expect(option('Solid')).toBeTruthy();
+
+    await userEvent.keyboard('{ArrowDown}');
+    await flushUpdates();
+    await flushUpdates();
+    expect(focusedText()).toBe('Solid');
+
+    await userEvent.keyboard('{ArrowRight}');
+    await userEvent.keyboard('{ArrowLeft}');
+    await flushUpdates();
+    await flushUpdates();
+    expect(focusedText()).toBe('Solid');
+  });
+  it('should restore uncontrolled state when its native form resets', async () => {
+    const onValueChange = vi.fn();
+    container = mount(
+      <form>
+        <Select
+          name="framework"
+          defaultValue="askr"
+          onValueChange={onValueChange}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Choose one" />
+          </SelectTrigger>
+          <SelectPortal>
+            <SelectContent>
+              <SelectItem value="askr">Askr</SelectItem>
+              <SelectItem value="solid">Solid</SelectItem>
+            </SelectContent>
+          </SelectPortal>
+        </Select>
+      </form>
+    );
+    await flushUpdates();
+
+    const hiddenValue = () =>
+      (container.querySelector('input[name="framework"]') as HTMLInputElement)
+        .value;
+    const trigger = container.querySelector(
+      '[data-slot="select-trigger"]'
+    ) as HTMLButtonElement;
+
+    trigger.click();
+    await flushUpdates();
+    await flushUpdates();
+    Array.from(document.body.querySelectorAll<HTMLElement>('[role="option"]'))
+      .find((option) => option.textContent?.trim() === 'Solid')
+      ?.click();
+    await flushUpdates();
+    await flushUpdates();
+    expect(hiddenValue()).toBe('solid');
+
+    (container.querySelector('form') as HTMLFormElement).reset();
+    await flushUpdates();
+    await flushUpdates();
+    expect(hiddenValue()).toBe('askr');
+    expect(onValueChange.mock.calls).toEqual([['solid'], ['askr']]);
+  });
 });

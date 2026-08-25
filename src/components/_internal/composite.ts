@@ -57,10 +57,8 @@ function isSameCompositeSnapshot(
 ) {
   return (
     left.length === right.length &&
-    left.every(
-      (item, index) =>
-        item.node === right[index]?.node &&
-        isSameCompositeMetadata(item.metadata, right[index]!.metadata)
+    left.every((item, index) =>
+      isSameCompositeMetadata(item.metadata, right[index]!.metadata)
     )
   );
 }

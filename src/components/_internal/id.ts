@@ -1,6 +1,7 @@
 import { getSignal } from '@askrjs/askr';
 import { formatId } from '@askrjs/askr/foundations/utilities';
 import { serializeForId } from './jsx';
+import { readVirtualCompositeIdentity } from './virtual-composite';
 
 type AutoIdLease = {
   baseKey: string;
@@ -39,17 +40,28 @@ export function resolveCompoundId(
     return existing.value;
   }
 
-  const autoId = `auto-${hashString(serializeForId(identity))}`;
+  const virtualIdentity = readVirtualCompositeIdentity();
+  const serializedIdentity = serializeForId(identity);
+  const autoId = `auto-${hashString(
+    virtualIdentity === null
+      ? serializedIdentity
+      : `${serializedIdentity}\0virtual:${virtualIdentity}`
+  )}`;
   const baseKey = `${prefix}\0${autoId}`;
   const activeOrdinals = activeAutoIdOrdinals.get(baseKey) ?? new Set<number>();
   let ordinal = 0;
-
-  while (activeOrdinals.has(ordinal)) {
-    ordinal += 1;
-  }
-
+  while (activeOrdinals.has(ordinal)) ordinal += 1;
   activeOrdinals.add(ordinal);
   activeAutoIdOrdinals.set(baseKey, activeOrdinals);
+  signal.addEventListener(
+    'abort',
+    () => {
+      const current = activeAutoIdOrdinals.get(baseKey);
+      current?.delete(ordinal);
+      if (current?.size === 0) activeAutoIdOrdinals.delete(baseKey);
+    },
+    { once: true }
+  );
   const value = formatId({
     prefix,
     id: ordinal === 0 ? autoId : `${autoId}-${ordinal + 1}`,
@@ -57,18 +69,6 @@ export function resolveCompoundId(
   const lease = { baseKey, ordinal, value };
   leases.set(prefix, lease);
   autoIdLeases.set(signal, leases);
-  signal.addEventListener(
-    'abort',
-    () => {
-      const current = activeAutoIdOrdinals.get(baseKey);
-      current?.delete(ordinal);
-
-      if (current?.size === 0) {
-        activeAutoIdOrdinals.delete(baseKey);
-      }
-    },
-    { once: true }
-  );
 
   return value;
 }

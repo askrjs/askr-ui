@@ -6,6 +6,7 @@ export type FocusScopeOwnProps = {
   children?: unknown;
   trapped?: boolean;
   loop?: boolean;
+  autoFocus?: boolean;
   restoreFocus?: boolean;
   id?: string;
   tabIndex?: number;

@@ -5,9 +5,13 @@ import {
   createOverlayIdentity,
   getOverlayNodes,
   getPersistentPortal,
+  OVERLAY_Z_INDEX,
+  primeOverlayStackNode,
+  registerOverlayNode,
+  setOverlayStackActive,
   syncOverlayPosition,
 } from '../_internal/overlay';
-import { cspNonce, state } from '@askrjs/askr';
+import { cspNonce, getSignal, state } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import {
   DialogRootContext,
@@ -77,11 +81,24 @@ export function Dialog(props: DialogProps) {
     defaultValue: defaultOpen,
     onChange: onOpenChange,
   });
+  const currentOpen = openState();
+  setOverlayStackActive(overlayIdentity, currentOpen, getSignal());
+  const backdropStackId = resolvePartId(dialogId, 'backdrop-stack');
+  primeOverlayStackNode(
+    overlayIdentity,
+    'backdrop',
+    backdropStackId,
+    OVERLAY_Z_INDEX.modalBackdrop
+  );
   const contentId = resolvePartId(dialogId, 'content');
   const titleId = resolvePartId(dialogId, 'title');
   const descriptionId = resolvePartId(dialogId, 'description');
   const portal = getPersistentPortal(overlayIdentity);
   const overlayNodes = getOverlayNodes(overlayIdentity);
+  const titleNodeOwner = {};
+  const descriptionNodeOwner = {};
+  const triggerNodeOwner = {};
+  const contentNodeOwner = {};
   const position: DialogPositionOptions = resolveDialogPositionOptions();
   const PortalHost = portal;
   const syncLabelAttributes = () => {
@@ -124,19 +141,25 @@ export function Dialog(props: DialogProps) {
     hasTitle: Boolean(overlayNodes.title?.isConnected),
     hasDescription: Boolean(overlayNodes.description?.isConnected),
     portal,
+    backdropStackId,
     setTitleNode: (node: HTMLElement | null) => {
-      overlayNodes.title = node;
+      registerOverlayNode(overlayIdentity, 'title', node, titleNodeOwner);
       syncLabelAttributesSoon();
     },
     setDescriptionNode: (node: HTMLElement | null) => {
-      overlayNodes.description = node;
+      registerOverlayNode(
+        overlayIdentity,
+        'description',
+        node,
+        descriptionNodeOwner
+      );
       syncLabelAttributesSoon();
     },
     setTriggerNode: (node: HTMLElement | null) => {
-      overlayNodes.trigger = node;
+      registerOverlayNode(overlayIdentity, 'trigger', node, triggerNodeOwner);
     },
     setContentNode: (node: HTMLElement | null) => {
-      overlayNodes.content = node;
+      registerOverlayNode(overlayIdentity, 'content', node, contentNodeOwner);
       syncLabelAttributesSoon();
     },
     syncPosition: () => {

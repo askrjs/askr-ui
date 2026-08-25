@@ -10,6 +10,7 @@ export default defineConfig({
       'tests/unit/bench-contract.test.ts',
       'tests/unit/browser-bench-contract.test.ts',
       'tests/unit/composite-id.test.tsx',
+      'tests/unit/overlay-stack.test.ts',
       'tests/unit/foundations-contract.test.ts',
       'tests/unit/source-layout.test.ts',
       'tests/unit/source-style-contract.test.ts',

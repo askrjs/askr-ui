@@ -30,6 +30,7 @@ export function DialogOverlay(
     'data-slot': 'dialog-overlay',
     'data-state': root.open ? 'open' : 'closed',
     'data-dialog-overlay': 'true',
+    'data-askr-overlay-stack-id': root.backdropStackId,
     'aria-hidden': 'true',
   });
 

@@ -1,11 +1,16 @@
 import { defineScope, readScope } from '@askrjs/askr';
 import {
-  firstEnabledIndex,
   getMenuCollection,
   getMenuCollectionItems,
   type MenuItemMetadata,
 } from '../_internal/menu';
 import type { OverlayPortal } from '../_internal/overlay';
+import {
+  compositeItemCount,
+  disabledCompositeItemIndexes,
+  firstEnabledCompositeItemIndex,
+  readVirtualCompositeIdentity,
+} from '../_internal/virtual-composite';
 
 /** Dropdown State Input. */
 export type DropdownStateInput = {
@@ -33,6 +38,7 @@ export type DropdownRootContextValue = {
 /** Shape of the Dropdown Render Context Value. */
 export type DropdownRenderContextValue = {
   claimItemIndex: () => number;
+  virtualIdentity: string | null;
 };
 
 /** Dropdown Resolved State. */
@@ -40,6 +46,7 @@ export type DropdownResolvedState = {
   items: MenuItemMetadata[];
   currentIndex: number;
   disabledIndexes: number[];
+  itemCount: number;
 };
 
 export const DropdownRootContext = defineScope<DropdownRootContextValue | null>(
@@ -81,6 +88,7 @@ export function createDropdownRenderContext(): DropdownRenderContextValue {
   let nextItemIndex = 0;
 
   return {
+    virtualIdentity: readVirtualCompositeIdentity(),
     claimItemIndex: () => {
       const index = nextItemIndex;
       nextItemIndex += 1;
@@ -97,12 +105,18 @@ export function resolveDropdownState(
   root: DropdownStateInput
 ): DropdownResolvedState {
   const items = getMenuCollectionItems(getMenuCollection(root.dropdownId));
-  const fallbackIndex = firstEnabledIndex(items);
+  const fallbackIndex = firstEnabledCompositeItemIndex(items);
+  const itemCount = compositeItemCount(items);
   const allItemsDisabled =
-    items.length > 0 && items.every((item) => item.disabled);
+    items.length > 0 &&
+    itemCount <= items.length &&
+    items.every((item) => item.disabled);
   const candidateIndex = root.currentIndexCandidate;
+  const candidate = items.find((item) => item.index === candidateIndex);
+  const candidateInRange =
+    candidateIndex >= 0 && candidateIndex < Math.max(itemCount, 1);
   const currentIndex =
-    items[candidateIndex] && !items[candidateIndex]?.disabled
+    (candidate && !candidate.disabled) || (!candidate && candidateInRange)
       ? candidateIndex
       : allItemsDisabled
         ? -1
@@ -111,8 +125,7 @@ export function resolveDropdownState(
   return {
     items,
     currentIndex,
-    disabledIndexes: items
-      .map((item, index) => (item.disabled ? index : -1))
-      .filter((index) => index !== -1),
+    disabledIndexes: disabledCompositeItemIndexes(items),
+    itemCount,
   };
 }
