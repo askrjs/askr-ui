@@ -224,7 +224,7 @@
     "fmt": "vp fmt .",
     "lint": "vp lint .",
     "typecheck": "npm run test:types",
-    "test": "npm run test:unit && npm run test:checks && npm run test:jsdom && npm run test:browser",
+    "test": "npm run test:unit && npm run test:integrity && npm run test:jsdom && npm run test:browser",
     "test:browser": "vp test run --config vitest.test.browser.config.ts",
     "test:component": "npm run test:browser",
     "test:jsdom": "npm run build && vp test run --config vitest.test.jsdom.config.ts",
@@ -235,7 +235,8 @@
     "check": "npm run build && npm run lint && npm run typecheck && npm test && npm run test:publint && npm run pack:check",
     "prepack": "npm run build",
     "prepublishOnly": "npm run check",
-    "test:checks": "vp test run -c vitest.test.checks.config.ts"
+    "test:checks": "vp test run -c vitest.test.checks.config.ts",
+    "test:integrity": "vp test run -c vitest.test.integrity.config.ts"
   },
   "devDependencies": {
     "@askrjs/askr": ">=0.2.2 <0.3.0",
