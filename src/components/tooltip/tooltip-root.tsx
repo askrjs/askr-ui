@@ -18,6 +18,7 @@ import {
   type TooltipRootContextValue,
 } from './tooltip.shared';
 import type { TooltipProps } from './tooltip.types';
+import { OverlayPortalHost } from '../_internal/overlay-portal-host';
 
 function scheduleTooltipPortalSync(callback: () => void) {
   queueMicrotask(callback);
@@ -137,13 +138,11 @@ export function Tooltip(props: TooltipProps) {
       clearOverlayPosition(overlayIdentity);
     },
   };
-  const PortalHost = portal;
-
   return (
     <TooltipRootContext value={rootContext}>
       <>
         {children}
-        {PortalHost ? <PortalHost key="tooltip-root-portal" /> : null}
+        <OverlayPortalHost portal={portal} />
       </>
     </TooltipRootContext>
   );

@@ -13,6 +13,7 @@ import {
   DialogPortal,
   DialogTrigger,
 } from '../../../../src/components/dialog';
+import { OverlayHost } from '../../../../src/components/overlay-host';
 import { flushUpdates, mount, unmount } from '../../test-utils';
 
 describe('Popover - Behavior', () => {
@@ -66,6 +67,7 @@ describe('Popover - Behavior', () => {
 
     expect(trigger).toBeTruthy();
     expect(content).toBeTruthy();
+    expect(document.body.querySelectorAll('[data-slot="popover-content"]')).toHaveLength(1);
     expect(trigger?.id).toBeTruthy();
     expect(content?.getAttribute('aria-labelledby')).toBe(trigger?.id);
   });
@@ -111,6 +113,65 @@ describe('Popover - Behavior', () => {
     expect(
       document.body.querySelector('[data-slot="popover-content"]')
     ).toBeNull();
+  });
+
+  it('should portal outside transformed clipping ancestors and restore focus', async () => {
+    container = mount(
+      <OverlayHost>
+        <div
+          data-testid="clipping-ancestor"
+          style={{
+            width: '120px',
+            height: '48px',
+            overflow: 'hidden',
+            transform: 'translateZ(0)',
+          }}
+        >
+          <Popover>
+            <PopoverTrigger>Inspect row</PopoverTrigger>
+            <PopoverPortal>
+              <PopoverContent style={{ width: '240px', height: '120px' }}>
+                Row details
+              </PopoverContent>
+            </PopoverPortal>
+          </Popover>
+        </div>
+      </OverlayHost>
+    );
+
+    const trigger = container.querySelector(
+      '[data-slot="popover-trigger"]'
+    ) as HTMLElement;
+    trigger.focus();
+    trigger.click();
+    await flushUpdates();
+    await flushUpdates();
+
+    const clippingAncestor = container.querySelector(
+      '[data-testid="clipping-ancestor"]'
+    ) as HTMLElement;
+    const content = document.body.querySelector(
+      '[data-slot="popover-content"]'
+    ) as HTMLElement;
+
+    expect(content).toBeTruthy();
+    expect(clippingAncestor.contains(content)).toBe(false);
+
+    await userEvent.keyboard('{Escape}');
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(
+      document.body.querySelector('[data-slot="popover-content"]')
+    ).toBeNull();
+    expect(document.activeElement).toBe(trigger);
+
+    trigger.click();
+    await flushUpdates();
+    await flushUpdates();
+    expect(
+      clippingAncestor.contains(document.body.querySelector('[role="dialog"]'))
+    ).toBe(false);
   });
 
   it('should map typed width affordance to a stable data attribute', async () => {

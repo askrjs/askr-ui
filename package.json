@@ -187,6 +187,11 @@
       "import": "./dist/components/menubar/index.js",
       "require": "./dist/components/menubar/index.cjs"
     },
+    "./overlay-host": {
+      "types": "./dist/components/overlay-host/index.d.ts",
+      "import": "./dist/components/overlay-host/index.js",
+      "require": "./dist/components/overlay-host/index.cjs"
+    },
     "./popover": {
       "types": "./dist/components/popover/index.d.ts",
       "import": "./dist/components/popover/index.js",

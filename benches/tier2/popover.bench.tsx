@@ -1,4 +1,5 @@
 import { bench, describe } from 'vite-plus/test';
+import { OverlayHost } from '../../src/components/overlay-host';
 import {
   Popover,
   PopoverClose,
@@ -18,6 +19,21 @@ describe('Popover benches - default tree', () => {
             <PopoverContent>Body</PopoverContent>
           </PopoverPortal>
         </>
+      ),
+    });
+  });
+});
+
+describe('OverlayHost benches - hosted popover tree', () => {
+  bench('create overlay host with popover tree', () => {
+    OverlayHost({
+      children: (
+        <Popover defaultOpen>
+          <PopoverTrigger>Open popover</PopoverTrigger>
+          <PopoverPortal>
+            <PopoverContent>Body</PopoverContent>
+          </PopoverPortal>
+        </Popover>
       ),
     });
   });

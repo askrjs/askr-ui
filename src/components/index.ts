@@ -27,6 +27,7 @@ export * from './focus-scope';
 export * from './hover-card';
 export * from './menu';
 export * from './menubar';
+export * from './overlay-host';
 export * from './popover';
 export * from './scroll-area';
 export * from './toast';
