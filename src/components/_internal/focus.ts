@@ -494,13 +494,14 @@ export function repairFocusForDisabledItem<
   TMetadata extends { disabled: boolean; index: number },
 >(options: {
   collection: Collection<HTMLElement, TMetadata>;
+  current?: boolean;
   disabled: boolean;
   index: number;
   loop: boolean;
   node: HTMLElement | null;
   setCurrentIndex: (index: number) => void;
 }) {
-  const { collection, disabled, index, loop, node, setCurrentIndex } = options;
+  const { collection, current, disabled, index, loop, node, setCurrentIndex } = options;
 
   if (!node) {
     return;
@@ -510,7 +511,7 @@ export function repairFocusForDisabledItem<
   const becameDisabled = disabled && !tracker.disabled;
   tracker.disabled = disabled;
 
-  if (!becameDisabled || !tracker.focused || tracker.repairQueued) {
+  if (!becameDisabled || (!tracker.focused && !current) || tracker.repairQueued) {
     return;
   }
 
@@ -518,7 +519,18 @@ export function repairFocusForDisabledItem<
   queueMicrotask(() => {
     tracker.repairQueued = false;
 
-    if (!tracker.disabled || !tracker.focused) {
+    if (!tracker.disabled) {
+      return;
+    }
+
+    const activeElement = document.activeElement;
+    if (
+      activeElement instanceof HTMLElement &&
+      activeElement !== node &&
+      activeElement !== document.body &&
+      activeElement.isConnected
+    ) {
+      tracker.focused = false;
       return;
     }
 
@@ -548,7 +560,6 @@ export function repairFocusForDisabledItem<
     tracker.focused = false;
 
     if (!target?.node.isConnected) {
-      const activeElement = document.activeElement;
       if (
         activeElement instanceof HTMLElement &&
         activeElement.hasAttribute('disabled')
