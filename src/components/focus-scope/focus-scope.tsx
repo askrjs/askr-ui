@@ -33,6 +33,7 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
     loop = false,
     autoFocus = true,
     restoreFocus = true,
+    restoreFocusTarget,
     id,
     ref,
     tabIndex,
@@ -97,7 +98,14 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
 
       scopeEntry.pendingDetachedNode = null;
       if (restoreFocus) {
-        scopeEntry.previousFocused?.focus?.();
+        const explicitTarget =
+          typeof restoreFocusTarget === 'function'
+            ? restoreFocusTarget()
+            : restoreFocusTarget;
+        const target = explicitTarget ?? scopeEntry.previousFocused;
+        if (target?.isConnected && !target.hasAttribute('disabled')) {
+          target.focus();
+        }
       }
     });
   };
