@@ -1,4 +1,4 @@
-import { userEvent } from '@vitest/browser/context';
+import { page, userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
 import {
@@ -21,6 +21,63 @@ describe('Select - Behavior', () => {
     vi.useRealTimers();
     unmount(container);
   });
+
+  it.each(['pointer', 'keyboard'] as const)(
+    'should restore trigger focus after a viewport resize when opened by %s',
+    async (openMethod) => {
+      await page.viewport(1280, 800);
+      container = mount(
+        <Select defaultValue="askr">
+          <SelectTrigger aria-label="Framework">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectPortal>
+            <SelectContent>
+              <SelectItem value="askr">Askr</SelectItem>
+              <SelectItem value="solid">Solid</SelectItem>
+            </SelectContent>
+          </SelectPortal>
+        </Select>
+      );
+
+      const trigger = container.querySelector(
+        '[aria-haspopup="listbox"]'
+      ) as HTMLButtonElement;
+      trigger.focus();
+      if (openMethod === 'pointer') {
+        trigger.click();
+      } else {
+        trigger.dispatchEvent(
+          new KeyboardEvent('keydown', {
+            key: 'ArrowDown',
+            bubbles: true,
+            cancelable: true,
+          })
+        );
+      }
+      await flushUpdates();
+      await flushUpdates();
+
+      await page.viewport(320, 568);
+      window.dispatchEvent(new Event('resize'));
+      await flushUpdates();
+
+      const content = document.body.querySelector(
+        '[data-slot="select-content"]'
+      ) as HTMLElement;
+      const bounds = content.getBoundingClientRect();
+      expect(bounds.left).toBeGreaterThanOrEqual(0);
+      expect(bounds.right).toBeLessThanOrEqual(320);
+      content.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+      );
+      await flushUpdates();
+      await flushUpdates();
+
+      expect(document.activeElement).toBe(trigger);
+      await page.viewport(1280, 800);
+    }
+  );
 
   it('should wire the hidden input and trigger expansion state', async () => {
     container = mount(

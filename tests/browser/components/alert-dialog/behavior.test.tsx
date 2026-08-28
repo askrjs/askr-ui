@@ -9,6 +9,7 @@ import {
   AlertDialogTrigger,
 } from '../../../../src/components/alert-dialog';
 import { flushUpdates, mount, unmount } from '../../test-utils';
+import { state } from '@askrjs/askr';
 
 describe('AlertDialog - Behavior', () => {
   let container: HTMLElement;
@@ -152,6 +153,69 @@ describe('AlertDialog - Behavior', () => {
       document.body.querySelector('[data-slot="dialog-content"]')
     ).toBeNull();
   });
+
+  it.each(['escape', 'cancel', 'action'] as const)(
+    'should restore an explicit persistent target after triggerless %s close',
+    async (closeMethod) => {
+      let open!: ReturnType<typeof state<boolean>>;
+      let persistentTrigger!: HTMLButtonElement;
+
+      function Fixture() {
+        open = state(false);
+        return (
+          <>
+            <button
+              ref={(node) => (persistentTrigger = node!)}
+              onClick={() => open.set(true)}
+            >
+              Open invite actions
+            </button>
+            <AlertDialog
+              open={open()}
+              onOpenChange={(nextOpen) => open.set(nextOpen)}
+            >
+              <AlertDialogPortal>
+                <AlertDialogContent restoreFocus={() => persistentTrigger}>
+                  Reset active invite link?
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction>Reset link</AlertDialogAction>
+                </AlertDialogContent>
+              </AlertDialogPortal>
+            </AlertDialog>
+          </>
+        );
+      }
+
+      container = mount(<Fixture />);
+      persistentTrigger.focus();
+      persistentTrigger.click();
+      await flushUpdates();
+
+      const content = document.body.querySelector(
+        '[data-slot="dialog-content"]'
+      ) as HTMLElement;
+      expect(content.contains(document.activeElement)).toBe(true);
+
+      if (closeMethod === 'escape') {
+        content.dispatchEvent(
+          new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' })
+        );
+      } else {
+        const label = closeMethod === 'cancel' ? 'Cancel' : 'Reset link';
+        Array.from(
+          document.body.querySelectorAll<HTMLButtonElement>(
+            '[data-dialog-close="true"]'
+          )
+        )
+          .find((button) => button.textContent === label)!
+          .click();
+      }
+      await flushUpdates();
+      await flushUpdates();
+
+      expect(document.activeElement).toBe(persistentTrigger);
+    }
+  );
 
   it('should keep centered alert dialog content within viewport padding on narrow viewports', async () => {
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation(

@@ -16,6 +16,7 @@ import {
   type PendingCollectionFocus,
 } from '../_internal/focus';
 import { VirtualCompositeOwnerContext } from '../_internal/virtual-composite';
+import { OverlayPortalHost } from '../_internal/overlay-portal-host';
 import {
   observeMenuCollectionCount,
   resolveMenuItemText,
@@ -209,7 +210,7 @@ export function Select(props: SelectProps) {
         <VirtualCompositeOwnerContext value>
           <>
             {children as JSX.Element}
-            <PortalHost key="select-root-portal" />
+            <OverlayPortalHost portal={PortalHost} />
             {name ? (
               <input
                 type="hidden"

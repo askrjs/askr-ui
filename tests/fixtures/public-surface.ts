@@ -29,6 +29,7 @@ import * as FocusScopeModule from '../../src/components/focus-scope/index';
 import * as HoverCardModule from '../../src/components/hover-card/index';
 import * as MenuModule from '../../src/components/menu/index';
 import * as MenubarModule from '../../src/components/menubar/index';
+import * as OverlayHostModule from '../../src/components/overlay-host/index';
 import * as PopoverModule from '../../src/components/popover/index';
 import * as ScrollAreaModule from '../../src/components/scroll-area/index';
 import * as ToastModule from '../../src/components/toast/index';
@@ -76,6 +77,7 @@ export const componentSurface = [
   { bucket: 'composites', name: 'hover-card', module: HoverCardModule },
   { bucket: 'composites', name: 'menu', module: MenuModule },
   { bucket: 'composites', name: 'menubar', module: MenubarModule },
+  { bucket: 'composites', name: 'overlay-host', module: OverlayHostModule },
   { bucket: 'composites', name: 'popover', module: PopoverModule },
   { bucket: 'composites', name: 'scroll-area', module: ScrollAreaModule },
   { bucket: 'composites', name: 'toast', module: ToastModule },
@@ -139,6 +141,7 @@ export const docsCategories = [
     names: [
       'dialog',
       'alert-dialog',
+      'overlay-host',
       'popover',
       'hover-card',
       'tooltip',

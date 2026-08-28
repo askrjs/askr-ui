@@ -8,6 +8,7 @@ export type FocusScopeOwnProps = {
   loop?: boolean;
   autoFocus?: boolean;
   restoreFocus?: boolean;
+  restoreFocusTarget?: HTMLElement | null | (() => HTMLElement | null);
   id?: string;
   tabIndex?: number;
 };

@@ -20,6 +20,7 @@ import {
   type DialogRootContextValue,
 } from './dialog.shared';
 import type { DialogProps } from './dialog.types';
+import { OverlayPortalHost } from '../_internal/overlay-portal-host';
 
 function scheduleDialogPortalSync(callback: () => void) {
   queueMicrotask(callback);
@@ -100,7 +101,6 @@ export function Dialog(props: DialogProps) {
   const triggerNodeOwner = {};
   const contentNodeOwner = {};
   const position: DialogPositionOptions = resolveDialogPositionOptions();
-  const PortalHost = portal;
   const syncLabelAttributes = () => {
     syncDialogLabelAttributes(
       overlayNodes.content,
@@ -175,7 +175,7 @@ export function Dialog(props: DialogProps) {
   return (
     <DialogRootContext value={rootContext}>
       {children as JSX.Element}
-      {PortalHost ? <PortalHost key="dialog-root-portal" /> : null}
+      <OverlayPortalHost portal={portal} />
     </DialogRootContext>
   );
 }

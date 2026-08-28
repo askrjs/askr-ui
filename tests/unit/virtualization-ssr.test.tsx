@@ -8,7 +8,9 @@ import {
 import {
   buildVirtualKeyIndexMap,
   createVirtualAnchor,
+  createVariableVirtualAnchor,
   resolveVirtualScrollTopFromAnchor,
+  resolveVariableVirtualScrollTopFromAnchor,
 } from '../../src/components/_internal/virtualization';
 
 type Row = { id: string; name: string };
@@ -62,6 +64,32 @@ describe('virtualization SSR styles', () => {
 
     expect(anchor).toEqual({ key: 'row-21', offset: -40 });
     expect(resolveVirtualScrollTopFromAnchor(anchor!, nextKeys, 40)).toBe(760);
+  });
+
+  it('should preserve a retained variable-height key offset after an insertion', () => {
+    const anchor = createVariableVirtualAnchor(
+      'row-2',
+      ['row-2', 'row-3'],
+      2,
+      55,
+      [20, 30, 40, 50]
+    );
+    const nextKeys = buildVirtualKeyIndexMap([
+      'prepended',
+      'row-0',
+      'row-1',
+      'row-2',
+      'row-3',
+    ]);
+
+    expect(anchor).toEqual({ key: 'row-2', offset: 5 });
+    expect(
+      resolveVariableVirtualScrollTopFromAnchor(
+        anchor!,
+        nextKeys,
+        [60, 20, 30, 40, 50]
+      )
+    ).toBe(115);
   });
 
   it('should register virtual-list geometry before hydration', () => {

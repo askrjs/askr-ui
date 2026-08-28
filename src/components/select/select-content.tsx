@@ -159,7 +159,13 @@ export function SelectContent(
       <FocusScope restoreFocus>
         <DismissableLayer
           onDismiss={() => {
+            const trigger = overlayNodes.trigger;
             root.setOpen(false);
+            queueMicrotask(() => {
+              if (trigger?.isConnected && !trigger.hasAttribute('disabled')) {
+                trigger.focus();
+              }
+            });
           }}
         >
           {scopedContentNode}

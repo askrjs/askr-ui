@@ -32,6 +32,7 @@ import {
 } from './menubar.shared';
 import type { MenubarProps } from './menubar.types';
 import { MenubarMenu } from './menubar-menu';
+import { OverlayPortalHost } from '../_internal/overlay-portal-host';
 
 function assertUniqueMenubarMenuValues(children: unknown) {
   const values = new Set<string>();
@@ -289,9 +290,10 @@ export function Menubar(props: MenubarProps) {
             {
               Array.from(portalRegistry.byKey.entries()).map(
                 ([menuKey, record]) => {
-                  const PortalHost = getPersistentPortal(record.identity);
+                  const portal = getPersistentPortal(record.identity);
                   return (
-                    <PortalHost
+                    <OverlayPortalHost
+                      portal={portal}
                       key={resolvePartId(
                         menubarId,
                         `portal-${record.ordinal}-${menuKey}`

@@ -25,6 +25,13 @@ import {
   SelectPortal,
   SelectTrigger,
 } from '../../../../src/components/select';
+import {
+  Dropdown,
+  DropdownContent,
+  DropdownItem,
+  DropdownPortal,
+  DropdownTrigger,
+} from '../../../../src/components/dropdown';
 
 describe('Dialog - Behavior', () => {
   let container: HTMLElement;
@@ -416,6 +423,51 @@ describe('Dialog - Behavior', () => {
       document.body.querySelector('[data-slot="dialog-content"]')
     ).toBeNull();
     expect(container.querySelector('[data-slot="toast"]')).not.toBeNull();
+  });
+
+  it('should let a nested dropdown own focus and restore it inside the dialog', async () => {
+    container = mount(
+      <Dialog defaultOpen>
+        <DialogPortal>
+          <DialogContent>
+            <Dropdown>
+              <DropdownTrigger>Workspace actions</DropdownTrigger>
+              <DropdownPortal>
+                <DropdownContent>
+                  <DropdownItem>Archive workspace</DropdownItem>
+                </DropdownContent>
+              </DropdownPortal>
+            </Dropdown>
+          </DialogContent>
+        </DialogPortal>
+      </Dialog>
+    );
+    await flushUpdates();
+    await flushUpdates();
+
+    const trigger = document.body.querySelector(
+      '[data-slot="dropdown-trigger"]'
+    ) as HTMLElement;
+    trigger.click();
+    await flushUpdates();
+    await flushUpdates();
+
+    const content = document.body.querySelector(
+      '[data-slot="dropdown-content"]'
+    ) as HTMLElement;
+    const item = content.querySelector('[data-slot="dropdown-item"]');
+    expect(document.activeElement).toBe(item);
+
+    content.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+    );
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(document.activeElement).toBe(trigger);
+    expect(
+      document.body.querySelector('[data-slot="dialog-content"]')
+    ).not.toBeNull();
   });
 
   it('should stack a later dialog and its backdrop above an already-open select', async () => {

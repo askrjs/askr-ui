@@ -30,6 +30,7 @@ export function DialogContent(
     onPointerDownOutside,
     onInteractOutside,
     onDismiss,
+    restoreFocus,
     ...rest
   } = props;
   const root = readDialogRootContext();
@@ -70,7 +71,12 @@ export function DialogContent(
 
   return (
     <Presence present={forceMount || root.open}>
-      <FocusScope trapped={root.modal} loop restoreFocus>
+      <FocusScope
+        trapped={root.modal}
+        loop
+        restoreFocus
+        restoreFocusTarget={restoreFocus}
+      >
         <DismissableLayer
           disableOutsidePointerEvents={root.modal}
           onEscapeKeyDown={onEscapeKeyDown}

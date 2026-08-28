@@ -379,4 +379,58 @@ describe('VirtualList - Behavior', () => {
     expect(firstBox.height).toBeCloseTo(20, 0);
     expect(secondBox.top - firstBox.top).toBeCloseTo(20, 0);
   });
+
+  it('should reposition keyed rows when an opt-in row height expands', async () => {
+    function ExpandableList() {
+      const expanded = state<string | null>(null);
+      const items = createItems(4);
+      return (
+        <VirtualList
+          aria-label="Expandable incidents"
+          style={{ height: '40px', overflowY: 'auto' }}
+          items={items}
+          rowHeight={20}
+          overscan={1}
+          getRowHeight={(item) => (expanded() === item.id ? 80 : 20)}
+          getKey={(item) => item.id}
+          rowComponent={({ item }) => (
+            <div>
+              <button onClick={() => expanded.set(item.id)}>
+                Expand {item.label}
+              </button>
+              {expanded() === item.id ? (
+                <button>Inspect {item.label}</button>
+              ) : null}
+            </div>
+          )}
+        />
+      );
+    }
+
+    container = mount(<ExpandableList />);
+    await flushUpdates();
+    const host = container.querySelector(
+      '[data-slot="virtual-list"]'
+    ) as HTMLElement;
+    expect(host.scrollHeight).toBe(80);
+
+    (
+      container.querySelector('[data-key="item-0"] button') as HTMLButtonElement
+    ).click();
+    await flushUpdates();
+    const inspect = Array.from(container.querySelectorAll('button')).find(
+      (button) => button.textContent?.includes('Inspect Item 0')
+    ) as HTMLButtonElement;
+    inspect.focus();
+    const first = container.querySelector('[data-key="item-0"]') as HTMLElement;
+    const second = container.querySelector(
+      '[data-key="item-1"]'
+    ) as HTMLElement;
+    expect(first.getBoundingClientRect().height).toBeCloseTo(80, 0);
+    expect(
+      second.getBoundingClientRect().top - first.getBoundingClientRect().top
+    ).toBeCloseTo(80, 0);
+    expect(host.scrollHeight).toBe(140);
+    expect(document.activeElement).toBe(inspect);
+  });
 });

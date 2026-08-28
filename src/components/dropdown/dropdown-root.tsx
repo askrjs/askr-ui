@@ -13,6 +13,7 @@ import {
   type PendingCollectionFocus,
 } from '../_internal/focus';
 import { VirtualCompositeOwnerContext } from '../_internal/virtual-composite';
+import { OverlayPortalHost } from '../_internal/overlay-portal-host';
 import { observeMenuCollectionCount } from '../_internal/menu';
 import {
   handleTypeaheadKeyDown,
@@ -125,13 +126,12 @@ export function Dropdown(props: DropdownProps) {
       handleTypeaheadKeyUp(overlayIdentity, event),
   };
   const runtimeRenderContext = createDropdownRenderContext();
-  const PortalHost = rootContext.portal;
   return (
     <DropdownRootContext value={rootContext}>
       <DropdownRenderContext value={runtimeRenderContext}>
         <VirtualCompositeOwnerContext value>
           {children as JSX.Element}
-          <PortalHost key="dropdown-root-portal" />
+          <OverlayPortalHost portal={rootContext.portal} />
         </VirtualCompositeOwnerContext>
       </DropdownRenderContext>
     </DropdownRootContext>

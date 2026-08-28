@@ -94,6 +94,7 @@ export function DropdownItem(
     isNativeButton: false,
   });
   const focusRepairProps = compositeItemFocusProps();
+  const focusNode = state<{ current: HTMLElement | null }>({ current: null })();
   const handleKeyDown = (event: KeyboardEvent) => {
     if (!disabled && root.handleTypeaheadKeyDown(event)) {
       return;
@@ -110,6 +111,7 @@ export function DropdownItem(
   };
   const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
+    focusNode.current = node;
     const virtualPlacement =
       scopedVirtualPlacement ??
       (node ? resolveVirtualCompositePlacement(node) : null);
@@ -134,6 +136,7 @@ export function DropdownItem(
     root.restoreItemFocus(resolvedIndex, node);
     repairFocusForDisabledItem({
       collection,
+      current: root.open && root.resolvedState.currentIndex === resolvedIndex,
       disabled,
       index: resolvedIndex,
       loop: true,
@@ -141,6 +144,14 @@ export function DropdownItem(
       setCurrentIndex: root.setCurrentIndex,
     });
   };
+  const renderedNode = focusNode.current;
+  if (renderedNode) {
+    queueMicrotask(() => {
+      if (focusNode.current === renderedNode && renderedNode.isConnected) {
+        setNode(renderedNode);
+      }
+    });
+  }
   const refHandler = ref
     ? composeRefs(
         ref as

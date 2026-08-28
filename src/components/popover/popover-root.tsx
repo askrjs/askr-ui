@@ -18,6 +18,7 @@ import {
   type PopoverRootContextValue,
 } from './popover.shared';
 import type { PopoverProps } from './popover.types';
+import { OverlayPortalHost } from '../_internal/overlay-portal-host';
 
 function schedulePopoverPortalSync(callback: () => void) {
   queueMicrotask(callback);
@@ -85,13 +86,11 @@ export function Popover(props: PopoverProps) {
       clearOverlayPosition(overlayIdentity);
     },
   };
-  const PortalHost = portal;
-
   return (
     <PopoverRootContext value={rootContext}>
       <>
         {children}
-        {PortalHost ? <PortalHost key="popover-root-portal" /> : null}
+        <OverlayPortalHost portal={portal} />
       </>
     </PopoverRootContext>
   );

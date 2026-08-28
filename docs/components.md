@@ -10,7 +10,7 @@ family with a narrower surface.
 
 ```ts
 import { Button, Checkbox, Input } from '@askrjs/ui';
-import { Dialog, Popover, Tooltip } from '@askrjs/ui';
+import { Dialog, OverlayHost, Popover, Tooltip } from '@askrjs/ui';
 import { Dialog } from '@askrjs/ui/dialog';
 ```
 
@@ -30,7 +30,7 @@ These are documentation groupings only.
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Primitives                 | Button, Checkbox, Input, Label, Form, Toggle, ToggleGroup, RadioGroup, Select, Slider, Switch, Table, Textarea, Progress, ProgressCircle, VisuallyHidden |
 | Focus                      | FocusScope, DismissableLayer                                                                                                                             |
-| Overlays                   | Dialog, AlertDialog, Popover, HoverCard, Tooltip, Dropdown, Menu                                                                                         |
+| Overlays                   | OverlayHost, Dialog, AlertDialog, Popover, HoverCard, Tooltip, Dropdown, Menu                                                                            |
 | Disclosure                 | Accordion, Collapsible                                                                                                                                   |
 | Status                     | Progress, ProgressCircle, Toast                                                                                                                          |
 | Identity                   | Avatar                                                                                                                                                   |
@@ -47,6 +47,10 @@ These are documentation groupings only.
 - `DialogOverlay` and `AlertDialogOverlay` are fully styled out of the box when
   used with `@askrjs/themes/default`: the theme supplies the backdrop token,
   blur, stacking, and fade animation. Standard usage needs no additional CSS.
+- `OverlayHost` provides one explicit application-shell outlet for descendant
+  overlay portals. Use it when overlays rendered inside clipping or virtualized
+  content must escape that layout boundary; standalone roots retain their local
+  portal behavior when no host is present.
 - Toast is a stacked notification family. `ToastHost` owns the registry,
   `ToastViewport` renders the stack, and `Toast` registers entries rather than
   rendering standalone DOM.
