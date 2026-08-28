@@ -48,6 +48,8 @@ export type DialogContentOwnProps = {
   onPointerDownOutside?: (event: PointerEvent) => void;
   onInteractOutside?: (event: Event) => void;
   onDismiss?: () => void;
+  /** Explicit focus target used when a controlled dialog has no persistent trigger. */
+  restoreFocus?: HTMLElement | null | (() => HTMLElement | null);
 };
 
 /** Props for Dialog Content. */

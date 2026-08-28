@@ -1,6 +1,6 @@
 {
   "name": "@askrjs/ui",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Headless Askr components",
   "keywords": [
     "accessible",
@@ -186,6 +186,11 @@
       "types": "./dist/components/menubar/index.d.ts",
       "import": "./dist/components/menubar/index.js",
       "require": "./dist/components/menubar/index.cjs"
+    },
+    "./overlay-host": {
+      "types": "./dist/components/overlay-host/index.d.ts",
+      "import": "./dist/components/overlay-host/index.js",
+      "require": "./dist/components/overlay-host/index.cjs"
     },
     "./popover": {
       "types": "./dist/components/popover/index.d.ts",

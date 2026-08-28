@@ -18,6 +18,7 @@ import {
   type HoverCardRootContextValue,
 } from './hover-card.shared';
 import type { HoverCardProps } from './hover-card.types';
+import { OverlayPortalHost } from '../_internal/overlay-portal-host';
 
 function scheduleHoverCardPortalSync(callback: () => void) {
   queueMicrotask(callback);
@@ -204,7 +205,6 @@ export function HoverCard(props: HoverCardProps) {
       clearOverlayPosition(overlayIdentity);
     },
   };
-  const PortalHost = portal;
 
   pointerEntry.sync = (event: PointerEvent) => {
     const target = event.target;
@@ -250,7 +250,7 @@ export function HoverCard(props: HoverCardProps) {
     <HoverCardRootContext value={rootContext}>
       <>
         {children}
-        {PortalHost ? <PortalHost key="hover-card-root-portal" /> : null}
+        <OverlayPortalHost portal={portal} />
       </>
     </HoverCardRootContext>
   );

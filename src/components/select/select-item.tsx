@@ -94,6 +94,7 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
   });
   const itemFocusProps = nav.item(itemIndex);
   const focusRepairProps = compositeItemFocusProps();
+  const focusNode = state<{ current: HTMLElement | null }>({ current: null })();
   const handleKeyDown = (event: KeyboardEvent) => {
     if (!isDisabled && root.handleTypeaheadKeyDown(event)) {
       return;
@@ -109,6 +110,48 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
     interactionProps.onKeyUp?.(event);
   };
   const registrationOwner = {};
+  const setNode = (node: HTMLElement | null) => {
+    focusNode.current = node;
+    const virtualPlacement =
+      scopedVirtualPlacement ??
+      (node ? resolveVirtualCompositePlacement(node) : null);
+    if (virtualPlacement && !scopedVirtualPlacement) {
+      placement.index = virtualPlacement.index;
+      placement.setSize = virtualPlacement.setSize;
+    }
+    const resolvedIndex = virtualPlacement?.index ?? itemIndex;
+    registerCollectionNode(
+      itemId,
+      collection,
+      node,
+      {
+        index: resolvedIndex,
+        setSize: virtualPlacement?.setSize ?? placement.setSize,
+        disabled: isDisabled,
+        value,
+        text: itemText,
+      },
+      registrationOwner
+    );
+    root.restoreItemFocus(resolvedIndex, node);
+    repairFocusForDisabledItem({
+      collection,
+      current: root.open && root.resolvedState.currentIndex === resolvedIndex,
+      disabled: isDisabled,
+      index: resolvedIndex,
+      loop: true,
+      node,
+      setCurrentIndex: root.setCurrentIndex,
+    });
+  };
+  const renderedNode = focusNode.current;
+  if (renderedNode) {
+    queueMicrotask(() => {
+      if (focusNode.current === renderedNode && renderedNode.isConnected) {
+        setNode(renderedNode);
+      }
+    });
+  }
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
@@ -120,38 +163,7 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
         | { current: HTMLElement | null }
         | null
         | undefined,
-      (node: HTMLElement | null) => {
-        const virtualPlacement =
-          scopedVirtualPlacement ??
-          (node ? resolveVirtualCompositePlacement(node) : null);
-        if (virtualPlacement && !scopedVirtualPlacement) {
-          placement.index = virtualPlacement.index;
-          placement.setSize = virtualPlacement.setSize;
-        }
-        const resolvedIndex = virtualPlacement?.index ?? itemIndex;
-        registerCollectionNode(
-          itemId,
-          collection,
-          node,
-          {
-            index: resolvedIndex,
-            setSize: virtualPlacement?.setSize ?? placement.setSize,
-            disabled: isDisabled,
-            value,
-            text: itemText,
-          },
-          registrationOwner
-        );
-        root.restoreItemFocus(resolvedIndex, node);
-        repairFocusForDisabledItem({
-          collection,
-          disabled: isDisabled,
-          index: resolvedIndex,
-          loop: true,
-          node,
-          setCurrentIndex: root.setCurrentIndex,
-        });
-      }
+      setNode
     ),
     id: itemId,
     role: 'option',

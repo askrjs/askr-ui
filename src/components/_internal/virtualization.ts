@@ -190,6 +190,124 @@ export function resolveVirtualRange(options: {
   };
 }
 
+export function resolveVariableVirtualRange(options: {
+  rowHeights: readonly number[];
+  scrollTop: number;
+  viewportHeight: number;
+  overscan?: VirtualOverscan;
+}): VirtualRange {
+  const rowHeights = options.rowHeights.map((height) =>
+    assertPositiveVirtualHeight(height, 'getRowHeight result')
+  );
+  const totalCount = rowHeights.length;
+  const viewportHeight = Math.max(0, Number(options.viewportHeight) || 0);
+  const offsets = [0];
+  for (const height of rowHeights)
+    offsets.push(offsets[offsets.length - 1] + height);
+  const totalHeight = offsets[totalCount];
+  const maxScrollTop = Math.max(0, totalHeight - viewportHeight);
+  const scrollTop = clampRangeValue(
+    Math.max(0, Number(options.scrollTop) || 0),
+    0,
+    maxScrollTop
+  );
+  if (totalCount === 0) {
+    return {
+      ...resolveVirtualRange({
+        totalCount: 0,
+        rowHeight: 1,
+        scrollTop,
+        viewportHeight,
+      }),
+      rowHeight: 0,
+    };
+  }
+  const indexAtOffset = (offset: number) => {
+    let low = 0;
+    let high = totalCount - 1;
+    while (low < high) {
+      const middle = Math.floor((low + high + 1) / 2);
+      if (offsets[middle] <= offset) low = middle;
+      else high = middle - 1;
+    }
+    return clampVirtualIndex(low, totalCount);
+  };
+  const overscan = normalizeVirtualOverscan(options.overscan);
+  const visibleStartIndex = indexAtOffset(scrollTop);
+  const visibleEndIndex = indexAtOffset(
+    Math.max(scrollTop, scrollTop + viewportHeight - 1)
+  );
+  const renderStartIndex = clampVirtualIndex(
+    visibleStartIndex - overscan.before,
+    totalCount
+  );
+  const renderEndIndex = clampVirtualIndex(
+    visibleEndIndex + overscan.after,
+    totalCount
+  );
+  return {
+    totalCount,
+    rowHeight: 0,
+    scrollTop,
+    viewportHeight,
+    totalHeight,
+    visibleStartIndex,
+    visibleEndIndex,
+    visibleCount: visibleEndIndex - visibleStartIndex + 1,
+    renderStartIndex,
+    renderEndIndex,
+    renderedCount: renderEndIndex - renderStartIndex + 1,
+    beforeSpacerHeight: offsets[renderStartIndex],
+    afterSpacerHeight: totalHeight - offsets[renderEndIndex + 1],
+    isAtTop: scrollTop <= 0,
+    isAtBottom: resolveVirtualIsAtBottom(
+      scrollTop,
+      viewportHeight,
+      totalHeight
+    ),
+  };
+}
+
+export function resolveVariableVirtualOffset(
+  rowHeights: readonly number[],
+  index: number
+): number {
+  let offset = 0;
+  for (let current = 0; current < Math.max(0, index); current += 1)
+    offset += rowHeights[current] ?? 0;
+  return offset;
+}
+
+export function resolveVariableVirtualScrollTopForIndex(
+  index: number,
+  rowHeights: readonly number[],
+  viewportHeight: number,
+  alignment: VirtualScrollAlignment = 'start'
+): number {
+  const clampedIndex = clampVirtualIndex(index, rowHeights.length);
+  if (clampedIndex < 0) return 0;
+  const rowTop = resolveVariableVirtualOffset(rowHeights, clampedIndex);
+  const rowHeight = rowHeights[clampedIndex];
+  const totalHeight = resolveVariableVirtualOffset(
+    rowHeights,
+    rowHeights.length
+  );
+  const maxScrollTop = Math.max(0, totalHeight - viewportHeight);
+  if (alignment === 'center')
+    return clampRangeValue(
+      rowTop - viewportHeight / 2 + rowHeight / 2,
+      0,
+      maxScrollTop
+    );
+  if (alignment === 'end')
+    return clampRangeValue(
+      rowTop - viewportHeight + rowHeight,
+      0,
+      maxScrollTop
+    );
+  return clampRangeValue(rowTop, 0, maxScrollTop);
+}
+
 export function resolveVirtualScrollTopForIndex(
   index: number,
   rowHeight: number,
@@ -279,6 +397,27 @@ export function createVirtualAnchor(
   };
 }
 
+export function createVariableVirtualAnchor(
+  key: string,
+  visibleKeys: readonly string[],
+  visibleStartIndex: number,
+  scrollTop: number,
+  rowHeights: readonly number[]
+): VirtualAnchor | null {
+  const anchorOffset = visibleKeys.indexOf(key);
+  if (anchorOffset < 0 || visibleStartIndex < 0) return null;
+
+  return {
+    key,
+    offset:
+      scrollTop -
+      resolveVariableVirtualOffset(
+        rowHeights,
+        visibleStartIndex + anchorOffset
+      ),
+  };
+}
+
 export function resolveVirtualScrollTopFromAnchor(
   anchor: VirtualAnchor,
   nextKeyIndexMap: Map<string, number>,
@@ -291,6 +430,17 @@ export function resolveVirtualScrollTopFromAnchor(
   }
 
   return nextIndex * rowHeight + anchor.offset;
+}
+
+export function resolveVariableVirtualScrollTopFromAnchor(
+  anchor: VirtualAnchor,
+  nextKeyIndexMap: Map<string, number>,
+  rowHeights: readonly number[]
+): number | null {
+  const nextIndex = nextKeyIndexMap.get(anchor.key);
+  return nextIndex === undefined
+    ? null
+    : resolveVariableVirtualOffset(rowHeights, nextIndex) + anchor.offset;
 }
 
 export function isVirtualAppendOnly(
