@@ -40,8 +40,9 @@ function isInsideDescendantScope(
       targetScope.previousFocused?.closest<HTMLElement>(
         '[data-focus-scope="true"]'
       ) ?? null;
-    targetScope =
-      previousScopeNode ? focusScopeEntries.get(previousScopeNode) : undefined;
+    targetScope = previousScopeNode
+      ? focusScopeEntries.get(previousScopeNode)
+      : undefined;
   }
 
   return false;

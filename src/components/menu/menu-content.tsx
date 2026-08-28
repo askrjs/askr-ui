@@ -1,8 +1,6 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
-import {
-  moveFocusOutsideCompositeWithTab,
-} from '../_internal/focus';
+import { moveFocusOutsideCompositeWithTab } from '../_internal/focus';
 import { readMenuRootContext } from './menu.shared';
 import type { MenuContentAsChildProps, MenuContentProps } from './menu.types';
 
