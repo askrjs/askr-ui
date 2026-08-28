@@ -501,7 +501,8 @@ export function repairFocusForDisabledItem<
   node: HTMLElement | null;
   setCurrentIndex: (index: number) => void;
 }) {
-  const { collection, current, disabled, index, loop, node, setCurrentIndex } = options;
+  const { collection, current, disabled, index, loop, node, setCurrentIndex } =
+    options;
 
   if (!node) {
     return;
@@ -511,7 +512,11 @@ export function repairFocusForDisabledItem<
   const becameDisabled = disabled && !tracker.disabled;
   tracker.disabled = disabled;
 
-  if (!becameDisabled || (!tracker.focused && !current) || tracker.repairQueued) {
+  if (
+    !becameDisabled ||
+    (!tracker.focused && !current) ||
+    tracker.repairQueued
+  ) {
     return;
   }
 

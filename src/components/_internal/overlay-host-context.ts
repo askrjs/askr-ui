@@ -12,7 +12,9 @@ export type OverlayHostContextValue = {
   register: (portal: OverlayPortal, signal: AbortSignal) => void;
 };
 
-export const OverlayHostContext = defineScope<OverlayHostContextValue | null>(null);
+export const OverlayHostContext = defineScope<OverlayHostContextValue | null>(
+  null
+);
 
 export function readOptionalOverlayHost(): OverlayHostContextValue | null {
   return readScope(OverlayHostContext);

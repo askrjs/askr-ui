@@ -67,7 +67,9 @@ describe('Popover - Behavior', () => {
 
     expect(trigger).toBeTruthy();
     expect(content).toBeTruthy();
-    expect(document.body.querySelectorAll('[data-slot="popover-content"]')).toHaveLength(1);
+    expect(
+      document.body.querySelectorAll('[data-slot="popover-content"]')
+    ).toHaveLength(1);
     expect(trigger?.id).toBeTruthy();
     expect(content?.getAttribute('aria-labelledby')).toBe(trigger?.id);
   });

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add opt-in variable row heights to `VirtualList` while preserving the fixed
+  row path and keyed scroll anchoring.
+
 ## [0.2.3] - 2026-08-25
 
 ### Fixed

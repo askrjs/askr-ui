@@ -6,8 +6,12 @@ import {
   assertPositiveVirtualHeight,
   buildVirtualKeyIndexMap,
   createVirtualAnchor,
+  createVariableVirtualAnchor,
   resolveVirtualAppendedCount,
   resolveVirtualRange,
+  resolveVariableVirtualRange,
+  resolveVariableVirtualScrollTopForIndex,
+  resolveVariableVirtualScrollTopFromAnchor,
   resolveVirtualRetainedAnchorKey,
   resolveVirtualScrollTopForBottom,
   resolveVirtualScrollTopForIndex,
@@ -88,6 +92,7 @@ type VirtualListEntry<Item> = {
   renderVersionState: StateCell<number> | undefined;
   viewportHeightHint: number;
   rowHeight: number;
+  rowHeights: number[] | null;
   overscan: VirtualOverscan;
   rowComponent: VirtualListRowComponent<Item>;
   itemsRef: readonly Item[] | null;
@@ -114,6 +119,34 @@ type VirtualListEntry<Item> = {
   nextLayoutRules: Map<string, string>;
   layoutNonce: string | undefined;
 };
+
+function resolveEntryTotalHeight<Item>(entry: VirtualListEntry<Item>): number {
+  return entry.rowHeights
+    ? entry.rowHeights.reduce((total, height) => total + height, 0)
+    : resolveVirtualTotalHeight(entry.keys.length, entry.rowHeight);
+}
+
+function resolveEntryRange<Item>(
+  entry: VirtualListEntry<Item>,
+  scrollTop: number,
+  viewportHeight: number
+): VirtualRange {
+  if (entry.rowHeights) {
+    return resolveVariableVirtualRange({
+      rowHeights: entry.rowHeights,
+      scrollTop,
+      viewportHeight,
+      overscan: entry.overscan,
+    });
+  }
+  return resolveVirtualRange({
+    totalCount: entry.keys.length,
+    rowHeight: entry.rowHeight,
+    scrollTop,
+    viewportHeight,
+    overscan: entry.overscan,
+  });
+}
 
 function resolveVirtualListScope<Item>(
   entry: VirtualListEntry<Item>,
@@ -189,13 +222,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
         ? entry.pendingScrollTop
         : currentScrollTop;
 
-    return resolveVirtualRange({
-      totalCount: entry.keys.length,
-      rowHeight: entry.rowHeight,
-      scrollTop: effectiveScrollTop,
-      viewportHeight: currentViewportHeight,
-      overscan: entry.overscan,
-    });
+    return resolveEntryRange(entry, effectiveScrollTop, currentViewportHeight);
   };
 
   const bumpRenderVersion = () => {
@@ -212,7 +239,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
 
     const viewportHeight = readViewportHeight() || entry.viewportHeightHint;
     const maxScrollTop = resolveVirtualScrollTopForBottom(
-      resolveVirtualTotalHeight(entry.keys.length, entry.rowHeight),
+      resolveEntryTotalHeight(entry),
       viewportHeight
     );
     const nextScrollTop = Math.min(Math.max(0, pendingScrollTop), maxScrollTop);
@@ -230,13 +257,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
   };
 
   const updateVisibleRange = (scrollTop: number, viewportHeight: number) => {
-    entry.visibleRange = resolveVirtualRange({
-      totalCount: entry.keys.length,
-      rowHeight: entry.rowHeight,
-      scrollTop,
-      viewportHeight,
-      overscan: entry.overscan,
-    });
+    entry.visibleRange = resolveEntryRange(entry, scrollTop, viewportHeight);
   };
 
   const schedulePendingScrollTop = () => {
@@ -280,10 +301,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
       setScrollTop(nextScrollTop);
     }
 
-    const totalHeight = resolveVirtualTotalHeight(
-      entry.keys.length,
-      entry.rowHeight
-    );
+    const totalHeight = resolveEntryTotalHeight(entry);
     const viewportHeight = readViewportHeight();
     const isAtBottom = resolveVirtualIsAtBottom(
       nextScrollTop,
@@ -324,10 +342,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
       setViewportHeight(nextViewportHeight);
     }
 
-    const totalHeight = resolveVirtualTotalHeight(
-      entry.keys.length,
-      entry.rowHeight
-    );
+    const totalHeight = resolveEntryTotalHeight(entry);
     const maxScrollTop = resolveVirtualScrollTopForBottom(
       totalHeight,
       nextViewportHeight
@@ -462,13 +477,20 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
     scrollToIndex(index, alignment = 'start') {
       const node = entry.node;
       const viewportHeight = readViewportHeight() || entry.viewportHeightHint;
-      const nextScrollTop = resolveVirtualScrollTopForIndex(
-        index,
-        entry.rowHeight,
-        viewportHeight,
-        entry.keys.length,
-        alignment
-      );
+      const nextScrollTop = entry.rowHeights
+        ? resolveVariableVirtualScrollTopForIndex(
+            index,
+            entry.rowHeights,
+            viewportHeight,
+            alignment
+          )
+        : resolveVirtualScrollTopForIndex(
+            index,
+            entry.rowHeight,
+            viewportHeight,
+            entry.keys.length,
+            alignment
+          );
 
       entry.followBottomActive = alignment === 'end';
       entry.pendingUnseenCount = 0;
@@ -488,10 +510,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
     scrollToBottom() {
       const node = entry.node;
       const viewportHeight = readViewportHeight() || entry.viewportHeightHint;
-      const totalHeight = resolveVirtualTotalHeight(
-        entry.keys.length,
-        entry.rowHeight
-      );
+      const totalHeight = resolveEntryTotalHeight(entry);
       const nextScrollTop = resolveVirtualScrollTopForBottom(
         totalHeight,
         viewportHeight
@@ -572,6 +591,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
   entry.userRef = entry.userRef ?? undefined;
   entry.apiRef = entry.apiRef ?? undefined;
   entry.rowHeight = entry.rowHeight ?? 0;
+  entry.rowHeights = entry.rowHeights ?? null;
   entry.overscan = entry.overscan ?? 0;
   entry.rowComponent = entry.rowComponent ?? (() => null as never);
   entry.itemsRef = entry.itemsRef ?? null;
@@ -614,10 +634,7 @@ function buildVirtualListState<Item>(
   scrollTop: number,
   viewportHeight: number
 ): VirtualListState {
-  const totalHeight = resolveVirtualTotalHeight(
-    entry.keys.length,
-    entry.rowHeight
-  );
+  const totalHeight = resolveEntryTotalHeight(entry);
 
   return {
     count: entry.keys.length,
@@ -690,7 +707,11 @@ function renderVirtualListRows<Item>(
         data-key={rowKey}
         data-visible={isVisible ? 'true' : 'false'}
         data-askr-virtual-composite={placementEnabled ? 'true' : 'false'}
-        {...virtualListLayoutProps(entry, 'row', entry.rowHeight)}
+        {...virtualListLayoutProps(
+          entry,
+          'row',
+          entry.rowHeights?.[index] ?? entry.rowHeight
+        )}
       >
         <VirtualCompositeIdentityContext
           value={resolveVirtualListScope(
@@ -720,12 +741,14 @@ function renderVirtualListRows<Item>(
 function syncVirtualListItems<Item>(
   entry: VirtualListEntry<Item>,
   items: readonly Item[],
-  getKey: (item: Item, index: number) => string | number
+  getKey: (item: Item, index: number) => string | number,
+  nextRowHeights: number[] | null
 ) {
   const previousKeys = entry.keys;
   const itemsChanged = entry.itemsRef !== items;
 
   if (!itemsChanged) {
+    entry.rowHeights = nextRowHeights;
     return;
   }
 
@@ -748,14 +771,10 @@ function syncVirtualListItems<Item>(
       : entry.scrollTopState();
   const currentViewportHeight =
     entry.viewportHeightState() || entry.viewportHeightHint;
-  const currentTotalHeight = resolveVirtualTotalHeight(
-    previousKeys.length,
-    entry.rowHeight
-  );
-  const nextTotalHeight = resolveVirtualTotalHeight(
-    nextKeys.length,
-    entry.rowHeight
-  );
+  const currentTotalHeight = resolveEntryTotalHeight(entry);
+  const nextTotalHeight = nextRowHeights
+    ? nextRowHeights.reduce((total, height) => total + height, 0)
+    : resolveVirtualTotalHeight(nextKeys.length, entry.rowHeight);
   const bottomPinned =
     entry.followBottomEnabled &&
     entry.followBottomActive &&
@@ -780,20 +799,34 @@ function syncVirtualListItems<Item>(
     );
 
     if (anchorKey) {
-      const anchor = createVirtualAnchor(
-        anchorKey,
-        previousVisibleKeys,
-        entry.visibleRange.visibleStartIndex,
-        currentScrollTop,
-        entry.rowHeight
-      );
+      const anchor = entry.rowHeights
+        ? createVariableVirtualAnchor(
+            anchorKey,
+            previousVisibleKeys,
+            entry.visibleRange.visibleStartIndex,
+            currentScrollTop,
+            entry.rowHeights
+          )
+        : createVirtualAnchor(
+            anchorKey,
+            previousVisibleKeys,
+            entry.visibleRange.visibleStartIndex,
+            currentScrollTop,
+            entry.rowHeight
+          );
 
       if (anchor) {
-        const nextScrollTop = resolveVirtualScrollTopFromAnchor(
-          anchor,
-          nextKeyIndexMap,
-          entry.rowHeight
-        );
+        const nextScrollTop = nextRowHeights
+          ? resolveVariableVirtualScrollTopFromAnchor(
+              anchor,
+              nextKeyIndexMap,
+              nextRowHeights
+            )
+          : resolveVirtualScrollTopFromAnchor(
+              anchor,
+              nextKeyIndexMap,
+              entry.rowHeight
+            );
 
         if (nextScrollTop !== null) {
           entry.pendingScrollTop = nextScrollTop;
@@ -811,6 +844,7 @@ function syncVirtualListItems<Item>(
   entry.keys = nextKeys;
   entry.keyIndexMap = nextKeyIndexMap;
   entry.itemsRef = items;
+  entry.rowHeights = nextRowHeights;
 
   const maxScrollTop = resolveVirtualScrollTopForBottom(
     nextTotalHeight,
@@ -849,6 +883,7 @@ export function VirtualList<Item>(
     ref,
     rowComponent: RowComponent,
     rowHeight: rowHeightProp,
+    getRowHeight,
     onScroll,
     viewport,
     ...rest
@@ -874,6 +909,14 @@ export function VirtualList<Item>(
   entry.scrollTopState = scrollTopState;
   entry.viewportHeightState = viewportHeightState;
   entry.rowHeight = rowHeight;
+  const nextRowHeights = getRowHeight
+    ? items.map((item, index) =>
+        assertPositiveVirtualHeight(
+          getRowHeight(item, index),
+          'getRowHeight result'
+        )
+      )
+    : null;
   entry.layoutNonce = layoutNonce;
   entry.viewportHeightHint = viewportHeightHint;
   entry.overscan = overscan;
@@ -888,7 +931,7 @@ export function VirtualList<Item>(
   setRefValue(entry.userRef, entry.node);
   setRefValue(entry.apiRef, entry.api as VirtualListApi<Item>);
 
-  syncVirtualListItems(entry, items, getKey);
+  syncVirtualListItems(entry, items, getKey, nextRowHeights);
 
   const currentScrollTop = entry.scrollTopState();
   const effectiveScrollTop =
@@ -897,13 +940,11 @@ export function VirtualList<Item>(
       ? entry.pendingScrollTop
       : currentScrollTop;
   const viewportHeight = viewportHeightState() || viewportHeightHint;
-  const visibleRange = resolveVirtualRange({
-    totalCount: items.length,
-    rowHeight,
-    scrollTop: effectiveScrollTop,
-    viewportHeight,
-    overscan,
-  });
+  const visibleRange = resolveEntryRange(
+    entry,
+    effectiveScrollTop,
+    viewportHeight
+  );
 
   entry.visibleRange = visibleRange;
 

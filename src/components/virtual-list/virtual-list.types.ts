@@ -63,6 +63,8 @@ export type VirtualListApi<_Item> = {
 export type VirtualListProps<Item> = VirtualListRootProps & {
   items: readonly Item[];
   rowHeight: number;
+  /** Optional keyed row sizing. When omitted, VirtualList retains its fixed-height arithmetic path. */
+  getRowHeight?: (item: Item, index: number) => number;
   overscan?: VirtualOverscan;
   getKey: (item: Item, index: number) => string | number;
   rowComponent: VirtualListRowComponent<Item>;
@@ -81,6 +83,8 @@ export type VirtualListAsChildProps<Item> = Omit<
 > & {
   items: readonly Item[];
   rowHeight: number;
+  /** Optional keyed row sizing. When omitted, VirtualList retains its fixed-height arithmetic path. */
+  getRowHeight?: (item: Item, index: number) => number;
   overscan?: VirtualOverscan;
   getKey: (item: Item, index: number) => string | number;
   rowComponent: VirtualListRowComponent<Item>;

@@ -37,14 +37,22 @@ describe('OverlayHost - Behavior', () => {
 
     await flushUpdates();
     await flushUpdates();
-    expect(document.body.querySelectorAll('[data-slot="popover-content"]')).toHaveLength(2);
+    expect(
+      document.body.querySelectorAll('[data-slot="popover-content"]')
+    ).toHaveLength(2);
 
-    (document.body.querySelector('[data-slot="popover-close"]') as HTMLElement).click();
+    (
+      document.body.querySelector('[data-slot="popover-close"]') as HTMLElement
+    ).click();
     await flushUpdates();
     await flushUpdates();
 
-    expect(document.body.querySelector('[aria-label="First overlay"]')).toBeNull();
-    expect(document.body.querySelector('[aria-label="Second overlay"]')).not.toBeNull();
+    expect(
+      document.body.querySelector('[aria-label="First overlay"]')
+    ).toBeNull();
+    expect(
+      document.body.querySelector('[aria-label="Second overlay"]')
+    ).not.toBeNull();
   });
 
   it('should remove hosted portal content when the application host unmounts', async () => {
@@ -61,10 +69,14 @@ describe('OverlayHost - Behavior', () => {
 
     await flushUpdates();
     await flushUpdates();
-    expect(document.body.querySelector('[data-slot="popover-content"]')).not.toBeNull();
+    expect(
+      document.body.querySelector('[data-slot="popover-content"]')
+    ).not.toBeNull();
 
     unmount(container);
-    expect(document.body.querySelector('[data-slot="popover-content"]')).toBeNull();
+    expect(
+      document.body.querySelector('[data-slot="popover-content"]')
+    ).toBeNull();
 
     container = mount(<div>Replacement application</div>);
   });
