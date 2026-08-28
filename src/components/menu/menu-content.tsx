@@ -1,10 +1,8 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import {
-  focusSelectedCollectionItem,
   moveFocusOutsideCompositeWithTab,
 } from '../_internal/focus';
-import { getMenuCollection } from '../_internal/menu';
 import { readMenuRootContext } from './menu.shared';
 import type { MenuContentAsChildProps, MenuContentProps } from './menu.types';
 
@@ -42,10 +40,7 @@ export function MenuContent(props: MenuContentProps | MenuContentAsChildProps) {
         if (item) {
           event.preventDefault();
           root.setCurrentIndex(item.index);
-          focusSelectedCollectionItem(
-            getMenuCollection(root.menuId),
-            item.index
-          );
+          root.focusItem(item.index);
           return;
         }
       }

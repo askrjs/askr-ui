@@ -18,6 +18,35 @@ type ScopeEntry = {
   pendingDetachedNode: HTMLElement | null;
 };
 
+const focusScopeEntries = new WeakMap<HTMLElement, ScopeEntry>();
+
+function isInsideDescendantScope(
+  scope: ScopeEntry,
+  target: HTMLElement
+): boolean {
+  const scopeNode = target.closest<HTMLElement>('[data-focus-scope="true"]');
+  let targetScope = scopeNode ? focusScopeEntries.get(scopeNode) : undefined;
+  const visited = new Set<ScopeEntry>();
+
+  while (targetScope && !visited.has(targetScope)) {
+    visited.add(targetScope);
+    if (
+      targetScope.previousFocused &&
+      scope.node?.contains(targetScope.previousFocused)
+    ) {
+      return true;
+    }
+    const previousScopeNode =
+      targetScope.previousFocused?.closest<HTMLElement>(
+        '[data-focus-scope="true"]'
+      ) ?? null;
+    targetScope =
+      previousScopeNode ? focusScopeEntries.get(previousScopeNode) : undefined;
+  }
+
+  return false;
+}
+
 /**
  * Renders a part of `focus-scope`.
  *
@@ -52,6 +81,7 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
       const pendingDetachedNode = scopeEntry.pendingDetachedNode;
       scopeEntry.pendingDetachedNode = null;
       scopeEntry.node = node;
+      focusScopeEntries.set(node, scopeEntry);
 
       if (pendingDetachedNode) {
         if (
@@ -89,6 +119,9 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
     }
 
     const detachedNode = scopeEntry.node;
+    if (detachedNode && focusScopeEntries.get(detachedNode) === scopeEntry) {
+      focusScopeEntries.delete(detachedNode);
+    }
     scopeEntry.node = null;
     scopeEntry.pendingDetachedNode = detachedNode;
     queueMicrotask(() => {
@@ -172,7 +205,33 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
     const relatedTarget =
       event.relatedTarget instanceof HTMLElement ? event.relatedTarget : null;
 
-    if (relatedTarget && node.contains(relatedTarget)) {
+    if (!relatedTarget) {
+      queueMicrotask(() => {
+        if (scopeEntry.node !== node) {
+          return;
+        }
+        const active =
+          document.activeElement instanceof HTMLElement
+            ? document.activeElement
+            : null;
+        if (
+          active &&
+          (node.contains(active) || isInsideDescendantScope(scopeEntry, active))
+        ) {
+          return;
+        }
+        if (!focusFirstDescendant(node)) {
+          node.focus();
+        }
+      });
+      return;
+    }
+
+    if (node.contains(relatedTarget)) {
+      return;
+    }
+
+    if (isInsideDescendantScope(scopeEntry, relatedTarget)) {
       return;
     }
 

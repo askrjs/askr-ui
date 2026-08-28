@@ -144,8 +144,13 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
       setCurrentIndex: root.setCurrentIndex,
     });
   };
-  if (focusNode.current) {
-    setNode(focusNode.current);
+  const renderedNode = focusNode.current;
+  if (renderedNode) {
+    queueMicrotask(() => {
+      if (focusNode.current === renderedNode && renderedNode.isConnected) {
+        setNode(renderedNode);
+      }
+    });
   }
   const finalProps = mergeProps(rest, {
     ...interactionProps,

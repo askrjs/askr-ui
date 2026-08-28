@@ -7,10 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-08-28
+
 ### Added
 
 - Add opt-in variable row heights to `VirtualList` while preserving the fixed
   row path and keyed scroll anchoring.
+
+### Fixed
+
+- Let nested portalled overlays own focus without escaping their parent modal,
+  and restore focus to their persistent trigger on close.
+- Restore dialog and select focus across triggerless and resized overlay
+  transitions.
+- Move composite focus when a current Dropdown or Select item becomes disabled
+  during a prop-only rerender.
+- Mount shared overlay portals through an explicit application `OverlayHost` so
+  content escapes transformed and overflow-clipped product surfaces.
 
 ## [0.2.3] - 2026-08-25
 
@@ -62,7 +75,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Establish the coordinated AskrJS 0.2 compatibility baseline and peer ranges.
 
-[Unreleased]: https://github.com/askrjs/askr-ui/compare/v0.2.3...HEAD
+[Unreleased]: https://github.com/askrjs/askr-ui/compare/v0.2.4...HEAD
+[0.2.4]: https://github.com/askrjs/askr-ui/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/askrjs/askr-ui/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/askrjs/askr-ui/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/askrjs/askr-ui/compare/v0.2.0...v0.2.1
