@@ -362,7 +362,20 @@ describe('Source layout', () => {
       'utf8'
     );
     expect(overlaySource).toContain('primeOverlayStackNode');
-    expect(overlaySource).toContain('setDynamicStyleRule');
+
+    const overlayPositionSource = readFileSync(
+      join(
+        process.cwd(),
+        'src',
+        'components',
+        '_internal',
+        'overlay',
+        'position.ts'
+      ),
+      'utf8'
+    );
+    expect(overlayPositionSource).toContain('primeOverlayStackNode');
+    expect(overlayPositionSource).toContain('setDynamicStyleRule');
   });
 
   it('should keep checkable roles on native checkable key semantics', () => {
