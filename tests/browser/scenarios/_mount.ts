@@ -72,7 +72,7 @@ export function unmount(container: HTMLElement | undefined): void {
  * a previous test left behind.
  */
 export function disposeMounts(): void {
-  for (const container of [...activeContainers]) unmount(container);
+  for (const container of activeContainers) unmount(container);
   activeContainers.clear();
   resetTestState();
 }
