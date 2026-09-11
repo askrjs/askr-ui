@@ -230,7 +230,7 @@
     "lint": "vp lint .",
     "typecheck": "npm run test:types",
     "test": "npm run test:unit && npm run test:integrity && npm run test:jsdom && npm run test:browser",
-    "test:browser": "vp test run --config vitest.test.browser.config.ts",
+    "test:browser": "playwright test",
     "test:component": "npm run test:browser",
     "test:jsdom": "npm run build && vp test run --config vitest.test.jsdom.config.ts",
     "test:types": "tsc -p tsconfig.type-tests.json --noEmit",
@@ -246,6 +246,7 @@
   "devDependencies": {
     "@askrjs/askr": ">=0.2.3 <0.3.0",
     "@askrjs/vite": ">=0.2.1 <0.3.0",
+    "@playwright/test": "1.62.1",
     "@types/node": "^26.3.0",
     "@vitest/browser-playwright": "4.1.11",
     "axe-core": "^4.13.0",

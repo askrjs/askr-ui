@@ -13,7 +13,11 @@ theme composition belong in `@askrjs/themes`.
   benchmark coverage, and test-suite conventions.
 - `tests/jsdom/` covers DOM-backed internal behavior.
 - `tests/browser/components/` owns public behavior, accessibility, and
-  determinism coverage.
+  determinism coverage. These run on native `@playwright/test`
+  (`playwright.config.ts`): each `<name>.spec.ts` runs in Node and drives the
+  page, while the component tree it mounts lives in the mirrored
+  `tests/browser/scenarios/<same path>.tsx` module, loaded lazily by
+  `tests/browser/harness.ts`.
 - `benches/` contains the four benchmark tiers.
 - `docs/` contains the package overview, composition guidance, and standing
   regression-coverage rules.

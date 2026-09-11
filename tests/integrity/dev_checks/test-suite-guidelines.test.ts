@@ -4,6 +4,13 @@ import { describe, expect, it } from 'vite-plus/test';
 import fs from 'node:fs';
 import path from 'node:path';
 
+// Native Playwright specs are `.spec.ts`; the component trees they mount live
+// in sibling `tests/browser/scenarios/**/*.tsx` modules. Both halves of a
+// browser test must be linted, or the port would silently drop the browser
+// suite out of these guidelines.
+const TEST_FILE_PATTERN = /\.(test|spec)\.(ts|tsx)$/;
+const SCENARIO_DIR = path.join('tests', 'browser', 'scenarios');
+
 function readAllTestFiles(dir: string): string[] {
   if (dir.includes(path.join('tests', 'integrity', 'dev_checks'))) return [];
 
@@ -13,7 +20,11 @@ function readAllTestFiles(dir: string): string[] {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       results.push(...readAllTestFiles(full));
-    } else if (entry.isFile() && /\.test\.(ts|tsx)$/.test(entry.name)) {
+    } else if (
+      entry.isFile() &&
+      (TEST_FILE_PATTERN.test(entry.name) ||
+        (full.includes(SCENARIO_DIR) && /\.tsx?$/.test(entry.name)))
+    ) {
       results.push(full);
     }
   }
@@ -108,7 +119,7 @@ describe('Test suite guidelines', () => {
           });
         }
         if (
-          /behavior\.test\.(ts|tsx)$/.test(file) &&
+          /behavior\.(test|spec)\.ts$/.test(file) &&
           /\b(setTimeout|sleep)\s*\(/.test(line)
         ) {
           const usesFakeTimers =
@@ -130,7 +141,7 @@ describe('Test suite guidelines', () => {
     }
 
     for (const file of files.filter((candidate) =>
-      /\.test\.(ts|tsx)$/.test(candidate)
+      TEST_FILE_PATTERN.test(candidate)
     )) {
       const content = fs.readFileSync(file, 'utf-8');
       const regex = /\b(it|test)\s*\(\s*(['"`])([^'"\n\r]+)\2/gi;
@@ -152,17 +163,17 @@ describe('Test suite guidelines', () => {
     }
 
     for (const file of files.filter((candidate) =>
-      /\.test\.(ts|tsx)$/.test(candidate)
+      TEST_FILE_PATTERN.test(candidate)
     )) {
       const base = path.basename(file);
-      if (!/^[a-z0-9_-]+\.test\.(ts|tsx)$/.test(base)) {
+      if (!/^[a-z0-9_-]+\.(test|spec)\.(ts|tsx)$/.test(base)) {
         failures.push({
           file,
           line: 1,
           snippet: path.relative(process.cwd(), file),
           rule: 'test filename convention',
           message:
-            'Test filenames must be lowercase and end with .test.ts or .test.tsx',
+            'Test filenames must be lowercase and end with .test.ts, .test.tsx or .spec.ts',
         });
       }
     }
@@ -182,9 +193,10 @@ describe('Test suite guidelines', () => {
 
   it('should keep browser tests on public component behavior', () => {
     const browserDir = path.join(testsDir, 'browser');
-    const files = readAllTestFiles(browserDir).filter((file) =>
-      /\.test\.(ts|tsx)$/.test(file)
-    );
+    // Scenario modules are included on purpose: they are where a browser test
+    // now does its importing, so that is where a private-internals import would
+    // hide.
+    const files = readAllTestFiles(browserDir);
     const failures: string[] = [];
     const privateImportPattern =
       /from\s+['"][^'"]*\/src\/components\/(?:_internal|[^'"]+\.(?:shared|types))['"]/;
