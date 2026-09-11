@@ -39,9 +39,11 @@ test.describe('Textarea - Accessibility', () => {
     expect(
       await textarea.evaluate((node: HTMLTextAreaElement) => node.disabled)
     ).toBe(true);
+    // `disabled` is a boolean attribute: presence is the semantic, and its
+    // serialized value is the empty string. Assert presence, not a value.
     await expect(textarea).toHaveAttribute(
       contract.DISABLED_ATTRIBUTES.asChild,
-      'true'
+      /.*/
     );
   });
 
@@ -59,7 +61,7 @@ test.describe('Textarea - Accessibility', () => {
     ).toBe(true);
     await expect(host).toHaveAttribute(
       contract.DISABLED_ATTRIBUTES.asChild,
-      'true'
+      /.*/
     );
   });
 

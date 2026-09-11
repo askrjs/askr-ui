@@ -77,7 +77,7 @@ For the full surface and composition examples, start with the docs above.
 
 ## Themes catalog boundary
 
-`@askrjs/themes` also publishes styling-only compatibility anatomy for Tabs,
+`@askrjs/themes` also publishes styling-only catalog anatomy for Tabs,
 Combobox, Calendar/DatePicker, Command, NavigationMenu, Carousel,
 ResizablePanelGroup, and InputOTP. Those names are not `@askrjs/ui`
 primitives and do not provide widget state, keyboard interaction, focus
