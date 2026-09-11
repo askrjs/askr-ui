@@ -9,8 +9,6 @@ export function captureOverlayNonce(
   overlayNonces.set(identity, nonce);
 }
 
-export function getOverlayNonce(
-  identity: OverlayIdentity
-): string | undefined {
+export function getOverlayNonce(identity: OverlayIdentity): string | undefined {
   return overlayNonces.get(identity);
 }
