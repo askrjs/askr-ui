@@ -200,7 +200,7 @@ describe('Docs contract', () => {
       expect(readme, family).toContain(family);
     }
 
-    expect(readme).toContain('styling-only compatibility anatomy');
+    expect(readme).toContain('styling-only catalog anatomy');
     expect(readme).toContain('do not provide widget state');
     expect(readme).toContain('Themes may then compose');
     expect(readme).toContain('rather than reproducing its state');
