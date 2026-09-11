@@ -90,8 +90,8 @@ async function openHarness(page: Page): Promise<void> {
 
 export const test = base.extend<Fixtures>({
   /**
-   * Replaces `tests/browser/browser-console.setup.ts`: patches the console in
-   * the page and fails the test if anything unallowed was logged.
+   * Patches the console in the page and fails the test if any unallowed
+   * message is logged.
    *
    * Patching in-page rather than listening to Playwright's `console` event is
    * deliberate — that event also reports browser-internal advisories the vitest
