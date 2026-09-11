@@ -23,14 +23,8 @@ test.describe('Table - Behavior', () => {
     await render('asChildComposition');
 
     await expect(root.locator('table')).toHaveAttribute('data-slot', 'table');
-    await expect(root.locator('tr')).toHaveAttribute(
-      'data-slot',
-      'table-row'
-    );
-    await expect(root.locator('td')).toHaveAttribute(
-      'data-slot',
-      'table-cell'
-    );
+    await expect(root.locator('tr')).toHaveAttribute('data-slot', 'table-row');
+    await expect(root.locator('td')).toHaveAttribute('data-slot', 'table-cell');
     await expect(root.locator('td')).toHaveText('Alice');
   });
 

@@ -241,8 +241,9 @@ export function disabledInteraction(root: HTMLElement) {
 
   return {
     disabledFlags: () => ({
-      groupRight: (getToggleByText(container, 'Group right') as HTMLButtonElement)
-        .disabled,
+      groupRight: (
+        getToggleByText(container, 'Group right') as HTMLButtonElement
+      ).disabled,
       itemLeft: (getToggleByText(container, 'Item left') as HTMLButtonElement)
         .disabled,
     }),

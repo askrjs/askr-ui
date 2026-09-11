@@ -11,9 +11,10 @@ test.describe('OverlayHost - Behavior', () => {
 
     await run('closeFirst');
 
-    expect(
-      await run<{ first: boolean; second: boolean }>('overlays')
-    ).toEqual({ first: false, second: true });
+    expect(await run<{ first: boolean; second: boolean }>('overlays')).toEqual({
+      first: false,
+      second: true,
+    });
   });
 
   test('should remove hosted portal content when the application host unmounts', async ({

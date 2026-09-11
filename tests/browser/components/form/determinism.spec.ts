@@ -1,4 +1,7 @@
-import { type DeterministicRender, expectDeterministic } from '../../assertions';
+import {
+  type DeterministicRender,
+  expectDeterministic,
+} from '../../assertions';
 import { test } from '../../fixtures';
 
 test.describe('Form - Determinism', () => {

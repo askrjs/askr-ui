@@ -62,9 +62,9 @@ test.describe('Textarea - Behavior', () => {
     await render('asChildDisabled');
     const host = root.locator('textarea');
 
-    expect(await host.evaluate((node: HTMLTextAreaElement) => node.disabled)).toBe(
-      true
-    );
+    expect(
+      await host.evaluate((node: HTMLTextAreaElement) => node.disabled)
+    ).toBe(true);
     await expect(host).toHaveAttribute('data-disabled', 'true');
   });
 
@@ -75,9 +75,9 @@ test.describe('Textarea - Behavior', () => {
     await render('asChildReadOnly');
     const host = root.locator('textarea');
 
-    expect(await host.evaluate((node: HTMLTextAreaElement) => node.readOnly)).toBe(
-      true
-    );
+    expect(
+      await host.evaluate((node: HTMLTextAreaElement) => node.readOnly)
+    ).toBe(true);
     await expect(host).toHaveAttribute('readonly');
   });
 

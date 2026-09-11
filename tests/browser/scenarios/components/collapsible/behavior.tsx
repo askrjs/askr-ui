@@ -296,8 +296,8 @@ export function uniqueIds(root: HTMLElement) {
 
   return {
     ids: () =>
-      Array.from(
-        container.querySelectorAll('[id^="collapsible-content"]')
-      ).map((element) => element.id),
+      Array.from(container.querySelectorAll('[id^="collapsible-content"]')).map(
+        (element) => element.id
+      ),
   };
 }

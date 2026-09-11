@@ -63,8 +63,9 @@ async function mount(
   document.body.append(root);
 
   controls =
-    ((await scenario(root, options as never)) as ScenarioControls | undefined) ??
-    {};
+    ((await scenario(root, options as never)) as
+      | ScenarioControls
+      | undefined) ?? {};
   return null;
 }
 

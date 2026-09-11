@@ -78,8 +78,14 @@ interface Fixtures {
 function scenarioModuleFor(file: string): string {
   const browserDir = path.join('tests', 'browser');
   const index = file.lastIndexOf(browserDir);
-  const relative = index === -1 ? path.basename(file) : file.slice(index + browserDir.length + 1);
-  return relative.replace(/\.spec\.ts$/u, '').split(path.sep).join('/');
+  const relative =
+    index === -1
+      ? path.basename(file)
+      : file.slice(index + browserDir.length + 1);
+  return relative
+    .replace(/\.spec\.ts$/u, '')
+    .split(path.sep)
+    .join('/');
 }
 
 async function openHarness(page: Page): Promise<void> {

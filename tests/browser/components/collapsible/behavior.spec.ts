@@ -77,7 +77,9 @@ test.describe('Collapsible — Behavior', () => {
       run,
     }) => {
       await render('controlledOpenChange');
-      await root.locator('button').evaluate((node: HTMLElement) => node.click());
+      await root
+        .locator('button')
+        .evaluate((node: HTMLElement) => node.click());
 
       expect(await run<boolean[]>('openChangeArgs')).toContainEqual(true);
     });
@@ -211,7 +213,9 @@ test.describe('Collapsible — Behavior', () => {
   test.describe('Disabled State', () => {
     test('should not toggle when disabled', async ({ render, root, run }) => {
       await render('disabledToggle');
-      await root.locator('button').evaluate((node: HTMLElement) => node.click());
+      await root
+        .locator('button')
+        .evaluate((node: HTMLElement) => node.click());
 
       expect(await run<number>('openChangeCount')).toBe(0);
     });

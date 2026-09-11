@@ -1,4 +1,7 @@
-import { type DeterministicRender, expectDeterministic } from '../../assertions';
+import {
+  type DeterministicRender,
+  expectDeterministic,
+} from '../../assertions';
 import { expect, test } from '../../fixtures';
 
 test.describe('Button - Determinism', () => {
@@ -37,9 +40,9 @@ test.describe('Button - Determinism', () => {
   }) => {
     await render('behaviorAcrossRemounts');
 
-    expect(
-      await run<{ first: number; second: number }>('pressCounts')
-    ).toEqual({ first: 1, second: 1 });
+    expect(await run<{ first: number; second: number }>('pressCounts')).toEqual(
+      { first: 1, second: 1 }
+    );
   });
 
   test('should not schedule timers during render', async ({ render, run }) => {

@@ -1,4 +1,7 @@
-import { type DeterministicRender, expectDeterministic } from '../../assertions';
+import {
+  type DeterministicRender,
+  expectDeterministic,
+} from '../../assertions';
 import { expect, test } from '../../fixtures';
 
 test.describe('Toggle - Determinism', () => {

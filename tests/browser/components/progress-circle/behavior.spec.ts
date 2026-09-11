@@ -14,7 +14,9 @@ test.describe('ProgressCircle - Behavior', () => {
     await render('percentageCustomProperty');
 
     expect(
-      await run<{ styleAttribute: string | null; percentage: string }>('styling')
+      await run<{ styleAttribute: string | null; percentage: string }>(
+        'styling'
+      )
     ).toEqual({ styleAttribute: null, percentage: '50%' });
   });
 });

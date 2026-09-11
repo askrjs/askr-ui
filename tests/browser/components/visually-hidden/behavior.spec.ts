@@ -5,9 +5,9 @@ test.describe('VisuallyHidden — Behavior', () => {
     await render('hiddenSpanDefault');
     const span = root.locator('span');
 
-    expect(
-      await span.evaluate((node: HTMLElement) => node.textContent)
-    ).toBe('Hidden text');
+    expect(await span.evaluate((node: HTMLElement) => node.textContent)).toBe(
+      'Hidden text'
+    );
     await expect(span).toHaveAttribute('data-askr-visually-hidden', 'true');
   });
 

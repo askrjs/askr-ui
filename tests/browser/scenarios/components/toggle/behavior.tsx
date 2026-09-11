@@ -98,7 +98,10 @@ export function refForwarding(root: HTMLElement) {
   let nativeRef: HTMLButtonElement | null = null;
   let childRef: HTMLElement | null = null;
 
-  const first = mount(<Toggle ref={(node) => (nativeRef = node)}>Mute</Toggle>, root);
+  const first = mount(
+    <Toggle ref={(node) => (nativeRef = node)}>Mute</Toggle>,
+    root
+  );
   const nativeMatches =
     nativeRef === (first.querySelector('button') as HTMLButtonElement | null);
 
@@ -111,7 +114,8 @@ export function refForwarding(root: HTMLElement) {
     root
   );
   const childMatches =
-    childRef === (second.querySelector('[role="button"]') as HTMLElement | null);
+    childRef ===
+    (second.querySelector('[role="button"]') as HTMLElement | null);
 
   return { refs: () => ({ nativeMatches, childMatches }) };
 }

@@ -343,8 +343,7 @@ export function virtualizedWindow(root: HTMLElement) {
       await flushUpdates();
       await flushUpdates();
     },
-    visibleStartIndex: () =>
-      viewport.dataset.virtualVisibleStartIndex ?? null,
+    visibleStartIndex: () => viewport.dataset.virtualVisibleStartIndex ?? null,
     hasItem43Button: () =>
       Array.from(container.querySelectorAll('button')).some(
         (button) => button.textContent?.trim() === 'Item 43'

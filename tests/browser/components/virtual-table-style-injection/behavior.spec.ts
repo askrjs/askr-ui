@@ -27,7 +27,9 @@ test.describe('virtual table style injection', () => {
       nextRuleCount: number;
     }>('result');
 
-    expect(result.props).toEqual({ 'data-askr-virtual-table-row-height': '32' });
+    expect(result.props).toEqual({
+      'data-askr-virtual-table-row-height': '32',
+    });
     expect(result.nextRuleCount).toBe(1);
 
     expect(await run<string>('committedHeight')).toBe('32px');

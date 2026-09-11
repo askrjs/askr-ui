@@ -1,4 +1,7 @@
-import { type DeterministicRender, expectDeterministic } from '../../assertions';
+import {
+  type DeterministicRender,
+  expectDeterministic,
+} from '../../assertions';
 import { expect, test } from '../../fixtures';
 
 test.describe('Collapsible — Determinism', () => {
@@ -77,9 +80,9 @@ test.describe('Collapsible — Determinism', () => {
     }) => {
       await render('ariaPresenceOpen');
 
-      await expect(
-        root.locator('[id^="collapsible-content"]')
-      ).toHaveAttribute('id');
+      await expect(root.locator('[id^="collapsible-content"]')).toHaveAttribute(
+        'id'
+      );
     });
   });
 
