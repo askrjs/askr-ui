@@ -130,10 +130,14 @@ describe('Source layout', () => {
       join(componentsDirectory, 'virtual-table', 'virtual-table.tsx'),
       'utf8'
     );
+    const virtualTableIdentityWiringSource = readFileSync(
+      join(componentsDirectory, 'virtual-table', 'identity-wiring.ts'),
+      'utf8'
+    );
     expect(virtualListSource).toContain('VirtualCompositeIdentityContext');
     expect(virtualListSource).toContain("'list-row'");
     expect(virtualTableSource).toContain('VirtualCompositeIdentityContext');
-    expect(virtualTableSource).toContain("'table-cell'");
+    expect(virtualTableIdentityWiringSource).toContain("'table-cell'");
 
     const virtualizedCompositeSuite = readFileSync(
       join(

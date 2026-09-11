@@ -4,13 +4,9 @@ import type { Ref } from '@askrjs/askr/foundations/utilities';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import {
   assertPositiveVirtualHeight,
-  buildVirtualKeyIndexMap,
-  createVirtualAnchor,
   resolveVirtualRange,
-  resolveVirtualRetainedAnchorKey,
   resolveVirtualScrollTopForBottom,
   resolveVirtualScrollTopForIndex,
-  resolveVirtualScrollTopFromAnchor,
   resolveVirtualTotalHeight,
   resolveVirtualStyleHeight,
   setRefValue,
@@ -20,12 +16,6 @@ import {
 } from '../_internal/virtualization';
 import { isJsxElement } from '../_internal/jsx';
 import {
-  dynamicAttributeSelector,
-  removeDynamicStyleRuleWhenUnused,
-  setDynamicStyleRule,
-} from '../_internal/dynamic-style';
-import {
-  extendVirtualCompositeIdentity,
   readVirtualCompositeIdentity,
   readVirtualCompositeOwner,
   type VirtualCompositeScopeValue,
@@ -36,8 +26,17 @@ import type {
   VirtualTableAsChildProps,
   VirtualTableColumn,
   VirtualTableProps,
-  VirtualTableState,
 } from './virtual-table.types';
+import {
+  clearVirtualTableLayoutRules,
+  commitVirtualTableLayoutRules,
+  virtualTableLayoutProps,
+} from './style-injection';
+import { resolveVirtualTableScope } from './identity-wiring';
+import {
+  buildVirtualTableState,
+  syncVirtualTableRows,
+} from './virtualization-orchestration';
 
 type StateCell<T> = (() => T) & {
   set: (next: T | ((prev: T) => T)) => void;
@@ -118,31 +117,6 @@ function isVirtualTableInteractiveEventTarget(
   );
 }
 
-function virtualTableLayoutProps<Row>(
-  entry: VirtualTableEntry<Row>,
-  kind: string,
-  value: string | undefined,
-  declarations: Record<string, string | number | undefined>
-): Record<string, string> {
-  if (value === undefined) return {};
-  const attribute = `data-askr-virtual-table-${kind}`;
-  const key = `virtual-table:${kind}:${value}`;
-  const selector = dynamicAttributeSelector(attribute, value);
-  setDynamicStyleRule(key, selector, declarations, entry.layoutNonce);
-  entry.nextLayoutRules.set(key, selector);
-  return { [attribute]: value };
-}
-
-function commitVirtualTableLayoutRules<Row>(entry: VirtualTableEntry<Row>) {
-  for (const [key, selector] of entry.layoutRules) {
-    if (!entry.nextLayoutRules.has(key)) {
-      removeDynamicStyleRuleWhenUnused(key, selector);
-    }
-  }
-  entry.layoutRules = entry.nextLayoutRules;
-  entry.nextLayoutRules = new Map();
-}
-
 type VirtualTableEntry<Row> = {
   wrapperNode: HTMLElement | null;
   tableNode: HTMLTableElement | null;
@@ -182,40 +156,6 @@ type VirtualTableEntry<Row> = {
   nextLayoutRules: Map<string, string>;
   layoutNonce: string | undefined;
 };
-
-function resolveVirtualTableScope<Row>(
-  entry: VirtualTableEntry<Row>,
-  parentIdentity: string | null,
-  rowKey: string,
-  columnId: string,
-  index: number,
-  placementEnabled: boolean
-): VirtualCompositeScopeValue {
-  const identity = extendVirtualCompositeIdentity(
-    parentIdentity,
-    'table-cell',
-    rowKey,
-    columnId
-  );
-  const placementKey = JSON.stringify([rowKey, columnId]);
-  const existing = entry.placements.get(placementKey);
-  if (
-    existing?.identity === identity &&
-    existing.index === index &&
-    existing.setSize === entry.keys.length &&
-    existing.placementEnabled === placementEnabled
-  ) {
-    return existing;
-  }
-  const scope = {
-    identity,
-    index,
-    setSize: entry.keys.length,
-    placementEnabled,
-  };
-  entry.placements.set(placementKey, scope);
-  return scope;
-}
 
 const virtualTableEntries = new WeakMap<object, VirtualTableEntry<unknown>>();
 
@@ -455,10 +395,7 @@ function getVirtualTableEntry<Row>(
     }
 
     if (node === null) {
-      for (const [key, selector] of entry.layoutRules) {
-        removeDynamicStyleRuleWhenUnused(key, selector);
-      }
-      entry.layoutRules.clear();
+      clearVirtualTableLayoutRules(entry);
     }
 
     if (entry.pendingCommitFrame !== null) {
@@ -732,126 +669,6 @@ function getVirtualTableEntry<Row>(
 
   virtualTableEntries.set(key, entry as VirtualTableEntry<unknown>);
   return entry as VirtualTableEntry<Row>;
-}
-
-function buildVirtualTableState<Row>(
-  entry: VirtualTableEntry<Row>,
-  visibleRange: VirtualRange,
-  scrollTop: number,
-  viewportHeight: number,
-  selectedKey: string | null
-): VirtualTableState {
-  const totalHeight =
-    resolveVirtualTotalHeight(entry.keys.length, entry.rowHeight) +
-    entry.headerHeight;
-
-  return {
-    count: entry.keys.length,
-    rowHeight: entry.rowHeight,
-    headerHeight: entry.headerHeight,
-    scrollTop,
-    viewportHeight,
-    totalHeight,
-    visibleRange,
-    isAtTop: visibleRange.isAtTop,
-    isAtBottom: visibleRange.isAtBottom,
-    selectedRowKey: selectedKey,
-    selectedRowIndex:
-      selectedKey === null ? -1 : (entry.keyIndexMap.get(selectedKey) ?? -1),
-  };
-}
-
-function syncVirtualTableRows<Row>(
-  entry: VirtualTableEntry<Row>,
-  rows: readonly Row[],
-  getKey: (row: Row, index: number) => string | number
-) {
-  const previousKeys = entry.keys;
-  const itemsChanged = entry.rowsRef !== rows;
-
-  if (!itemsChanged) {
-    return;
-  }
-
-  const nextKeys = rows.map((row, index) => String(getKey(row, index)));
-  entry.placements.clear();
-  const nextKeyIndexMap = buildVirtualKeyIndexMap(nextKeys);
-  const previousVisibleKeys =
-    entry.visibleRange.visibleStartIndex < 0
-      ? []
-      : previousKeys.slice(
-          entry.visibleRange.visibleStartIndex,
-          entry.visibleRange.visibleEndIndex + 1
-        );
-  const currentScrollTop = entry.scrollTopState();
-  const currentViewportHeight =
-    entry.viewportHeightState() || entry.viewportHeightHint;
-  const currentBodyViewportHeight = Math.max(
-    0,
-    currentViewportHeight - entry.headerHeight
-  );
-  const currentBodyScrollTop = Math.max(
-    0,
-    currentScrollTop - entry.headerHeight
-  );
-  const currentBodyTotalHeight = resolveVirtualTotalHeight(
-    previousKeys.length,
-    entry.rowHeight
-  );
-  const nextBodyTotalHeight = resolveVirtualTotalHeight(
-    nextKeys.length,
-    entry.rowHeight
-  );
-
-  const anchorKey = resolveVirtualRetainedAnchorKey(
-    previousVisibleKeys,
-    nextKeyIndexMap
-  );
-
-  if (anchorKey) {
-    const anchor = createVirtualAnchor(
-      anchorKey,
-      previousVisibleKeys,
-      entry.visibleRange.visibleStartIndex,
-      currentBodyScrollTop,
-      entry.rowHeight
-    );
-
-    if (anchor) {
-      const nextBodyScrollTop = resolveVirtualScrollTopFromAnchor(
-        anchor,
-        nextKeyIndexMap,
-        entry.rowHeight
-      );
-
-      if (nextBodyScrollTop !== null) {
-        entry.pendingScrollTop = entry.headerHeight + nextBodyScrollTop;
-      }
-    }
-  }
-
-  const maxScrollTop =
-    entry.headerHeight +
-    resolveVirtualScrollTopForBottom(
-      nextBodyTotalHeight,
-      currentBodyViewportHeight
-    );
-  entry.pendingScrollTop = Math.min(
-    Math.max(0, entry.pendingScrollTop ?? currentScrollTop),
-    maxScrollTop
-  );
-
-  entry.keys = nextKeys;
-  entry.keyIndexMap = nextKeyIndexMap;
-  entry.rowsRef = rows;
-
-  if (entry.pendingScrollTop !== null) {
-    entry.schedulePendingScrollTop();
-  }
-
-  if (currentBodyTotalHeight === 0 && nextBodyTotalHeight > 0) {
-    entry.handleResize?.();
-  }
 }
 
 function getVirtualTableHostName(element: JSXElement | null): string {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 import {
+  clearVirtualTableLayoutRules,
   commitVirtualTableLayoutRules,
   virtualTableLayoutProps,
   type VirtualTableStyleHost,
@@ -14,7 +15,7 @@ function createHost(): VirtualTableStyleHost {
 }
 
 describe('virtual table style injection', () => {
-  it('returns no attribute and injects no rule when the value is undefined', () => {
+  it('should return no attribute and inject no rule when the value is undefined', () => {
     const host = createHost();
 
     const props = virtualTableLayoutProps(host, 'row-height', undefined, {
@@ -25,7 +26,7 @@ describe('virtual table style injection', () => {
     expect(host.nextLayoutRules.size).toBe(0);
   });
 
-  it('injects a dynamic style rule and returns the matching data attribute', () => {
+  it('should inject a dynamic style rule and return the matching data attribute', () => {
     const host = createHost();
 
     const props = virtualTableLayoutProps(host, 'row-height', '32', {
@@ -48,7 +49,7 @@ describe('virtual table style injection', () => {
     }
   });
 
-  it('removes rules that are no longer used after committing', async () => {
+  it('should remove rules that are no longer used after committing', async () => {
     const host = createHost();
 
     virtualTableLayoutProps(host, 'row-height', '20', { height: '20px' });
@@ -59,6 +60,19 @@ describe('virtual table style injection', () => {
     // Nothing referenced this render, so the previously active rule should be
     // scheduled for removal once nothing in the DOM still uses it.
     commitVirtualTableLayoutRules(host);
+
+    expect(host.layoutRules.size).toBe(0);
+  });
+
+  it('should clear every committed rule immediately on unmount cleanup', () => {
+    const host = createHost();
+
+    virtualTableLayoutProps(host, 'row-height', '12', { height: '12px' });
+    commitVirtualTableLayoutRules(host);
+
+    expect(host.layoutRules.size).toBe(1);
+
+    clearVirtualTableLayoutRules(host);
 
     expect(host.layoutRules.size).toBe(0);
   });

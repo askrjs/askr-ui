@@ -52,3 +52,17 @@ export function commitVirtualTableLayoutRules(host: VirtualTableStyleHost) {
   host.layoutRules = host.nextLayoutRules;
   host.nextLayoutRules = new Map();
 }
+
+/**
+ * Schedules every currently committed layout rule for removal (once nothing
+ * in the DOM still references it) and clears the committed set. Used when a
+ * table instance unmounts (its root ref goes to null).
+ */
+export function clearVirtualTableLayoutRules(
+  host: Pick<VirtualTableStyleHost, 'layoutRules'>
+) {
+  for (const [key, selector] of host.layoutRules) {
+    removeDynamicStyleRuleWhenUnused(key, selector);
+  }
+  host.layoutRules.clear();
+}

@@ -10,7 +10,7 @@ function createHost(keys: string[]) {
 }
 
 describe('virtual table identity wiring', () => {
-  it('derives a scope identity from the parent identity, row key, and column', () => {
+  it('should derive a scope identity from the parent identity, row key, and column', () => {
     const host = createHost(['row-1', 'row-2']);
 
     const scope = resolveVirtualTableScope(
@@ -30,7 +30,7 @@ describe('virtual table identity wiring', () => {
     });
   });
 
-  it('returns the cached scope object when nothing relevant has changed', () => {
+  it('should return the cached scope object when nothing relevant has changed', () => {
     const host = createHost(['row-1']);
 
     const first = resolveVirtualTableScope(host, null, 'row-1', 'name', 0, true);
@@ -39,7 +39,7 @@ describe('virtual table identity wiring', () => {
     expect(second).toBe(first);
   });
 
-  it('recomputes the scope when the index, set size, or placement flag changes', () => {
+  it('should recompute the scope when the index, set size, or placement flag changes', () => {
     const host = createHost(['row-1']);
 
     const first = resolveVirtualTableScope(host, null, 'row-1', 'name', 0, true);

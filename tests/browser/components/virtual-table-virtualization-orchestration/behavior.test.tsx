@@ -45,7 +45,7 @@ function createHost(
 }
 
 describe('virtual table virtualization orchestration', () => {
-  it('builds a state snapshot from the host and the visible range', () => {
+  it('should build a state snapshot from the host and the visible range', () => {
     const host = createHost({
       keys: ['a', 'b', 'c'],
       keyIndexMap: new Map([
@@ -81,7 +81,7 @@ describe('virtual table virtualization orchestration', () => {
     });
   });
 
-  it('does nothing when the rows reference has not changed', () => {
+  it('should do nothing when the rows reference has not changed', () => {
     const rows = ['a', 'b'];
     const host = createHost({ keys: ['a', 'b'], rowsRef: rows });
     const keysBefore = host.keys;
@@ -91,7 +91,7 @@ describe('virtual table virtualization orchestration', () => {
     expect(host.keys).toBe(keysBefore);
   });
 
-  it('rebuilds keys and clears placement cache when the rows reference changes', () => {
+  it('should rebuild keys and clear the placement cache when the rows reference changes', () => {
     const host = createHost({
       keys: ['a'],
       keyIndexMap: new Map([['a', 0]]),
@@ -107,7 +107,7 @@ describe('virtual table virtualization orchestration', () => {
     expect(host.placements.size).toBe(0);
   });
 
-  it('clamps the pending scroll top to the new content bounds', () => {
+  it('should clamp the pending scroll top to the new content bounds', () => {
     const host = createHost({
       keys: ['a', 'b', 'c'],
       keyIndexMap: new Map([
