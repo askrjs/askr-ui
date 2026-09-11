@@ -102,7 +102,10 @@ export function syncVirtualTableRows<Row>(
     0,
     currentViewportHeight - host.headerHeight
   );
-  const currentBodyScrollTop = Math.max(0, currentScrollTop - host.headerHeight);
+  const currentBodyScrollTop = Math.max(
+    0,
+    currentScrollTop - host.headerHeight
+  );
   const currentBodyTotalHeight = resolveVirtualTotalHeight(
     previousKeys.length,
     host.rowHeight

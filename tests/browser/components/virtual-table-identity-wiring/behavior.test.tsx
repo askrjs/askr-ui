@@ -23,7 +23,12 @@ describe('virtual table identity wiring', () => {
     );
 
     expect(scope).toEqual({
-      identity: JSON.stringify(['parent-identity', 'table-cell', 'row-1', 'name']),
+      identity: JSON.stringify([
+        'parent-identity',
+        'table-cell',
+        'row-1',
+        'name',
+      ]),
       index: 0,
       setSize: 2,
       placementEnabled: true,
@@ -33,8 +38,22 @@ describe('virtual table identity wiring', () => {
   it('should return the cached scope object when nothing relevant has changed', () => {
     const host = createHost(['row-1']);
 
-    const first = resolveVirtualTableScope(host, null, 'row-1', 'name', 0, true);
-    const second = resolveVirtualTableScope(host, null, 'row-1', 'name', 0, true);
+    const first = resolveVirtualTableScope(
+      host,
+      null,
+      'row-1',
+      'name',
+      0,
+      true
+    );
+    const second = resolveVirtualTableScope(
+      host,
+      null,
+      'row-1',
+      'name',
+      0,
+      true
+    );
 
     expect(second).toBe(first);
   });
@@ -42,8 +61,22 @@ describe('virtual table identity wiring', () => {
   it('should recompute the scope when the index, set size, or placement flag changes', () => {
     const host = createHost(['row-1']);
 
-    const first = resolveVirtualTableScope(host, null, 'row-1', 'name', 0, true);
-    const second = resolveVirtualTableScope(host, null, 'row-1', 'name', 1, true);
+    const first = resolveVirtualTableScope(
+      host,
+      null,
+      'row-1',
+      'name',
+      0,
+      true
+    );
+    const second = resolveVirtualTableScope(
+      host,
+      null,
+      'row-1',
+      'name',
+      1,
+      true
+    );
 
     expect(second).not.toBe(first);
     expect(second.index).toBe(1);
