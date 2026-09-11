@@ -4,7 +4,7 @@ import {
   AvatarImage,
 } from '../../../../../src/components/avatar';
 import { AVATAR_A11Y_CONTRACT } from '../../../../../src/components/avatar/avatar.a11y';
-import { flushUpdates, mount } from '../../_mount';
+import { mount } from '../../_mount';
 
 export function fallbackUntilLoad(root: HTMLElement) {
   const container = mount(
@@ -17,9 +17,5 @@ export function fallbackUntilLoad(root: HTMLElement) {
 
   return {
     fallbackSelector: () => `[${AVATAR_A11Y_CONTRACT.FALLBACK.marker}="true"]`,
-    dispatchLoad: async () => {
-      container.querySelector('img')?.dispatchEvent(new Event('load'));
-      await flushUpdates();
-    },
   };
 }
