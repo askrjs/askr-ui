@@ -44,6 +44,7 @@ jobs:
         run: npx playwright install chromium firefox webkit
 
       - name: Format check
+        if: runner.os != 'Windows'
         run: npm run fmt --if-present -- --check
 
       - name: Lint
