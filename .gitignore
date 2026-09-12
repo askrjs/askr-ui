@@ -140,3 +140,6 @@ __screenshots__/
 test-results/
 playwright-report/
 blob-report/
+
+# Local agent state and worktrees
+.claude/
