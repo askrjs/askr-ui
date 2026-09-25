@@ -4,13 +4,20 @@ on:
   workflow_dispatch:
 
 jobs:
+  release-branch:
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Require main release branch
+        run: test "$GITHUB_REF" = 'refs/heads/main'
+
   ci:
     uses: ./.github/workflows/ci.yml
     permissions:
       contents: read
 
   publish:
-    needs: ci
+    needs: [release-branch, ci]
     uses: askrjs/actions/.github/workflows/publish-package.yml@main
     with:
       install-playwright: true
