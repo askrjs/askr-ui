@@ -1,3 +1,5 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
+import { nativeRef } from '../_internal/native-ref';
 import { nativeButtonProps } from '../_internal/native-control';
 import { defineScope, readScope, state } from '@askrjs/askr';
 import { Slot, Presence } from '@askrjs/askr/foundations/structures';
@@ -178,7 +180,9 @@ export function CollapsibleContent(
       {asChild ? (
         <Slot asChild {...finalProps} children={children} />
       ) : (
-        <div {...finalProps}>{children}</div>
+        <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+          {children}
+        </div>
       )}
     </Presence>
   );

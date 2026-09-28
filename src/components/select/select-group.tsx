@@ -1,5 +1,7 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { nativeRef } from '../_internal/native-ref';
 import { resolvePartId } from '../_internal/id';
 import { collectJsxElements } from '../_internal/jsx';
 import {
@@ -93,7 +95,11 @@ export function SelectLabel(props: SelectLabelProps | SelectLabelAsChildProps) {
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return <div {...finalProps}>{children}</div>;
+  return (
+    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+      {children}
+    </div>
+  );
 }
 
 /**
@@ -121,5 +127,9 @@ export function SelectSeparator(
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return <div {...finalProps}>{children}</div>;
+  return (
+    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+      {children}
+    </div>
+  );
 }

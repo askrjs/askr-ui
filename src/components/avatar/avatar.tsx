@@ -1,3 +1,5 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
+import { nativeRef } from '../_internal/native-ref';
 import { state } from '@askrjs/askr';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
@@ -184,7 +186,9 @@ export function AvatarFallback(
       {asChild ? (
         <Slot asChild {...finalProps} children={children} />
       ) : (
-        <span {...finalProps}>{children}</span>
+        <span {...finalProps} ref={nativeRef<HTMLSpanElement>(props)}>
+          {children}
+        </span>
       )}
     </Presence>
   );

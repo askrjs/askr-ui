@@ -1,3 +1,5 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
+import { nativeRef } from '../_internal/native-ref';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import type {
@@ -28,7 +30,11 @@ export function MenuGroup(props: MenuGroupProps | MenuGroupAsChildProps) {
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return <div {...finalProps}>{children}</div>;
+  return (
+    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+      {children}
+    </div>
+  );
 }
 
 /**
@@ -49,7 +55,11 @@ export function MenuLabel(props: MenuLabelProps | MenuLabelAsChildProps) {
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return <div {...finalProps}>{children}</div>;
+  return (
+    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+      {children}
+    </div>
+  );
 }
 
 /**
@@ -75,5 +85,9 @@ export function MenuSeparator(
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return <div {...finalProps}>{children}</div>;
+  return (
+    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+      {children}
+    </div>
+  );
 }

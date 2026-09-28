@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { readDialogRootContext } from './dialog.shared';
 import type { DialogPortalProps } from './dialog.types';
 

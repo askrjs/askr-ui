@@ -1,4 +1,6 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeButtonProps } from '../_internal/native-control';
+import { nativeRef } from '../_internal/native-ref';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
@@ -84,7 +86,11 @@ export function Toggle(props: ToggleButtonProps | ToggleAsChildProps) {
   // Explicit type="button" default prevents accidental form submission
   const type = typeProp ?? 'button';
   return (
-    <button type={type} {...nativeButtonProps(finalProps)}>
+    <button
+      type={type}
+      {...nativeButtonProps(finalProps)}
+      ref={nativeRef<HTMLButtonElement>(props)}
+    >
       {children}
     </button>
   );

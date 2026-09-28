@@ -1,6 +1,8 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { nativeRef } from '../_internal/native-ref';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { runCancelablePress } from '../_internal/press';
 import { readPopoverRootContext } from './popover.shared';
@@ -51,7 +53,11 @@ export function PopoverClose(
   }
 
   return (
-    <button type={typeProp ?? 'button'} {...nativeButtonProps(finalProps)}>
+    <button
+      type={typeProp ?? 'button'}
+      {...nativeButtonProps(finalProps)}
+      ref={nativeRef<HTMLButtonElement>(props)}
+    >
       {children}
     </button>
   );

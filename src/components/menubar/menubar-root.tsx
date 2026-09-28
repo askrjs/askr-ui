@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { cspNonce, getSignal, state } from '@askrjs/askr';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import { rovingFocus } from '../_internal/roving-focus';

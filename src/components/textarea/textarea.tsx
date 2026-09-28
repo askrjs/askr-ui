@@ -1,3 +1,5 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
+import { nativeRef } from '../_internal/native-ref';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { focusable } from '@askrjs/askr/foundations/interactions';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
@@ -35,7 +37,11 @@ export function Textarea(props: TextareaElementProps | TextareaAsChildProps) {
   }
 
   return (
-    <textarea {...finalProps} disabled={disabled}>
+    <textarea
+      {...finalProps}
+      disabled={disabled}
+      ref={nativeRef<HTMLTextAreaElement>(props)}
+    >
       {children}
     </textarea>
   );

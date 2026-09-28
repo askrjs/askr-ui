@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { describe, it, expect, afterEach } from 'vite-plus/test';
 import {
   Collapsible,

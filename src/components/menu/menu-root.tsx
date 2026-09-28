@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { getSignal, state } from '@askrjs/askr';
 import { rovingFocus } from '../_internal/roving-focus';
 import { resolveCompoundId } from '../_internal/id';

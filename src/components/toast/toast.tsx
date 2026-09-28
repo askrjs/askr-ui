@@ -1,4 +1,6 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeButtonProps } from '../_internal/native-control';
+import { nativeRef } from '../_internal/native-ref';
 /**
  * Toast is the stacked notification family.
  *
@@ -24,7 +26,8 @@ import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { runCancelablePress } from '../_internal/press';
-import { For, state } from '@askrjs/askr';
+import { state } from '@askrjs/askr';
+import { For } from '@askrjs/askr/control';
 import { resource } from '@askrjs/askr/resources';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import { collectJsxElements, serializeForId } from '../_internal/jsx';
@@ -449,7 +452,11 @@ export function ToastViewport(
     return <Slot asChild {...finalProps} children={content as JSX.Element} />;
   }
 
-  return <div {...finalProps}>{content}</div>;
+  return (
+    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+      {content}
+    </div>
+  );
 }
 
 /**
@@ -524,7 +531,11 @@ export function ToastTitle(props: ToastTitleProps | ToastTitleAsChildProps) {
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return <div {...finalProps}>{children}</div>;
+  return (
+    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+      {children}
+    </div>
+  );
 }
 
 /**
@@ -555,7 +566,11 @@ export function ToastDescription(
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return <div {...finalProps}>{children}</div>;
+  return (
+    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+      {children}
+    </div>
+  );
 }
 
 /**
@@ -601,7 +616,11 @@ export function ToastAction(props: ToastActionProps | ToastActionAsChildProps) {
   }
 
   return (
-    <button type={typeProp ?? 'button'} {...nativeButtonProps(finalProps)}>
+    <button
+      type={typeProp ?? 'button'}
+      {...nativeButtonProps(finalProps)}
+      ref={nativeRef<HTMLButtonElement>(props)}
+    >
       {children}
     </button>
   );
@@ -650,7 +669,11 @@ export function ToastClose(props: ToastCloseProps | ToastCloseAsChildProps) {
   }
 
   return (
-    <button type={typeProp ?? 'button'} {...nativeButtonProps(finalProps)}>
+    <button
+      type={typeProp ?? 'button'}
+      {...nativeButtonProps(finalProps)}
+      ref={nativeRef<HTMLButtonElement>(props)}
+    >
       {children ?? 'Close'}
     </button>
   );

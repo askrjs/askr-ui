@@ -1,4 +1,6 @@
-import { For, state } from '@askrjs/askr';
+import type { JSX } from '@askrjs/askr/jsx-runtime';
+import { state } from '@askrjs/askr';
+import { For } from '@askrjs/askr/control';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 import {
   Accordion,

@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { describe, it, expect, vi } from 'vite-plus/test';
 import { Button } from '../../../../src/components/button/button';
 import { createIsland } from '@askrjs/askr/boot';

@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { DialogContent } from '../dialog';
 import { readDialogRootContext } from '../dialog/dialog.shared';
 import type {

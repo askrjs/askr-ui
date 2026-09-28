@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 import { createIsland } from '@askrjs/askr/boot';
 import { VisuallyHidden } from '../../../../src/components/visually-hidden/visually-hidden';

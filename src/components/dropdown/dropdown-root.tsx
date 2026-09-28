@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { cspNonce, getSignal, state } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';

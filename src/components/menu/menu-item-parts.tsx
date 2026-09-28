@@ -1,3 +1,5 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
+import { nativeRef } from '../_internal/native-ref';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import type { MenuItemPartAsChildProps, MenuItemPartProps } from './menu.types';
@@ -12,7 +14,11 @@ function MenuItemPart(props: PartProps, slot: string) {
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return <span {...finalProps}>{children}</span>;
+  return (
+    <span {...finalProps} ref={nativeRef<HTMLSpanElement>(props)}>
+      {children}
+    </span>
+  );
 }
 
 /** Optional leading visual for a Menu Item. */

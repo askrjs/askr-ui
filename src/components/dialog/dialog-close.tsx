@@ -1,3 +1,5 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
+import { nativeRef } from '../_internal/native-ref';
 import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
@@ -47,7 +49,11 @@ export function DialogClose(props: DialogCloseProps | DialogCloseAsChildProps) {
   }
 
   return (
-    <button type={typeProp ?? 'button'} {...nativeButtonProps(finalProps)}>
+    <button
+      type={typeProp ?? 'button'}
+      {...nativeButtonProps(finalProps)}
+      ref={nativeRef<HTMLButtonElement>(props)}
+    >
       {children}
     </button>
   );

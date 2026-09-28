@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { cleanupApp, createIsland } from '@askrjs/askr/boot';
 import { DefaultPortal } from '@askrjs/askr/foundations/structures';
 
