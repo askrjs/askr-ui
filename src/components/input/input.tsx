@@ -1,3 +1,5 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
+import { nativeRef } from '../_internal/native-ref';
 import { debounceEvent } from '@askrjs/askr/fx';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { focusable } from '@askrjs/askr/foundations/interactions';
@@ -32,7 +34,13 @@ export function Input(props: InputInputProps | InputAsChildProps) {
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return <input {...finalProps} disabled={disabled} />;
+  return (
+    <input
+      {...finalProps}
+      disabled={disabled}
+      ref={nativeRef<HTMLInputElement>(props)}
+    />
+  );
 }
 
 /**

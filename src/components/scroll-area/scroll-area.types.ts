@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import type { BoxAsChildProps, BoxProps } from '../_internal/types';
 
 /** Own props for Scroll Area, before merging with native element attributes. */

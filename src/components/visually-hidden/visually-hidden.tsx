@@ -1,3 +1,5 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
+import { nativeRef } from '../_internal/native-ref';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { cspNonce } from '@askrjs/askr';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
@@ -50,5 +52,9 @@ export function VisuallyHidden(
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return <span {...finalProps}>{children}</span>;
+  return (
+    <span {...finalProps} ref={nativeRef<HTMLSpanElement>(props)}>
+      {children}
+    </span>
+  );
 }

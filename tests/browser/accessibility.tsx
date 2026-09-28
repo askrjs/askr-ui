@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import axe from 'axe-core';
 import { mount, unmount } from './test-utils';
 

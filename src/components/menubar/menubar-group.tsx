@@ -1,5 +1,6 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { nativeRef } from '../_internal/native-ref';
 import type {
   MenubarGroupAsChildProps,
   MenubarGroupProps,
@@ -28,7 +29,9 @@ export function MenubarGroup(
   return asChild ? (
     <Slot asChild {...finalProps} children={children} />
   ) : (
-    <div {...finalProps}>{children}</div>
+    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+      {children}
+    </div>
   );
 }
 
@@ -50,7 +53,9 @@ export function MenubarLabel(
   return asChild ? (
     <Slot asChild {...finalProps} children={children} />
   ) : (
-    <div {...finalProps}>{children}</div>
+    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+      {children}
+    </div>
   );
 }
 
@@ -72,6 +77,8 @@ export function MenubarSeparator(
   return asChild ? (
     <Slot asChild {...finalProps} children={children} />
   ) : (
-    <div {...finalProps}>{children}</div>
+    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+      {children}
+    </div>
   );
 }

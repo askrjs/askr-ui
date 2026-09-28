@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { getSignal, state } from '@askrjs/askr';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';

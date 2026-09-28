@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { state } from '@askrjs/askr';
 
 import { Button } from '../../../../../src/components/button';

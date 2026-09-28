@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeButtonProps } from '../_internal/native-control';
 import { state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';

@@ -1,5 +1,6 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { nativeRef } from '../_internal/native-ref';
 import type {
   DropdownGroupAsChildProps,
   DropdownGroupProps,
@@ -28,7 +29,11 @@ export function DropdownGroup(
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return <div {...finalProps}>{children}</div>;
+  return (
+    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+      {children}
+    </div>
+  );
 }
 
 /**
@@ -50,7 +55,11 @@ export function DropdownLabel(
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return <div {...finalProps}>{children}</div>;
+  return (
+    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+      {children}
+    </div>
+  );
 }
 
 /**
@@ -72,5 +81,9 @@ export function DropdownSeparator(
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return <div {...finalProps}>{children}</div>;
+  return (
+    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+      {children}
+    </div>
+  );
 }

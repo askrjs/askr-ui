@@ -1,3 +1,5 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
+import { nativeRef } from '../_internal/native-ref';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import { moveFocusOutsideCompositeWithTab } from '../_internal/focus';
@@ -58,5 +60,9 @@ export function MenuContent(props: MenuContentProps | MenuContentAsChildProps) {
     return <Slot asChild {...finalProps} children={children as JSX.Element} />;
   }
 
-  return <div {...finalProps}>{children}</div>;
+  return (
+    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+      {children}
+    </div>
+  );
 }

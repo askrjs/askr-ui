@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import {
   captureOverlayNonce,

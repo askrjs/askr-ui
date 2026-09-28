@@ -1,3 +1,5 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
+import { nativeRef } from '../_internal/native-ref';
 import { nativeButtonProps } from '../_internal/native-control';
 import { state } from '@askrjs/askr';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
@@ -341,7 +343,11 @@ export function AccordionHeader(
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return <h3 {...finalProps}>{children}</h3>;
+  return (
+    <h3 {...finalProps} ref={nativeRef<HTMLHeadingElement>(props)}>
+      {children}
+    </h3>
+  );
 }
 
 /**
@@ -498,7 +504,9 @@ export function AccordionContent(
       {asChild ? (
         <Slot asChild {...finalProps} children={children} />
       ) : (
-        <div {...finalProps}>{children}</div>
+        <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+          {children}
+        </div>
       )}
     </Presence>
   );

@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { expect } from 'vite-plus/test';
 import { mount, resetTestState, unmount } from './test-utils';
 

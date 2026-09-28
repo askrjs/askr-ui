@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { readPopoverRootContext } from './popover.shared';
 import type { PopoverPortalProps } from './popover.types';
 

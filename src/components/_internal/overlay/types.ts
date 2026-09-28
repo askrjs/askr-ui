@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 export type OverlaySide = 'top' | 'right' | 'bottom' | 'left';
 export type OverlayAlign = 'start' | 'center' | 'end';
 export type OverlayPortal = {

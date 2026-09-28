@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import type { BoxProps } from '../_internal/types';
 
 /** Own props for Form, before merging with native element attributes. */
