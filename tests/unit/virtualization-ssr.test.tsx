@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { describe, expect, it } from 'vite-plus/test';
 import { renderToStringSync } from '@askrjs/askr/ssr';
 import { VirtualList } from '../../src/components/virtual-list';

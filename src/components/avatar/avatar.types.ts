@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import type { Ref } from '@askrjs/askr/foundations/utilities';
 import type { BoxAsChildProps, BoxProps } from '../_internal/types';
 

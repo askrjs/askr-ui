@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { describe, it, expect, vi, afterEach } from 'vite-plus/test';
 import { userEvent } from '@vitest/browser/context';
 import { Button } from '../../../../src/components/button';

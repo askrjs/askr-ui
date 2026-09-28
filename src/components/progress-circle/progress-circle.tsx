@@ -1,6 +1,8 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { cspNonce, defineScope, readScope } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { nativeRef } from '../_internal/native-ref';
 import {
   dynamicAttributeSelector,
   removeDynamicStyleRuleWhenUnused,
@@ -157,5 +159,9 @@ export function ProgressCircleIndicator(
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return <div {...finalProps}>{children}</div>;
+  return (
+    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
+      {children}
+    </div>
+  );
 }

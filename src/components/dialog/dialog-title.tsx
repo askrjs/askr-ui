@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { readDialogRootContext } from './dialog.shared';

@@ -1,3 +1,5 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
+import { nativeRef } from '../_internal/native-ref';
 import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
@@ -134,7 +136,11 @@ export function SelectValue(props: SelectValueProps | SelectValueAsChildProps) {
     return <Slot asChild {...finalProps} children={children as JSX.Element} />;
   }
 
-  return <span {...finalProps}>{renderedChildren}</span>;
+  return (
+    <span {...finalProps} ref={nativeRef<HTMLSpanElement>(props)}>
+      {renderedChildren}
+    </span>
+  );
 }
 
 /**

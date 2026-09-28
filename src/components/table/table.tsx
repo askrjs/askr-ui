@@ -1,6 +1,8 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import type { JSXElement } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { nativeRef } from '../_internal/native-ref';
 import { TABLE_DATA_ATTRIBUTES, TABLE_SLOTS } from './table.shared';
 import type {
   TableAsChildProps,
@@ -39,11 +41,15 @@ export function Table(props: TableProps | TableAsChildProps) {
     [TABLE_DATA_ATTRIBUTES.table]: 'true',
   });
 
-  if (asChild) {
+  if (props.asChild) {
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return <table {...finalProps}>{children}</table>;
+  return (
+    <table {...finalProps} ref={nativeRef<HTMLTableElement>(props)}>
+      {children}
+    </table>
+  );
 }
 
 /**
@@ -67,7 +73,11 @@ export function TableCaption(
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return <caption {...finalProps}>{children}</caption>;
+  return (
+    <caption {...finalProps} ref={nativeRef<HTMLTableCaptionElement>(props)}>
+      {children}
+    </caption>
+  );
 }
 
 /**
@@ -89,7 +99,11 @@ export function TableHead(props: TableHeadProps | TableHeadAsChildProps) {
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return <thead {...finalProps}>{children}</thead>;
+  return (
+    <thead {...finalProps} ref={nativeRef<HTMLTableSectionElement>(props)}>
+      {children}
+    </thead>
+  );
 }
 
 /**
@@ -111,7 +125,11 @@ export function TableBody(props: TableBodyProps | TableBodyAsChildProps) {
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return <tbody {...finalProps}>{children}</tbody>;
+  return (
+    <tbody {...finalProps} ref={nativeRef<HTMLTableSectionElement>(props)}>
+      {children}
+    </tbody>
+  );
 }
 
 /**
@@ -133,7 +151,11 @@ export function TableFoot(props: TableFootProps | TableFootAsChildProps) {
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return <tfoot {...finalProps}>{children}</tfoot>;
+  return (
+    <tfoot {...finalProps} ref={nativeRef<HTMLTableSectionElement>(props)}>
+      {children}
+    </tfoot>
+  );
 }
 
 /**
@@ -155,7 +177,11 @@ export function TableRow(props: TableRowProps | TableRowAsChildProps) {
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return <tr {...finalProps}>{children}</tr>;
+  return (
+    <tr {...finalProps} ref={nativeRef<HTMLTableRowElement>(props)}>
+      {children}
+    </tr>
+  );
 }
 
 /**
@@ -181,7 +207,11 @@ export function TableHeaderCell(
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return <th {...finalProps}>{children}</th>;
+  return (
+    <th {...finalProps} ref={nativeRef<HTMLTableCellElement>(props)}>
+      {children}
+    </th>
+  );
 }
 
 /**
@@ -203,5 +233,9 @@ export function TableCell(props: TableCellProps | TableCellAsChildProps) {
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
 
-  return <td {...finalProps}>{children}</td>;
+  return (
+    <td {...finalProps} ref={nativeRef<HTMLTableCellElement>(props)}>
+      {children}
+    </td>
+  );
 }

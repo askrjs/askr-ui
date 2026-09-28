@@ -1,3 +1,4 @@
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { readHoverCardRootContext } from './hover-card.shared';
 import type { HoverCardPortalProps } from './hover-card.types';
 
