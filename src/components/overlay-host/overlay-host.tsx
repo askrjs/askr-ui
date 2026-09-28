@@ -1,4 +1,5 @@
-import { For, getSignal, state } from '@askrjs/askr';
+import { getSignal, state } from '@askrjs/askr';
+import { For } from '@askrjs/askr/control';
 import type { OverlayPortal } from '../_internal/overlay';
 import {
   OverlayHostContext,

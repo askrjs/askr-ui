@@ -1,4 +1,5 @@
-import { For, state } from '@askrjs/askr';
+import { state } from '@askrjs/askr';
+import { For } from '@askrjs/askr/control';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 import {
   Accordion,
