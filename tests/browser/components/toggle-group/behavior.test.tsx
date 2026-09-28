@@ -1,6 +1,7 @@
 import { userEvent } from '@vitest/browser/context';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
-import { For, state } from '@askrjs/askr';
+import { state } from '@askrjs/askr';
+import { For } from '@askrjs/askr/control';
 import {
   ToggleGroup,
   ToggleGroupItem,

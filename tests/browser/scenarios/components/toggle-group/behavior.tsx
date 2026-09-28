@@ -1,4 +1,5 @@
-import { For, state } from '@askrjs/askr';
+import { state } from '@askrjs/askr';
+import { For } from '@askrjs/askr/control';
 import {
   ToggleGroup,
   ToggleGroupItem,
