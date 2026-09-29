@@ -10,10 +10,7 @@ async function pressTrackAt(
 ): Promise<void> {
   const box = await track.boundingBox();
   if (!box) throw new Error('slider track has no layout box');
-  await page.mouse.click(
-    box.x + box.width * fraction,
-    box.y + box.height / 2
-  );
+  await page.mouse.click(box.x + box.width * fraction, box.y + box.height / 2);
 }
 
 test.describe('Slider - Behavior', () => {
@@ -34,6 +31,8 @@ test.describe('Slider - Behavior', () => {
 
     await thumb.press('ArrowRight');
     await expect(input).toHaveValue('81');
+    await expect(thumb).toHaveAttribute('aria-valuenow', '81');
+    await expect(track).toHaveAttribute('data-percentage', '81');
   });
 
   test('should update value while the thumb is dragged and stop on release', async ({
@@ -167,15 +166,18 @@ test.describe('Slider - Behavior', () => {
 
     await thumb.press('PageUp');
     await expect(input).toHaveValue('100');
+    await expect(thumb).toHaveAttribute('aria-valuenow', '100');
 
     await thumb.press('End');
     await expect(input).toHaveValue('100');
 
     await thumb.press('PageDown');
     await expect(input).toHaveValue('50');
+    await expect(thumb).toHaveAttribute('aria-valuenow', '50');
 
     await thumb.press('Home');
     await expect(input).toHaveValue('0');
+    await expect(thumb).toHaveAttribute('aria-valuenow', '0');
   });
 
   test('should ignore pointer and keyboard updates when disabled', async ({
@@ -193,8 +195,8 @@ test.describe('Slider - Behavior', () => {
     await expect(input).toHaveValue('30');
     await expect(thumb).toHaveAttribute('aria-valuenow', '30');
     await expect(thumb).toHaveAttribute('aria-disabled', 'true');
-    expect(await input.evaluate((node: HTMLInputElement) => node.disabled)).toBe(
-      true
-    );
+    expect(
+      await input.evaluate((node: HTMLInputElement) => node.disabled)
+    ).toBe(true);
   });
 });

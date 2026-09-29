@@ -14,6 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and fails with a clear message on any other output instead of
   `Cannot read properties of undefined (reading 'files')`. A test now covers
   both shapes (#129).
+- `SliderTrack` without `asChild` registers its internal track ref again, so
+  pressing the track and dragging the thumb change the value (#136). This was
+  the known issue listed for 0.4.0: since #132 the native branch replaced the
+  composed ref with only the caller's `ref`.
+- `SliderThumb`, `SliderTrack`, and `SliderRange` update `aria-valuenow` and
+  `data-percentage` when the value changes (#136). `Slider` passed the same
+  mutated context object to its parts on every render, so they were not
+  re-rendered and kept the initial value. The hidden input and
+  `--ak-slider-percentage` were not affected.
 
 ## [0.4.0] - 2026-09-28
 

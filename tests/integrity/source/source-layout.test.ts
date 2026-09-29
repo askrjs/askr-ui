@@ -205,17 +205,30 @@ describe('Source layout', () => {
       'slider',
       'switch',
     ]) {
-      const source = readFileSync(
-        join(
-          process.cwd(),
-          'tests',
-          'browser',
-          'components',
-          suite,
-          'behavior.test.tsx'
-        ),
-        'utf8'
+      // A Playwright spec keeps its component tree, and so the reset call, in
+      // the mirrored scenario module; unported suites are still `.test.tsx`.
+      const browserDirectory = join(process.cwd(), 'tests', 'browser');
+      const spec = join(
+        browserDirectory,
+        'components',
+        suite,
+        'behavior.spec.ts'
       );
+      const sources = existsSync(spec)
+        ? [
+            spec,
+            join(
+              browserDirectory,
+              'scenarios',
+              'components',
+              suite,
+              'behavior.tsx'
+            ),
+          ]
+        : [join(browserDirectory, 'components', suite, 'behavior.test.tsx')];
+      const source = sources
+        .map((path) => readFileSync(path, 'utf8'))
+        .join('\n');
       expect(source).toMatch(/\.reset\(\)|new Event\('reset'/);
     }
   });
