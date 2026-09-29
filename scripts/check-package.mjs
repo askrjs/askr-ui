@@ -14,12 +14,16 @@ const root = process.cwd();
 const temporary = mkdtempSync(join(tmpdir(), 'askr-ui-pack-'));
 
 try {
-  const packed = JSON.parse(
+  const packResult = JSON.parse(
     execFileSync(
       'npm',
       ['pack', '--ignore-scripts', '--json', '--pack-destination', temporary],
       { cwd: root, encoding: 'utf8' }
     )
+  );
+  // npm 11 prints an array of pack records; npm 12 keys them by package name.
+  const packed = (
+    Array.isArray(packResult) ? packResult : Object.values(packResult)
   )[0];
   const forbidden =
     /(?:^|\/)(?:node_modules|\.cache|coverage)(?:\/|$)|\.tsbuildinfo$/;
@@ -27,6 +31,11 @@ try {
   const rejected = files.filter((path) => forbidden.test(path));
   if (rejected.length > 0) {
     throw new Error(`Forbidden packed files:\n${rejected.join('\n')}`);
+  }
+  const required = ['CHANGELOG.md', 'README.md', 'LICENSE', 'package.json'];
+  const absent = required.filter((path) => !files.includes(path));
+  if (absent.length > 0) {
+    throw new Error(`Packed artifact is missing:\n${absent.join('\n')}`);
   }
 
   const packageJson = JSON.parse(

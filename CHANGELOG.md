@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-28
+
+Upgrade `@askrjs/askr` to 0.4 at the same time. `@askrjs/ui` 0.3 does not work
+with `@askrjs/askr` 0.4: it imports `For` from the `@askrjs/askr` root, which
+0.4 no longer exports, and its declarations need the global `JSX` namespace
+that 0.4 removed. There are no component, prop, or export changes, and no
+deprecations.
+
+### Changed
+
+- **Breaking:** the `@askrjs/askr` peer range (and the `@askrjs/askr` and
+  `@askrjs/vite` dev dependencies) moves to `>=0.4.0 <0.5.0`. `OverlayHost`
+  and the toast components import `For` from `@askrjs/askr/control`, its only
+  import path in `@askrjs/askr` 0.4 (#131).
+  Migration: upgrade `@askrjs/askr` to 0.4 together with this package and
+  follow its 0.4.0 changelog.
+- **Breaking (types):** the published declarations import `JSX` from
+  `@askrjs/askr/jsx-runtime` instead of reading the global `JSX` namespace
+  (#132). `@askrjs/askr` 0.3 declared that global; 0.4 scopes its JSX types to
+  the `jsxImportSource` runtime modules, so 0.3 declarations fail against it
+  with `Cannot find namespace 'JSX'`. Component return types and every prop
+  type built on `JSX.IntrinsicElements[...]` now resolve through
+  `@askrjs/askr/jsx-runtime`, so they follow `@askrjs/askr` 0.4's intrinsic
+  element types (for example, element-specific `ref` types).
+  Migration: none beyond upgrading `@askrjs/askr`. Any new type errors in your
+  own props come from `@askrjs/askr` 0.4's intrinsic typing changes; see its
+  changelog. In your own code, import `type JSX` from
+  `@askrjs/askr/jsx-runtime` instead of using the global.
+
+### Known issues
+
+- `SliderTrack` without `asChild` loses its internal track ref, whether or not
+  you pass a `ref` (#136). Pressing on the track and dragging the thumb no
+  longer change the value. Keyboard input still works, and
+  `SliderTrack asChild` avoids the problem. It comes from #132, which passes
+  each native element's `ref` explicitly so it typechecks against
+  `@askrjs/askr` 0.4's element-specific refs; every other component's runtime
+  ref behavior is unchanged.
+
 ## [0.3.0] - 2026-09-11
 
 ### Changed
@@ -82,7 +121,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Establish the coordinated AskrJS 0.2 compatibility baseline and peer ranges.
 
-[Unreleased]: https://github.com/askrjs/askr-ui/compare/v0.2.4...HEAD
+[Unreleased]: https://github.com/askrjs/askr-ui/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/askrjs/askr-ui/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/askrjs/askr-ui/compare/v0.2.4...v0.3.0
 [0.2.4]: https://github.com/askrjs/askr-ui/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/askrjs/askr-ui/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/askrjs/askr-ui/compare/v0.2.1...v0.2.2
