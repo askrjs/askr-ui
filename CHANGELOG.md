@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `npm run pack:check` reads both `npm pack --json` shapes, the array printed
+  by npm 11 and earlier and the object keyed by package name printed by npm 12,
+  and fails with a clear message on any other output instead of
+  `Cannot read properties of undefined (reading 'files')`. A test now covers
+  both shapes (#129).
+
 ## [0.4.0] - 2026-09-28
 
 Upgrade `@askrjs/askr` to 0.4 at the same time. `@askrjs/ui` 0.3 does not work
