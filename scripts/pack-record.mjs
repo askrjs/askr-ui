@@ -6,7 +6,14 @@
  * command, rather than a TypeError further down.
  */
 export function readPackRecord(output) {
-  const result = JSON.parse(output);
+  let result;
+  try {
+    result = JSON.parse(output);
+  } catch (error) {
+    throw new Error(
+      `Expected npm pack --json to print JSON (${error.message}), got:\n${output}`
+    );
+  }
   const records =
     result !== null && typeof result === 'object'
       ? Array.isArray(result)

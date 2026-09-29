@@ -26,6 +26,8 @@ describe('readPackRecord (npm pack --json)', () => {
     ['two records', JSON.stringify([record, record])],
     ['a record without files', JSON.stringify([{ name: '@askrjs/ui' }])],
     ['a non-object', '"@askrjs/ui"'],
+    ['JSON null', 'null'],
+    ['non-JSON output', 'npm notice packing @askrjs/ui'],
   ])('should reject %s with a clear error', (_label, output) => {
     expect(() => readPackRecord(output)).toThrow(/npm pack --json/);
   });
