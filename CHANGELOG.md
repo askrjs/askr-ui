@@ -23,6 +23,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   mutated context object to its parts on every render, so they were not
   re-rendered and kept the initial value. The hidden input and
   `--ak-slider-percentage` were not affected.
+- `DebouncedInput` creates its debounced emitter once per mount instead of on
+  every render. Before, each re-render (for example a controlled `value`
+  updated from `onInput`) started a new debounce timer without cancelling the
+  previous one, so a settled value could be emitted once per render, or early,
+  and pending calls used the `onDebouncedInput` and `debounceMs` from an older
+  render. Now a pending value is emitted once to the latest
+  `onDebouncedInput`, is re-timed when `debounceMs` changes (or emitted at once
+  when it drops to `0`), is dropped when `onDebouncedInput` is removed, and is
+  cancelled on unmount (#126).
 
 ## [0.4.0] - 2026-09-28
 
