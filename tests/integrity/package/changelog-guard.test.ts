@@ -94,6 +94,54 @@ describe('changelog release guard', () => {
     );
   });
 
+  it('should not count markup, link definitions, or placeholders as entries', () => {
+    const heading = '# Changelog\n\n## Unreleased\n\n## 0.4.0 - 2026-09-28\n\n';
+    for (const body of [
+      '-\n',
+      '---\n',
+      '<br>\n',
+      '<details></details>\n',
+      '​\n',
+      'TBD\n',
+      '- TODO\n',
+      '<!-- fill in -->\n',
+      '```\nnotes\n```\n',
+      '[0.4.0]: https://github.com/askrjs/example/compare/v0.3.0...v0.4.0\n',
+    ]) {
+      expectRejected('0.4.0', `${heading}${body}`);
+    }
+  });
+
+  it('should reject an impossible release date', () => {
+    expectRejected(
+      '0.4.0',
+      '# Changelog\n\n## 0.4.0 - 2026-99-99\n\n- Fixed.\n'
+    );
+    expectRejected(
+      '0.4.0',
+      '# Changelog\n\n## 0.4.0 - 2026-02-30\n\n- Fixed.\n'
+    );
+  });
+
+  it('should count an undated heading as a duplicate section', () => {
+    expectRejected(
+      '0.4.0',
+      '# Changelog\n\n## 0.4.0 - 2026-09-28\n\n- Fixed.\n\n## [0.4.0]\n\n- Also fixed.\n'
+    );
+  });
+
+  it('should not let a stray comment opener in code hide the section', () => {
+    const section = '## 0.4.0 - 2026-09-28\n\n- Fixed.\n';
+    expectAccepted(
+      '0.4.0',
+      `# Changelog\n\nUse \`<!--\` sparingly.\n\n${section}`
+    );
+    expectAccepted(
+      '0.4.0',
+      `# Changelog\n\n\`\`\`html\n<!-- example\n\`\`\`\n\n${section}`
+    );
+  });
+
   it('should ignore headings inside code fences and HTML comments', () => {
     const base = '# Changelog\n\n## Unreleased\n\n';
     expectRejected(
@@ -133,6 +181,27 @@ describe('changelog release guard', () => {
     expectAccepted(
       '0.4.0',
       `# Changelog\r\n\r\n## 0.4.0 - 2026-09-28\r\n\r\n- Fixed.\r\n`
+    );
+    expectAccepted('0.4.0', `﻿## 0.4.0 - 2026-09-28${body}`);
+    expectAccepted('0.4.0', `# Changelog\n\n## 0.4.0 – 2026-09-28${body}`);
+    expectAccepted(
+      '0.4.0',
+      `# Changelog\n\n  ##  0.4.0  -  2026-09-28 ##${body}`
+    );
+    expectAccepted(
+      '0.4.0',
+      `# Changelog\n\n## [0.4.0](https://example.test/compare/v0.3.0...v0.4.0) (2026-09-28)${body}`
+    );
+  });
+
+  it('should match build-metadata versions with or without the metadata', () => {
+    expectAccepted(
+      '0.4.0+build.5',
+      '# Changelog\n\n## 0.4.0 - 2026-09-28\n\n- Fixed.\n'
+    );
+    expectAccepted(
+      '0.4.0+build.5',
+      '# Changelog\n\n## 0.4.0+build.5 - 2026-09-28\n\n- Fixed.\n'
     );
   });
 
