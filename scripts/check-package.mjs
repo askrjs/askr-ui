@@ -9,22 +9,19 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
+import { readPackRecord } from './pack-record.mjs';
 
 const root = process.cwd();
 const temporary = mkdtempSync(join(tmpdir(), 'askr-ui-pack-'));
 
 try {
-  const packResult = JSON.parse(
+  const packed = readPackRecord(
     execFileSync(
       'npm',
       ['pack', '--ignore-scripts', '--json', '--pack-destination', temporary],
       { cwd: root, encoding: 'utf8' }
     )
   );
-  // npm 11 prints an array of pack records; npm 12 keys them by package name.
-  const packed = (
-    Array.isArray(packResult) ? packResult : Object.values(packResult)
-  )[0];
   const forbidden =
     /(?:^|\/)(?:node_modules|\.cache|coverage)(?:\/|$)|\.tsbuildinfo$/;
   const files = packed.files.map(({ path }) => path);

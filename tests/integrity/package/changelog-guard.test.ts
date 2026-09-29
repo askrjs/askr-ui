@@ -3,6 +3,8 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
+// @ts-expect-error -- plain .mjs build script without declarations
+import { readPackRecord } from '../../../scripts/pack-record.mjs';
 
 const ROOT_DIR = process.cwd();
 const PACKAGE_JSON = join(ROOT_DIR, 'package.json');
@@ -247,12 +249,7 @@ describe('changelog release guard', () => {
         shell: process.platform === 'win32',
       }
     ).stdout;
-    // npm 11 prints an array of pack records; npm 12 keys them by package name.
-    const parsed = JSON.parse(output) as
-      | PackRecord[]
-      | Record<string, PackRecord>;
-    const records = Array.isArray(parsed) ? parsed : Object.values(parsed);
-    expect(records).toHaveLength(1);
-    expect(records[0].files.map(({ path }) => path)).toContain('CHANGELOG.md');
+    const packed = readPackRecord(output) as PackRecord;
+    expect(packed.files.map(({ path }) => path)).toContain('CHANGELOG.md');
   }, 60_000);
 });
