@@ -70,6 +70,18 @@ may change.
 Keep changes narrow, preserve public contracts unless a breaking change is
 explicitly requested, and do not rewrite unrelated files.
 
+## Changelog
+
+Any change to the `version` field in `package.json`, whether a release,
+prerelease, or patch bump, must include a matching `## <version>` section in
+`CHANGELOG.md` in the same commit or pull request. Date the section and list
+breaking changes (with migration notes), deprecations, additions, and fixes.
+Move entries from `Unreleased` into the new version section rather than leaving
+them there. Do not publish or tag a version whose changelog section is missing.
+Check with `npm run changelog:check` (the first step of `npm run check`, which
+`prepublishOnly` and the publish workflow run), which fails when `CHANGELOG.md`
+has no non-empty section for the current version.
+
 ## Optimization Gate
 
 A benchmark number is only half of an optimization's success criterion. The
