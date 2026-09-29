@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   pressing the track and dragging the thumb change the value (#136). This was
   the known issue listed for 0.4.0: since #132 the native branch replaced the
   composed ref with only the caller's `ref`.
+- An open `Toast` that uses `ToastHost`'s default duration is re-timed when
+  that `duration` prop changes (#144). `ToastHost` passed the same mutated
+  context object on every render, so open toasts were not re-rendered and kept
+  their old auto-dismiss timeout. Toasts added after the change, and toasts
+  with their own `duration`, were not affected. A hovered or focused toast
+  stays paused through the change and uses the new duration once it resumes.
 - `SliderThumb`, `SliderTrack`, and `SliderRange` update `aria-valuenow` and
   `data-percentage` when the value changes (#136). `Slider` passed the same
   mutated context object to its parts on every render, so they were not
