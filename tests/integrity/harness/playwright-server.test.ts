@@ -9,6 +9,10 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 const ROOT_DIR = resolve(__dirname, '..', '..', '..');
 
+// Imported by URL so the type checker does not resolve a `.ts` specifier.
+const CONFIG_URL = pathToFileURL(
+  resolve(ROOT_DIR, 'playwright.config.ts')
+).href;
 const HOST = '127.0.0.1';
 const DEFAULT_PORT = 4318;
 const ENV_KEYS = ['CI', 'ASKR_TEST_PORT', 'PW_REUSE_SERVER'] as const;
@@ -82,8 +86,7 @@ async function loadConfig(
 ) {
   for (const key of ENV_KEYS) vi.stubEnv(key, env[key]);
   vi.resetModules();
-  const config = (await import('../../../playwright.config.ts'))
-    .default as LoadedConfig;
+  const config = (await import(CONFIG_URL)).default as LoadedConfig;
   const webServer = Array.isArray(config.webServer)
     ? config.webServer[0]
     : config.webServer;
@@ -120,7 +123,7 @@ describe('playwright harness server', () => {
 
   it('should share one port between the web server and baseURL across config loads', async () => {
     const first = await loadConfig({});
-    const again = await import('../../../playwright.config.ts?reload');
+    const again = await import(`${CONFIG_URL}?reload`);
     const reloaded = (again.default as LoadedConfig).webServer as WebServer;
 
     expect(new URL(reloaded.url ?? '').port).toBe(String(first.port));
