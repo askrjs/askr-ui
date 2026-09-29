@@ -55,15 +55,33 @@ function visibleLines(changelog) {
           return '';
         }
       }
-      let visible = line.replace(/(`+)(?!`)[\s\S]*?(?<!`)\1(?!`)/g, ' code ');
-      visible = visible.replace(/<!--[\s\S]*?-->/g, '');
-      const start = visible.indexOf('<!--');
-      if (start !== -1) {
-        inComment = true;
-        visible = visible.slice(0, start);
+      let rest = line.replace(/(`+)(?!`)[\s\S]*?(?<!`)\1(?!`)/g, ' code ');
+      let visible = '';
+      for (;;) {
+        const start = rest.indexOf('<!--');
+        if (start === -1) return visible + rest;
+        visible += rest.slice(0, start);
+        const end = rest.indexOf('-->', start + 4);
+        if (end === -1) {
+          inComment = true;
+          return visible;
+        }
+        rest = rest.slice(end + 3);
       }
-      return visible;
     });
+}
+
+/** Returns the text outside `<...>` tags; only used to decide whether a line has words. */
+function textOutsideTags(line) {
+  let text = '';
+  let inTag = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    if (char === '<' && /^[A-Za-z/!]/.test(line[index + 1] ?? '')) inTag = true;
+    else if (char === '>' && inTag) inTag = false;
+    else if (!inTag) text += char;
+  }
+  return text;
 }
 
 function isRealDate(value) {
@@ -80,8 +98,7 @@ function isRealDate(value) {
 function entryText(line) {
   if (line.trim() === '' || SUB_HEADING.test(line)) return '';
   if (LINK_REFERENCE.test(line) || THEMATIC_BREAK.test(line)) return '';
-  const text = line
-    .replace(/<[^>]*>/g, '')
+  const text = textOutsideTags(line)
     .replace(/^[ \t]*(?:>[ \t]*)*(?:[-*+]|\d+[.)])?[ \t]*/, '')
     .trim();
   return /[\p{L}\p{N}]/u.test(text) ? text : '';

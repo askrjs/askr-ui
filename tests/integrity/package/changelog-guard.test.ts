@@ -112,6 +112,13 @@ describe('changelog release guard', () => {
     }
   });
 
+  it('should count entries that use angle brackets as text', () => {
+    const heading = '# Changelog\n\n## 0.4.0 - 2026-09-28\n\n';
+    expectAccepted('0.4.0', `${heading}- <3 faster\n`);
+    expectAccepted('0.4.0', `${heading}- Fixed <kbd>Tab</kbd> focus.\n`);
+    expectAccepted('0.4.0', `${heading}Intro <!-- note --> text.\n`);
+  });
+
   it('should reject an impossible release date', () => {
     expectRejected(
       '0.4.0',
