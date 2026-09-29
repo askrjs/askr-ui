@@ -12,6 +12,29 @@ function readComponentDirectories() {
     .sort();
 }
 
+/**
+ * Reads a browser behavior suite. A Playwright spec keeps its component tree in
+ * the mirrored scenario module, so a ported suite is the spec plus that module;
+ * an unported suite is still its legacy `behavior.test.tsx`.
+ */
+function readBehaviorSuite(suite: string): string {
+  const browserDirectory = join(process.cwd(), 'tests', 'browser');
+  const spec = join(browserDirectory, 'components', suite, 'behavior.spec.ts');
+  const sources = existsSync(spec)
+    ? [
+        spec,
+        join(
+          browserDirectory,
+          'scenarios',
+          'components',
+          suite,
+          'behavior.tsx'
+        ),
+      ]
+    : [join(browserDirectory, 'components', suite, 'behavior.test.tsx')];
+  return sources.map((path) => readFileSync(path, 'utf8')).join('\n');
+}
+
 describe('Source layout', () => {
   it('should keep the component tree flat and one folder per public component', () => {
     const expectedDirectories = [
@@ -97,17 +120,7 @@ describe('Source layout', () => {
       'toggle-group',
     ];
     for (const suite of behaviorSuites) {
-      const source = readFileSync(
-        join(
-          process.cwd(),
-          'tests',
-          'browser',
-          'components',
-          suite,
-          'behavior.test.tsx'
-        ),
-        'utf8'
-      );
+      const source = readBehaviorSuite(suite);
       expect(source).toContain('document.activeElement');
       expect(source).toMatch(/Arrow(?:Down|Up|Left|Right)/);
       expect(source).toContain('becomes disabled');
@@ -139,16 +152,8 @@ describe('Source layout', () => {
     expect(virtualTableSource).toContain('VirtualCompositeIdentityContext');
     expect(virtualTableIdentityWiringSource).toContain("'table-cell'");
 
-    const virtualizedCompositeSuite = readFileSync(
-      join(
-        process.cwd(),
-        'tests',
-        'browser',
-        'components',
-        'virtualized-composites',
-        'behavior.test.tsx'
-      ),
-      'utf8'
+    const virtualizedCompositeSuite = readBehaviorSuite(
+      'virtualized-composites'
     );
     for (const component of [
       'Dropdown',
@@ -205,30 +210,7 @@ describe('Source layout', () => {
       'slider',
       'switch',
     ]) {
-      // A Playwright spec keeps its component tree, and so the reset call, in
-      // the mirrored scenario module; unported suites are still `.test.tsx`.
-      const browserDirectory = join(process.cwd(), 'tests', 'browser');
-      const spec = join(
-        browserDirectory,
-        'components',
-        suite,
-        'behavior.spec.ts'
-      );
-      const sources = existsSync(spec)
-        ? [
-            spec,
-            join(
-              browserDirectory,
-              'scenarios',
-              'components',
-              suite,
-              'behavior.tsx'
-            ),
-          ]
-        : [join(browserDirectory, 'components', suite, 'behavior.test.tsx')];
-      const source = sources
-        .map((path) => readFileSync(path, 'utf8'))
-        .join('\n');
+      const source = readBehaviorSuite(suite);
       expect(source).toMatch(/\.reset\(\)|new Event\('reset'/);
     }
   });
@@ -347,17 +329,7 @@ describe('Source layout', () => {
       'select',
       'toggle-group',
     ]) {
-      const source = readFileSync(
-        join(
-          process.cwd(),
-          'tests',
-          'browser',
-          'components',
-          suite,
-          'behavior.test.tsx'
-        ),
-        'utf8'
-      );
+      const source = readBehaviorSuite(suite);
       expect(source).toContain('dir="rtl"');
     }
   });
@@ -412,17 +384,7 @@ describe('Source layout', () => {
     expect(checkablePressSource).toContain("'Enter'");
 
     for (const suite of ['checkbox', 'switch', 'radio-group']) {
-      const source = readFileSync(
-        join(
-          process.cwd(),
-          'tests',
-          'browser',
-          'components',
-          suite,
-          'behavior.test.tsx'
-        ),
-        'utf8'
-      );
+      const source = readBehaviorSuite(suite);
       expect(source).toContain('asChild');
       expect(source).toMatch(/\{Enter\}/);
     }
@@ -436,10 +398,7 @@ describe('Source layout', () => {
       'browser',
       'components'
     );
-    const hoverCardSuite = readFileSync(
-      join(browserDirectory, 'hover-card', 'behavior.test.tsx'),
-      'utf8'
-    );
+    const hoverCardSuite = readBehaviorSuite('hover-card');
     expect(hoverCardSuite).toContain('pointer leaves immediately');
     expect(hoverCardSuite).toContain('pointer re-enters before its deadline');
     expect(hoverCardSuite).toContain('repeated timer churn');
@@ -456,10 +415,7 @@ describe('Source layout', () => {
     );
     expect(hoverCardSource).toContain('clearOpenTimer()');
 
-    const tooltipSuite = readFileSync(
-      join(browserDirectory, 'tooltip', 'behavior.test.tsx'),
-      'utf8'
-    );
+    const tooltipSuite = readBehaviorSuite('tooltip');
     expect(tooltipSuite).toContain('trigger.focus()');
     expect(tooltipSuite).toContain('await userEvent.tab()');
     expect(tooltipSuite).toContain('Button control');
@@ -467,10 +423,7 @@ describe('Source layout', () => {
     expect(tooltipSuite).toContain('controlled native-focus request bounded');
     expect(tooltipSuite).toContain('focus-adoption work during teardown');
 
-    const toastSuite = readFileSync(
-      join(browserDirectory, 'toast', 'behavior.test.tsx'),
-      'utf8'
-    );
+    const toastSuite = readBehaviorSuite('toast');
     expect(toastSuite).toContain('unrelated paused toast through sibling');
     expect(toastSuite).toContain('toBe(original)');
     expect(toastSuite).toContain('toBe(originalClose)');
