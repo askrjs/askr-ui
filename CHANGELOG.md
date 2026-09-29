@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Internal
+
+- Local Playwright runs start the browser harness on a free port instead of a
+  fixed 4318, so parallel runs in different worktrees no longer reuse each
+  other's harness and test the wrong checkout. Reusing a running harness is
+  opt-in with `PW_REUSE_SERVER=1`, and a reused harness that serves another
+  checkout is refused before any test runs. `ASKR_TEST_PORT` pins the port.
+  CI still uses port 4318 and never reuses a server.
+
 ## [0.4.2] - 2026-09-30
 
 ### Fixed
