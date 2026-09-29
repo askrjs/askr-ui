@@ -1,6 +1,23 @@
-import { expect, test } from '../../fixtures';
+import { expect, type Page, test } from '../../fixtures';
 
 const MODES = ['map', 'for'] as const;
+
+/**
+ * Moves the pointer off the mounted tree. The harness has no body margin, so
+ * the first menubar trigger sits at (0, 0), which is where the pointer starts.
+ * Headless Chromium on Linux fires hover events at the resting pointer after
+ * layout changes, and an open menubar switches to a trigger the pointer
+ * enters (standard menubar hover behavior). That would open the first menu
+ * instead of the one the test clicked. The vitest original rendered inside an
+ * offset iframe and never had the pointer over a trigger.
+ */
+async function parkPointer(page: Page): Promise<void> {
+  const viewport = page.viewportSize();
+  await page.mouse.move(
+    (viewport?.width ?? 1280) - 1,
+    (viewport?.height ?? 900) - 1
+  );
+}
 
 interface Controls {
   alpha: string | null;
@@ -93,10 +110,12 @@ test.describe('dynamic children context contract', () => {
   });
 
   test('should support mapped and For-rendered Menubar menus and items', async ({
+    page,
     render,
     run,
   }) => {
     await render('menubarMenusAndItems');
+    await parkPointer(page);
 
     await run('clickTwoTriggers');
 
@@ -207,10 +226,12 @@ test.describe('dynamic children context contract', () => {
   });
 
   test('should keep dynamic Menubar identities stable across reorder and removal', async ({
+    page,
     render,
     run,
   }) => {
     await render('menubarIdentity');
+    await parkPointer(page);
 
     const initialControls = await run<Controls>('controls');
     expect(initialControls.alpha).not.toBe(initialControls.beta);
