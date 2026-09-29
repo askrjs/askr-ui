@@ -7,8 +7,16 @@ import {
   vi,
 } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
+import { debounceEvent } from '@askrjs/askr/fx';
 import { DebouncedInput } from '../../../../src/components/input';
 import { flushUpdates, mount, unmount } from '../../test-utils';
+
+// Count debounced emitters: each one owns a timer and registers an owner
+// cleanup, so a render must not create a new one.
+vi.mock('@askrjs/askr/fx', async (importOriginal) => {
+  const fx = await importOriginal<typeof import('@askrjs/askr/fx')>();
+  return { ...fx, debounceEvent: vi.fn(fx.debounceEvent) };
+});
 
 type Props = {
   debounceMs: number;
@@ -64,6 +72,7 @@ describe('DebouncedInput - debounce state across renders', () => {
 
   beforeEach(() => {
     vi.useFakeTimers();
+    vi.mocked(debounceEvent).mockClear();
   });
 
   afterEach(() => {
@@ -233,6 +242,51 @@ describe('DebouncedInput - debounce state across renders', () => {
 
     unmount(container);
     container = undefined;
+
+    vi.advanceTimersByTime(1000);
+    await flushUpdates();
+    expect(committed).toEqual([]);
+  });
+
+  it('should create one debounced emitter per mount and one per delay change', async () => {
+    const onDebouncedInput = () => {};
+    const view = renderWithProps({ debounceMs: 200, onDebouncedInput });
+    container = view.container;
+
+    for (let version = 1; version <= 5; version += 1) {
+      await view.setProps({ version });
+    }
+    expect(view.renders.count).toBe(6);
+    expect(debounceEvent).toHaveBeenCalledTimes(1);
+
+    await view.setProps({ debounceMs: 300 });
+    await view.setProps({ version: 6 });
+    expect(debounceEvent).toHaveBeenCalledTimes(2);
+  });
+
+  it('should cancel a pending value when the user types into a disabled input', async () => {
+    const committed: string[] = [];
+    let setDisabled: (value: boolean) => void = () => {};
+
+    const Parent = () => {
+      const disabled = state(false);
+      setDisabled = (value) => disabled.set(value);
+      return (
+        <DebouncedInput
+          aria-label="Search"
+          disabled={disabled()}
+          onDebouncedInput={(value) => committed.push(value)}
+        />
+      );
+    };
+
+    container = mount(<Parent />);
+    const input = () => container!.querySelector('input') as HTMLInputElement;
+
+    type(input(), 'north');
+    setDisabled(true);
+    await flushUpdates();
+    type(input(), 'northwind');
 
     vi.advanceTimersByTime(1000);
     await flushUpdates();
