@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-09-30
+
 ### Fixed
 
 - `npm run pack:check` reads both `npm pack --json` shapes, the array printed
@@ -24,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   their old auto-dismiss timeout. Toasts added after the change, and toasts
   with their own `duration`, were not affected. A hovered or focused toast
   stays paused through the change and uses the new duration once it resumes.
+- A portalled Select reads the current open state when an application
+  `OverlayHost` renders its content outside the Select tree.
 - `SliderThumb`, `SliderTrack`, and `SliderRange` update `aria-valuenow` and
   `data-percentage` when the value changes (#136). `Slider` passed the same
   mutated context object to its parts on every render, so they were not
@@ -153,7 +157,8 @@ deprecations.
 
 - Establish the coordinated AskrJS 0.2 compatibility baseline and peer ranges.
 
-[Unreleased]: https://github.com/askrjs/askr-ui/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/askrjs/askr-ui/compare/v0.4.2...HEAD
+[0.4.2]: https://github.com/askrjs/askr-ui/compare/v0.4.0...v0.4.2
 [0.4.0]: https://github.com/askrjs/askr-ui/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/askrjs/askr-ui/compare/v0.2.4...v0.3.0
 [0.2.4]: https://github.com/askrjs/askr-ui/compare/v0.2.3...v0.2.4
