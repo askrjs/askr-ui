@@ -217,7 +217,11 @@ function ToastRegistrationView(props: {
       clearToastTimer(entry);
 
       entry.remainingDuration = resolvedDuration;
-      armTimer(resolvedDuration);
+      // A duration change re-runs this while the toast may be hovered or
+      // focused; stay paused and let resumeTimer arm the new duration.
+      if (!entry.pointerInside && !entry.focusInside) {
+        armTimer(resolvedDuration);
+      }
       signal.addEventListener(
         'abort',
         () => {
@@ -336,18 +340,7 @@ export function ToastHost(props: ToastHostProps) {
     id === undefined
       ? generatedHostId()
       : resolveCompoundId('toast-host', id, children);
-  const hostContextState = state<ToastHostContextValue>({
-    hostId,
-    duration,
-    toasts: [],
-    getToasts: () => [],
-    registerToast: () => {},
-    unregisterToast: () => {},
-  });
-  const hostContext = hostContextState();
-  const toastRegistrationsState = state<ToastRegistration[]>(
-    hostContext.toasts
-  );
+  const toastRegistrationsState = state<ToastRegistration[]>([]);
   const registerToast = (registration: ToastRegistration) => {
     const currentRegistrations = toastRegistrationsState();
     const currentRegistration = currentRegistrations.find(
@@ -358,7 +351,6 @@ export function ToastHost(props: ToastHostProps) {
       const registrationIndex =
         currentRegistrations.indexOf(currentRegistration);
       currentRegistrations[registrationIndex] = registration;
-      hostContext.toasts = currentRegistrations;
       return;
     }
 
@@ -367,7 +359,6 @@ export function ToastHost(props: ToastHostProps) {
     );
     nextRegistrations.push(registration);
     toastRegistrationsState.set(nextRegistrations);
-    hostContext.toasts = nextRegistrations;
   };
   const unregisterToast = (
     toastId: string,
@@ -383,20 +374,22 @@ export function ToastHost(props: ToastHostProps) {
         return;
       }
 
-      const nextRegistrations = currentRegistrations.filter(
-        (entry) => entry.toastId !== toastId
+      toastRegistrationsState.set(
+        currentRegistrations.filter((entry) => entry.toastId !== toastId)
       );
-      toastRegistrationsState.set(nextRegistrations);
-      hostContext.toasts = nextRegistrations;
     });
   };
-  hostContext.hostId = hostId;
-  hostContext.duration = duration;
-  const toastRegistrations = toastRegistrationsState();
-  hostContext.toasts = toastRegistrations;
-  hostContext.getToasts = toastRegistrationsState;
-  hostContext.registerToast = registerToast;
-  hostContext.unregisterToast = unregisterToast;
+  // A fresh value every render: the scope provider only re-renders consumers
+  // when its value changes identity, so mutating one cached object in place
+  // would leave open toasts timed with the previous `duration`.
+  const hostContext: ToastHostContextValue = {
+    hostId,
+    duration,
+    toasts: toastRegistrationsState(),
+    getToasts: toastRegistrationsState,
+    registerToast,
+    unregisterToast,
+  };
   const finalProps = mergeProps(rest, {
     ref,
     'data-slot': 'toast-host',

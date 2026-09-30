@@ -9,24 +9,30 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
+import { readPackRecord } from './pack-record.mjs';
 
 const root = process.cwd();
 const temporary = mkdtempSync(join(tmpdir(), 'askr-ui-pack-'));
 
 try {
-  const packed = JSON.parse(
+  const packed = readPackRecord(
     execFileSync(
       'npm',
       ['pack', '--ignore-scripts', '--json', '--pack-destination', temporary],
       { cwd: root, encoding: 'utf8' }
     )
-  )[0];
+  );
   const forbidden =
     /(?:^|\/)(?:node_modules|\.cache|coverage)(?:\/|$)|\.tsbuildinfo$/;
   const files = packed.files.map(({ path }) => path);
   const rejected = files.filter((path) => forbidden.test(path));
   if (rejected.length > 0) {
     throw new Error(`Forbidden packed files:\n${rejected.join('\n')}`);
+  }
+  const required = ['CHANGELOG.md', 'README.md', 'LICENSE', 'package.json'];
+  const absent = required.filter((path) => !files.includes(path));
+  if (absent.length > 0) {
+    throw new Error(`Packed artifact is missing:\n${absent.join('\n')}`);
   }
 
   const packageJson = JSON.parse(

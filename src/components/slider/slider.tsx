@@ -224,19 +224,26 @@ export function Slider(props: SliderProps) {
     }
   });
   const percentage = rangePercentage(normalizedValue, min, max);
-  const rootContext = getSliderRootContext(identity, sliderId);
-  rootContext.sliderId = sliderId;
-  rootContext.value = normalizedValue;
-  rootContext.setValue = (nextValue: number) => {
-    valueState.set(nextValue as never);
+  // A fresh value every render: the scope provider only re-renders the parts
+  // when its value changes identity, so mutating one cached object in place
+  // would leave SliderThumb's aria-valuenow and data-percentage stale. The
+  // same object is recorded as the live root for drag and keyboard handlers.
+  const rootContext: SliderRootContextValue = {
+    sliderId,
+    identity,
+    value: normalizedValue,
+    setValue: (nextValue: number) => {
+      valueState.set(nextValue as never);
+    },
+    min,
+    max,
+    step,
+    orientation,
+    disabled,
+    trackId: resolvePartId(sliderId, 'track'),
+    thumbId: resolvePartId(sliderId, 'thumb'),
   };
-  rootContext.min = min;
-  rootContext.max = max;
-  rootContext.step = step;
-  rootContext.orientation = orientation;
-  rootContext.disabled = disabled;
-  rootContext.trackId = resolvePartId(sliderId, 'track');
-  rootContext.thumbId = resolvePartId(sliderId, 'thumb');
+  sliderContexts.set(identity, rootContext);
   const sliderRuleKey = `slider:${sliderId}`;
   const sliderSelector = dynamicAttributeSelector(
     'data-askr-slider-id',
@@ -339,11 +346,10 @@ export function SliderTrack(props: SliderTrackProps | SliderTrackAsChildProps) {
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  return (
-    <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
-      {children}
-    </div>
-  );
+  // `finalProps.ref` already composes the caller's ref with the internal track
+  // ref that pointer input reads. Do not override it with `nativeRef(props)`:
+  // that is only the caller's ref, so the track would never be registered.
+  return <div {...finalProps}>{children}</div>;
 }
 
 /**

@@ -1,6 +1,6 @@
 {
   "name": "@askrjs/ui",
-  "version": "0.4.0",
+  "version": "0.4.2",
   "description": "Headless Askr components",
   "keywords": [
     "accessible",
@@ -236,7 +236,8 @@
     "test:unit": "npm run test:types && vp test run --config vitest.test.unit.config.ts",
     "test:publint": "publint",
     "pack:check": "node scripts/check-package.mjs",
-    "check": "npm run build && npm run lint && npm run typecheck && npm test && npm run test:publint && npm run pack:check",
+    "changelog:check": "node scripts/check-changelog.mjs",
+    "check": "npm run changelog:check && npm run build && npm run lint && npm run typecheck && npm test && npm run test:publint && npm run pack:check",
     "prepack": "npm run build",
     "prepublishOnly": "npm run check",
     "test:checks": "vp test run -c vitest.test.checks.config.ts",
