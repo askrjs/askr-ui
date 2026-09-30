@@ -156,7 +156,9 @@ export function Select(props: SelectProps) {
   };
   const rootContext: SelectRootContextValue = {
     ...rootContextBase,
-    open: openState(),
+    get open() {
+      return openState();
+    },
     setOpen,
     contentId: resolvePartId(selectId, 'content'),
     portal: getPersistentPortal(overlayIdentity),
