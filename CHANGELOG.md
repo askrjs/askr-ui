@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   opt-in with `PW_REUSE_SERVER=1`, and a reused harness that serves another
   checkout is refused before any test runs. `ASKR_TEST_PORT` pins the port.
   CI still uses port 4318 and never reuses a server.
+- Browser tests wait for the harness document and its exposed API, without
+  waiting for the page's later `load` event, which can stall in long WebKit runs.
 
 ### Fixed
 

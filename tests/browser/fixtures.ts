@@ -90,7 +90,7 @@ function scenarioModuleFor(file: string): string {
 
 async function openHarness(page: Page): Promise<void> {
   if (new URL(page.url(), 'http://127.0.0.1').pathname === HARNESS_URL) return;
-  await page.goto(HARNESS_URL);
+  await page.goto(HARNESS_URL, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => 'askrHarness' in window);
 }
 
