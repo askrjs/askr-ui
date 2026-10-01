@@ -38,9 +38,7 @@ export function checkedAcrossRemounts(root: HTMLElement) {
   unmount(container);
 
   container = mount(<Checkbox checked />, root);
-  const second = container
-    .querySelector('input')
-    ?.getAttribute('aria-checked');
+  const second = container.querySelector('input')?.getAttribute('aria-checked');
 
   return { checkedStates: () => ({ first, second }) };
 }

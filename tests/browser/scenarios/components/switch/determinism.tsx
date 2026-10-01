@@ -35,9 +35,7 @@ export function asChildMarkup() {
 
 export function checkedAcrossRemounts(root: HTMLElement) {
   let container = mount(<Switch checked={false}>Power</Switch>, root);
-  const first = container
-    .querySelector('button')
-    ?.getAttribute('aria-checked');
+  const first = container.querySelector('button')?.getAttribute('aria-checked');
   unmount(container);
 
   container = mount(<Switch checked>Power</Switch>, root);

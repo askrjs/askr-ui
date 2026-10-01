@@ -113,10 +113,7 @@ test.describe('Checkbox - Behavior', () => {
     });
   });
 
-  test('should forward refs to the asChild host', async ({
-    render,
-    run,
-  }) => {
+  test('should forward refs to the asChild host', async ({ render, run }) => {
     await render('asChildRef');
 
     expect(await run<boolean>('refIsHost')).toBe(true);

@@ -48,7 +48,10 @@ test.describe('Accordion - Behavior', () => {
     await render('consecutiveUncontrolledUpdates');
 
     // Both clicks run in one browser task, with no flush between them.
-    expect(await run<string[][]>('clickBoth')).toEqual([['one'], ['one', 'two']]);
+    expect(await run<string[][]>('clickBoth')).toEqual([
+      ['one'],
+      ['one', 'two'],
+    ]);
 
     await run('flush');
 

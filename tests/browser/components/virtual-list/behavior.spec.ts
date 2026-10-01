@@ -38,9 +38,7 @@ test.describe('VirtualList - Behavior', () => {
       'role',
       'list'
     );
-    await expect(root.locator('[data-slot="virtual-list-row"]')).toHaveCount(
-      3
-    );
+    await expect(root.locator('[data-slot="virtual-list-row"]')).toHaveCount(3);
     await expect(root.locator('[data-key="item-0"]')).toHaveCount(1);
     await expect(root.locator('[data-key="item-2"]')).toHaveCount(1);
     expect(await run<number>('visibleStartIndex')).toBe(0);

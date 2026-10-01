@@ -103,9 +103,9 @@ test.describe('Tooltip - Behavior', () => {
 
     const content = page.locator('[data-slot="tooltip-content"]');
     await expect(content).toHaveAttribute('data-side', 'right');
-    expect(await content.evaluate((node) => (node as HTMLElement).dataset.side)).toBe(
-      'right'
-    );
+    expect(
+      await content.evaluate((node) => (node as HTMLElement).dataset.side)
+    ).toBe('right');
     await expect(content).not.toHaveAttribute('style');
     await expect(content).toHaveCSS('left', '148px');
     await expect(content).toHaveCSS('top', '90px');

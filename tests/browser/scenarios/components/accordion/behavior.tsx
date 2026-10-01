@@ -95,7 +95,6 @@ export function openStateModes(root: HTMLElement): void {
     </div>,
     root
   );
-
 }
 
 export function consecutiveUncontrolledUpdates(root: HTMLElement) {

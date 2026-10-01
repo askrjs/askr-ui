@@ -7,10 +7,18 @@ test.describe('ScrollArea - Behavior', () => {
   }) => {
     await render('canonicalHooks');
 
-    await expect(root.locator('[data-slot="scroll-area-viewport"]')).toHaveCount(1);
-    await expect(root.locator('[data-slot="scroll-area-scrollbar"]')).toHaveCount(1);
-    await expect(root.locator('[data-slot="scroll-area-thumb"]')).toHaveCount(1);
-    await expect(root.locator('[data-slot="scroll-area-corner"]')).toHaveCount(1);
+    await expect(
+      root.locator('[data-slot="scroll-area-viewport"]')
+    ).toHaveCount(1);
+    await expect(
+      root.locator('[data-slot="scroll-area-scrollbar"]')
+    ).toHaveCount(1);
+    await expect(root.locator('[data-slot="scroll-area-thumb"]')).toHaveCount(
+      1
+    );
+    await expect(root.locator('[data-slot="scroll-area-corner"]')).toHaveCount(
+      1
+    );
   });
 
   test('should not emit inline viewport styles and should reject orphan parts', async ({
@@ -47,7 +55,10 @@ test.describe('ScrollArea - Behavior', () => {
         controls: node.getAttribute('aria-controls'),
       }))
     );
-    expect(semantics.map((bar) => bar.role)).toEqual(['scrollbar', 'scrollbar']);
+    expect(semantics.map((bar) => bar.role)).toEqual([
+      'scrollbar',
+      'scrollbar',
+    ]);
     expect(semantics.map((bar) => bar.orientation)).toEqual([
       'vertical',
       'horizontal',
@@ -62,7 +73,9 @@ test.describe('ScrollArea - Behavior', () => {
   }) => {
     await render('asChildViewport');
 
-    await root.locator('[data-slot="scroll-area-viewport"]').dispatchEvent('scroll');
+    await root
+      .locator('[data-slot="scroll-area-viewport"]')
+      .dispatchEvent('scroll');
 
     expect(await run<boolean>('refIsViewport')).toBe(true);
     expect(await run<number>('scrollCalls')).toBe(1);
