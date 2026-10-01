@@ -19,6 +19,10 @@ import {
   ProgressCircle,
   ProgressCircleIndicator,
 } from '../../../../src/components/progress-circle';
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from '../../../../src/components/toggle-group';
 import { Checkbox } from '../../../../src/components/checkbox';
 import { Switch } from '../../../../src/components/switch';
 
@@ -100,6 +104,70 @@ describe('form primitives committed state', () => {
         .value
     ).toBe('');
   });
+
+  it.each(['single', 'multiple'] as const)(
+    'should retain %s toggle group roving state through a rejected selection update',
+    async (mode) => {
+      let selected!: ReturnType<typeof state<string>>;
+      const view = render(() => {
+        selected = state('a');
+        const selection = selected();
+        const selectionProps =
+          mode === 'single'
+            ? { type: 'single' as const, value: selection }
+            : { type: 'multiple' as const, value: [selection] };
+        return (
+          <>
+            <ToggleGroup {...selectionProps}>
+              <ToggleGroupItem value="a">A</ToggleGroupItem>
+              <ToggleGroupItem value="b">B</ToggleGroupItem>
+              <ToggleGroupItem value="c">C</ToggleGroupItem>
+            </ToggleGroup>
+            {selection === 'b' ? <i>Insert failure</i> : null}
+          </>
+        );
+      });
+      await settle();
+      const before = view.container.innerHTML;
+      rejectInsertion(view.container, () => selected.set('b'));
+      expect(view.container.innerHTML).toBe(before);
+      const items = () =>
+        view.container.querySelectorAll<HTMLButtonElement>(
+          '[data-slot="toggle-group-item"]'
+        );
+      items()[0]!.focus();
+      items()[0]!.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'ArrowRight',
+          bubbles: true,
+          cancelable: true,
+        })
+      );
+      await settle();
+      expect(document.activeElement).toBe(items()[1]);
+      expect(Array.from(items(), (item) => item.tabIndex)).toEqual([-1, 0, -1]);
+      expect(items()[0]!.getAttribute('aria-pressed')).toBe('true');
+      expect(items()[1]!.getAttribute('aria-pressed')).toBe('false');
+      selected.set('a');
+      await settle();
+      selected.set('b');
+      await settle();
+      expect(items()[1]!.tabIndex).toBe(0);
+      expect(items()[1]!.getAttribute('aria-pressed')).toBe('true');
+      items()[1]!.focus();
+      items()[1]!.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'ArrowRight',
+          bubbles: true,
+          cancelable: true,
+        })
+      );
+      await settle();
+      expect(document.activeElement).toBe(items()[2]);
+      expect(Array.from(items(), (item) => item.tabIndex)).toEqual([-1, -1, 0]);
+      expect(items()[1]!.getAttribute('aria-pressed')).toBe('true');
+    }
+  );
 
   it('should suppress value changes when a slider becomes disabled during a drag', async () => {
     let disabled!: ReturnType<typeof state<boolean>>;

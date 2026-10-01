@@ -1,5 +1,6 @@
 import { state } from '@askrjs/askr';
 import { controllableState } from '@askrjs/askr/foundations/state';
+import { watch } from '@askrjs/askr/resources';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import { rovingFocus } from '../_internal/roving-focus';
 import {
@@ -145,20 +146,25 @@ export function ToggleGroup(props: ToggleGroupProps) {
   const rovingVersion = state(0);
   rovingVersion();
 
-  if (roving.selected !== resolvedSelectedIndex) {
-    roving.selected = resolvedSelectedIndex;
-
-    if (resolvedSelectedIndex >= 0) {
-      roving.index = resolvedSelectedIndex;
+  const renderIndex =
+    roving.selected !== resolvedSelectedIndex && resolvedSelectedIndex >= 0
+      ? resolvedSelectedIndex
+      : roving.index;
+  watch(
+    () => resolvedSelectedIndex,
+    (committedSelection) => {
+      if (roving.selected === committedSelection) return;
+      roving.selected = committedSelection;
+      if (committedSelection >= 0) roving.index = committedSelection;
     }
-  }
+  );
 
-  const currentItem = items.find((item) => item.index === roving.index);
+  const currentItem = items.find((item) => item.index === renderIndex);
   const rovingIsUsable = currentItem
     ? !currentItem.disabled
-    : roving.index >= 0 && roving.index < Math.max(itemCount, 1);
+    : renderIndex >= 0 && renderIndex < Math.max(itemCount, 1);
   const currentIndex = rovingIsUsable
-    ? roving.index
+    ? renderIndex
     : selectedIsEnabled
       ? selectedIndex
       : firstEnabledCompositeItemIndex(items);
