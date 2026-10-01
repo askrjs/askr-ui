@@ -89,20 +89,22 @@ function renderMenubarSurfaceContent(
     focusCollectionItemWithRestore(pendingFocus, collection, index);
   };
   function handleContentTypeaheadKeyDown(event: KeyboardEvent) {
-    const liveState = resolveMenubarContentState(contentContext);
-    const currentItemIndex = liveState.items.findIndex(
-      (item) => item.index === liveState.currentIndex
-    );
+    return handleTypeaheadKeyDown(typeaheadIdentity, event, () => {
+      const liveState = resolveMenubarContentState(contentContext);
+      const currentItemIndex = liveState.items.findIndex(
+        (item) => item.index === liveState.currentIndex
+      );
 
-    return handleTypeaheadKeyDown(typeaheadIdentity, event, {
-      currentIndex: currentItemIndex,
-      items: liveState.items,
-      onMatch: (matchIndex) => {
-        const index = liveState.items[matchIndex]?.index;
-        if (index === undefined) return;
-        contentContext.setCurrentIndex(index);
-        contentContext.focusItem(index);
-      },
+      return {
+        currentIndex: currentItemIndex,
+        items: liveState.items,
+        onMatch: (matchIndex) => {
+          const index = liveState.items[matchIndex]?.index;
+          if (index === undefined) return;
+          contentContext.setCurrentIndex(index);
+          contentContext.focusItem(index);
+        },
+      };
     });
   }
   const contentContext: MenubarContentContextValue = {
@@ -302,22 +304,24 @@ function renderMenubarSurfaceContent(
         root.setOpenPath(contentContext.path.slice(0, -1));
       }
 
-      const rootTrigger = getCompositeCollection(root.menubarId)
-        .items()
-        .find((item) => item.metadata.value === contentContext.path[0])?.node;
+      if (event.key === 'Tab') {
+        const rootTrigger = getCompositeCollection(root.menubarId)
+          .items()
+          .find((item) => item.metadata.value === contentContext.path[0])?.node;
 
-      dismissPopupWithTab(
-        event,
-        rootTrigger ?? null,
-        Array.from(
-          document.querySelectorAll<HTMLElement>(
-            '[data-slot="menubar-content"]'
-          )
-        ),
-        () => {
-          root.setOpenPath([]);
-        }
-      );
+        dismissPopupWithTab(
+          event,
+          rootTrigger ?? null,
+          Array.from(
+            document.querySelectorAll<HTMLElement>(
+              '[data-slot="menubar-content"]'
+            )
+          ),
+          () => {
+            root.setOpenPath([]);
+          }
+        );
+      }
     },
   });
   return (

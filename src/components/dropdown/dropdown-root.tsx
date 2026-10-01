@@ -104,23 +104,25 @@ export function Dropdown(props: DropdownProps) {
     },
     resolvedState,
     handleTypeaheadKeyDown: (event) => {
-      const liveState = resolveDropdownState({
-        dropdownId,
-        currentIndexCandidate: currentIndexState(),
-      });
+      return handleTypeaheadKeyDown(overlayIdentity, event, () => {
+        const liveState = resolveDropdownState({
+          dropdownId,
+          currentIndexCandidate: currentIndexState(),
+        });
+        const currentItemIndex = liveState.items.findIndex(
+          (item) => item.index === liveState.currentIndex
+        );
 
-      const currentItemIndex = liveState.items.findIndex(
-        (item) => item.index === liveState.currentIndex
-      );
-      return handleTypeaheadKeyDown(overlayIdentity, event, {
-        currentIndex: currentItemIndex,
-        items: liveState.items,
-        onMatch: (matchIndex) => {
-          const index = liveState.items[matchIndex]?.index;
-          if (index === undefined) return;
-          setCurrentIndex(index);
-          focusItem(index);
-        },
+        return {
+          currentIndex: currentItemIndex,
+          items: liveState.items,
+          onMatch: (matchIndex) => {
+            const index = liveState.items[matchIndex]?.index;
+            if (index === undefined) return;
+            setCurrentIndex(index);
+            focusItem(index);
+          },
+        };
       });
     },
     handleTypeaheadKeyUp: (event) =>

@@ -71,20 +71,22 @@ export function Menu(props: MenuProps) {
     restoreItemFocus: (index, node) =>
       restorePendingCollectionItemFocus(pendingFocus, index, node),
     handleTypeaheadKeyDown: (event) => {
-      const items = getMenuCollectionItems(collection);
+      return handleTypeaheadKeyDown(typeaheadIdentity, event, () => {
+        const items = getMenuCollectionItems(collection);
+        const currentItemIndex = items.findIndex(
+          (item) => item.index === currentIndexState()
+        );
 
-      const currentItemIndex = items.findIndex(
-        (item) => item.index === currentIndexState()
-      );
-      return handleTypeaheadKeyDown(typeaheadIdentity, event, {
-        currentIndex: currentItemIndex,
-        items,
-        onMatch: (matchIndex) => {
-          const index = items[matchIndex]?.index;
-          if (index === undefined) return;
-          setCurrentIndex(index);
-          focusItem(index);
-        },
+        return {
+          currentIndex: currentItemIndex,
+          items,
+          onMatch: (matchIndex) => {
+            const index = items[matchIndex]?.index;
+            if (index === undefined) return;
+            setCurrentIndex(index);
+            focusItem(index);
+          },
+        };
       });
     },
     handleTypeaheadKeyUp: (event) =>
