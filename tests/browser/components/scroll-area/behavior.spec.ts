@@ -112,7 +112,7 @@ test.describe('ScrollArea - Behavior', () => {
   });
 });
 
-test('RTL horizontal scrollbar publishes bounded values and reaches End', async ({
+test('should publish bounded values and reach End (RTL horizontal scrollbar)', async ({
   page,
   render,
   root,
@@ -149,7 +149,7 @@ test('RTL horizontal scrollbar publishes bounded values and reaches End', async 
   expect(await viewport.evaluate((node) => node.scrollLeft)).toBe(0);
 });
 
-test('LTR horizontal scrollbar preserves range values and keyboard directions', async ({
+test('should preserve range values and keyboard directions (LTR horizontal scrollbar)', async ({
   render,
   page,
   root,
@@ -182,7 +182,7 @@ test('LTR horizontal scrollbar preserves range values and keyboard directions', 
 });
 
 for (const cancellation of ['ancestor', 'caller'] as const) {
-  test(`ScrollArea honors ${cancellation} keyboard cancellation`, async ({
+  test(`should honor ${cancellation} keyboard cancellation (ScrollArea)`, async ({
     page,
     render,
     root,

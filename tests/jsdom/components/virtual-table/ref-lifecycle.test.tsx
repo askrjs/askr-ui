@@ -58,7 +58,7 @@ afterEach(() => {
 describe.each(['list', 'table'] as const)(
   'Virtual %s ref lifecycle',
   (kind) => {
-    it('publishes its node and API synchronously when mount returns', () => {
+    it('should publish its node and API synchronously when mount returns', () => {
       const nodes: Array<HTMLElement | null> = [];
       const apis: Array<Api | null> = [];
       container = mount(
@@ -76,7 +76,7 @@ describe.each(['list', 'table'] as const)(
       expect(apis).toHaveLength(1);
       expect(apis[0]).not.toBeNull();
     });
-    it('drains replaced callback refs and the current callbacks at teardown', () => {
+    it('should drain replaced callback refs and the current callbacks at teardown', () => {
       const oldNodes: Array<HTMLElement | null> = [];
       const newNodes: Array<HTMLElement | null> = [];
       const oldApis: Array<Api | null> = [];
@@ -111,7 +111,7 @@ describe.each(['list', 'table'] as const)(
       expect(oldNodes).toEqual([node, null]);
       expect(oldApis).toEqual([api, null]);
     });
-    it('leaves committed refs untouched when replacement rendering is rejected', () => {
+    it('should leave committed refs untouched when replacement rendering is rejected', () => {
       const oldNode = { current: null as HTMLElement | null };
       const nextNode = { current: null as HTMLElement | null };
       const oldApi = { current: null as Api | null };

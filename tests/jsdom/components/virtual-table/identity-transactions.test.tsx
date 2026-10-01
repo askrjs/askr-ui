@@ -134,7 +134,7 @@ function setup(kind: 'list' | 'table', connected = true) {
   };
 }
 for (const phase of ['render', 'structural'] as const) {
-  it(`VirtualTable keeps committed key lookup after discarded ${phase} resolver`, async () => {
+  it(`should keep committed key lookup after discarded ${phase} resolver (VirtualTable)`, async () => {
     const view = setup('table');
     await settle();
     const api = view.api as VirtualTableApi<string>;
@@ -147,7 +147,7 @@ for (const phase of ['render', 'structural'] as const) {
     expect(api.getSelectedRowIndex()).toBe(1);
   });
   for (const kind of ['list', 'table'] as const) {
-    it(`Virtual ${kind} retains committed anchor after discarded ${phase} resolver`, async () => {
+    it(`should retain committed anchor after discarded ${phase} resolver (Virtual ${kind})`, async () => {
       const view = setup(kind);
       await settle();
       view.api.scrollToIndex(2, 'start');
@@ -184,7 +184,7 @@ for (const connected of [true, false]) {
   }
 }
 
-it('VirtualTable keeps an already pending anchor correction across another resolver render', () => {
+it('should keep an already pending anchor correction across another resolver render (VirtualTable)', () => {
   const rows = ['a', 'b', '', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
   const keys = rows;
   const oldKey = (row: string) => row;
@@ -214,7 +214,7 @@ it('VirtualTable keeps an already pending anchor correction across another resol
 });
 
 for (const kind of ['list', 'table'] as const) {
-  it(`Virtual ${kind} retains committed native scroll callback after rejected structural props`, async () => {
+  it(`should retain committed native scroll callback after rejected structural props (Virtual ${kind})`, async () => {
     let proposed = false;
     let insertSibling = false;
     const oldScroll = vi.fn();
@@ -291,7 +291,7 @@ for (const kind of ['list', 'table'] as const) {
     expect(oldScroll).toHaveBeenCalledTimes(1);
     expect(newScroll).not.toHaveBeenCalled();
   });
-  it(`Virtual ${kind} publishes changed dataset before replacement API callback runs`, () => {
+  it(`should publish changed dataset before replacement API callback runs (Virtual ${kind})`, () => {
     let rows = ['a', 'b'];
     let replacement = false;
     const snapshots: Array<number> = [];
@@ -346,7 +346,7 @@ for (const kind of ['list', 'table'] as const) {
     createIsland({ root, component: Root });
     expect(snapshots).toEqual([2, 3]);
   });
-  it(`Virtual ${kind} restores refs after rejected structural replacement`, async () => {
+  it(`should restore refs after rejected structural replacement (Virtual ${kind})`, async () => {
     let replace = false;
     let insertSibling = false;
     const oldNode = { current: null as HTMLElement | null };
@@ -441,7 +441,7 @@ for (const kind of ['list', 'table'] as const) {
 
 for (const phase of ['render', 'structural'] as const) {
   for (const kind of ['list', 'table'] as const) {
-    it(`Virtual ${kind} retains committed row geometry after rejected ${phase} props`, async () => {
+    it(`should retain committed row geometry after rejected ${phase} props (Virtual ${kind})`, async () => {
       let proposed = false;
       let rejected = false;
       let insertSibling = false;
@@ -513,7 +513,7 @@ for (const phase of ['render', 'structural'] as const) {
     });
   }
 }
-it('VirtualTable retains committed selection callback after rejected structural props', async () => {
+it('should retain committed selection callback after rejected structural props (VirtualTable)', async () => {
   let proposed = false;
   let insertSibling = false;
   const oldSelection = vi.fn();
@@ -572,7 +572,7 @@ it('VirtualTable retains committed selection callback after rejected structural 
 });
 
 for (const kind of ['list', 'table'] as const) {
-  it(`Virtual ${kind} retains committed replacement bindings when a caller ref throws`, async () => {
+  it(`should retain committed replacement bindings when a caller ref throws (Virtual ${kind})`, async () => {
     let replaced = false;
     let throwRef = true;
     const oldNode = { current: null as HTMLElement | null };
@@ -701,7 +701,7 @@ for (const movement of ['programmatic', 'user'] as const) {
 
 for (const phase of ['render', 'structural'] as const) {
   for (const kind of ['list', 'table'] as const) {
-    it(`Virtual ${kind} does not retain unused dynamic layout rule after rejected ${phase} geometry`, async () => {
+    it(`should not retain unused dynamic layout rule after rejected ${phase} geometry (Virtual ${kind})`, async () => {
       for (const style of document.querySelectorAll(
         'style[data-askr-dynamic-styles]'
       ))
@@ -780,7 +780,7 @@ for (const phase of ['render', 'structural'] as const) {
 }
 
 for (const kind of ['list', 'table'] as const) {
-  it(`Virtual ${kind} collects SSR layout rules without mutating an available document`, () => {
+  it(`should collect SSR layout rules without mutating an available document (Virtual ${kind})`, () => {
     const before = document.head.innerHTML;
     let styles = '';
     const rows = ['a', 'b', 'c'];
@@ -824,7 +824,7 @@ for (const kind of ['list', 'table'] as const) {
     expect(document.head.innerHTML).toBe(before);
   });
 }
-it('prepared dynamic CSS validates synchronously and publishes the captured serialized declarations once', () => {
+it('should validate prepared dynamic CSS synchronously and publish the captured serialized declarations once', () => {
   const before = document.head.innerHTML;
   expect(() =>
     prepareDynamicStyleRule(

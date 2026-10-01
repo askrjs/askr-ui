@@ -35,7 +35,7 @@ test.describe('Avatar - Behavior', () => {
   });
 });
 
-test('Avatar preserves fallback while replacement source is loading', async ({
+test('should preserve fallback while replacement source is loading (Avatar)', async ({
   page,
   render,
   root,

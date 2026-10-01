@@ -211,7 +211,7 @@ test.describe('Tooltip - Behavior', () => {
   });
 });
 
-test('Tooltip associates the actual custom content ID in committed markup', async ({
+test('should associate the actual custom content ID in committed markup (Tooltip)', async ({
   render,
   root,
   page,
@@ -225,7 +225,7 @@ test('Tooltip associates the actual custom content ID in committed markup', asyn
     'caller-tooltip-content'
   );
 });
-test('Tooltip preserves explicit caller ARIA with a custom content ID', async ({
+test('should preserve explicit caller ARIA with a custom content ID (Tooltip)', async ({
   render,
   root,
   page,

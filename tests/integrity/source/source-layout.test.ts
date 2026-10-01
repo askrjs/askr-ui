@@ -403,10 +403,29 @@ describe('Source layout', () => {
       join(componentsDirectory, 'hover-card', 'hover-card.tsx'),
       'utf8'
     );
-    expect(hoverCardSource).toContain("addEventListener('pointerover'");
-    expect(hoverCardSource).toContain(
-      "removeEventListener(\n            'pointerover'"
+    const pointerWatchSource = hoverCardSource.slice(
+      hoverCardSource.indexOf('  watch(')
     );
+    expect(pointerWatchSource).toMatch(
+      /watch\(\s*\(\)\s*=>\s*syncPointer,\s*\(committedSync\)\s*=>\s*\{\s*pointerEntry\.sync\s*=\s*committedSync;/
+    );
+    expect(pointerWatchSource).toContain('if (pointerEntry.handler) return;');
+    expect(pointerWatchSource).toMatch(
+      /pointerEntry\.document\s*=\s*overlayNodes\.trigger\?\.ownerDocument\s*\?\?\s*overlayNodes\.content\?\.ownerDocument\s*\?\?\s*document;/
+    );
+    expect(pointerWatchSource).toMatch(
+      /pointerEntry\.document\.addEventListener\(\s*'pointerover',\s*pointerEntry\.handler\s*\)/
+    );
+    expect(
+      hoverCardSource.match(/\.addEventListener\(\s*'pointerover'/g)
+    ).toHaveLength(1);
+    expect(pointerWatchSource).toMatch(
+      /cleanupSignal\.addEventListener\(\s*'abort',[\s\S]*?pointerEntry\.document\.removeEventListener\(\s*'pointerover',\s*pointerEntry\.handler\s*\)/
+    );
+    expect(pointerWatchSource).toContain('pointerEntry.document = null;');
+    expect(pointerWatchSource).toContain('pointerEntry.handler = null;');
+    expect(pointerWatchSource).toContain('pointerEntry.sync = null;');
+    expect(pointerWatchSource).toContain('{ once: true }');
     expect(hoverCardSource).toContain('clearOpenTimer()');
 
     const tooltipSuite = readBehaviorSuite('tooltip');

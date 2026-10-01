@@ -267,7 +267,7 @@ test.describe('Toast - Behavior', () => {
   });
 });
 
-test('Toast propagates native attributes and callbacks after rerender', async ({
+test('should propagate native attributes and callbacks after rerender (Toast)', async ({
   render,
   run,
   root,
@@ -287,7 +287,7 @@ test('Toast propagates native attributes and callbacks after rerender', async ({
   expect(await run('childCalls')).toEqual(['new']);
 });
 
-test('ToastViewport asChild puts notification stack inside supplied host', async ({
+test('should put notification stack inside supplied host (ToastViewport asChild)', async ({
   render,
   root,
 }) => {
@@ -300,7 +300,7 @@ test('ToastViewport asChild puts notification stack inside supplied host', async
   await expect(host).toContainText('Caller content');
 });
 
-test('Toast close uses the latest callback after rerender', async ({
+test('should use the latest callback after rerender (Toast close)', async ({
   render,
   run,
   root,
@@ -312,7 +312,7 @@ test('Toast close uses the latest callback after rerender', async ({
   expect(await run('childCalls')).toEqual(['new']);
 });
 
-test('Toast keeps declaration order when the first registration updates', async ({
+test('should keep declaration order when the first registration updates (Toast)', async ({
   render,
   run,
   root,

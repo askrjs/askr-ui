@@ -265,7 +265,7 @@ test.describe('VirtualTable - Behavior', () => {
   });
 });
 
-test('VirtualTable selects every valid falsy row by index and key', async ({
+test('should select every valid falsy row by index and key (VirtualTable)', async ({
   render,
   run,
 }) => {
@@ -281,7 +281,7 @@ test('VirtualTable selects every valid falsy row by index and key', async ({
     expect(await run('select', index)).toEqual({ key: '4', index: 4 });
 });
 
-test('Virtual components clear replaced object refs', async ({
+test('should clear replaced object refs (Virtual components)', async ({
   render,
   run,
 }) => {
@@ -320,7 +320,7 @@ test('Virtual components clear replaced object refs', async ({
   });
 });
 
-test('Virtual components retain an empty-string anchor key when rows are prepended', async ({
+test('should retain an empty-string anchor key when rows are prepended (Virtual components)', async ({
   render,
   run,
 }) => {
@@ -331,7 +331,7 @@ test('Virtual components retain an empty-string anchor key when rows are prepend
   await expect.poll(() => run('scrollTops')).toEqual({ list: 112, table: 112 });
 });
 
-test('VirtualTable uses changed getKey callback with the same rows array', async ({
+test('should use changed getKey callback with the same rows array (VirtualTable)', async ({
   render,
   run,
   root,
@@ -341,7 +341,7 @@ test('VirtualTable uses changed getKey callback with the same rows array', async
   await expect(root.locator('[data-row-key="new-c"]')).toHaveCount(1);
   expect(await run('select')).toEqual({ key: 'new-c', index: 2 });
 });
-test('Virtual components anchor newly rendered keys after getKey changes', async ({
+test('should anchor newly rendered keys after getKey changes (Virtual components)', async ({
   render,
   run,
 }) => {
@@ -353,7 +353,7 @@ test('Virtual components anchor newly rendered keys after getKey changes', async
   await expect.poll(() => run('scrollTops')).toEqual({ list: 84, table: 84 });
 });
 
-test('VirtualTable honors ancestor keyboard cancellation', async ({
+test('should honor ancestor keyboard cancellation (VirtualTable)', async ({
   page,
   render,
   root,
@@ -376,7 +376,7 @@ test('VirtualTable honors ancestor keyboard cancellation', async ({
 });
 
 for (const phase of ['render', 'structural'] as const) {
-  test(`Virtual keys stay committed after discarded ${phase} resolver`, async ({
+  test(`should stay committed after discarded ${phase} resolver (Virtual keys)`, async ({
     render,
     root,
     run,
@@ -417,7 +417,7 @@ for (const phase of ['render', 'structural'] as const) {
 }
 
 for (const phase of ['render', 'structural'] as const) {
-  test(`Virtual components retain committed geometry after rejected ${phase} properties`, async ({
+  test(`should retain committed geometry after rejected ${phase} properties (Virtual components)`, async ({
     render,
     run,
   }) => {
@@ -426,7 +426,7 @@ for (const phase of ['render', 'structural'] as const) {
     expect(await run('reject', phase)).toBe('discarded virtual properties');
     expect(await run('geometry')).toEqual({ list: 112, table: 140 });
   });
-  test(`Virtual components retain native scroll callbacks after rejected ${phase} properties`, async ({
+  test(`should retain native scroll callbacks after rejected ${phase} properties (Virtual components)`, async ({
     render,
     run,
   }) => {
@@ -437,7 +437,7 @@ for (const phase of ['render', 'structural'] as const) {
       'old-table-scroll',
     ]);
   });
-  test(`VirtualTable retains selection callback after rejected ${phase} properties`, async ({
+  test(`should retain selection callback after rejected ${phase} properties (VirtualTable)`, async ({
     render,
     run,
   }) => {

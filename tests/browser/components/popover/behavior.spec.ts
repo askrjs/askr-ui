@@ -246,7 +246,7 @@ test.describe('Popover - Behavior', () => {
 });
 
 for (const part of ['trigger', 'content'] as const) {
-  test(`Popover associates actual custom ${part} IDs in committed markup`, async ({
+  test(`should associate actual custom ${part} IDs in committed markup (Popover)`, async ({
     render,
     root,
     page,
@@ -267,7 +267,7 @@ for (const part of ['trigger', 'content'] as const) {
     await expect(content).toHaveAttribute('aria-labelledby', triggerId!);
   });
 }
-test('Popover preserves explicit caller ARIA with custom part IDs', async ({
+test('should preserve explicit caller ARIA with custom part IDs (Popover)', async ({
   render,
   root,
   page,

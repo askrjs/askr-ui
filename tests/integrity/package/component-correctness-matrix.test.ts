@@ -12,11 +12,7 @@ const UNIVERSAL_SUITES = ['a11y', 'behavior', 'determinism'] as const;
  * can only shrink. Port a suite to `<suite>.spec.ts` plus its scenario module,
  * then remove its entry. A new family must ship Playwright specs.
  */
-const UNPORTED_LEGACY_SUITES = new Set([
-  'input/a11y',
-  'input/behavior',
-  'input/determinism',
-]);
+const UNPORTED_LEGACY_SUITES = new Set<string>();
 
 function suitePath(name: string, file: string): string {
   return join(process.cwd(), 'tests', 'browser', 'components', name, file);

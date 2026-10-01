@@ -48,7 +48,7 @@ describe('Overlay server ID associations', () => {
       }
     );
 
-    it(`${family} should preserve caller reference attributes`, () => {
+    it(`should preserve caller reference attributes (${family})`, () => {
       const Root = family === 'popover' ? Popover : HoverCard;
       const Trigger = family === 'popover' ? PopoverTrigger : HoverCardTrigger;
       const Content = family === 'popover' ? PopoverContent : HoverCardContent;
@@ -68,7 +68,7 @@ describe('Overlay server ID associations', () => {
       expect(html).not.toContain('aria-labelledby="custom-trigger"');
     });
 
-    it(`${family} should preserve caller reference omission`, () => {
+    it(`should preserve caller reference omission (${family})`, () => {
       const Root = family === 'popover' ? Popover : HoverCard;
       const Trigger = family === 'popover' ? PopoverTrigger : HoverCardTrigger;
       const Content = family === 'popover' ? PopoverContent : HoverCardContent;
@@ -83,7 +83,7 @@ describe('Overlay server ID associations', () => {
     });
   }
 
-  it('tooltip should associate the custom later content ID once', () => {
+  it('should associate the custom later content ID once (tooltip)', () => {
     let reads = 0;
     const LaterContent = () => (
       <TooltipContent
