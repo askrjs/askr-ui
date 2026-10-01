@@ -170,12 +170,14 @@ export const test = base.extend<Fixtures>({
         : [specModule, name];
       await openHarness(page);
       await page.evaluate(
-        ([scenarioFile, scenarioName, scenarioOptions]) =>
-          (window as unknown as HarnessWindow).askrHarness.mount(
+        async ([scenarioFile, scenarioName, scenarioOptions]) => {
+          await (window as unknown as HarnessWindow).askrHarness.mount(
             scenarioFile as string,
             scenarioName as string,
             scenarioOptions
-          ),
+          );
+          return null;
+        },
         [file, exportName, options ?? null] as const
       );
     });
