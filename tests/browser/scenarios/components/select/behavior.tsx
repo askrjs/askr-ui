@@ -1,5 +1,6 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { state } from '@askrjs/askr';
+import { For } from '@askrjs/askr/control';
 import {
   Select,
   SelectContent,
@@ -12,6 +13,133 @@ import {
   SelectValue,
 } from '../../../../../src/components/select';
 import { flushUpdates, mount, spy } from '../../_mount';
+
+export function customContentId(
+  root: HTMLElement,
+  options: { callerAria?: boolean } = {}
+) {
+  let contentId!: ReturnType<typeof state<string>>;
+  function CustomSelect() {
+    contentId = state('caller-select-content');
+    return (
+      <Select defaultOpen>
+        <SelectTrigger
+          aria-controls={
+            options.callerAria ? 'caller-owned-controls' : undefined
+          }
+        >
+          <SelectValue placeholder="Choose" />
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectContent id={() => contentId()}>
+            <SelectItem value="one">One</SelectItem>
+          </SelectContent>
+        </SelectPortal>
+      </Select>
+    );
+  }
+  mount(<CustomSelect />, root);
+  return {
+    updateId: async () => {
+      contentId.set('updated-select-content');
+      await flushUpdates();
+    },
+  };
+}
+
+export function reactiveGroupLabelId(root: HTMLElement) {
+  let labelId!: ReturnType<typeof state<string>>;
+  let shown!: ReturnType<typeof state<boolean>>;
+  function CallerLabel() {
+    labelId = state('caller-frameworks');
+    shown = state(true);
+    return shown() ? (
+      <SelectLabel id={() => labelId()}>Frameworks</SelectLabel>
+    ) : null;
+  }
+  mount(
+    <Select>
+      <SelectGroup>
+        <CallerLabel />
+      </SelectGroup>
+    </Select>,
+    root
+  );
+  return {
+    updateId: async () => {
+      labelId.set('updated-frameworks');
+      await flushUpdates();
+    },
+    hide: async () => {
+      shown.set(false);
+      await flushUpdates();
+    },
+    show: async () => {
+      shown.set(true);
+      await flushUpdates();
+    },
+  };
+}
+
+export function ownKeyboardCaller(
+  root: HTMLElement,
+  options: { cancel?: boolean; target?: 'trigger' | 'item' } = {}
+) {
+  let calls = 0;
+  const onKeyDown = (event: KeyboardEvent) => {
+    calls += 1;
+    if (options.cancel) event.preventDefault();
+  };
+  mount(
+    <Select defaultOpen={options.target === 'item'} defaultValue="one">
+      <SelectTrigger
+        data-caller="preserved"
+        onKeyDown={options.target === 'trigger' ? onKeyDown : undefined}
+      >
+        <SelectValue />
+      </SelectTrigger>
+      <SelectPortal>
+        <SelectContent>
+          <SelectItem
+            value="one"
+            data-caller="preserved"
+            onKeyDown={options.target === 'item' ? onKeyDown : undefined}
+          >
+            One
+          </SelectItem>
+          <SelectItem value="two">Two</SelectItem>
+        </SelectContent>
+      </SelectPortal>
+    </Select>,
+    root
+  );
+  return { calls: () => calls };
+}
+
+export function callerCancellation(root: HTMLElement) {
+  let calls = 0;
+  mount(
+    <Select defaultOpen defaultValue="one">
+      <SelectTrigger>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectPortal>
+        <SelectContent
+          data-caller="preserved"
+          onKeyDown={(event) => {
+            calls += 1;
+            event.preventDefault();
+          }}
+        >
+          <SelectItem value="one">One</SelectItem>
+          <SelectItem value="two">Two</SelectItem>
+        </SelectContent>
+      </SelectPortal>
+    </Select>,
+    root
+  );
+  return { calls: () => calls };
+}
 
 export function viewportResize(root: HTMLElement): void {
   mount(
@@ -396,4 +524,102 @@ export async function formReset(root: HTMLElement) {
     },
     calls: () => onValueChange.calls,
   };
+}
+
+function WrappedOptions() {
+  return (
+    <>
+      <SelectItem value="askr">Askr</SelectItem>
+      <SelectItem value="solid">Solid</SelectItem>
+    </>
+  );
+}
+function WrappedLabel() {
+  return <SelectLabel>Frameworks</SelectLabel>;
+}
+export function wrappedOptions(
+  root: HTMLElement,
+  options?: { forRendered?: boolean }
+): void {
+  mount(
+    <form>
+      <Select name="framework" defaultValue="askr">
+        <SelectTrigger>
+          <SelectValue placeholder="Choose one" />
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectContent>
+            <SelectGroup>
+              <WrappedLabel />
+              {options?.forRendered ? (
+                <For
+                  each={[
+                    { value: 'askr', text: 'Askr' },
+                    { value: 'solid', text: 'Solid' },
+                  ]}
+                  by={(item) => item.value}
+                >
+                  {(item) => (
+                    <SelectItem value={item.value}>{item.text}</SelectItem>
+                  )}
+                </For>
+              ) : (
+                <WrappedOptions />
+              )}
+            </SelectGroup>
+          </SelectContent>
+        </SelectPortal>
+      </Select>
+      <button type="reset">Reset choice</button>
+    </form>,
+    root
+  );
+}
+
+export function removableWrappedLabel(root: HTMLElement) {
+  let shown!: ReturnType<typeof state<boolean>>;
+  function WrappedDynamicLabel() {
+    shown = state(true);
+    return shown() ? <SelectLabel>Frameworks</SelectLabel> : null;
+  }
+  mount(
+    <Select defaultOpen>
+      <SelectGroup>
+        <WrappedDynamicLabel />
+        <SelectItem value="askr">Askr</SelectItem>
+      </SelectGroup>
+      <SelectGroup aria-labelledby="caller-label">
+        <SelectLabel>Internal label</SelectLabel>
+        <SelectItem value="solid">Solid</SelectItem>
+      </SelectGroup>
+      <span id="caller-label">Caller name</span>
+    </Select>,
+    root
+  );
+  return {
+    hideLabel: () => shown.set(false),
+    showLabel: () => shown.set(true),
+  };
+}
+
+export function removedLiteralOption(root: HTMLElement) {
+  let shown!: ReturnType<typeof state<boolean>>;
+  function LiteralOptions() {
+    shown = state(true);
+    return (
+      <Select value="askr">
+        <SelectTrigger>
+          <SelectValue placeholder="Choose one" />
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectContent>
+            {shown() ? <SelectItem value="askr">Askr</SelectItem> : null}
+            <SelectItem value="solid">Solid</SelectItem>
+          </SelectContent>
+        </SelectPortal>
+      </Select>
+    );
+  }
+  mount(<LiteralOptions />, root);
+  return { removeSelected: () => shown.set(false) };
 }

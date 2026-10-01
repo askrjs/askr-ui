@@ -10,6 +10,165 @@ function button(root: Locator, name: string): Locator {
 }
 
 test.describe('Accordion - Behavior', () => {
+  test('should keep editable panel arrows native', async ({
+    page,
+    render,
+    root,
+    run,
+  }) => {
+    await render('editablePanel');
+    const notes = root.getByRole('textbox', { name: 'Notes' });
+    await notes.focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(notes).toBeFocused({ timeout: 1000 });
+    expect(await run<boolean>('prevented')).toBe(false);
+  });
+
+  test('should navigate while preserving caller data attributes', async ({
+    page,
+    render,
+    root,
+  }) => {
+    await render('callerNavigationProps');
+    const first = button(root, 'One');
+    await expect(root.locator('[data-accordion="caller-root"]')).toHaveCount(1);
+    await expect(first).toHaveAttribute('data-slot', 'caller-trigger');
+    await expect(first).toHaveAttribute('data-roving-index', 'caller-index');
+    await expect(first).toHaveAttribute('data-disabled', 'caller-value');
+    await first.focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(button(root, 'Two')).toBeFocused({ timeout: 1000 });
+  });
+
+  test('should preserve trigger focus when the caller cancels navigation', async ({
+    page,
+    render,
+    root,
+    run,
+  }) => {
+    await render('callerCancellation');
+    const first = button(root, 'One');
+    await expect(root.locator('[data-caller="preserved"]')).toHaveCount(1);
+    await first.focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(first).toBeFocused({ timeout: 1000 });
+    expect(await run<number>('calls')).toBe(1);
+  });
+
+  for (const key of ['Home', 'End']) {
+    test(`should restore virtual dataset boundary focus with ${key}`, async ({
+      page,
+      render,
+      root,
+      run,
+    }) => {
+      await render('virtualizedWindow');
+      await run('scrollTo', 800);
+      await expect(root.locator('[data-slot="virtual-list"]')).toHaveAttribute(
+        'data-virtual-visible-start-index',
+        '40'
+      );
+      await run('focusButton', 'Item 41');
+      await page.keyboard.press(key);
+      await expect(
+        button(root, key === 'Home' ? 'Item 0' : 'Item 99')
+      ).toBeFocused({ timeout: 1000 });
+    });
+  }
+
+  test('should preserve trigger focus when an ancestor cancels an orientation arrow', async ({
+    page,
+    render,
+    root,
+  }) => {
+    await render('keyboardNavigation');
+    const first = root.getByRole('button', { name: 'One', exact: true });
+    await first.focus();
+    await first.evaluate((node: HTMLElement) => {
+      node
+        .closest('[data-accordion]')!
+        .addEventListener('keydown', (event) => event.preventDefault(), {
+          capture: true,
+          once: true,
+        });
+    });
+    await page.keyboard.press('ArrowDown');
+    await expect(first).toBeFocused({ timeout: 1000 });
+  });
+
+  for (const action of ['click', 'Enter', 'Space'] as const) {
+    test(`should suppress ${action} activation canceled by an ancestor in capture`, async ({
+      page,
+      render,
+      root,
+    }) => {
+      await render('asChildKeyboardActivation');
+      const trigger = root.locator('[data-slot="accordion-trigger"]');
+      await trigger.focus();
+      await trigger.evaluate(
+        (node: HTMLElement, eventType: string) => {
+          node
+            .closest('#mount-root')!
+            .addEventListener(eventType, (event) => event.preventDefault(), {
+              capture: true,
+              once: true,
+            });
+        },
+        action === 'click' ? 'click' : action === 'Enter' ? 'keydown' : 'keyup'
+      );
+      if (action === 'click') {
+        await trigger.evaluate((node: HTMLElement) => node.click());
+      } else {
+        await page.keyboard.press(action === 'Enter' ? 'Enter' : ' ');
+      }
+      await expect(trigger).toHaveAttribute('aria-expanded', 'false', {
+        timeout: 1000,
+      });
+    });
+  }
+
+  test('should navigate from the focused trigger without changing the open panel', async ({
+    page,
+    render,
+    root,
+  }) => {
+    await render('keyboardNavigation');
+    const one = button(root, 'One');
+    const three = button(root, 'Three');
+    const four = button(root, 'Four');
+
+    await one.focus();
+    await page.keyboard.press('Tab');
+    await expect(three).toBeFocused();
+    await page.keyboard.press('ArrowDown');
+    await expect(four).toBeFocused();
+    await page.keyboard.press('ArrowDown');
+    await expect(one).toBeFocused();
+    await page.keyboard.press('ArrowUp');
+    await expect(four).toBeFocused();
+    await expect(one).toHaveAttribute('aria-expanded', 'true');
+    await expect(three).toHaveAttribute('aria-expanded', 'false');
+    await expect(four).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('should navigate to enabled boundaries with Home and End', async ({
+    page,
+    render,
+    root,
+  }) => {
+    await render('keyboardNavigation');
+    const one = button(root, 'One');
+    const three = button(root, 'Three');
+    const four = button(root, 'Four');
+
+    await three.focus();
+    await page.keyboard.press('Home');
+    await expect(one).toBeFocused();
+    await page.keyboard.press('End');
+    await expect(four).toBeFocused();
+    await expect(one).toHaveAttribute('aria-expanded', 'true');
+  });
+
   test('should mount single and multiple accordions without render-time state errors', async ({
     render,
     root,

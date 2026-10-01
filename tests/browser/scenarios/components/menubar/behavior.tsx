@@ -13,6 +13,184 @@ import {
 import { getCompositeCollection } from '../../../../../src/components/_internal/composite';
 import { flushUpdates, mount, spy } from '../../_mount';
 
+export function customContentId(
+  root: HTMLElement,
+  options: { callerAria?: boolean } = {}
+) {
+  let contentId!: ReturnType<typeof state<string>>;
+  function CustomMenubar() {
+    contentId = state('caller-menubar-content');
+    return (
+      <Menubar>
+        <MenubarMenu value="file">
+          <MenubarTrigger
+            aria-controls={
+              options.callerAria ? 'caller-owned-controls' : undefined
+            }
+          >
+            File
+          </MenubarTrigger>
+          <MenubarPortal>
+            <MenubarContent id={() => contentId()}>
+              <MenubarItem>One</MenubarItem>
+            </MenubarContent>
+          </MenubarPortal>
+        </MenubarMenu>
+      </Menubar>
+    );
+  }
+  mount(<CustomMenubar />, root);
+  return {
+    updateId: async () => {
+      contentId.set('updated-menubar-content');
+      await flushUpdates();
+    },
+  };
+}
+
+export function customTriggerId(
+  root: HTMLElement,
+  options: { callerAria?: boolean; submenu?: boolean } = {}
+) {
+  let triggerId!: ReturnType<typeof state<string>>;
+  function CustomMenubar() {
+    triggerId = state('caller-menu-trigger');
+    return (
+      <Menubar>
+        <MenubarMenu value="file">
+          <MenubarTrigger id={options.submenu ? undefined : () => triggerId()}>
+            File
+          </MenubarTrigger>
+          <MenubarPortal>
+            <MenubarContent
+              aria-labelledby={
+                !options.submenu && options.callerAria
+                  ? 'caller-owned-label'
+                  : undefined
+              }
+            >
+              {options.submenu ? (
+                <MenubarSub value="share">
+                  <MenubarSubTrigger id={() => triggerId()}>
+                    Share
+                  </MenubarSubTrigger>
+                  <MenubarPortal>
+                    <MenubarSubContent
+                      aria-labelledby={
+                        options.callerAria ? 'caller-owned-label' : undefined
+                      }
+                    >
+                      <MenubarItem>One</MenubarItem>
+                    </MenubarSubContent>
+                  </MenubarPortal>
+                </MenubarSub>
+              ) : (
+                <MenubarItem>One</MenubarItem>
+              )}
+            </MenubarContent>
+          </MenubarPortal>
+        </MenubarMenu>
+      </Menubar>
+    );
+  }
+  mount(<CustomMenubar />, root);
+  return {
+    updateId: async () => {
+      triggerId.set('updated-menu-trigger');
+      await flushUpdates();
+    },
+  };
+}
+
+export function ownKeyboardCaller(
+  root: HTMLElement,
+  options: { cancel?: boolean; target?: 'trigger' | 'item' | 'subtrigger' } = {}
+) {
+  let calls = 0;
+  const onKeyDown = (event: KeyboardEvent) => {
+    calls += 1;
+    if (options.cancel) event.preventDefault();
+  };
+  mount(
+    <Menubar>
+      <MenubarMenu value="file">
+        <MenubarTrigger
+          data-caller="preserved"
+          onKeyDown={options.target === 'trigger' ? onKeyDown : undefined}
+        >
+          File
+        </MenubarTrigger>
+        <MenubarPortal>
+          <MenubarContent>
+            <MenubarItem
+              data-caller="preserved"
+              onKeyDown={options.target === 'item' ? onKeyDown : undefined}
+            >
+              One
+            </MenubarItem>
+            <MenubarSub value="share">
+              <MenubarSubTrigger
+                data-caller="preserved"
+                onKeyDown={
+                  options.target === 'subtrigger' ? onKeyDown : undefined
+                }
+              >
+                Share
+              </MenubarSubTrigger>
+              <MenubarSubContent>
+                <MenubarItem>Email</MenubarItem>
+              </MenubarSubContent>
+            </MenubarSub>
+            <MenubarItem>Two</MenubarItem>
+          </MenubarContent>
+        </MenubarPortal>
+      </MenubarMenu>
+    </Menubar>,
+    root
+  );
+  return { calls: () => calls };
+}
+
+export function callerCancellation(
+  root: HTMLElement,
+  options: { content?: boolean } = {}
+) {
+  let calls = 0;
+  const onKeyDown = (event: KeyboardEvent) => {
+    calls += 1;
+    event.preventDefault();
+  };
+  mount(
+    <Menubar
+      data-caller="preserved"
+      onKeyDown={options.content ? undefined : onKeyDown}
+    >
+      <MenubarMenu value="file">
+        <MenubarTrigger>File</MenubarTrigger>
+        <MenubarPortal>
+          <MenubarContent
+            data-caller="preserved"
+            onKeyDown={options.content ? onKeyDown : undefined}
+          >
+            <MenubarItem>One</MenubarItem>
+            <MenubarItem>Two</MenubarItem>
+          </MenubarContent>
+        </MenubarPortal>
+      </MenubarMenu>
+      <MenubarMenu value="edit">
+        <MenubarTrigger>Edit</MenubarTrigger>
+        <MenubarPortal>
+          <MenubarContent>
+            <MenubarItem>Cut</MenubarItem>
+          </MenubarContent>
+        </MenubarPortal>
+      </MenubarMenu>
+    </Menubar>,
+    root
+  );
+  return { calls: () => calls };
+}
+
 async function flushPortalUpdates(): Promise<void> {
   await flushUpdates();
   await flushUpdates();
@@ -305,4 +483,62 @@ export async function rtlTriggers(root: HTMLElement): Promise<void> {
     root
   );
   await flushPortalUpdates();
+}
+
+export function disabledKeyboardTriggers(root: HTMLElement): void {
+  mount(
+    <Menubar>
+      <MenubarMenu value="disabled">
+        <MenubarTrigger disabled asChild>
+          <span>Disabled menu</span>
+        </MenubarTrigger>
+        <MenubarPortal>
+          <MenubarContent>
+            <MenubarItem>Disabled action</MenubarItem>
+          </MenubarContent>
+        </MenubarPortal>
+      </MenubarMenu>
+      <MenubarMenu value="enabled">
+        <MenubarTrigger>Enabled menu</MenubarTrigger>
+        <MenubarPortal>
+          <MenubarContent>
+            <MenubarItem>Enabled action</MenubarItem>
+            <MenubarSub value="disabled-sub">
+              <MenubarSubTrigger disabled asChild>
+                <span>Disabled submenu</span>
+              </MenubarSubTrigger>
+              <MenubarSubContent>
+                <MenubarItem>Disabled child action</MenubarItem>
+              </MenubarSubContent>
+            </MenubarSub>
+          </MenubarContent>
+        </MenubarPortal>
+      </MenubarMenu>
+    </Menubar>,
+    root
+  );
+}
+
+export function nestedItemFocus(root: HTMLElement): void {
+  mount(
+    <Menubar>
+      <MenubarMenu value="file">
+        <MenubarTrigger>File</MenubarTrigger>
+        <MenubarPortal>
+          <MenubarContent>
+            <MenubarItem>New</MenubarItem>
+            <MenubarSub value="share">
+              <MenubarSubTrigger>Share</MenubarSubTrigger>
+              <MenubarSubContent>
+                <MenubarItem>Email</MenubarItem>
+                <MenubarItem disabled>SMS</MenubarItem>
+                <MenubarItem>Chat</MenubarItem>
+              </MenubarSubContent>
+            </MenubarSub>
+          </MenubarContent>
+        </MenubarPortal>
+      </MenubarMenu>
+    </Menubar>,
+    root
+  );
 }

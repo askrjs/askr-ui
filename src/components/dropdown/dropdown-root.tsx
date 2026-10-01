@@ -5,9 +5,11 @@ import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import {
   captureOverlayNonce,
   createOverlayIdentity,
+  getOverlayNodes,
   getPersistentPortal,
   setOverlayStackActive,
 } from '../_internal/overlay';
+import { syncIdAssociation } from '../_internal/id-association';
 import {
   focusCollectionItemWithRestore,
   restorePendingCollectionItemFocus,
@@ -43,6 +45,16 @@ export function Dropdown(props: DropdownProps) {
   });
   const dropdownId = resolveCompoundId('dropdown', id, children);
   const overlayIdentity = state(createOverlayIdentity())();
+  const automaticIds = state({ controls: true })();
+  const syncPartIds = () => {
+    const nodes = getOverlayNodes(overlayIdentity);
+    syncIdAssociation(
+      nodes.trigger,
+      nodes.content,
+      'aria-controls',
+      automaticIds.controls
+    );
+  };
   const cleanupSignal = getSignal();
   setOverlayStackActive(overlayIdentity, openState(), cleanupSignal);
   captureOverlayNonce(overlayIdentity, cspNonce());
@@ -57,6 +69,7 @@ export function Dropdown(props: DropdownProps) {
   const rootContextBase = {
     dropdownId,
     overlayIdentity,
+    idAssociation: { automatic: automaticIds, sync: syncPartIds },
     currentIndexCandidate: currentIndexState(),
   };
   const resolvedState = resolveDropdownState(rootContextBase);

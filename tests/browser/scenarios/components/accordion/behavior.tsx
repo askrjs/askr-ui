@@ -97,6 +97,114 @@ export function openStateModes(root: HTMLElement): void {
   );
 }
 
+export function keyboardNavigation(root: HTMLElement): void {
+  mount(
+    <Accordion defaultValue="one">
+      <AccordionItem value="one">
+        <AccordionHeader>
+          <AccordionTrigger>One</AccordionTrigger>
+        </AccordionHeader>
+        <AccordionContent>First panel</AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="two" disabled>
+        <AccordionHeader>
+          <AccordionTrigger>Two</AccordionTrigger>
+        </AccordionHeader>
+        <AccordionContent>Second panel</AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="three">
+        <AccordionHeader>
+          <AccordionTrigger>Three</AccordionTrigger>
+        </AccordionHeader>
+        <AccordionContent>Third panel</AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="four">
+        <AccordionHeader>
+          <AccordionTrigger>Four</AccordionTrigger>
+        </AccordionHeader>
+        <AccordionContent>Fourth panel</AccordionContent>
+      </AccordionItem>
+    </Accordion>,
+    root
+  );
+}
+
+export function editablePanel(root: HTMLElement) {
+  const container = mount(
+    <Accordion defaultValue="one">
+      <AccordionItem value="one">
+        <AccordionHeader>
+          <AccordionTrigger>One</AccordionTrigger>
+        </AccordionHeader>
+        <AccordionContent>
+          <textarea aria-label="Notes">First line\nSecond line</textarea>
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="two">
+        <AccordionHeader>
+          <AccordionTrigger>Two</AccordionTrigger>
+        </AccordionHeader>
+      </AccordionItem>
+    </Accordion>,
+    root
+  );
+  let prevented: boolean | null = null;
+  container.addEventListener('keydown', (event) => {
+    prevented = event.defaultPrevented;
+  });
+  return { prevented: () => prevented };
+}
+
+export function callerNavigationProps(root: HTMLElement) {
+  mount(
+    <Accordion data-accordion="caller-root">
+      <AccordionItem value="one">
+        <AccordionHeader>
+          <AccordionTrigger
+            data-slot="caller-trigger"
+            data-roving-index="caller-index"
+            data-disabled="caller-value"
+          >
+            One
+          </AccordionTrigger>
+        </AccordionHeader>
+      </AccordionItem>
+      <AccordionItem value="two">
+        <AccordionHeader>
+          <AccordionTrigger>Two</AccordionTrigger>
+        </AccordionHeader>
+      </AccordionItem>
+    </Accordion>,
+    root
+  );
+}
+
+export function callerCancellation(root: HTMLElement) {
+  let calls = 0;
+  mount(
+    <Accordion
+      data-caller="preserved"
+      onKeyDown={(event) => {
+        calls += 1;
+        event.preventDefault();
+      }}
+    >
+      <AccordionItem value="one">
+        <AccordionHeader>
+          <AccordionTrigger>One</AccordionTrigger>
+        </AccordionHeader>
+      </AccordionItem>
+      <AccordionItem value="two">
+        <AccordionHeader>
+          <AccordionTrigger>Two</AccordionTrigger>
+        </AccordionHeader>
+      </AccordionItem>
+    </Accordion>,
+    root
+  );
+  return { calls: () => calls };
+}
+
 export function consecutiveUncontrolledUpdates(root: HTMLElement) {
   const changes: string[][] = [];
 

@@ -1,8 +1,10 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { cspNonce, getSignal, state } from '@askrjs/askr';
+import { watch } from '@askrjs/askr/resources';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import { formResetRef } from '../_internal/form-reset';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
+import { syncIdAssociation } from '../_internal/id-association';
 import { collectJsxElements } from '../_internal/jsx';
 import {
   captureOverlayNonce,
@@ -56,6 +58,16 @@ export function Select(props: SelectProps) {
   } = props;
   const selectId = resolveCompoundId('select', id, children);
   const overlayIdentity = state(createOverlayIdentity())();
+  const automaticIds = state({ controls: true })();
+  const syncPartIds = () => {
+    const nodes = getOverlayNodes(overlayIdentity);
+    syncIdAssociation(
+      nodes.trigger,
+      nodes.content,
+      'aria-controls',
+      automaticIds.controls
+    );
+  };
   const cleanupSignal = getSignal();
   captureOverlayNonce(overlayIdentity, cspNonce());
   registerTypeaheadCleanup(overlayIdentity, cleanupSignal);
@@ -105,6 +117,7 @@ export function Select(props: SelectProps) {
   const rootContextBase = {
     selectId,
     overlayIdentity,
+    idAssociation: { automatic: automaticIds, sync: syncPartIds },
     value: valueState(),
     open: openState(),
     currentIndexCandidate: currentIndexState(),
@@ -113,7 +126,29 @@ export function Select(props: SelectProps) {
     declaredItems,
   };
   const collection = observeMenuCollectionCount(selectId);
+  const observedLabels = state(new Map<string, string>())();
   const resolvedState = resolveSelectState(rootContextBase);
+  if (
+    !openState() &&
+    !resolvedState.items.some((item) => item.value === valueState())
+  ) {
+    resolvedState.selectedText = observedLabels.get(valueState()) ?? '';
+  }
+  watch(
+    () => resolvedState.items,
+    (committedItems) => {
+      for (const item of committedItems) {
+        if (item.value === undefined) continue;
+        // Literal options keep following current JSX props. Only labels that
+        // require mounted descendants need a fallback when the popup closes.
+        if (declaredItems.some((declared) => declared.value === item.value)) {
+          observedLabels.delete(item.value);
+        } else {
+          observedLabels.set(item.value, item.text);
+        }
+      }
+    }
+  );
   const focusItem = (index: number) => {
     const itemValue = resolvedState.items.find(
       (item) => item.index === index

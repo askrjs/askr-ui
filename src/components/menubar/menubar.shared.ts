@@ -1,4 +1,6 @@
-import { defineScope, readScope } from '@askrjs/askr';
+import { defineScope, readScope, state } from '@askrjs/askr';
+import { getOverlayNodes } from '../_internal/overlay';
+import { syncIdAssociation } from '../_internal/id-association';
 import {
   getCompositeCollection,
   getCompositeCollectionItems,
@@ -67,6 +69,35 @@ export type MenubarRootRenderContextValue = {
 };
 
 /** Shape of the Menubar Menu Context Value. */
+export type MenubarIdAssociation = {
+  automatic: { controls: boolean; labelledBy: boolean };
+  sync: () => void;
+};
+
+export function createMenubarIdAssociation(
+  identity: object
+): MenubarIdAssociation {
+  const automatic = state({ controls: true, labelledBy: true })();
+  return {
+    automatic,
+    sync: () => {
+      const nodes = getOverlayNodes(identity);
+      syncIdAssociation(
+        nodes.trigger,
+        nodes.content,
+        'aria-controls',
+        automatic.controls
+      );
+      syncIdAssociation(
+        nodes.content,
+        nodes.trigger,
+        'aria-labelledby',
+        automatic.labelledBy
+      );
+    },
+  };
+}
+
 export type MenubarMenuContextValue = {
   menuKey: string;
   menuIndex: number;
@@ -75,6 +106,7 @@ export type MenubarMenuContextValue = {
   contentId: string;
   portalId: string;
   overlayIdentity: object;
+  idAssociation: MenubarIdAssociation;
   path: string[];
 };
 
@@ -107,6 +139,7 @@ export type MenubarSubContextValue = {
   contentId: string;
   path: string[];
   overlayIdentity: object;
+  idAssociation: MenubarIdAssociation;
 };
 
 /** Menubar Root Resolved State. */
@@ -327,6 +360,7 @@ export function resolveMenubarContentOwner(): {
   triggerId: string;
   overlayId: string;
   overlayIdentity: object;
+  idAssociation: MenubarIdAssociation;
   path: string[];
 } {
   const subContext = readScope(MenubarSubContext);
@@ -337,6 +371,7 @@ export function resolveMenubarContentOwner(): {
       triggerId: subContext.triggerId,
       overlayId: subContext.triggerId,
       overlayIdentity: subContext.overlayIdentity,
+      idAssociation: subContext.idAssociation,
       path: subContext.path,
     };
   }
@@ -349,6 +384,7 @@ export function resolveMenubarContentOwner(): {
       triggerId: menuContext.triggerId,
       overlayId: menuContext.triggerId,
       overlayIdentity: menuContext.overlayIdentity,
+      idAssociation: menuContext.idAssociation,
       path: menuContext.path,
     };
   }

@@ -3,6 +3,7 @@ import { nativeRef } from '../_internal/native-ref';
 import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { mergeComponentProps } from '../_internal/component-props';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { registerOverlayNode } from '../_internal/overlay';
 import { runCancelablePress } from '../_internal/press';
@@ -73,7 +74,7 @@ export function SelectTrigger(
 
     interactionProps.onKeyUp?.(event);
   };
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
     onKeyUp: handleKeyUp,
@@ -84,12 +85,16 @@ export function SelectTrigger(
         | null
         | undefined,
       (node: HTMLElement | null) => {
+        if (node)
+          root.idAssociation.automatic.controls =
+            (rest as Record<string, unknown>)['aria-controls'] === undefined;
         registerOverlayNode(
           root.overlayIdentity,
           'trigger',
           node,
           overlayNodeOwner
         );
+        root.idAssociation.sync();
         root.bindFormReset(node);
       }
     ),

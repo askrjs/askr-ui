@@ -1,6 +1,82 @@
 import { expect, test } from '../../fixtures';
 
 test.describe('Menu - Behavior', () => {
+  for (const cancel of [false, true]) {
+    test(`should ${cancel ? 'suppress' : 'allow'} typeahead when the caller ${cancel ? 'cancels' : 'observes'} own item keydown`, async ({
+      page,
+      render,
+      root,
+      run,
+    }) => {
+      await render('ownKeyboardCaller', { cancel });
+      const first = root.getByRole('menuitem', { name: 'One', exact: true });
+      await expect(first).toHaveAttribute('data-caller', 'preserved');
+      await first.focus();
+      await page.keyboard.press('t');
+      await expect(
+        root.getByRole('menuitem', {
+          name: cancel ? 'One' : 'Two',
+          exact: true,
+        })
+      ).toBeFocused({ timeout: 1000 });
+      expect(await run<number>('calls')).toBe(1);
+    });
+  }
+
+  test('should preserve item focus when the caller cancels navigation', async ({
+    page,
+    render,
+    root,
+    run,
+  }) => {
+    await render('callerCancellation');
+    const first = root.getByRole('menuitem', { name: 'One', exact: true });
+    await expect(root.getByRole('menu')).toHaveAttribute(
+      'data-caller',
+      'preserved'
+    );
+    await first.focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(first).toBeFocused({ timeout: 1000 });
+    expect(await run<number>('calls')).toBe(1);
+  });
+
+  for (const key of ['ArrowDown', 'End']) {
+    test(`should preserve item focus when an ancestor cancels ${key}`, async ({
+      page,
+      render,
+      root,
+    }) => {
+      await render('verticalArrows');
+      const first = root.getByRole('menuitem', { name: 'One', exact: true });
+      await first.focus();
+      await first.evaluate((node: HTMLElement) => {
+        node
+          .closest('[role="menu"]')!
+          .addEventListener('keydown', (event) => event.preventDefault(), {
+            capture: true,
+            once: true,
+          });
+      });
+      await page.keyboard.press(key);
+      await expect(first).toBeFocused({ timeout: 1000 });
+    });
+  }
+
+  test('should navigate from an item focused directly by the caller', async ({
+    page,
+    render,
+    root,
+  }) => {
+    await render('verticalArrows');
+    const items = root.getByRole('menuitem');
+    await items.nth(2).focus();
+    await page.keyboard.press('ArrowUp');
+    await expect(items.nth(0)).toBeFocused();
+    await expect(items.nth(0)).toHaveAttribute('tabindex', '0');
+    await expect(items.nth(2)).toHaveAttribute('tabindex', '-1');
+  });
+
   test('should render menu semantics with a single tab stop', async ({
     render,
     root,

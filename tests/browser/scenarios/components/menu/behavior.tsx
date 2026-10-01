@@ -11,6 +11,51 @@ import {
 } from '../../../../../src/components/menu';
 import { flushUpdates, mount, spy } from '../../_mount';
 
+export function ownKeyboardCaller(
+  root: HTMLElement,
+  options: { cancel?: boolean } = {}
+) {
+  let calls = 0;
+  mount(
+    <Menu>
+      <MenuContent>
+        <MenuItem
+          data-caller="preserved"
+          onKeyDown={(event) => {
+            calls += 1;
+            if (options.cancel) event.preventDefault();
+          }}
+        >
+          One
+        </MenuItem>
+        <MenuItem>Two</MenuItem>
+      </MenuContent>
+    </Menu>,
+    root
+  );
+  return { calls: () => calls };
+}
+
+export function callerCancellation(root: HTMLElement) {
+  let calls = 0;
+  mount(
+    <Menu>
+      <MenuContent
+        data-caller="preserved"
+        onKeyDown={(event) => {
+          calls += 1;
+          event.preventDefault();
+        }}
+      >
+        <MenuItem>One</MenuItem>
+        <MenuItem>Two</MenuItem>
+      </MenuContent>
+    </Menu>,
+    root
+  );
+  return { calls: () => calls };
+}
+
 export function singleTabStop(root: HTMLElement): void {
   mount(
     <Menu>

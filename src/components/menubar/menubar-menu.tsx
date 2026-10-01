@@ -2,7 +2,8 @@ import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeButtonProps } from '../_internal/native-control';
 import { getSignal, state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { mergeComponentProps } from '../_internal/component-props';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { rovingFocus } from '../_internal/roving-focus';
 import {
@@ -26,6 +27,7 @@ import {
   readMenubarMenuContext,
   readMenubarRootContext,
   readMenubarRootRenderContext,
+  createMenubarIdAssociation,
   MenubarMenuContext,
   MenubarRootContext,
   type MenubarMenuContextValue,
@@ -84,6 +86,7 @@ export function MenubarMenu(props: MenubarMenuProps) {
   const menuIndex = resolvedPlacement.index;
   const menuKey = props.value ?? `menu-${menuIndex}`;
   const portalRecord = root.ensureMenuPortal(menuKey, getSignal());
+  const idAssociation = createMenubarIdAssociation(portalRecord.identity);
   const menuContext: MenubarMenuContextValue = {
     menuKey,
     menuIndex,
@@ -92,6 +95,7 @@ export function MenubarMenu(props: MenubarMenuProps) {
     contentId: resolvePartId(root.menubarId, `content-${menuKey}`),
     portalId: resolvePartId(root.menubarId, `portal-${portalRecord.ordinal}`),
     overlayIdentity: portalRecord.identity,
+    idAssociation,
     path: [menuKey],
   };
 
@@ -156,6 +160,9 @@ export function MenubarTrigger(
   const focusRepairProps = compositeItemFocusProps();
   const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
+    if (node)
+      menu.idAssociation.automatic.controls =
+        (rest as Record<string, unknown>)['aria-controls'] === undefined;
     const virtualPlacement =
       scopedVirtualPlacement ??
       (node ? resolveVirtualCompositePlacement(node) : null);
@@ -170,6 +177,7 @@ export function MenubarTrigger(
       node,
       registrationOwner
     );
+    menu.idAssociation.sync();
     registerCompositeNode(
       menu.triggerId,
       collection,
@@ -224,7 +232,7 @@ export function MenubarTrigger(
     interactionProps.onKeyUp?.(event);
   };
   const itemFocusProps = nav.item(menu.menuIndex);
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
     onKeyUp: handleKeyUp,
@@ -252,6 +260,14 @@ export function MenubarTrigger(
       }
     },
   });
+  const nativeId = (finalProps as Record<string, unknown>).id;
+  if (typeof nativeId === 'function') {
+    (finalProps as Record<string, unknown>).id = () => {
+      const id = nativeId();
+      queueMicrotask(menu.idAssociation.sync);
+      return id;
+    };
+  }
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;

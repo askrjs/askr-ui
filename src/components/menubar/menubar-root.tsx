@@ -1,6 +1,6 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { cspNonce, getSignal, state } from '@askrjs/askr';
-import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { mergeComponentProps } from '../_internal/component-props';
 import { rovingFocus } from '../_internal/roving-focus';
 import {
   focusCollectionItemWithRestore,
@@ -10,7 +10,7 @@ import {
 import { VirtualCompositeOwnerContext } from '../_internal/virtual-composite';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import { observeCompositeCollection } from '../_internal/composite';
-import { setDynamicStyleRule } from '../_internal/dynamic-style';
+import { setCommittedDynamicStyleRule } from '../_internal/dynamic-style';
 import {
   handleTypeaheadKeyDown,
   handleTypeaheadKeyUp,
@@ -100,7 +100,7 @@ export function Menubar(props: MenubarProps) {
   const { children, id, loop = true, ref, ...rest } = props;
   assertUniqueMenubarMenuValues(children);
   const nonce = cspNonce();
-  setDynamicStyleRule(
+  setCommittedDynamicStyleRule(
     'menubar:structural-root',
     '[data-askr-menubar-root="true"]',
     { display: 'contents' },
@@ -273,12 +273,16 @@ export function Menubar(props: MenubarProps) {
     isDisabled: (index) => rootState.disabledTriggerIndexes.includes(index),
     onNavigate: navigateToTrigger,
   });
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ref,
     role: 'menubar',
     'data-slot': 'menubar',
     'data-menubar': 'true',
     onKeyDown: (event: KeyboardEvent) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
       if (!handleRootTypeaheadKeyDown(event)) {
         nav.container.onKeyDown?.(event);
       }

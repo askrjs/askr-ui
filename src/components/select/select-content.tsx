@@ -1,6 +1,7 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { mergeComponentProps } from '../_internal/component-props';
 import { rovingFocus } from '../_internal/roving-focus';
 import { DismissableLayer } from '../dismissable-layer';
 import { FocusScope } from '../focus-scope';
@@ -65,7 +66,7 @@ export function SelectContent(
       root.focusItem(index);
     },
   });
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ref: composeRefs(
       ref as
         | ((value: HTMLElement | null) => void)
@@ -79,6 +80,7 @@ export function SelectContent(
           node,
           overlayNodeOwner
         );
+        root.idAssociation.sync();
         if (node && root.open) {
           syncOverlayPosition(root.overlayIdentity, root.selectId, {
             side,
@@ -122,6 +124,10 @@ export function SelectContent(
     'data-align': align,
     'data-side-offset': String(sideOffset),
     onKeyDown: (event: KeyboardEvent) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
       if (root.handleTypeaheadKeyDown(event)) {
         return;
       }
@@ -142,6 +148,14 @@ export function SelectContent(
       );
     },
   });
+  const nativeId = (finalProps as Record<string, unknown>).id;
+  if (typeof nativeId === 'function') {
+    (finalProps as Record<string, unknown>).id = () => {
+      const id = nativeId();
+      queueMicrotask(root.idAssociation.sync);
+      return id;
+    };
+  }
   const contentNode = asChild ? (
     <Slot asChild {...finalProps} children={children} />
   ) : (

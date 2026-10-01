@@ -5,7 +5,57 @@ interface OpenChangeState {
   text: string;
 }
 
-test.describe('Collapsible — Behavior', () => {
+test.describe('Collapsible - Behavior', () => {
+  for (const cancel of [false, true]) {
+    test(`should ${cancel ? 'suppress' : 'allow'} activation when the caller ${cancel ? 'cancels' : 'observes'} click`, async ({
+      render,
+      root,
+      run,
+    }) => {
+      await render('callerCancellation', { cancel });
+      const trigger = root.getByRole('button', { name: 'Details' });
+      await expect(trigger).toHaveAttribute('data-caller', 'preserved');
+      await trigger.evaluate((node: HTMLElement) => node.click());
+      await expect(trigger).toHaveAttribute(
+        'aria-expanded',
+        cancel ? 'false' : 'true',
+        { timeout: 1000 }
+      );
+      expect(await run<number>('calls')).toBe(1);
+    });
+  }
+
+  for (const action of ['click', 'Enter', 'Space'] as const) {
+    test(`should suppress ${action} activation canceled by an ancestor in capture`, async ({
+      page,
+      render,
+      root,
+    }) => {
+      await render('asChildTrigger');
+      const trigger = root.locator('[data-collapsible-trigger]');
+      await trigger.focus();
+      await trigger.evaluate(
+        (node: HTMLElement, eventType: string) => {
+          node
+            .closest('#mount-root')!
+            .addEventListener(eventType, (event) => event.preventDefault(), {
+              capture: true,
+              once: true,
+            });
+        },
+        action === 'click' ? 'click' : action === 'Enter' ? 'keydown' : 'keyup'
+      );
+      if (action === 'click') {
+        await trigger.evaluate((node: HTMLElement) => node.click());
+      } else {
+        await page.keyboard.press(action === 'Enter' ? 'Enter' : ' ');
+      }
+      await expect(trigger).toHaveAttribute('aria-expanded', 'false', {
+        timeout: 1000,
+      });
+    });
+  }
+
   test.describe('State Management', () => {
     test('should not transfer pending focus to a recycled virtual row', async ({
       render,

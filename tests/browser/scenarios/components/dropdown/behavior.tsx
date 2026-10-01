@@ -9,6 +9,96 @@ import {
 } from '../../../../../src/components/dropdown';
 import { flushUpdates, mount, spy } from '../../_mount';
 
+export function customContentId(
+  root: HTMLElement,
+  options: { callerAria?: boolean } = {}
+) {
+  let contentId!: ReturnType<typeof state<string>>;
+  function CustomDropdown() {
+    contentId = state('caller-dropdown-content');
+    return (
+      <Dropdown defaultOpen>
+        <DropdownTrigger
+          aria-controls={
+            options.callerAria ? 'caller-owned-controls' : undefined
+          }
+        >
+          Open
+        </DropdownTrigger>
+        <DropdownPortal>
+          <DropdownContent id={() => contentId()}>
+            <DropdownItem>One</DropdownItem>
+          </DropdownContent>
+        </DropdownPortal>
+      </Dropdown>
+    );
+  }
+  mount(<CustomDropdown />, root);
+  return {
+    updateId: async () => {
+      contentId.set('updated-dropdown-content');
+      await flushUpdates();
+    },
+  };
+}
+
+export function ownKeyboardCaller(
+  root: HTMLElement,
+  options: { cancel?: boolean; target?: 'trigger' | 'item' } = {}
+) {
+  let calls = 0;
+  const onKeyDown = (event: KeyboardEvent) => {
+    calls += 1;
+    if (options.cancel) event.preventDefault();
+  };
+  mount(
+    <Dropdown defaultOpen={options.target === 'item'}>
+      <DropdownTrigger
+        data-caller="preserved"
+        onKeyDown={options.target === 'trigger' ? onKeyDown : undefined}
+      >
+        Open
+      </DropdownTrigger>
+      <DropdownPortal>
+        <DropdownContent>
+          <DropdownItem
+            data-caller="preserved"
+            onKeyDown={options.target === 'item' ? onKeyDown : undefined}
+          >
+            One
+          </DropdownItem>
+          <DropdownItem>Two</DropdownItem>
+        </DropdownContent>
+      </DropdownPortal>
+    </Dropdown>,
+    root
+  );
+  return { calls: () => calls };
+}
+
+export function callerCancellation(root: HTMLElement) {
+  let calls = 0;
+  mount(
+    <Dropdown defaultOpen>
+      <DropdownTrigger>Open</DropdownTrigger>
+      <DropdownPortal>
+        <DropdownContent
+          data-caller="preserved"
+          onKeyDown={(event) => {
+            calls += 1;
+            event.preventDefault();
+          }}
+        >
+          <DropdownItem>One</DropdownItem>
+          <DropdownItem>Two</DropdownItem>
+        </DropdownContent>
+      </DropdownPortal>
+    </Dropdown>,
+    root
+  );
+  return { calls: () => calls };
+}
+
 export function toggleExpansion(root: HTMLElement): void {
   mount(
     <Dropdown>
@@ -219,4 +309,20 @@ export async function rtlVertical(root: HTMLElement): Promise<void> {
   );
   await flushUpdates();
   await flushUpdates();
+}
+
+export function ancestorCancellation(root: HTMLElement): void {
+  mount(
+    <Dropdown>
+      <DropdownTrigger asChild>
+        <span>Open menu</span>
+      </DropdownTrigger>
+      <DropdownPortal>
+        <DropdownContent>
+          <DropdownItem>Action</DropdownItem>
+        </DropdownContent>
+      </DropdownPortal>
+    </Dropdown>,
+    root
+  );
 }

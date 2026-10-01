@@ -32,6 +32,7 @@ export type SelectItemMetadata = {
 export type SelectRootContextValue = {
   selectId: string;
   overlayIdentity: object;
+  idAssociation: { automatic: { controls: boolean }; sync: () => void };
   open: boolean;
   setOpen: (open: boolean) => void;
   contentId: string;
@@ -61,6 +62,8 @@ export type SelectRenderContextValue = {
 export type SelectGroupContextValue = {
   groupId: string;
   labelId: string;
+  registerLabel: (node: Element | null, previous: Element | null) => void;
+  registerRenderedLabel: (id: unknown) => void;
 };
 
 /** Select Resolved State. */

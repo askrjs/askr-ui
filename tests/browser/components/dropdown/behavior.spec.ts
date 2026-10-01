@@ -8,6 +8,153 @@ function focusedText(page: Page) {
 }
 
 test.describe('Dropdown - Behavior', () => {
+  for (const callerAria of [false, true]) {
+    test(`should ${callerAria ? 'preserve caller ARIA despite' : 'associate'} a custom native content ID`, async ({
+      render,
+      root,
+      page,
+      run,
+    }) => {
+      await render('customContentId', { callerAria });
+      const trigger = root.locator('[data-slot="dropdown-trigger"]');
+      const content = page.locator('[data-slot="dropdown-content"]');
+      await expect(content).toHaveAttribute('id', 'caller-dropdown-content');
+      await expect(trigger).toHaveAttribute(
+        'aria-controls',
+        callerAria ? 'caller-owned-controls' : 'caller-dropdown-content',
+        { timeout: 1000 }
+      );
+      await run('updateId');
+      await expect(content).toHaveAttribute('id', 'updated-dropdown-content');
+      await expect(trigger).toHaveAttribute(
+        'aria-controls',
+        callerAria ? 'caller-owned-controls' : 'updated-dropdown-content',
+        { timeout: 1000 }
+      );
+    });
+  }
+
+  for (const target of ['trigger', 'item'] as const) {
+    for (const cancel of [false, true]) {
+      test(`should ${cancel ? 'suppress' : 'allow'} ${target} default when the caller ${cancel ? 'cancels' : 'observes'} own keydown`, async ({
+        page,
+        render,
+        root,
+        run,
+      }) => {
+        await render('ownKeyboardCaller', { target, cancel });
+        const first =
+          target === 'trigger'
+            ? root.getByRole('button', { name: 'Open' })
+            : page.getByRole('menuitem', { name: 'One', exact: true });
+        await expect(first).toHaveAttribute('data-caller', 'preserved');
+        await first.focus();
+        await page.keyboard.press(target === 'trigger' ? 'ArrowDown' : 't');
+        if (target === 'trigger')
+          await expect(first).toHaveAttribute(
+            'aria-expanded',
+            cancel ? 'false' : 'true',
+            { timeout: 1000 }
+          );
+        else
+          await expect(
+            page.getByRole('menuitem', {
+              name: cancel ? 'One' : 'Two',
+              exact: true,
+            })
+          ).toBeFocused({ timeout: 1000 });
+        expect(await run<number>('calls')).toBe(1);
+      });
+    }
+  }
+
+  test('should preserve item focus when the caller cancels navigation', async ({
+    page,
+    render,
+    run,
+  }) => {
+    await render('callerCancellation');
+    const first = page.getByRole('menuitem', { name: 'One', exact: true });
+    await expect(page.getByRole('menu')).toHaveAttribute(
+      'data-caller',
+      'preserved'
+    );
+    await first.focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(first).toBeFocused({ timeout: 1000 });
+    expect(await run<number>('calls')).toBe(1);
+  });
+
+  test('should preserve item focus when an ancestor cancels an orientation arrow', async ({
+    page,
+    render,
+    root,
+  }) => {
+    await render('menuButton');
+    await root.getByRole('button', { name: 'Open database menu' }).click();
+    const first = page.getByRole('menuitem', { name: 'Alpha', exact: true });
+    await first.focus();
+    await first.evaluate((node: HTMLElement) => {
+      node
+        .closest('[role="menu"]')!
+        .addEventListener('keydown', (event) => event.preventDefault(), {
+          capture: true,
+          once: true,
+        });
+    });
+    await page.keyboard.press('ArrowDown');
+    await expect(first).toBeFocused({ timeout: 1000 });
+  });
+
+  for (const action of ['click', 'Enter', 'Space'] as const) {
+    test(`should suppress ${action} activation canceled by an ancestor in capture`, async ({
+      page,
+      render,
+      root,
+    }) => {
+      await render('ancestorCancellation');
+      const trigger = root.locator('[data-slot="dropdown-trigger"]');
+      await trigger.focus();
+      await trigger.evaluate(
+        (node: HTMLElement, eventType: string) => {
+          node
+            .closest('#mount-root')!
+            .addEventListener(eventType, (event) => event.preventDefault(), {
+              capture: true,
+              once: true,
+            });
+        },
+        action === 'click' ? 'click' : action === 'Enter' ? 'keydown' : 'keyup'
+      );
+      if (action === 'click') {
+        await trigger.evaluate((node: HTMLElement) => node.click());
+      } else {
+        await page.keyboard.press(action === 'Enter' ? 'Enter' : ' ');
+      }
+      await expect(trigger).toHaveAttribute('aria-expanded', 'false', {
+        timeout: 1000,
+      });
+    });
+  }
+
+  test('should navigate from an item focused directly by the caller', async ({
+    page,
+    render,
+    root,
+    run,
+  }) => {
+    await render('menuButton');
+    const trigger = root.getByRole('button', { name: 'Open database menu' });
+    await trigger.click();
+    await page.getByRole('menuitem', { name: 'Archived database' }).focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(
+      page.getByRole('menuitem', { name: 'Alpha', exact: true })
+    ).toBeFocused();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(await run<number>('archiveSelectCount')).toBe(0);
+  });
+
   test('should toggle trigger expansion state when activated', async ({
     render,
     root,

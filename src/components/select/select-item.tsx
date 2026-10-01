@@ -4,6 +4,7 @@ import { nativeButtonProps } from '../_internal/native-control';
 import { state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { mergeComponentProps } from '../_internal/component-props';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { rovingFocus } from '../_internal/roving-focus';
 import {
@@ -154,7 +155,7 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
       }
     });
   }
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
     onKeyUp: handleKeyUp,
@@ -177,6 +178,12 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
     'aria-disabled': isDisabled ? 'true' : undefined,
     tabIndex: isDisabled ? -1 : itemFocusProps.tabIndex,
     ...focusRepairProps,
+    onFocus: (event: FocusEvent) => {
+      focusRepairProps.onFocus(event);
+      if (!isDisabled) {
+        root.setCurrentIndex(scopedVirtualPlacement?.index ?? placement.index);
+      }
+    },
   });
 
   if (asChild) {

@@ -22,6 +22,7 @@ export type DropdownStateInput = {
 export type DropdownRootContextValue = {
   dropdownId: string;
   overlayIdentity: object;
+  idAssociation: { automatic: { controls: boolean }; sync: () => void };
   open: boolean;
   setOpen: (open: boolean) => void;
   contentId: string;
