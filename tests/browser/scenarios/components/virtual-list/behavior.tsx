@@ -381,3 +381,107 @@ export async function expandableRowHeight(root: HTMLElement): Promise<void> {
   mount(<ExpandableList />, root);
   await flushUpdates();
 }
+
+export function committedScrollRestoration(
+  root: HTMLElement,
+  options?: { delayedNotification?: boolean } | null
+) {
+  const items = createItems(100);
+  let api: VirtualListApi<Item> | null = null;
+  let revision!: ReturnType<typeof state<number>>;
+  let handledRevision = 0;
+  let notificationTop: number | null = null;
+  let viewport: HTMLElement;
+  const apiRef = (next: VirtualListApi<Item> | null) => {
+    if (next) api = next;
+  };
+  function Fixture() {
+    revision = state(0);
+    const currentRevision = revision();
+    return (
+      <VirtualList
+        items={items}
+        getKey={(item) => item.id}
+        rowHeight={20}
+        style={{ height: '60px', overflowY: 'auto' }}
+        apiRef={apiRef}
+        rowComponent={({ item, index }) => (
+          <button
+            ref={(node) => {
+              if (!node || index !== 43 || currentRevision <= handledRevision)
+                return;
+              handledRevision = currentRevision;
+              if (options?.delayedNotification && currentRevision === 1) {
+                viewport.scrollTop = 0;
+                return;
+              }
+              if (options?.delayedNotification) {
+                // Hold the native offset at the previous layout bound while the
+                // newer reveal and its delayed restoration notification arrive.
+                const descriptor = Object.getOwnPropertyDescriptor(
+                  viewport,
+                  'scrollTop'
+                );
+                Object.defineProperty(viewport, 'scrollTop', {
+                  configurable: true,
+                  get: () => 860,
+                  set: () => {},
+                });
+                try {
+                  api!.scrollToIndex(80);
+                  viewport.dispatchEvent(new Event('scroll'));
+                  notificationTop = api!.getScrollTop();
+                } finally {
+                  if (descriptor)
+                    Object.defineProperty(viewport, 'scrollTop', descriptor);
+                  else
+                    delete (viewport as unknown as { scrollTop?: number })
+                      .scrollTop;
+                }
+              } else {
+                api!.scrollToIndex(80);
+              }
+            }}
+          >
+            {item.label}
+          </button>
+        )}
+      />
+    );
+  }
+  const container = mount(<Fixture />, root);
+  viewport = container.querySelector<HTMLElement>(
+    '[data-slot="virtual-list"]'
+  )!;
+  return {
+    prepare: async () => {
+      api!.scrollToIndex(43);
+      await settle();
+      viewport.dispatchEvent(new Event('scroll'));
+      if (options?.delayedNotification) {
+        viewport.addEventListener(
+          'scroll',
+          (event) => {
+            if (event.isTrusted) event.stopImmediatePropagation();
+          },
+          { capture: true }
+        );
+        revision.set(1);
+        await flushUpdates();
+        await flushUpdates();
+      }
+      return viewport.scrollTop;
+    },
+    update: async () => {
+      revision.set(options?.delayedNotification ? 2 : 1);
+      await flushUpdates();
+      await flushUpdates();
+      return notificationTop;
+    },
+    read: () => ({
+      apiTop: api!.getScrollTop(),
+      domTop: viewport.scrollTop,
+      start: Number(viewport.dataset.virtualVisibleStartIndex),
+    }),
+  };
+}

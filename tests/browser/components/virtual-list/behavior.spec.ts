@@ -192,3 +192,18 @@ test.describe('VirtualList - Behavior', () => {
     await expect(inspect).toBeFocused();
   });
 });
+
+for (const delayedNotification of [false, true]) {
+  test(`should retain a newer row-ref reveal ${delayedNotification ? 'after a delayed restoration scroll notification' : 'during parent scroll restoration'}`, async ({
+    render,
+    run,
+  }) => {
+    await render('committedScrollRestoration', { delayedNotification });
+    expect(await run('prepare')).toBe(860);
+    const notificationTop = await run('update');
+    if (delayedNotification) expect(notificationTop).toBe(1600);
+    await expect
+      .poll(() => run('read'))
+      .toEqual({ apiTop: 1600, domTop: 1600, start: 80 });
+  });
+}

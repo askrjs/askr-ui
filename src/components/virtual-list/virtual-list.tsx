@@ -126,6 +126,19 @@ type VirtualListEntry<Item> = {
   setLayoutStyleRule?: typeof setDynamicStyleRule;
 };
 
+function writeVirtualListScrollTop<Item>(
+  entry: VirtualListEntry<Item>,
+  node: HTMLElement,
+  nextScrollTop: number
+) {
+  if (node.scrollTop === nextScrollTop) return;
+  entry.pendingProgrammaticScrollTops.push(nextScrollTop);
+  if (entry.pendingProgrammaticScrollTops.length > 8) {
+    entry.pendingProgrammaticScrollTops.shift();
+  }
+  node.scrollTop = nextScrollTop;
+}
+
 function resolveEntryTotalHeight<Item>(entry: VirtualListEntry<Item>): number {
   return entry.rowHeights
     ? entry.rowHeights.reduce((total, height) => total + height, 0)
@@ -215,12 +228,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
     entry.scrollTopState!.set(nextScrollTop);
   };
   const writeScrollTop = (node: HTMLElement, nextScrollTop: number) => {
-    if (node.scrollTop === nextScrollTop) return;
-    entry.pendingProgrammaticScrollTops.push(nextScrollTop);
-    if (entry.pendingProgrammaticScrollTops.length > 8) {
-      entry.pendingProgrammaticScrollTops.shift();
-    }
-    node.scrollTop = nextScrollTop;
+    writeVirtualListScrollTop(entry, node, nextScrollTop);
   };
   const readViewportHeight = () => entry.viewportHeightState!();
   const setViewportHeight = (nextViewportHeight: number) => {
@@ -921,6 +929,7 @@ export function VirtualList<Item>(
   const layoutNonce = cspNonce();
   const instanceState = state({}) as StateCell<object>;
   const committedEntry = getVirtualListEntry<Item>(instanceState());
+  const pendingScrollTopAtRender = committedEntry.pendingScrollTop;
   const layoutStyleRules = new Map<string, () => void>();
   const setLayoutStyleRule: typeof prepareDynamicStyleRule = (
     key,
@@ -1097,7 +1106,18 @@ export function VirtualList<Item>(
       attachment.node !== node || attachment.binding !== bindingRef;
     if (bindingChanged) releaseAttachment();
     for (const publish of layoutStyleRules.values()) publish();
+    const pendingScrollTop = committedEntry.pendingScrollTop;
+    const pendingScrollChanged = pendingScrollTop !== pendingScrollTopAtRender;
+    const restoreScrollTop =
+      scrollTopState() === currentScrollTop && !pendingScrollChanged;
     Object.assign(committedEntry, committedIdentity);
+    if (pendingScrollChanged)
+      committedEntry.pendingScrollTop = pendingScrollTop;
+    // Child focus can clamp the viewport before new row and spacer CSS commits.
+    // Keep a later row-ref reveal and track restoration like other API writes.
+    if (restoreScrollTop) {
+      writeVirtualListScrollTop(committedEntry, node, effectiveScrollTop);
+    }
     if (scheduleScroll) committedEntry.schedulePendingScrollTop();
     if (bindingChanged) {
       attachment.node = node;

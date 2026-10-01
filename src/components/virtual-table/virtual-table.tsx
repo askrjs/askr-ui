@@ -996,6 +996,7 @@ export function VirtualTable<Row>(
     scrollTopState,
     viewportHeightState
   );
+  const pendingScrollTopAtRender = committedEntry.pendingScrollTop;
   const layoutStyleRules = new Map<string, () => void>();
   const setLayoutStyleRule: typeof prepareDynamicStyleRule = (
     key,
@@ -1258,7 +1259,18 @@ export function VirtualTable<Row>(
       attachment.node !== node || attachment.binding !== bindingRef;
     if (bindingChanged) releaseAttachment();
     for (const publish of layoutStyleRules.values()) publish();
+    const pendingScrollTop = committedEntry.pendingScrollTop;
+    const pendingScrollChanged = pendingScrollTop !== pendingScrollTopAtRender;
+    const restoreScrollTop =
+      scrollTopState() === currentScrollTop && !pendingScrollChanged;
     Object.assign(committedEntry, committedIdentity);
+    if (pendingScrollChanged)
+      committedEntry.pendingScrollTop = pendingScrollTop;
+    // Child focus can clamp the viewport before new row and spacer CSS commits.
+    // Restore this render's offset only while its logical scroll is still current.
+    if (restoreScrollTop && node.scrollTop !== effectiveScrollTop) {
+      node.scrollTop = effectiveScrollTop;
+    }
     if (scheduleScroll) committedEntry.schedulePendingScrollTop();
     if (measureResize) committedEntry.handleResize();
     if (bindingChanged) {
