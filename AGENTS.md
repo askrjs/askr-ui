@@ -67,6 +67,14 @@ Use `npm run test:unit`, `npm run test:jsdom`, or `npm run test:browser` for a
 focused rerun. Run `npm run bench` when component or shared-runtime performance
 may change.
 
+`npm run test:browser` runs the Playwright suite against a Vite harness
+(`vite.harness.config.ts`). Locally each run starts its own harness on a free
+port, so runs in parallel worktrees stay isolated. `ASKR_TEST_PORT=<port>` pins
+the port. To reuse a harness you already started from this checkout
+(`npx vp dev --config vite.harness.config.ts`, port 4318), set
+`PW_REUSE_SERVER=1`; the run fails fast if the server on that port serves a
+different checkout. CI always starts a fresh harness on port 4318.
+
 Keep changes narrow, preserve public contracts unless a breaking change is
 explicitly requested, and do not rewrite unrelated files.
 

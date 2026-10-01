@@ -1,6 +1,12 @@
 import { askr } from '@askrjs/vite';
 import { defineConfig } from 'vite-plus';
 
+import {
+  DEFAULT_HARNESS_PORT,
+  HARNESS_HOST,
+  harnessIdentityPlugin,
+} from './tests/browser/harness-server';
+
 /**
  * Dev server used only by the native Playwright browser suite: it serves the
  * repository root so specs can reach `tests/browser/harness.html`. The library
@@ -14,7 +20,9 @@ import { defineConfig } from 'vite-plus';
 export default defineConfig({
   // `askr()` installs the JSX transform (automatic runtime, `@askrjs/askr`
   // import source) that the scenario modules compile against.
-  plugins: [askr()],
+  // `harnessIdentityPlugin()` reports which checkout this server serves, so a
+  // Playwright run can refuse a reused harness started from another checkout.
+  plugins: [askr(), harnessIdentityPlugin()],
   resolve: {
     dedupe: ['@askrjs/askr'],
   },
@@ -30,8 +38,10 @@ export default defineConfig({
     include: ['axe-core'],
   },
   server: {
-    host: '127.0.0.1',
-    port: 4318,
+    host: HARNESS_HOST,
+    // Playwright passes its own `--port`; this default is for a manually
+    // started harness, which `PW_REUSE_SERVER=1` runs can reuse.
+    port: DEFAULT_HARNESS_PORT,
     strictPort: true,
     // Transform the harness and every scenario up front. Without this the first
     // worker to reach a given scenario pays the transform cost inline, which
