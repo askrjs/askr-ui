@@ -83,6 +83,22 @@ test.describe('Tooltip - Behavior', () => {
     expect(pageErrors).toEqual([]);
   });
 
+  test('should allow one controlled native-focus request in each focus cycle', async ({
+    render,
+    run,
+  }) => {
+    await render('controlledClosed');
+
+    expect(await run('focusTrigger')).toBeNull();
+    await run('settle');
+    expect(await run<number>('openChanges')).toBe(1);
+
+    expect(await run('focusOutside')).toBeNull();
+    expect(await run('focusTrigger')).toBeNull();
+    await run('settle');
+    expect(await run<number>('openChanges')).toBe(2);
+  });
+
   test('should cancel pending focus-adoption work during teardown', async ({
     render,
     run,

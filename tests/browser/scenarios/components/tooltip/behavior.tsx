@@ -102,12 +102,17 @@ export function controlledClosed(root: HTMLElement) {
     </Tooltip>,
     root
   );
+  const outside = document.createElement('button');
+  outside.dataset.testid = 'outside-focus-target';
+  outside.textContent = 'Outside';
+  container.append(outside);
 
   return {
     focusTrigger: () =>
       focusReportingError(
         container.querySelector('[data-slot="tooltip-trigger"]')
       ),
+    focusOutside: () => focusReportingError(outside),
     settle,
     openChanges: () => onOpenChange.count(),
   };

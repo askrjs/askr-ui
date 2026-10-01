@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   checkout is refused before any test runs. `ASKR_TEST_PORT` pins the port.
   CI still uses port 4318 and never reuses a server.
 
+### Fixed
+
+- `Tooltip` sends one controlled open request per focus cycle and keeps the
+  trigger focused if its DOM node is replaced after the next animation frame.
+
 ## [0.4.2] - 2026-09-30
 
 ### Fixed

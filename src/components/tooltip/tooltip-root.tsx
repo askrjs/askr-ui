@@ -40,6 +40,7 @@ export function Tooltip(props: TooltipProps) {
   setOverlayStackActive(overlayIdentity, openState(), cleanupSignal);
   const focusEntry = state({
     adoptTrigger: false,
+    focusRequestSent: false,
     generation: 0,
     releaseFrame: null as number | null,
   })();
@@ -61,6 +62,7 @@ export function Tooltip(props: TooltipProps) {
         focusEntry.adoptTrigger = false;
         return;
       }
+      if (focusEntry.generation !== generation) return;
       focusEntry.releaseFrame = requestAnimationFrame(() => {
         focusEntry.releaseFrame = null;
         if (focusEntry.generation === generation) {
@@ -77,6 +79,7 @@ export function Tooltip(props: TooltipProps) {
         cancelAnimationFrame(focusEntry.releaseFrame);
         focusEntry.releaseFrame = null;
       }
+      focusEntry.focusRequestSent = false;
       focusEntry.adoptTrigger = false;
       focusEntry.generation += 1;
     },
@@ -112,13 +115,22 @@ export function Tooltip(props: TooltipProps) {
     setOpen: updateOpen,
     openFromFocus: () => {
       // A controlled owner may decline the open request, leaving openState
-      // false until focus adoption is released on the next frame. If the
-      // trigger ref is attached again in that interval, do not emit a second
-      // onOpenChange request for the same native focus event.
-      if (focusEntry.adoptTrigger) return;
+      // false. Keep the request latched through the focus cycle so delayed
+      // trigger ref attachment cannot emit a duplicate open request.
+      if (focusEntry.focusRequestSent) return;
+      focusEntry.focusRequestSent = true;
       focusEntry.adoptTrigger = true;
       updateOpen(true);
       releaseTriggerAdoption();
+    },
+    releaseFocusAdoption: () => {
+      focusEntry.generation += 1;
+      if (focusEntry.releaseFrame !== null) {
+        cancelAnimationFrame(focusEntry.releaseFrame);
+        focusEntry.releaseFrame = null;
+      }
+      focusEntry.focusRequestSent = false;
+      focusEntry.adoptTrigger = false;
     },
     contentId,
     portal,
@@ -127,7 +139,11 @@ export function Tooltip(props: TooltipProps) {
     },
     setTriggerNode: (node: HTMLElement | null) => {
       registerOverlayNode(overlayIdentity, 'trigger', node, triggerNodeOwner);
-      if (node && focusEntry.adoptTrigger && document.activeElement !== node) {
+      if (
+        node &&
+        focusEntry.focusRequestSent &&
+        document.activeElement !== node
+      ) {
         node.focus();
       }
     },

@@ -57,6 +57,7 @@ export function TooltipTrigger(
       root.openFromFocus();
     },
     onBlur: () => {
+      root.releaseFocusAdoption();
       root.setOpen(false);
     },
     'aria-describedby': root.open ? root.contentId : undefined,
