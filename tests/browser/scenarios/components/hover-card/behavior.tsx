@@ -6,6 +6,26 @@ import {
 } from '../../../../../src/components/hover-card';
 import { flushUpdates, mount, settle, spy, unmount } from '../../_mount';
 
+export function ancestorCanceledTab(root: HTMLElement): void {
+  document.addEventListener('keydown', (event) => event.preventDefault(), {
+    capture: true,
+  });
+  mount(
+    <HoverCard defaultOpen>
+      <HoverCardTrigger tabIndex={0}>Preview</HoverCardTrigger>
+      <HoverCardContent>
+        <button data-testid="first" tabIndex={0}>
+          First
+        </button>
+        <button data-testid="last" tabIndex={0}>
+          Last
+        </button>
+      </HoverCardContent>
+    </HoverCard>,
+    root
+  );
+}
+
 /**
  * A 2px target pinned to the viewport's bottom-right corner, outside every
  * hover card part. Hovering it is how a spec moves the real pointer "away".
@@ -33,6 +53,20 @@ export function hoverAndFocus(root: HTMLElement) {
     root
   );
 
+  return { openChanges: () => onOpenChange.calls };
+}
+
+export function disabledFocusTrigger(root: HTMLElement) {
+  const onOpenChange = spy<[boolean]>();
+  mount(
+    <HoverCard onOpenChange={onOpenChange}>
+      <HoverCardTrigger asChild disabled>
+        <div tabIndex={0}>Disabled preview</div>
+      </HoverCardTrigger>
+      <HoverCardContent>Details</HoverCardContent>
+    </HoverCard>,
+    root
+  );
   return { openChanges: () => onOpenChange.calls };
 }
 
@@ -265,6 +299,87 @@ export function throttledRestorationFrame(root: HTMLElement) {
     },
     restoreFrames: () => {
       window.requestAnimationFrame = originalRequest;
+    },
+  };
+}
+
+export function partIdentityAssociations(
+  root: HTMLElement,
+  options?: { part?: 'trigger' | 'content'; callerAria?: boolean } | null
+): void {
+  mount(
+    <HoverCard open>
+      <HoverCardTrigger
+        id={
+          options?.part === 'trigger' || options?.callerAria
+            ? 'custom-hover-card-trigger'
+            : undefined
+        }
+        aria-controls={
+          options?.callerAria ? 'caller-hover-card-target' : undefined
+        }
+      >
+        Preview
+      </HoverCardTrigger>
+      <HoverCardContent
+        id={
+          options?.part === 'content' || options?.callerAria
+            ? 'custom-hover-card-content'
+            : undefined
+        }
+        aria-labelledby={
+          options?.callerAria ? 'caller-hover-card-label' : undefined
+        }
+      >
+        Details
+      </HoverCardContent>
+    </HoverCard>,
+    root
+  );
+}
+
+export function reactivePartIdentityAssociations(
+  root: HTMLElement,
+  options?: { callerAria?: boolean } | null
+) {
+  let suffix!: ReturnType<typeof state<string>>;
+  let triggerReads = 0;
+  let contentReads = 0;
+  function Fixture() {
+    suffix = state('initial');
+    return (
+      <HoverCard open>
+        <HoverCardTrigger
+          id={() => {
+            triggerReads++;
+            return `reactive-hover-card-trigger-${suffix()}`;
+          }}
+          aria-controls={
+            options?.callerAria ? 'caller-hover-card-target' : undefined
+          }
+        >
+          Preview
+        </HoverCardTrigger>
+        <HoverCardContent
+          id={() => {
+            contentReads++;
+            return `reactive-hover-card-content-${suffix()}`;
+          }}
+          aria-labelledby={
+            options?.callerAria ? 'caller-hover-card-label' : undefined
+          }
+        >
+          Details
+        </HoverCardContent>
+      </HoverCard>
+    );
+  }
+  mount(<Fixture />, root);
+  return {
+    reads: () => ({ trigger: triggerReads, content: contentReads }),
+    update: async () => {
+      suffix.set('updated');
+      await flushUpdates();
     },
   };
 }

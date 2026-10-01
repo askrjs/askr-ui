@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.3] - 2026-10-01
+
+No public component, prop, export, or compatible peer-range changes. No
+deprecations. Upgrade `@askrjs/askr` to 0.4.2 for complete server-rendered
+associations across wrapped parts, later siblings, and portals.
+
 ### Internal
 
 - Local Playwright runs start the browser harness on a free port instead of a
@@ -19,12 +25,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   waiting for the page's later `load` event, which can stall in long WebKit runs.
 - Give the complete browser matrix more time on cross-platform CI runners after
   the expanded public component suite and browser setup.
+- Restore the archived Input behavior, accessibility, and determinism cases to
+  the native browser suite, and retain targeted failed-update and identity
+  regressions in the package's default test gates.
 
 ### Fixed
 
 - `Tooltip` sends one controlled open request per focus cycle, including focus
   transitions within a composed trigger, preserves focus when a trigger is
   replaced, and releases that adoption when focus moves elsewhere.
+- Composite keyboard and pointer handlers honor caller and ancestor
+  cancellation before moving focus, selecting items, changing values, or
+  opening content. Supported caller handlers run before internal defaults.
+- `RadioGroup` navigates from an empty value; Accordion and menu-family focus
+  navigation use actual registered item positions, including virtual bounds
+  and disabled items.
+- `Select` retains the committed text of a wrapped selected item while closed.
+  `SelectGroup` associates its own surviving label through wrappers and caught
+  errors, preserving caller ARIA and nested group ownership.
+- Dialog, AlertDialog, Popover, HoverCard, Tooltip, Dropdown, Select, and Menubar
+  use actual custom and reactive part IDs for automatic ARIA associations.
+  Caller attributes remain authoritative. Server rendering resolves forward
+  references once and drops registrations from failed subtrees.
+- Closed force-mounted overlays retain their DOM without stealing focus or
+  intercepting dismissal of active layers. Persistent Dialog and Popover
+  content follows open/close focus transitions.
+- `FocusScope` permits native Tab exit when neither looping nor trapping, and
+  respects cancelled keyboard events.
+- Dismissable layers retain committed callbacks across rejected updates and
+  host replacement, and maintain independent stacks in each owner document.
+  AlertDialog and HoverCard request one close for one Escape event.
+- Disabled composed HoverCard and Tooltip triggers do not open on focus.
+  HoverCard avoids browser listeners during server rendering and retains its
+  committed close delay after a rejected update.
+- Debounced input, form reset, Slider, and ToggleGroup retain committed
+  callbacks, timing, geometry, and selection after rejected updates. Slider
+  cancels an active drag when disabled and handles pointer cancellation.
+- Progress, ProgressCircle, Menubar, VirtualList, and VirtualTable publish
+  dynamic browser styles after commit; abandoned updates do not leave CSS.
+- Virtual components retain accepted key caches, geometry, callbacks, and
+  scroll anchors after rejected renders. Ref and API bindings publish on
+  attachment and clear on replacement or teardown; stale programmatic scroll
+  notifications do not cancel a newer anchor.
+- Avatar resets fallback state when its image changes. Toast preserves reactive
+  ARIA, stack order, and composed viewport semantics; ScrollArea preserves RTL
+  accessibility and cancelled scrollbar interactions.
 
 ## [0.4.2] - 2026-09-30
 

@@ -3,6 +3,7 @@ import { controllableState } from '@askrjs/askr/foundations/state';
 import { watch } from '@askrjs/askr/resources';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
 import { rovingFocus } from '../_internal/roving-focus';
+import { mergeComponentProps } from '../_internal/component-props';
 import {
   focusCollectionItemWithRestore,
   restorePendingCollectionItemFocus,
@@ -217,7 +218,7 @@ export function ToggleGroup(props: ToggleGroupProps) {
       focusItem(index);
     },
   });
-  const mergedProps = mergeProps(finalProps, nav.container);
+  const mergedProps = mergeComponentProps(finalProps, nav.container);
 
   return (
     <ToggleGroupRootContext value={rootContext}>

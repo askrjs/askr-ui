@@ -11,7 +11,7 @@ import {
   TooltipPortal,
   TooltipTrigger,
 } from '../../../../../src/components/tooltip';
-import { mount, settle, spy, unmount } from '../../_mount';
+import { flushUpdates, mount, settle, spy, unmount } from '../../_mount';
 
 /** Calls `node.focus()` and reports what, if anything, it threw. */
 function focusReportingError(node: Element | null): string | null {
@@ -34,6 +34,20 @@ export function hoverTrigger(root: HTMLElement): void {
     </Tooltip>,
     root
   );
+}
+
+export function disabledFocusTrigger(root: HTMLElement) {
+  const onOpenChange = spy<[boolean]>();
+  mount(
+    <Tooltip onOpenChange={onOpenChange}>
+      <TooltipTrigger asChild disabled>
+        <div tabIndex={0}>Disabled preview</div>
+      </TooltipTrigger>
+      <TooltipContent>Details</TooltipContent>
+    </Tooltip>,
+    root
+  );
+  return { openChanges: () => onOpenChange.calls };
 }
 
 export function nativeFocusAlongsideControls(root: HTMLElement) {
@@ -271,4 +285,61 @@ export function customPosition(root: HTMLElement): void {
     </Tooltip>,
     root
   );
+}
+
+export function partIdentityAssociations(
+  root: HTMLElement,
+  options?: { callerAria?: boolean } | null
+): void {
+  mount(
+    <Tooltip open>
+      <TooltipTrigger
+        aria-describedby={
+          options?.callerAria ? 'caller-tooltip-description' : undefined
+        }
+      >
+        Preview
+      </TooltipTrigger>
+      <TooltipContent id="caller-tooltip-content">Details</TooltipContent>
+    </Tooltip>,
+    root
+  );
+}
+
+export function reactivePartIdentityAssociations(
+  root: HTMLElement,
+  options?: { callerAria?: boolean } | null
+) {
+  let suffix!: ReturnType<typeof state<string>>;
+  let contentReads = 0;
+  function Fixture() {
+    suffix = state('initial');
+    return (
+      <Tooltip open>
+        <TooltipTrigger
+          aria-describedby={
+            options?.callerAria ? 'caller-tooltip-description' : undefined
+          }
+        >
+          Preview
+        </TooltipTrigger>
+        <TooltipContent
+          id={() => {
+            contentReads++;
+            return `reactive-tooltip-content-${suffix()}`;
+          }}
+        >
+          Details
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+  mount(<Fixture />, root);
+  return {
+    reads: () => ({ content: contentReads }),
+    update: async () => {
+      suffix.set('updated');
+      await flushUpdates();
+    },
+  };
 }

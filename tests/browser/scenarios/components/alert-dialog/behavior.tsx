@@ -10,6 +10,18 @@ import {
 import { Button } from '../../../../../src/components/button';
 import { mount, spy } from '../../_mount';
 
+export function controlledEscapeRequest(root: HTMLElement) {
+  const onOpenChange = spy<[boolean]>();
+  mount(
+    <AlertDialog open={true} onOpenChange={onOpenChange}>
+      <AlertDialogTrigger>Preview</AlertDialogTrigger>
+      <AlertDialogContent aria-label="Preview">Confirmation</AlertDialogContent>
+    </AlertDialog>,
+    root
+  );
+  return { openChanges: () => onOpenChange.calls };
+}
+
 export function defaultAndExplicitRole(root: HTMLElement): void {
   mount(
     <>

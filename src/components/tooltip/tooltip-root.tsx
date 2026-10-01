@@ -19,6 +19,12 @@ import {
 } from './tooltip.shared';
 import type { TooltipProps } from './tooltip.types';
 import { OverlayPortalHost } from '../_internal/overlay-portal-host';
+import { syncIdAssociation } from '../_internal/id-association';
+import {
+  createSsrIdRegistration,
+  ssrAttributeRootProps,
+  type SsrIdRegistration,
+} from '../_internal/ssr-id-association';
 
 function scheduleTooltipPortalSync(callback: () => void) {
   queueMicrotask(callback);
@@ -47,8 +53,22 @@ export function Tooltip(props: TooltipProps) {
   let focusListenerAttached = false;
   captureOverlayNonce(overlayIdentity, cspNonce());
   const contentId = resolvePartId(tooltipId, 'content');
+  const ssrContent = state(createSsrIdRegistration(contentId))();
   const portal = getPersistentPortal(overlayIdentity);
   const overlayNodes = getOverlayNodes(overlayIdentity);
+  const association = state({ automatic: true })();
+  const syncDescription = () => {
+    if (openState()) {
+      syncIdAssociation(
+        overlayNodes.trigger,
+        overlayNodes.content,
+        'aria-describedby',
+        association.automatic
+      );
+    } else if (association.automatic) {
+      overlayNodes.trigger?.removeAttribute('aria-describedby');
+    }
+  };
   const triggerNodeOwner = {};
   const contentNodeOwner = {};
   let contentPosition: TooltipPositionOptions = resolveTooltipPositionOptions();
@@ -139,6 +159,24 @@ export function Tooltip(props: TooltipProps) {
     });
   };
 
+  const withCommittedIdSync = (
+    registration: SsrIdRegistration
+  ): SsrIdRegistration => ({
+    cell: registration.cell,
+    register(renderedId, signal) {
+      registration.register(renderedId, signal);
+      scheduleTooltipPortalSync(() => {
+        if (
+          !signal.aborted &&
+          overlayNodes.trigger?.isConnected &&
+          overlayNodes.content?.isConnected
+        ) {
+          syncDescription();
+        }
+      });
+    },
+  });
+
   const rootContext: TooltipRootContextValue = {
     tooltipId,
     get open() {
@@ -160,12 +198,19 @@ export function Tooltip(props: TooltipProps) {
     releaseFocusAdoption,
     getTriggerNode: () => overlayNodes.trigger,
     contentId,
+    ssrContent: withCommittedIdSync(ssrContent),
     portal,
     registerContentPosition: (nextPosition: TooltipPositionOptions) => {
       contentPosition = nextPosition;
     },
-    setTriggerNode: (node: HTMLElement | null) => {
+    setTriggerNode: (
+      node: HTMLElement | null,
+      automaticDescription: boolean
+    ) => {
       registerOverlayNode(overlayIdentity, 'trigger', node, triggerNodeOwner);
+      if (node && overlayNodes.trigger === node)
+        association.automatic = automaticDescription;
+      syncDescription();
       if (
         node &&
         focusEntry.focusRequestSent &&
@@ -176,6 +221,7 @@ export function Tooltip(props: TooltipProps) {
     },
     setContentNode: (node: HTMLElement | null) => {
       registerOverlayNode(overlayIdentity, 'content', node, contentNodeOwner);
+      syncDescription();
     },
     syncPosition: () => {
       if (overlayNodes.content) {
@@ -187,7 +233,7 @@ export function Tooltip(props: TooltipProps) {
     },
   };
   return (
-    <TooltipRootContext value={rootContext}>
+    <TooltipRootContext value={rootContext} {...ssrAttributeRootProps}>
       <>
         {children}
         <OverlayPortalHost portal={portal} />

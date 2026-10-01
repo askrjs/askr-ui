@@ -12,7 +12,42 @@ import {
   PopoverPortal,
   PopoverTrigger,
 } from '../../../../../src/components/popover';
-import { mount } from '../../_mount';
+import { flushUpdates, mount, spy } from '../../_mount';
+import { state } from '@askrjs/askr';
+
+export function forceMountedToggle(root: HTMLElement): void {
+  function Fixture() {
+    const open = state(false);
+    return (
+      <Popover open={open()} onOpenChange={open.set}>
+        <PopoverTrigger tabIndex={0}>Preview</PopoverTrigger>
+        <PopoverContent forceMount>
+          <button tabIndex={0}>Content action</button>
+        </PopoverContent>
+      </Popover>
+    );
+  }
+  mount(<Fixture />, root);
+}
+
+export function forceMountedClosed(root: HTMLElement) {
+  const before = document.createElement('button');
+  before.dataset.testid = 'before';
+  before.textContent = 'Before';
+  root.append(before);
+  before.focus();
+  const onOpenChange = spy<[boolean]>();
+  mount(
+    <Popover open={false} onOpenChange={onOpenChange}>
+      <PopoverTrigger>Preview</PopoverTrigger>
+      <PopoverContent forceMount>
+        <button>Content action</button>
+      </PopoverContent>
+    </Popover>,
+    root
+  );
+  return { openChanges: () => onOpenChange.calls };
+}
 
 export function triggered(root: HTMLElement): void {
   mount(
@@ -268,4 +303,85 @@ export function nestedInDialog(root: HTMLElement): void {
     </Dialog>,
     root
   );
+}
+
+export function partIdentityAssociations(
+  root: HTMLElement,
+  options?: { part?: 'trigger' | 'content'; callerAria?: boolean } | null
+): void {
+  mount(
+    <Popover defaultOpen>
+      <PopoverTrigger
+        id={
+          options?.part === 'trigger' || options?.callerAria
+            ? 'custom-popover-trigger'
+            : undefined
+        }
+        aria-controls={
+          options?.callerAria ? 'caller-popover-target' : undefined
+        }
+      >
+        Preview
+      </PopoverTrigger>
+      <PopoverContent
+        id={
+          options?.part === 'content' || options?.callerAria
+            ? 'custom-popover-content'
+            : undefined
+        }
+        aria-labelledby={
+          options?.callerAria ? 'caller-popover-label' : undefined
+        }
+      >
+        Details
+      </PopoverContent>
+    </Popover>,
+    root
+  );
+}
+
+export function reactivePartIdentityAssociations(
+  root: HTMLElement,
+  options?: { callerAria?: boolean } | null
+) {
+  let suffix!: ReturnType<typeof state<string>>;
+  let triggerReads = 0;
+  let contentReads = 0;
+  function Fixture() {
+    suffix = state('initial');
+    return (
+      <Popover defaultOpen>
+        <PopoverTrigger
+          id={() => {
+            triggerReads++;
+            return `reactive-popover-trigger-${suffix()}`;
+          }}
+          aria-controls={
+            options?.callerAria ? 'caller-popover-target' : undefined
+          }
+        >
+          Preview
+        </PopoverTrigger>
+        <PopoverContent
+          id={() => {
+            contentReads++;
+            return `reactive-popover-content-${suffix()}`;
+          }}
+          aria-labelledby={
+            options?.callerAria ? 'caller-popover-label' : undefined
+          }
+        >
+          Details
+        </PopoverContent>
+      </Popover>
+    );
+  }
+  mount(<Fixture />, root);
+  return {
+    reads: () => ({ trigger: triggerReads, content: contentReads }),
+    update: async () => {
+      suffix.set('updated');
+      await flushUpdates();
+    },
+  };
 }

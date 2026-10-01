@@ -19,6 +19,12 @@ import {
 } from './popover.shared';
 import type { PopoverProps } from './popover.types';
 import { OverlayPortalHost } from '../_internal/overlay-portal-host';
+import { syncIdAssociation } from '../_internal/id-association';
+import {
+  createSsrIdRegistration,
+  ssrAttributeRootProps,
+  type SsrIdRegistration,
+} from '../_internal/ssr-id-association';
 
 function schedulePopoverPortalSync(callback: () => void) {
   queueMicrotask(callback);
@@ -40,11 +46,38 @@ export function Popover(props: PopoverProps) {
   captureOverlayNonce(overlayIdentity, cspNonce());
   const triggerId = resolvePartId(popoverId, 'trigger');
   const contentId = resolvePartId(popoverId, 'content');
+  const ssrTrigger = state(createSsrIdRegistration(triggerId))();
+  const ssrContent = state(createSsrIdRegistration(contentId))();
   const portal = getPersistentPortal(overlayIdentity);
   const overlayNodes = getOverlayNodes(overlayIdentity);
+  const associations = state({ controls: true, label: true })();
   const triggerNodeOwner = {};
   const contentNodeOwner = {};
   let contentPosition: PopoverPositionOptions = resolvePopoverPositionOptions();
+  const syncAssociations = () => {
+    const trigger = overlayNodes.trigger;
+    const content = overlayNodes.content;
+    syncIdAssociation(trigger, content, 'aria-controls', associations.controls);
+    syncIdAssociation(content, trigger, 'aria-labelledby', associations.label);
+  };
+
+  const withCommittedIdSync = (
+    registration: SsrIdRegistration
+  ): SsrIdRegistration => ({
+    cell: registration.cell,
+    register(renderedId, signal) {
+      registration.register(renderedId, signal);
+      schedulePopoverPortalSync(() => {
+        if (
+          !signal.aborted &&
+          overlayNodes.trigger?.isConnected &&
+          overlayNodes.content?.isConnected
+        ) {
+          syncAssociations();
+        }
+      });
+    },
+  });
 
   const rootContext: PopoverRootContextValue = {
     popoverId,
@@ -67,20 +100,27 @@ export function Popover(props: PopoverProps) {
     },
     triggerId,
     contentId,
+    ssrTrigger: withCommittedIdSync(ssrTrigger),
+    ssrContent: withCommittedIdSync(ssrContent),
     portal,
     registerContentPosition: (nextPosition: PopoverPositionOptions) => {
       contentPosition = nextPosition;
     },
-    setTriggerNode: (node: HTMLElement | null) => {
+    setTriggerNode: (node: HTMLElement | null, automaticControls: boolean) => {
       registerOverlayNode(overlayIdentity, 'trigger', node, triggerNodeOwner);
+      if (node) associations.controls = automaticControls;
+      syncAssociations();
     },
     getTriggerNode: () => overlayNodes.trigger,
+    getContentNode: () => overlayNodes.content,
     isTriggerTarget: (target: EventTarget | null) =>
       typeof Node !== 'undefined' &&
       target instanceof Node &&
       Boolean(overlayNodes.trigger?.contains(target)),
-    setContentNode: (node: HTMLElement | null) => {
+    setContentNode: (node: HTMLElement | null, automaticLabel: boolean) => {
       registerOverlayNode(overlayIdentity, 'content', node, contentNodeOwner);
+      if (node) associations.label = automaticLabel;
+      syncAssociations();
     },
     syncPosition: () => {
       if (overlayNodes.content) {
@@ -92,7 +132,7 @@ export function Popover(props: PopoverProps) {
     },
   };
   return (
-    <PopoverRootContext value={rootContext}>
+    <PopoverRootContext value={rootContext} {...ssrAttributeRootProps}>
       <>
         {children}
         <OverlayPortalHost portal={portal} />

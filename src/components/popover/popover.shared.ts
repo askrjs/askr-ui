@@ -1,6 +1,7 @@
 import { defineScope, readScope } from '@askrjs/askr';
 import { OVERLAY_Z_INDEX, type OverlayPortal } from '../_internal/overlay';
 import type { PopoverContentOwnProps } from './popover.types';
+import type { SsrIdRegistration } from '../_internal/ssr-id-association';
 
 /** Popover Position Options. */
 export type PopoverPositionOptions = {
@@ -17,12 +18,18 @@ export type PopoverRootContextValue = {
   setOpen: (open: boolean) => void;
   triggerId: string;
   contentId: string;
+  ssrTrigger: SsrIdRegistration;
+  ssrContent: SsrIdRegistration;
   portal: OverlayPortal;
   registerContentPosition: (position: PopoverPositionOptions) => void;
-  setTriggerNode: (node: HTMLElement | null) => void;
+  setTriggerNode: (
+    node: HTMLElement | null,
+    automaticControls: boolean
+  ) => void;
   getTriggerNode: () => HTMLElement | null;
+  getContentNode: () => HTMLElement | null;
   isTriggerTarget: (target: EventTarget | null) => boolean;
-  setContentNode: (node: HTMLElement | null) => void;
+  setContentNode: (node: HTMLElement | null, automaticLabel: boolean) => void;
   syncPosition: () => void;
   clearPosition: () => void;
 };

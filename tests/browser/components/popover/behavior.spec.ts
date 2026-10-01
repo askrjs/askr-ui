@@ -12,6 +12,39 @@ function rectOf(locator: Locator): Promise<Rect> {
 }
 
 test.describe('Popover - Behavior', () => {
+  test('should move and restore focus while force-mounted content opens and closes', async ({
+    page,
+    render,
+    root,
+  }) => {
+    await render('forceMountedToggle');
+    const trigger = root.locator('[data-slot="popover-trigger"]');
+    const content = page.locator('[data-slot="popover-content"]');
+    const originalContent = await content.elementHandle();
+    await trigger.focus();
+    await page.keyboard.press('Enter');
+    await expect(content.getByRole('button')).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(trigger).toBeFocused();
+    await expect(content).toHaveAttribute('data-state', 'closed');
+    expect(await originalContent!.evaluate((node) => node.isConnected)).toBe(
+      true
+    );
+  });
+
+  test('should leave focus and Escape untouched while force-mounted content is closed', async ({
+    page,
+    render,
+    root,
+    run,
+  }) => {
+    await render('forceMountedClosed');
+    await expect(page.locator('[data-slot="popover-content"]')).toHaveCount(1);
+    await expect(root.getByTestId('before')).toBeFocused();
+    await page.keyboard.press('Escape');
+    expect(await run('openChanges')).toEqual([]);
+  });
+
   test('should toggle trigger expansion state through the trigger', async ({
     render,
     root,
@@ -211,3 +244,93 @@ test.describe('Popover - Behavior', () => {
     await expect(page.locator('[data-slot="dialog-content"]')).toHaveCount(1);
   });
 });
+
+for (const part of ['trigger', 'content'] as const) {
+  test(`Popover associates actual custom ${part} IDs in committed markup`, async ({
+    render,
+    root,
+    page,
+  }) => {
+    await render('partIdentityAssociations', { part });
+    const trigger = root.locator('[data-slot="popover-trigger"]');
+    const content = page.locator('[data-slot="popover-content"]');
+    await expect(content).toHaveCount(1);
+    await expect(part === 'trigger' ? trigger : content).toHaveAttribute(
+      'id',
+      `custom-popover-${part}`
+    );
+    const triggerId = await trigger.getAttribute('id');
+    const contentId = await content.getAttribute('id');
+    expect(triggerId).toBeTruthy();
+    expect(contentId).toBeTruthy();
+    await expect(trigger).toHaveAttribute('aria-controls', contentId!);
+    await expect(content).toHaveAttribute('aria-labelledby', triggerId!);
+  });
+}
+test('Popover preserves explicit caller ARIA with custom part IDs', async ({
+  render,
+  root,
+  page,
+}) => {
+  await render('partIdentityAssociations', { callerAria: true });
+  const trigger = root.locator('[data-slot="popover-trigger"]');
+  const content = page.locator('[data-slot="popover-content"]');
+  await expect(trigger).toHaveAttribute('id', 'custom-popover-trigger');
+  await expect(content).toHaveAttribute('id', 'custom-popover-content');
+  await expect(trigger).toHaveAttribute(
+    'aria-controls',
+    'caller-popover-target'
+  );
+  await expect(content).toHaveAttribute(
+    'aria-labelledby',
+    'caller-popover-label'
+  );
+});
+
+for (const callerAria of [false, true]) {
+  test(`Popover updates reactive part IDs with ${callerAria ? 'explicit caller ARIA' : 'automatic associations'}`, async ({
+    render,
+    run,
+    root,
+    page,
+  }) => {
+    await render('reactivePartIdentityAssociations', { callerAria });
+    const trigger = root.locator('[data-slot="popover-trigger"]');
+    const content = page.locator('[data-slot="popover-content"]');
+    await expect(trigger).toHaveAttribute(
+      'id',
+      'reactive-popover-trigger-initial'
+    );
+    await expect(content).toHaveAttribute(
+      'id',
+      'reactive-popover-content-initial'
+    );
+    expect(await run('reads')).toEqual({ trigger: 1, content: 1 });
+    await expect(trigger).toHaveAttribute(
+      'aria-controls',
+      callerAria ? 'caller-popover-target' : 'reactive-popover-content-initial'
+    );
+    await expect(content).toHaveAttribute(
+      'aria-labelledby',
+      callerAria ? 'caller-popover-label' : 'reactive-popover-trigger-initial'
+    );
+    await run('update');
+    await expect(trigger).toHaveAttribute(
+      'id',
+      'reactive-popover-trigger-updated'
+    );
+    await expect(content).toHaveAttribute(
+      'id',
+      'reactive-popover-content-updated'
+    );
+    expect(await run('reads')).toEqual({ trigger: 2, content: 2 });
+    await expect(trigger).toHaveAttribute(
+      'aria-controls',
+      callerAria ? 'caller-popover-target' : 'reactive-popover-content-updated'
+    );
+    await expect(content).toHaveAttribute(
+      'aria-labelledby',
+      callerAria ? 'caller-popover-label' : 'reactive-popover-trigger-updated'
+    );
+  });
+}

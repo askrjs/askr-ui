@@ -4,6 +4,7 @@ import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { hoverable } from '@askrjs/askr/foundations/interactions';
 import { readTooltipRootContext } from './tooltip.shared';
+import { setSsrIdAssociation } from '../_internal/ssr-id-association';
 import type {
   TooltipTriggerAsChildProps,
   TooltipTriggerProps,
@@ -38,7 +39,10 @@ export function TooltipTrigger(
     },
   });
   const setNode = (node: HTMLElement | null) => {
-    root.setTriggerNode(node);
+    root.setTriggerNode(
+      node,
+      (rest as Record<string, unknown>)['aria-describedby'] === undefined
+    );
   };
   const refHandler = ref
     ? composeRefs(
@@ -54,6 +58,7 @@ export function TooltipTrigger(
     ...hoverProps,
     ref: refHandler,
     onFocus: () => {
+      if (disabled) return;
       root.openFromFocus();
     },
     onBlur: (event: FocusEvent) => {
@@ -79,10 +84,19 @@ export function TooltipTrigger(
       });
     },
     'aria-describedby': root.open ? root.contentId : undefined,
+    'aria-disabled': disabled ? 'true' : undefined,
     'data-slot': 'tooltip-trigger',
     'data-disabled': disabled ? 'true' : undefined,
     'data-state': root.open ? 'open' : 'closed',
   });
+
+  setSsrIdAssociation(
+    finalProps,
+    'aria-describedby',
+    root.ssrContent,
+    root.open &&
+      (rest as Record<string, unknown>)['aria-describedby'] === undefined
+  );
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;

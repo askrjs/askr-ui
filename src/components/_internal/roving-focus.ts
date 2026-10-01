@@ -48,6 +48,7 @@ export function rovingFocus(options: RovingFocusOptions): RovingFocusResult {
   };
 
   const handleKeyDown = (event: RovingFocusKeyEvent) => {
+    if (event.defaultPrevented) return;
     let direction: 1 | -1 | undefined;
 
     if (orientation === 'horizontal' || orientation === 'both') {

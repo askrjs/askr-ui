@@ -1,6 +1,16 @@
 import { expect, test } from '../../fixtures';
 
 test.describe('AlertDialog - Behavior', () => {
+  test('should request one controlled close for a native Escape', async ({
+    page,
+    render,
+    run,
+  }) => {
+    await render('controlledEscapeRequest');
+    await page.keyboard.press('Escape');
+    expect(await run('openChanges')).toEqual([[false]]);
+  });
+
   test('should default content to alertdialog while allowing an explicit role', async ({
     page,
     render,

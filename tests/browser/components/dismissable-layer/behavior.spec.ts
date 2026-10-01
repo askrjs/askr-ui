@@ -1,6 +1,26 @@
 import { expect, test } from '../../fixtures';
 
 test.describe('DismissableLayer - Behavior', () => {
+  test('should let the active layer dismiss beneath a disabled layer', async ({
+    page,
+    render,
+    run,
+  }) => {
+    await render('disabledUpperLayer');
+    await page.keyboard.press('Escape');
+    expect(await run('counts')).toEqual({ lower: 1, upper: 0 });
+  });
+
+  test('should dismiss one layer per outside pointer when the top layer unmounts synchronously', async ({
+    render,
+    root,
+    run,
+  }) => {
+    await render('synchronouslyRemovedNestedLayer');
+    await root.getByTestId('outside').click();
+    expect(await run('counts')).toEqual({ inner: 1, outer: 0 });
+  });
+
   test('should dismiss on Escape for the mounted layer', async ({
     render,
     root,

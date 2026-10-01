@@ -3,6 +3,11 @@ import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { DismissableLayer } from '../dismissable-layer';
 import { FocusScope } from '../focus-scope';
+import { syncPersistentOverlayFocus } from '../_internal/overlay-focus';
+import {
+  registerSsrPartId,
+  setSsrIdAssociation,
+} from '../_internal/ssr-id-association';
 import {
   readPopoverRootContext,
   resolvePopoverPositionOptions,
@@ -36,6 +41,12 @@ export function PopoverContent(
     ...rest
   } = props;
   const root = readPopoverRootContext();
+  syncPersistentOverlayFocus(
+    root.open,
+    forceMount,
+    root.getContentNode,
+    root.getTriggerNode
+  );
   const position = resolvePopoverPositionOptions({
     side,
     align,
@@ -64,7 +75,10 @@ export function PopoverContent(
         | null
         | undefined,
       (node: HTMLElement | null) => {
-        root.setContentNode(node);
+        root.setContentNode(
+          node,
+          restDomProps['aria-labelledby'] === undefined && !explicitAriaLabel
+        );
 
         if (node && root.open) {
           root.syncPosition();
@@ -84,6 +98,13 @@ export function PopoverContent(
     'data-side-offset': String(position.sideOffset),
     'data-width': width,
   });
+  registerSsrPartId(finalProps, root.ssrContent);
+  setSsrIdAssociation(
+    finalProps,
+    'aria-labelledby',
+    root.ssrTrigger,
+    restDomProps['aria-labelledby'] === undefined && !explicitAriaLabel
+  );
   const contentNode = asChild ? (
     <Slot asChild {...finalProps} children={children} />
   ) : (
@@ -92,8 +113,13 @@ export function PopoverContent(
 
   return (
     <Presence present={forceMount || root.open}>
-      <FocusScope restoreFocus restoreFocusTarget={root.getTriggerNode}>
+      <FocusScope
+        autoFocus={root.open}
+        restoreFocus
+        restoreFocusTarget={root.getTriggerNode}
+      >
         <DismissableLayer
+          disabled={!root.open}
           onPointerDownOutside={(event) => {
             // The trigger sits outside the content layer in the DOM, but a
             // pointer press on it is the popover's toggle action. Let its

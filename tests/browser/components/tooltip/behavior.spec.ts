@@ -1,6 +1,31 @@
 import { expect, test } from '../../fixtures';
 
 test.describe('Tooltip - Behavior', () => {
+  test.beforeEach(async ({ page }) => {
+    // Keep the initial pointer away from the trigger. Chromium can deliver a
+    // pointerover after layout under a stationary pointer; that independent
+    // hover request must not contaminate the focus-only callback assertions.
+    const viewport = page.viewportSize();
+    await page.mouse.move(
+      (viewport?.width ?? 1280) - 1,
+      (viewport?.height ?? 720) - 1
+    );
+  });
+
+  test('should keep a disabled asChild trigger closed when programmatically focused', async ({
+    render,
+    root,
+    run,
+  }) => {
+    await render('disabledFocusTrigger');
+    await root.locator('[data-slot="tooltip-trigger"]').focus();
+    await expect(root.locator('[data-slot="tooltip-trigger"]')).toHaveAttribute(
+      'data-state',
+      'closed'
+    );
+    expect(await run('openChanges')).toEqual([]);
+  });
+
   test('should update trigger state around focus events', async ({
     page,
     render,
@@ -185,3 +210,68 @@ test.describe('Tooltip - Behavior', () => {
     await expect(content).toHaveCSS('top', '90px');
   });
 });
+
+test('Tooltip associates the actual custom content ID in committed markup', async ({
+  render,
+  root,
+  page,
+}) => {
+  await render('partIdentityAssociations');
+  const trigger = root.locator('[data-slot="tooltip-trigger"]');
+  const content = page.locator('[data-slot="tooltip-content"]');
+  await expect(content).toHaveAttribute('id', 'caller-tooltip-content');
+  await expect(trigger).toHaveAttribute(
+    'aria-describedby',
+    'caller-tooltip-content'
+  );
+});
+test('Tooltip preserves explicit caller ARIA with a custom content ID', async ({
+  render,
+  root,
+  page,
+}) => {
+  await render('partIdentityAssociations', { callerAria: true });
+  const trigger = root.locator('[data-slot="tooltip-trigger"]');
+  const content = page.locator('[data-slot="tooltip-content"]');
+  await expect(content).toHaveAttribute('id', 'caller-tooltip-content');
+  await expect(trigger).toHaveAttribute(
+    'aria-describedby',
+    'caller-tooltip-description'
+  );
+});
+
+for (const callerAria of [false, true]) {
+  test(`Tooltip updates reactive part IDs with ${callerAria ? 'explicit caller ARIA' : 'automatic associations'}`, async ({
+    render,
+    run,
+    root,
+    page,
+  }) => {
+    await render('reactivePartIdentityAssociations', { callerAria });
+    const trigger = root.locator('[data-slot="tooltip-trigger"]');
+    const content = page.locator('[data-slot="tooltip-content"]');
+    await expect(content).toHaveAttribute(
+      'id',
+      'reactive-tooltip-content-initial'
+    );
+    expect(await run('reads')).toEqual({ content: 1 });
+    await expect(trigger).toHaveAttribute(
+      'aria-describedby',
+      callerAria
+        ? 'caller-tooltip-description'
+        : 'reactive-tooltip-content-initial'
+    );
+    await run('update');
+    await expect(content).toHaveAttribute(
+      'id',
+      'reactive-tooltip-content-updated'
+    );
+    expect(await run('reads')).toEqual({ content: 2 });
+    await expect(trigger).toHaveAttribute(
+      'aria-describedby',
+      callerAria
+        ? 'caller-tooltip-description'
+        : 'reactive-tooltip-content-updated'
+    );
+  });
+}

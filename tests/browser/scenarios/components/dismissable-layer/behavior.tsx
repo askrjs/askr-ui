@@ -28,6 +28,59 @@ export function singleLayer(root: HTMLElement) {
   return { dismissCount: () => onDismiss.count() };
 }
 
+export function disabledUpperLayer(root: HTMLElement) {
+  const lowerDismiss = spy();
+  const upperDismiss = spy();
+  mount(
+    <>
+      <DismissableLayer onDismiss={lowerDismiss}>Active layer</DismissableLayer>
+      <DismissableLayer disabled onDismiss={upperDismiss}>
+        Inactive layer
+      </DismissableLayer>
+    </>,
+    root
+  );
+  return {
+    counts: () => ({
+      lower: lowerDismiss.count(),
+      upper: upperDismiss.count(),
+    }),
+  };
+}
+
+export function synchronouslyRemovedNestedLayer(root: HTMLElement) {
+  const outerDismiss = spy();
+  const innerDismiss = spy();
+  let innerContainer: HTMLElement | undefined;
+  const outerContainer = mount(
+    <DismissableLayer onDismiss={outerDismiss}>
+      <div data-testid="inner-host" />
+    </DismissableLayer>,
+    root
+  );
+  innerContainer = mount(
+    <DismissableLayer
+      onDismiss={() => {
+        innerDismiss();
+        unmount(innerContainer);
+      }}
+    >
+      Inner layer
+    </DismissableLayer>,
+    outerContainer.querySelector('[data-testid="inner-host"]') as HTMLElement
+  );
+  const outside = document.createElement('button');
+  outside.dataset.testid = 'outside';
+  outside.textContent = 'Outside';
+  root.append(outside);
+  return {
+    counts: () => ({
+      inner: innerDismiss.count(),
+      outer: outerDismiss.count(),
+    }),
+  };
+}
+
 export function preventedEscape(root: HTMLElement) {
   const onDismiss = spy();
   const globalEscape = spy();
