@@ -3,7 +3,7 @@ import {
   VirtualList,
   type VirtualListApi,
 } from '../../../../../src/components/virtual-list';
-import { flushUpdates, mount, spy, unmount } from '../../_mount';
+import { flushUpdates, mount, settle, spy, unmount } from '../../_mount';
 
 type Item = {
   id: string;
@@ -116,7 +116,7 @@ export async function windowScrollAndFollow(root: HTMLElement) {
     },
     appendItem: async () => {
       appendItem?.();
-      await flushUpdates();
+      await settle();
     },
     isFollowingBottom: () => api?.isFollowingBottom() ?? null,
     scrollTop: () => api?.getScrollTop() ?? null,

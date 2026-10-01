@@ -102,10 +102,7 @@ export function syncVirtualTableRows<Row>(
     0,
     currentViewportHeight - host.headerHeight
   );
-  const currentBodyScrollTop = Math.max(
-    0,
-    currentScrollTop - host.headerHeight
-  );
+  const currentBodyScrollTop = currentScrollTop;
   const currentBodyTotalHeight = resolveVirtualTotalHeight(
     previousKeys.length,
     host.rowHeight
@@ -137,17 +134,15 @@ export function syncVirtualTableRows<Row>(
       );
 
       if (nextBodyScrollTop !== null) {
-        host.pendingScrollTop = host.headerHeight + nextBodyScrollTop;
+        host.pendingScrollTop = nextBodyScrollTop;
       }
     }
   }
 
-  const maxScrollTop =
-    host.headerHeight +
-    resolveVirtualScrollTopForBottom(
-      nextBodyTotalHeight,
-      currentBodyViewportHeight
-    );
+  const maxScrollTop = resolveVirtualScrollTopForBottom(
+    nextBodyTotalHeight,
+    currentBodyViewportHeight
+  );
   host.pendingScrollTop = Math.min(
     Math.max(0, host.pendingScrollTop ?? currentScrollTop),
     maxScrollTop

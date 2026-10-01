@@ -62,7 +62,10 @@ test.describe('VirtualList - Behavior', () => {
 
     expect(await run<boolean>('isFollowingBottom')).toBe(true);
     expect(await run<number>('pendingUnseenCount')).toBe(0);
-    expect(await run<number>('scrollTop')).toBe(120);
+    // The native scroll extent grows after the appended row is committed.
+    // Firefox can deliver that layout and scroll update after the scenario's
+    // update flush, so wait for the browser-backed API state to settle.
+    await expect.poll(() => run<number>('scrollTop')).toBe(120);
     await expect(root.locator('[data-key="item-8"]')).toHaveCount(1);
   });
 

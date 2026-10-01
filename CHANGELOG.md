@@ -37,6 +37,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stays paused through the change and uses the new duration once it resumes.
 - A portalled Select reads the current open state when an application
   `OverlayHost` renders its content outside the Select tree.
+- `VirtualTable` uses the browser's table-top scroll coordinate with its sticky
+  header, keeping the terminal row reachable through `scrollToBottom()` and
+  keeping the rendered window aligned with native scrolling.
 - `SliderThumb`, `SliderTrack`, and `SliderRange` update `aria-valuenow` and
   `data-percentage` when the value changes (#136). `Slider` passed the same
   mutated context object to its parts on every render, so they were not

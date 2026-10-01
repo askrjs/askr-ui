@@ -200,12 +200,10 @@ function getVirtualTableEntry<Row>(
     const viewportHeight =
       entry.viewportHeightState() || entry.viewportHeightHint;
     const bodyViewportHeight = Math.max(0, viewportHeight - entry.headerHeight);
-    const maxScrollTop =
-      entry.headerHeight +
-      resolveVirtualScrollTopForBottom(
-        resolveVirtualTotalHeight(entry.keys.length, entry.rowHeight),
-        bodyViewportHeight
-      );
+    const maxScrollTop = resolveVirtualScrollTopForBottom(
+      resolveVirtualTotalHeight(entry.keys.length, entry.rowHeight),
+      bodyViewportHeight
+    );
     const nextScrollTop = Math.min(Math.max(0, pendingScrollTop), maxScrollTop);
     entry.pendingScrollTop = null;
 
@@ -290,9 +288,10 @@ function getVirtualTableEntry<Row>(
       entry.keys.length,
       entry.rowHeight
     );
-    const maxScrollTop =
-      entry.headerHeight +
-      resolveVirtualScrollTopForBottom(bodyTotalHeight, bodyViewportHeight);
+    const maxScrollTop = resolveVirtualScrollTopForBottom(
+      bodyTotalHeight,
+      bodyViewportHeight
+    );
 
     if (node.scrollTop > maxScrollTop) {
       node.scrollTop = maxScrollTop;
@@ -475,15 +474,13 @@ function getVirtualTableEntry<Row>(
       0,
       (viewportHeightState() || entry.viewportHeightHint) - entry.headerHeight
     );
-    const nextScrollTop =
-      entry.headerHeight +
-      resolveVirtualScrollTopForIndex(
-        index,
-        entry.rowHeight,
-        bodyViewportHeight,
-        entry.keys.length,
-        alignment
-      );
+    const nextScrollTop = resolveVirtualScrollTopForIndex(
+      index,
+      entry.rowHeight,
+      bodyViewportHeight,
+      entry.keys.length,
+      alignment
+    );
 
     entry.pendingScrollTop = nextScrollTop;
     entry.schedulePendingScrollTop();
@@ -553,9 +550,10 @@ function getVirtualTableEntry<Row>(
         entry.keys.length,
         entry.rowHeight
       );
-      const nextScrollTop =
-        entry.headerHeight +
-        resolveVirtualScrollTopForBottom(bodyTotalHeight, bodyViewportHeight);
+      const nextScrollTop = resolveVirtualScrollTopForBottom(
+        bodyTotalHeight,
+        bodyViewportHeight
+      );
 
       entry.pendingScrollTop = nextScrollTop;
       entry.schedulePendingScrollTop();
@@ -1050,7 +1048,10 @@ export function VirtualTable<Row>(
       ? entry.pendingScrollTop
       : currentScrollTop;
   const bodyViewportHeight = Math.max(0, currentViewportHeight - headerHeight);
-  const bodyScrollTop = Math.max(0, effectiveScrollTop - headerHeight);
+  // scrollTop is already measured from the table's top edge. The sticky
+  // header reduces the visible body height, but it does not add an offset to
+  // the scroll coordinate.
+  const bodyScrollTop = effectiveScrollTop;
   const visibleRange = resolveVirtualRange({
     totalCount: rows.length,
     rowHeight,
