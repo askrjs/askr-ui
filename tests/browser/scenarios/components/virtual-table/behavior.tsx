@@ -164,6 +164,7 @@ export async function nestedInteractiveCell(root: HTMLElement) {
       rows={createRows(4)}
       rowHeight={40}
       headerHeight={40}
+      overscan={4}
       getKey={(row) => row.id}
       columns={[
         ...columns,

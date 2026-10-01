@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   CI still uses port 4318 and never reuses a server.
 - Browser tests wait for the harness document and its exposed API, without
   waiting for the page's later `load` event, which can stall in long WebKit runs.
+- Give the complete browser matrix more time on cross-platform CI runners after
+  the expanded public component suite and browser setup.
 
 ### Fixed
 
