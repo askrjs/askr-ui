@@ -2,7 +2,7 @@ import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { cspNonce, state } from '@askrjs/askr';
 import type { JSXElement } from '@askrjs/askr/foundations/structures';
 import type { Ref } from '@askrjs/askr/foundations/utilities';
-import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import {
   assertPositiveVirtualHeight,
   resolveVirtualRange,
@@ -123,6 +123,7 @@ type VirtualTableEntry<Row> = {
   tableNode: HTMLTableElement | null;
   userRef: Ref<HTMLElement> | undefined;
   apiRef: Ref<VirtualTableApi<Row> | null> | undefined;
+  commitRef: ((node: HTMLElement | null) => void) | undefined;
   scrollTopState: StateCell<number>;
   viewportHeightState: StateCell<number>;
   viewportHeightHint: number;
@@ -388,8 +389,6 @@ function getVirtualTableEntry<Row>(
   };
 
   const rootRef = (node: HTMLElement | null) => {
-    setRefValue(entry.userRef, node);
-
     if (entry.wrapperNode === node) {
       return;
     }
@@ -425,7 +424,6 @@ function getVirtualTableEntry<Row>(
     entry.wrapperNode = node;
 
     if (!node) {
-      setRefValue(entry.apiRef, null);
       return;
     }
 
@@ -456,8 +454,6 @@ function getVirtualTableEntry<Row>(
       handleScroll();
       handleResize();
       schedulePendingScrollTop();
-
-      setRefValue(entry.apiRef, entry.api as VirtualTableApi<Row>);
     });
   };
 
@@ -495,11 +491,16 @@ function getVirtualTableEntry<Row>(
   };
 
   const selectRowByIndex = (index: number, reveal = true) => {
-    const row = entry.rowsRef?.[index];
-
-    if (!row) {
+    const rows = entry.rowsRef;
+    if (
+      !rows ||
+      !Number.isInteger(index) ||
+      index < 0 ||
+      index >= rows.length
+    ) {
       return;
     }
+    const row = rows[index];
 
     const getKey = entry.getKey;
 
@@ -1020,8 +1021,18 @@ export function VirtualTable<Row>(
   };
   const viewportHeightHint = resolveVirtualStyleHeight(wrapperRest.style);
 
-  entry.userRef = ref;
-  entry.apiRef = apiRef;
+  const commitRef: (node: HTMLElement | null) => void =
+    entry.userRef === ref && entry.apiRef === apiRef && entry.commitRef
+      ? entry.commitRef
+      : composeRefs(entry.rootRef, ref, (node: HTMLElement | null) => {
+          if (node) {
+            // Cache only bindings adopted by a committed DOM attachment.
+            entry.userRef = ref;
+            entry.apiRef = apiRef;
+            entry.commitRef = commitRef;
+          }
+          setRefValue(apiRef, node ? entry.api : null);
+        });
   entry.scrollTopState = scrollTopState;
   entry.viewportHeightState = viewportHeightState;
   entry.rowHeight = rowHeight;
@@ -1032,11 +1043,7 @@ export function VirtualTable<Row>(
   entry.viewportHeightHint = viewportHeightHint;
   entry.selectedKeyState = selectedKeyState;
   entry.onRowClick = onRowClick;
-  entry.getKey = getKey;
   entry.onScroll = onScroll;
-
-  setRefValue(entry.userRef, entry.wrapperNode);
-  setRefValue(entry.apiRef, entry.api as VirtualTableApi<Row>);
 
   syncVirtualTableRows(entry, rows, getKey);
 
@@ -1071,7 +1078,7 @@ export function VirtualTable<Row>(
     selectedRowKeySnapshot
   );
   const rootProps = mergeProps(wrapperRest, {
-    ref: entry.rootRef,
+    ref: commitRef,
     'data-slot': 'virtual-table',
     'data-virtual-table': 'true',
     'data-viewport': viewport,

@@ -266,3 +266,61 @@ test.describe('Toast - Behavior', () => {
     await expect(action).toHaveAttribute('href', '/logs');
   });
 });
+
+test('Toast propagates native attributes and callbacks after rerender', async ({
+  render,
+  run,
+  root,
+}) => {
+  await render('toastLatestProps');
+  await expect(root.locator('[data-slot="toast"]')).toHaveAttribute(
+    'aria-label',
+    'old'
+  );
+  await run('change');
+  await expect(root.locator('[data-slot="toast"]')).toHaveAttribute(
+    'aria-label',
+    'new'
+  );
+  await root.getByRole('button', { name: 'Close' }).click();
+  expect(await run('calls')).toEqual(['new']);
+  expect(await run('childCalls')).toEqual(['new']);
+});
+
+test('ToastViewport asChild puts notification stack inside supplied host', async ({
+  render,
+  root,
+}) => {
+  await render('toastViewportAsChild');
+  const host = root.locator('section[data-review-host]');
+  await expect(host).toHaveAttribute('role', 'region');
+  await expect(host).toHaveAttribute('data-slot', 'toast-viewport');
+  await expect(host.locator('[data-slot="toast"]')).toHaveCount(1);
+  await expect(host).toHaveAttribute('data-caller', 'retained');
+  await expect(host).toContainText('Caller content');
+});
+
+test('Toast close uses the latest callback after rerender', async ({
+  render,
+  run,
+  root,
+}) => {
+  await render('toastLatestProps');
+  await run('change');
+  await root.getByRole('button', { name: 'Close' }).click();
+  expect(await run('calls')).toEqual(['new']);
+  expect(await run('childCalls')).toEqual(['new']);
+});
+
+test('Toast keeps declaration order when the first registration updates', async ({
+  render,
+  run,
+  root,
+}) => {
+  await render('liveToastOrder');
+  const toasts = root.locator('[data-slot="toast"]');
+  await expect(toasts).toHaveText(['First', 'Second']);
+  await run('change');
+  await expect(toasts.first()).toHaveAttribute('data-variant', 'success');
+  await expect(toasts).toHaveText(['First', 'Second']);
+});

@@ -111,3 +111,72 @@ test.describe('ScrollArea - Behavior', () => {
     await expect(vertical).toHaveAttribute('aria-valuenow', '100');
   });
 });
+
+test('RTL horizontal scrollbar publishes bounded values and reaches End', async ({
+  page,
+  render,
+  root,
+}) => {
+  await render('rtlScrollbar');
+  await page.addStyleTag({
+    content:
+      '[data-slot="scroll-area-viewport"]{width:100px;height:40px;overflow:auto}[data-review-wide]{width:600px;height:20px}',
+  });
+  const viewport = root.locator('[data-slot="scroll-area-viewport"]');
+  const scrollbar = root.getByRole('scrollbar', { name: 'Horizontal' });
+  await expect(scrollbar).toHaveAttribute('aria-disabled', 'false');
+  await viewport.evaluate((node) => {
+    node.scrollLeft = -100;
+    node.dispatchEvent(new Event('scroll', { bubbles: true }));
+  });
+  expect(
+    Number(await scrollbar.getAttribute('aria-valuenow'))
+  ).toBeGreaterThanOrEqual(0);
+  await scrollbar.focus();
+  await scrollbar.press('End');
+  expect(await viewport.evaluate((node) => node.scrollLeft)).toBe(-500);
+  await expect(scrollbar).toHaveAttribute('aria-valuenow', '100');
+  await scrollbar.press('Home');
+  expect(await viewport.evaluate((node) => node.scrollLeft)).toBe(0);
+  await expect(scrollbar).toHaveAttribute('aria-valuenow', '0');
+  await scrollbar.press('ArrowLeft');
+  expect(await viewport.evaluate((node) => node.scrollLeft)).toBe(-40);
+  await scrollbar.press('ArrowRight');
+  expect(await viewport.evaluate((node) => node.scrollLeft)).toBe(0);
+  await scrollbar.press('PageDown');
+  expect(await viewport.evaluate((node) => node.scrollLeft)).toBe(-100);
+  await scrollbar.press('PageUp');
+  expect(await viewport.evaluate((node) => node.scrollLeft)).toBe(0);
+});
+
+test('LTR horizontal scrollbar preserves range values and keyboard directions', async ({
+  render,
+  page,
+  root,
+}) => {
+  await render('rtlScrollbar', { direction: 'ltr' });
+  await page.addStyleTag({
+    content:
+      '[data-slot="scroll-area-viewport"]{width:100px;height:40px;overflow:auto}[data-review-wide]{width:600px;height:20px}',
+  });
+  const viewport = root.locator('[data-slot="scroll-area-viewport"]');
+  const scrollbar = root.getByRole('scrollbar', { name: 'Horizontal' });
+  await expect(scrollbar).toHaveAttribute('aria-disabled', 'false');
+  await viewport.evaluate((node) => {
+    node.scrollLeft = 100;
+    node.dispatchEvent(new Event('scroll', { bubbles: true }));
+  });
+  await expect(scrollbar).toHaveAttribute('aria-valuenow', '20');
+  await scrollbar.focus();
+  for (const [key, position] of [
+    ['End', 500],
+    ['Home', 0],
+    ['ArrowRight', 40],
+    ['ArrowLeft', 0],
+    ['PageDown', 100],
+    ['PageUp', 0],
+  ] as const) {
+    await scrollbar.press(key);
+    expect(await viewport.evaluate((node) => node.scrollLeft)).toBe(position);
+  }
+});

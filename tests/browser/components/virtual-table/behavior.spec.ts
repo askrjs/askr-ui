@@ -264,3 +264,91 @@ test.describe('VirtualTable - Behavior', () => {
     expect(measured.rowOffset).toBeCloseTo(24, 0);
   });
 });
+
+test('VirtualTable selects every valid falsy row by index and key', async ({
+  render,
+  run,
+}) => {
+  await render('falsyTableRows');
+  for (const index of [5, 0, 1, 2, 3, 4])
+    expect(await run('select', index)).toEqual({ key: String(index), index });
+  for (const index of [5, 0, 1, 2, 3, 4])
+    expect(await run('selectKey', String(index))).toEqual({
+      key: String(index),
+      index,
+    });
+  for (const index of [-1, 6, 1.5])
+    expect(await run('select', index)).toEqual({ key: '4', index: 4 });
+});
+
+test('Virtual components clear replaced object refs', async ({
+  render,
+  run,
+}) => {
+  await render('virtualRefReplacement');
+  expect(await run('refs')).toEqual({
+    oldListNode: true,
+    newListNode: false,
+    oldListApi: true,
+    newListApi: false,
+    oldTableNode: true,
+    newTableNode: false,
+    oldTableApi: true,
+    newTableApi: false,
+  });
+  await run('change');
+  expect(await run('refs')).toEqual({
+    oldListNode: false,
+    newListNode: true,
+    oldListApi: false,
+    newListApi: true,
+    oldTableNode: false,
+    newTableNode: true,
+    oldTableApi: false,
+    newTableApi: true,
+  });
+  await run('unmount');
+  expect(await run('refs')).toEqual({
+    oldListNode: false,
+    newListNode: false,
+    oldListApi: false,
+    newListApi: false,
+    oldTableNode: false,
+    newTableNode: false,
+    oldTableApi: false,
+    newTableApi: false,
+  });
+});
+
+test('Virtual components retain an empty-string anchor key when rows are prepended', async ({
+  render,
+  run,
+}) => {
+  await render('emptyKeyAnchoring');
+  await run('scrollToAnchor');
+  await expect.poll(() => run('scrollTops')).toEqual({ list: 56, table: 56 });
+  await run('prepend');
+  await expect.poll(() => run('scrollTops')).toEqual({ list: 112, table: 112 });
+});
+
+test('VirtualTable uses changed getKey callback with the same rows array', async ({
+  render,
+  run,
+  root,
+}) => {
+  await render('changedKeyResolver');
+  await run('rekey');
+  await expect(root.locator('[data-row-key="new-c"]')).toHaveCount(1);
+  expect(await run('select')).toEqual({ key: 'new-c', index: 2 });
+});
+test('Virtual components anchor newly rendered keys after getKey changes', async ({
+  render,
+  run,
+}) => {
+  await render('changedKeyResolver');
+  await run('scroll');
+  await expect.poll(() => run('scrollTops')).toEqual({ list: 56, table: 56 });
+  await run('rekey');
+  await run('prepend');
+  await expect.poll(() => run('scrollTops')).toEqual({ list: 84, table: 84 });
+});

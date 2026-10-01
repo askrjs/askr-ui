@@ -340,3 +340,83 @@ export function linkAction(root: HTMLElement): void {
     root
   );
 }
+
+export function toastLatestProps(root: HTMLElement) {
+  let change!: () => void;
+  const calls: string[] = [];
+  const childCalls: string[] = [];
+  function Fixture() {
+    const tag = state('old');
+    change = () => tag.set('new');
+    const current = tag();
+    return (
+      <ToastHost duration={Infinity}>
+        <ToastViewport />
+        <Toast
+          id="review-live-toast"
+          aria-label={current}
+          onOpenChange={() => calls.push(current)}
+        >
+          <ToastTitle>Saved</ToastTitle>
+          <ToastClose onPress={() => childCalls.push(current)}>
+            Close
+          </ToastClose>
+        </Toast>
+      </ToastHost>
+    );
+  }
+  mount(<Fixture />, root);
+  return {
+    change: async () => {
+      change();
+      await flushUpdates();
+    },
+    calls: () => calls,
+    childCalls: () => childCalls,
+  };
+}
+
+export function toastViewportAsChild(root: HTMLElement) {
+  mount(
+    <ToastHost duration={Infinity}>
+      <ToastViewport asChild>
+        <section data-review-host="true" data-caller="retained">
+          Caller content
+        </section>
+      </ToastViewport>
+      <Toast id="review-child-toast">
+        <ToastTitle>Saved</ToastTitle>
+      </Toast>
+    </ToastHost>,
+    root
+  );
+}
+
+export function liveToastOrder(root: HTMLElement) {
+  let change!: () => void;
+  function Fixture() {
+    const changed = state(false);
+    change = () => changed.set(true);
+    return (
+      <ToastHost duration={Infinity}>
+        <ToastViewport />
+        <Toast
+          id="first-live-toast"
+          variant={changed() ? 'success' : 'default'}
+        >
+          <ToastTitle>First</ToastTitle>
+        </Toast>
+        <Toast id="second-live-toast">
+          <ToastTitle>Second</ToastTitle>
+        </Toast>
+      </ToastHost>
+    );
+  }
+  mount(<Fixture />, root);
+  return {
+    change: async () => {
+      change();
+      await flushUpdates();
+    },
+  };
+}

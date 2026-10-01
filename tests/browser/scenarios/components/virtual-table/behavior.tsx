@@ -1,3 +1,7 @@
+import {
+  VirtualList,
+  type VirtualListApi,
+} from '../../../../../src/components/virtual-list';
 import { CspNonceScope, state } from '@askrjs/askr';
 import {
   VirtualTable,
@@ -552,5 +556,255 @@ export async function fixedRowHeightContract(root: HTMLElement) {
         rowOffset: secondBox.top - firstBox.top,
       };
     },
+  };
+}
+
+export function falsyTableRows(root: HTMLElement) {
+  let api: VirtualTableApi<unknown> | null = null;
+  mount(
+    <VirtualTable
+      style={{ height: '180px', overflowY: 'auto' }}
+      aria-label="Falsy rows"
+      rows={[0, false, '', null, undefined, { name: 'object' }]}
+      rowHeight={28}
+      headerHeight={28}
+      getKey={(_, index) => String(index)}
+      columns={[
+        {
+          id: 'value',
+          header: 'Value',
+          cellComponent: ({ row }) => <span>{String(row)}</span>,
+        },
+      ]}
+      apiRef={(next) => {
+        api = next;
+      }}
+    />,
+    root
+  );
+  return {
+    select: async (index: number) => {
+      api?.selectRowByIndex(index);
+      await flushUpdates();
+      return {
+        key: api?.getSelectedRowKey(),
+        index: api?.getSelectedRowIndex(),
+      };
+    },
+    selectKey: async (key: string) => {
+      api?.selectRowByKey(key);
+      await flushUpdates();
+      return {
+        key: api?.getSelectedRowKey(),
+        index: api?.getSelectedRowIndex(),
+      };
+    },
+  };
+}
+
+export function virtualRefReplacement(root: HTMLElement) {
+  const oldListRef = { current: null as HTMLElement | null };
+  const newListRef = { current: null as HTMLElement | null };
+  const oldListApi = { current: null as VirtualListApi<number> | null };
+  const newListApi = { current: null as VirtualListApi<number> | null };
+  const oldTableRef = { current: null as HTMLElement | null };
+  const newTableRef = { current: null as HTMLElement | null };
+  const oldTableApi = { current: null as VirtualTableApi<number> | null };
+  const newTableApi = { current: null as VirtualTableApi<number> | null };
+  let change!: () => void;
+  function Fixture() {
+    const replaced = state(false);
+    change = () => replaced.set(true);
+    const next = replaced();
+    return (
+      <>
+        <VirtualList
+          aria-label="List"
+          style={{ height: '84px' }}
+          items={[1, 2, 3]}
+          rowHeight={28}
+          getKey={(item) => item}
+          rowComponent={({ item }) => <span>{item}</span>}
+          ref={next ? newListRef : oldListRef}
+          apiRef={next ? newListApi : oldListApi}
+        />
+        <VirtualTable
+          aria-label="Table"
+          style={{ height: '112px' }}
+          rows={[1, 2, 3]}
+          rowHeight={28}
+          headerHeight={28}
+          getKey={(row) => row}
+          columns={[
+            {
+              id: 'value',
+              header: 'Value',
+              cellComponent: ({ row }) => <span>{row}</span>,
+            },
+          ]}
+          ref={next ? newTableRef : oldTableRef}
+          apiRef={next ? newTableApi : oldTableApi}
+        />
+      </>
+    );
+  }
+  const container = mount(<Fixture />, root);
+  return {
+    change: async () => {
+      change();
+      await flushUpdates();
+    },
+    unmount: async () => {
+      unmount(container);
+      await flushUpdates();
+    },
+    refs: () => ({
+      oldListNode: oldListRef.current !== null,
+      newListNode: newListRef.current !== null,
+      oldListApi: oldListApi.current !== null,
+      newListApi: newListApi.current !== null,
+      oldTableNode: oldTableRef.current !== null,
+      newTableNode: newTableRef.current !== null,
+      oldTableApi: oldTableApi.current !== null,
+      newTableApi: newTableApi.current !== null,
+    }),
+  };
+}
+
+export function emptyKeyAnchoring(root: HTMLElement) {
+  let prepend!: () => void;
+  let listApi: VirtualListApi<string> | null = null;
+  let tableApi: VirtualTableApi<string> | null = null;
+  function Fixture() {
+    const rows = state(['a', 'b', '', 'd', 'e', 'f', 'g', 'h', 'i', 'j']);
+    prepend = () => rows.set(['before-a', 'before-b', ...rows()]);
+    const current = rows();
+    return (
+      <>
+        <VirtualList
+          style={{ height: '84px', overflowY: 'auto' }}
+          items={current}
+          rowHeight={28}
+          overscan={0}
+          getKey={(item) => item}
+          rowComponent={({ item }) => <span>{item || '(empty)'}</span>}
+          apiRef={(next) => {
+            listApi = next;
+          }}
+        />
+        <VirtualTable
+          style={{ height: '112px', overflowY: 'auto' }}
+          aria-label="Empty key table"
+          rows={current}
+          rowHeight={28}
+          headerHeight={28}
+          overscan={0}
+          getKey={(row) => row}
+          columns={[
+            {
+              id: 'value',
+              header: 'Value',
+              cellComponent: ({ row }) => <span>{row || '(empty)'}</span>,
+            },
+          ]}
+          apiRef={(next) => {
+            tableApi = next;
+          }}
+        />
+      </>
+    );
+  }
+  mount(<Fixture />, root);
+  return {
+    scrollToAnchor: async () => {
+      listApi?.scrollToIndex(2);
+      tableApi?.scrollToIndex(2);
+      await flushUpdates();
+    },
+    prepend: async () => {
+      prepend();
+      await flushUpdates();
+    },
+    scrollTops: () => ({
+      list: listApi?.getScrollTop(),
+      table: tableApi?.getScrollTop(),
+    }),
+  };
+}
+
+export function changedKeyResolver(root: HTMLElement) {
+  let rekey!: () => void;
+  let prepend!: () => void;
+  let listApi: VirtualListApi<string> | null = null;
+  let tableApi: VirtualTableApi<string> | null = null;
+  function Fixture() {
+    const rows = state(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']);
+    const prefix = state('old-');
+    rekey = () => prefix.set('new-');
+    prepend = () => rows.set(['before', ...rows()]);
+    const items = rows();
+    const keyPrefix = prefix();
+    const getKey = (row: string) => keyPrefix + row;
+    return (
+      <>
+        <VirtualList
+          style={{ height: '84px', overflowY: 'auto' }}
+          items={items}
+          rowHeight={28}
+          overscan={0}
+          getKey={getKey}
+          rowComponent={({ item }) => <span>{item}</span>}
+          apiRef={(next) => {
+            listApi = next;
+          }}
+        />
+        <VirtualTable
+          style={{ height: '112px', overflowY: 'auto' }}
+          rows={items}
+          rowHeight={28}
+          headerHeight={28}
+          overscan={0}
+          getKey={getKey}
+          columns={[
+            {
+              id: 'value',
+              header: 'Value',
+              cellComponent: ({ row }) => <span>{row}</span>,
+            },
+          ]}
+          apiRef={(next) => {
+            tableApi = next;
+          }}
+        />
+      </>
+    );
+  }
+  mount(<Fixture />, root);
+  return {
+    rekey: async () => {
+      rekey();
+      await flushUpdates();
+    },
+    prepend: async () => {
+      prepend();
+      await flushUpdates();
+    },
+    scroll: async () => {
+      listApi?.scrollToIndex(2);
+      tableApi?.scrollToIndex(2);
+      await flushUpdates();
+    },
+    select: async () => {
+      tableApi?.selectRowByKey('new-c');
+      await flushUpdates();
+      return {
+        key: tableApi?.getSelectedRowKey(),
+        index: tableApi?.getSelectedRowIndex(),
+      };
+    },
+    scrollTops: () => ({
+      list: listApi?.getScrollTop(),
+      table: tableApi?.getScrollTop(),
+    }),
   };
 }

@@ -2,7 +2,7 @@ import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { cspNonce, state } from '@askrjs/askr';
 import type { JSXElement } from '@askrjs/askr/foundations/structures';
 import type { Ref } from '@askrjs/askr/foundations/utilities';
-import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import {
   assertPositiveVirtualHeight,
   buildVirtualKeyIndexMap,
@@ -88,6 +88,7 @@ type VirtualListEntry<Item> = {
   node: HTMLElement | null;
   userRef: Ref<HTMLElement> | undefined;
   apiRef: Ref<VirtualListApi<Item> | null> | undefined;
+  commitRef: ((node: HTMLElement | null) => void) | undefined;
   scrollTopState: StateCell<number>;
   viewportHeightState: StateCell<number>;
   renderVersionState: StateCell<number> | undefined;
@@ -97,6 +98,7 @@ type VirtualListEntry<Item> = {
   overscan: VirtualOverscan;
   rowComponent: VirtualListRowComponent<Item>;
   itemsRef: readonly Item[] | null;
+  getKey: ((item: Item, index: number) => string | number) | null;
   keys: string[];
   keyIndexMap: Map<string, number>;
   placements: Map<string, VirtualCompositeScopeValue>;
@@ -417,8 +419,6 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
   };
 
   const rootRef = (node: HTMLElement | null) => {
-    setRefValue(entry.userRef, node);
-
     if (entry.node === node) {
       return;
     }
@@ -457,7 +457,6 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
     entry.node = node;
 
     if (!node) {
-      setRefValue(entry.apiRef, null);
       return;
     }
 
@@ -489,8 +488,6 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
       handleScroll();
       handleResize();
       schedulePendingScrollTop();
-
-      setRefValue(entry.apiRef, entry.api as VirtualListApi<Item>);
     });
   };
 
@@ -616,6 +613,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
   entry.overscan = entry.overscan ?? 0;
   entry.rowComponent = entry.rowComponent ?? (() => null as never);
   entry.itemsRef = entry.itemsRef ?? null;
+  entry.getKey = entry.getKey ?? null;
   entry.keys = entry.keys ?? [];
   entry.keyIndexMap = entry.keyIndexMap ?? new Map<string, number>();
   entry.placements =
@@ -768,7 +766,7 @@ function syncVirtualListItems<Item>(
   nextRowHeights: number[] | null
 ) {
   const previousKeys = entry.keys;
-  const itemsChanged = entry.itemsRef !== items;
+  const itemsChanged = entry.itemsRef !== items || entry.getKey !== getKey;
 
   if (!itemsChanged) {
     entry.rowHeights = nextRowHeights;
@@ -821,7 +819,7 @@ function syncVirtualListItems<Item>(
       nextKeyIndexMap
     );
 
-    if (anchorKey) {
+    if (anchorKey !== null) {
       const anchor = entry.rowHeights
         ? createVariableVirtualAnchor(
             anchorKey,
@@ -867,6 +865,7 @@ function syncVirtualListItems<Item>(
   entry.keys = nextKeys;
   entry.keyIndexMap = nextKeyIndexMap;
   entry.itemsRef = items;
+  entry.getKey = getKey;
   entry.rowHeights = nextRowHeights;
 
   const maxScrollTop = resolveVirtualScrollTopForBottom(
@@ -927,8 +926,18 @@ export function VirtualList<Item>(
   const renderVersion = renderVersionState();
   const viewportHeightHint = resolveVirtualStyleHeight(rest.style);
 
-  entry.userRef = ref;
-  entry.apiRef = apiRef;
+  const commitRef: (node: HTMLElement | null) => void =
+    entry.userRef === ref && entry.apiRef === apiRef && entry.commitRef
+      ? entry.commitRef
+      : composeRefs(entry.rootRef, ref, (node: HTMLElement | null) => {
+          if (node) {
+            // Cache only bindings adopted by a committed DOM attachment.
+            entry.userRef = ref;
+            entry.apiRef = apiRef;
+            entry.commitRef = commitRef;
+          }
+          setRefValue(apiRef, node ? entry.api : null);
+        });
   entry.scrollTopState = scrollTopState;
   entry.viewportHeightState = viewportHeightState;
   entry.rowHeight = rowHeight;
@@ -950,9 +959,6 @@ export function VirtualList<Item>(
     typeof followBottom === 'boolean'
       ? rowHeight
       : Math.max(0, followBottom.threshold ?? rowHeight);
-
-  setRefValue(entry.userRef, entry.node);
-  setRefValue(entry.apiRef, entry.api as VirtualListApi<Item>);
 
   syncVirtualListItems(entry, items, getKey, nextRowHeights);
 
@@ -977,7 +983,7 @@ export function VirtualList<Item>(
     getListHostElementName(semanticHost) === 'ol';
 
   const finalProps = mergeProps(rest, {
-    ref: entry.rootRef,
+    ref: commitRef,
     role: rendersSemanticListItems ? undefined : 'list',
     'data-slot': 'virtual-list',
     'data-virtual-list': 'true',

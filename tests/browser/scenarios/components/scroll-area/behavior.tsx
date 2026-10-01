@@ -110,3 +110,23 @@ export function overflowMetrics(root: HTMLElement): void {
     root
   );
 }
+
+export function rtlScrollbar(
+  root: HTMLElement,
+  options: { direction?: 'ltr' | 'rtl' } = {}
+) {
+  mount(
+    <ScrollArea>
+      <ScrollAreaViewport
+        dir={options?.direction ?? 'rtl'}
+        aria-label="RTL content"
+      >
+        <div data-review-wide="true">Wide</div>
+      </ScrollAreaViewport>
+      <ScrollAreaScrollbar orientation="horizontal" aria-label="Horizontal">
+        <ScrollAreaThumb />
+      </ScrollAreaScrollbar>
+    </ScrollArea>,
+    root
+  );
+}

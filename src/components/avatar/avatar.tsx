@@ -141,15 +141,8 @@ export function AvatarImage(props: AvatarImageProps): JSX.Element {
     'data-slot': 'avatar-image',
     'data-avatar-image': 'true',
     'data-state': status,
-    onLoad: (event: Event) => {
-      const avatar = (event.currentTarget as HTMLElement | null)?.closest(
-        '[data-avatar="true"]'
-      );
+    onLoad: () => {
       updateStatus('loaded');
-      queueMicrotask(() => {
-        const fallback = avatar?.querySelector('[data-avatar-fallback="true"]');
-        fallback?.parentNode?.removeChild(fallback);
-      });
     },
     onError: () => {
       updateStatus('error');
