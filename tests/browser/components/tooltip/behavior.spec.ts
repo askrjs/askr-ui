@@ -138,6 +138,25 @@ test.describe('Tooltip - Behavior', () => {
     expect(await run<number>('openChanges')).toBe(1);
   });
 
+  test('should preserve focus when a removed trigger is replaced', async ({
+    render,
+    root,
+    run,
+  }) => {
+    await render('controlledTriggerReplacement');
+
+    await root.getByTestId('tooltip-trigger').focus();
+    await run('settle');
+    expect(await run<number>('openChanges')).toBe(1);
+
+    await run('removeTrigger');
+    await run('remountTrigger');
+    await run('settle');
+
+    await expect(root.getByTestId('tooltip-trigger')).toBeFocused();
+    expect(await run<number>('openChanges')).toBe(1);
+  });
+
   test('should cancel pending focus-adoption work during teardown', async ({
     render,
     run,

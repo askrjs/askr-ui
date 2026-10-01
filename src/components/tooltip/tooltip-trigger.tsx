@@ -56,10 +56,22 @@ export function TooltipTrigger(
     onFocus: () => {
       root.openFromFocus();
     },
-    onBlur: () => {
+    onBlur: (event: FocusEvent) => {
+      const trigger = event.currentTarget as HTMLElement;
       queueMicrotask(() => {
+        const activeElement = document.activeElement;
         const currentTrigger = root.getTriggerNode();
-        if (currentTrigger && currentTrigger.contains(document.activeElement)) {
+        if (currentTrigger && currentTrigger.contains(activeElement)) {
+          return;
+        }
+        // Removing a focused trigger can temporarily leave focus on the body
+        // while its replacement is being mounted. A focusin elsewhere clears
+        // the adoption latch if the user moved to another control.
+        if (
+          !trigger.isConnected &&
+          (activeElement === document.body ||
+            activeElement === document.documentElement)
+        ) {
           return;
         }
         root.releaseFocusAdoption();
