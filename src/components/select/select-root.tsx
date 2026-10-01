@@ -170,7 +170,7 @@ export function Select(props: SelectProps) {
     },
     resolvedState,
     handleTypeaheadKeyDown: (event) =>
-      handleTypeaheadKeyDown(overlayIdentity, event, {
+      handleTypeaheadKeyDown(overlayIdentity, event, () => ({
         currentIndex: resolvedState.items.findIndex(
           (item) => item.index === resolvedState.currentIndex
         ),
@@ -197,7 +197,7 @@ export function Select(props: SelectProps) {
             }
           }
         },
-      }),
+      })),
     handleTypeaheadKeyUp: (event) =>
       handleTypeaheadKeyUp(overlayIdentity, event),
   };

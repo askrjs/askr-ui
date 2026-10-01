@@ -14,6 +14,7 @@ export default defineConfig({
       'tests/jsdom/components/consistency-reset/**/*.test.tsx',
       'tests/jsdom/internal/overlay/**/*.test.ts',
       'tests/jsdom/internal/focus/**/*.test.ts',
+      'tests/jsdom/internal/typeahead.test.ts',
     ],
   },
 });

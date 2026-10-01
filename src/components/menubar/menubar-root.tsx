@@ -168,21 +168,23 @@ export function Menubar(props: MenubarProps) {
     });
   };
   const handleRootTypeaheadKeyDown = (event: KeyboardEvent) => {
-    const liveState = resolveMenubarRootState({
-      menubarId,
-      currentTriggerIndexCandidate: currentTriggerIndexState(),
-    });
+    return handleTypeaheadKeyDown(identity, event, () => {
+      const liveState = resolveMenubarRootState({
+        menubarId,
+        currentTriggerIndexCandidate: currentTriggerIndexState(),
+      });
+      const currentItemIndex = liveState.items.findIndex(
+        (item) => item.index === liveState.currentTriggerIndex
+      );
 
-    const currentItemIndex = liveState.items.findIndex(
-      (item) => item.index === liveState.currentTriggerIndex
-    );
-    return handleTypeaheadKeyDown(identity, event, {
-      currentIndex: currentItemIndex,
-      items: liveState.items,
-      onMatch: (matchIndex) => {
-        const index = liveState.items[matchIndex]?.index;
-        if (index !== undefined) navigateToTrigger(index);
-      },
+      return {
+        currentIndex: currentItemIndex,
+        items: liveState.items,
+        onMatch: (matchIndex) => {
+          const index = liveState.items[matchIndex]?.index;
+          if (index !== undefined) navigateToTrigger(index);
+        },
+      };
     });
   };
   const queuePortalSync = () => {
