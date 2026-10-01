@@ -4,6 +4,7 @@ import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { runCancelablePress } from '../_internal/press';
+import { setSsrIdAssociation } from '../_internal/ssr-id-association';
 import { readDialogRootContext } from './dialog.shared';
 import type {
   DialogTriggerAsChildProps,
@@ -40,7 +41,10 @@ export function DialogTrigger(
     isNativeButton: !asChild,
   });
   const setNode = (node: HTMLElement | null) => {
-    root.setTriggerNode(node);
+    root.setTriggerNode(
+      node,
+      (rest as JSX.IntrinsicElements['button'])['aria-controls'] === undefined
+    );
   };
   const refHandler = ref
     ? composeRefs(
@@ -57,12 +61,18 @@ export function DialogTrigger(
     ref: refHandler,
     'aria-haspopup': 'dialog',
     'aria-expanded': root.open ? 'true' : 'false',
-    'aria-controls': root.contentId,
+    'aria-controls': root.getContentId,
     'data-slot': 'dialog-trigger',
     'data-dialog-trigger': 'true',
     'data-disabled': disabled ? 'true' : undefined,
     'data-state': root.open ? 'open' : 'closed',
   });
+  setSsrIdAssociation(
+    finalProps,
+    'aria-controls',
+    root.ssrContent,
+    (rest as JSX.IntrinsicElements['button'])['aria-controls'] === undefined
+  );
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;
