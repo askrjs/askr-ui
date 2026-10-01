@@ -105,6 +105,7 @@ type VirtualListEntry<Item> = {
   followBottomThreshold: number;
   pendingUnseenCount: number;
   pendingScrollTop: number | null;
+  pendingProgrammaticScrollTops: number[];
   pendingCommitFrame: number | null;
   resizeCommitFrame: number | null;
   resizeObserver: ResizeObserver | null;
@@ -209,6 +210,14 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
   const setScrollTop = (nextScrollTop: number) => {
     entry.scrollTopState!.set(nextScrollTop);
   };
+  const writeScrollTop = (node: HTMLElement, nextScrollTop: number) => {
+    if (node.scrollTop === nextScrollTop) return;
+    entry.pendingProgrammaticScrollTops.push(nextScrollTop);
+    if (entry.pendingProgrammaticScrollTops.length > 8) {
+      entry.pendingProgrammaticScrollTops.shift();
+    }
+    node.scrollTop = nextScrollTop;
+  };
   const readViewportHeight = () => entry.viewportHeightState!();
   const setViewportHeight = (nextViewportHeight: number) => {
     entry.viewportHeightState!.set(nextViewportHeight);
@@ -238,6 +247,11 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
       return;
     }
 
+    if (pendingScrollTop > node.scrollHeight - node.clientHeight) {
+      schedulePendingScrollTop();
+      return;
+    }
+
     const viewportHeight = readViewportHeight() || entry.viewportHeightHint;
     const maxScrollTop = resolveVirtualScrollTopForBottom(
       resolveEntryTotalHeight(entry),
@@ -247,7 +261,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
     entry.pendingScrollTop = null;
 
     if (node.scrollTop !== nextScrollTop) {
-      node.scrollTop = nextScrollTop;
+      writeScrollTop(node, nextScrollTop);
     }
 
     if (readScrollTop() !== nextScrollTop) {
@@ -290,11 +304,17 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
     // stays aligned with the browser's actual scroll state.
     const nextScrollTop = node.scrollTop;
 
-    if (event && entry.pendingScrollTop !== null) {
-      entry.pendingScrollTop = null;
-      if (entry.pendingCommitFrame !== null) {
-        cancelAnimationFrame(entry.pendingCommitFrame);
-        entry.pendingCommitFrame = null;
+    if (event) {
+      const programmaticIndex =
+        entry.pendingProgrammaticScrollTops.indexOf(nextScrollTop);
+      if (programmaticIndex >= 0) {
+        entry.pendingProgrammaticScrollTops.splice(0, programmaticIndex + 1);
+      } else if (entry.pendingScrollTop !== null) {
+        entry.pendingScrollTop = null;
+        if (entry.pendingCommitFrame !== null) {
+          cancelAnimationFrame(entry.pendingCommitFrame);
+          entry.pendingCommitFrame = null;
+        }
       }
     }
 
@@ -351,7 +371,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
 
     if (entry.followBottomEnabled && entry.followBottomActive) {
       if (node.scrollTop !== maxScrollTop) {
-        node.scrollTop = maxScrollTop;
+        writeScrollTop(node, maxScrollTop);
         if (readScrollTop() !== maxScrollTop) {
           setScrollTop(maxScrollTop);
         }
@@ -360,7 +380,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
     }
 
     if (node.scrollTop > maxScrollTop) {
-      node.scrollTop = maxScrollTop;
+      writeScrollTop(node, maxScrollTop);
       if (readScrollTop() !== maxScrollTop) {
         setScrollTop(maxScrollTop);
       }
@@ -499,7 +519,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
       entry.schedulePendingScrollTop();
 
       if (node && node.scrollTop !== nextScrollTop) {
-        node.scrollTop = nextScrollTop;
+        writeScrollTop(node, nextScrollTop);
       }
 
       updateVisibleRange(nextScrollTop, viewportHeight);
@@ -521,7 +541,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
       entry.schedulePendingScrollTop();
 
       if (node && node.scrollTop !== nextScrollTop) {
-        node.scrollTop = nextScrollTop;
+        writeScrollTop(node, nextScrollTop);
       }
 
       entry.followBottomActive = true;
@@ -605,6 +625,8 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
   entry.followBottomThreshold = entry.followBottomThreshold ?? 0;
   entry.pendingUnseenCount = entry.pendingUnseenCount ?? 0;
   entry.pendingScrollTop = entry.pendingScrollTop ?? null;
+  entry.pendingProgrammaticScrollTops =
+    entry.pendingProgrammaticScrollTops ?? [];
   entry.pendingCommitFrame = entry.pendingCommitFrame ?? null;
   entry.resizeCommitFrame = entry.resizeCommitFrame ?? null;
   entry.visibleRange =
