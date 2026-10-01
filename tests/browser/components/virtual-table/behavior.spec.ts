@@ -352,3 +352,25 @@ test('Virtual components anchor newly rendered keys after getKey changes', async
   await run('prepend');
   await expect.poll(() => run('scrollTops')).toEqual({ list: 84, table: 84 });
 });
+
+test('VirtualTable honors ancestor keyboard cancellation', async ({
+  page,
+  render,
+  root,
+  run,
+}) => {
+  await render('stickyHeaderSelection');
+  await page.evaluate(() =>
+    document.addEventListener('keydown', (event) => event.preventDefault(), {
+      capture: true,
+    })
+  );
+  const table = root.locator('[data-slot="virtual-table-table"]');
+  await table.focus();
+  await table.press('ArrowDown');
+  await page.evaluate(
+    () => new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
+  );
+  expect(await run<string | null>('selectedRowKey')).toBeNull();
+  await expect(table).toBeFocused();
+});

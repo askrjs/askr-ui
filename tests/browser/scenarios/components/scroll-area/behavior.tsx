@@ -130,3 +130,29 @@ export function rtlScrollbar(
     root
   );
 }
+
+export function cancelledKeyboard(
+  root: HTMLElement,
+  options: { cancellation: 'ancestor' | 'caller' }
+) {
+  mount(
+    <>
+      <style>{`[data-testid="cancelled-viewport"]{width:200px;height:100px;overflow:scroll}`}</style>
+      <ScrollArea>
+        <ScrollAreaViewport data-testid="cancelled-viewport">
+          <div style={{ height: '500px' }}>Messages</div>
+        </ScrollAreaViewport>
+        <ScrollAreaScrollbar
+          orientation="vertical"
+          aria-label="Vertical"
+          onKeyDown={
+            options.cancellation === 'caller'
+              ? (event: KeyboardEvent) => event.preventDefault()
+              : undefined
+          }
+        />
+      </ScrollArea>
+    </>,
+    root
+  );
+}

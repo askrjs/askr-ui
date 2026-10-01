@@ -180,3 +180,31 @@ test('LTR horizontal scrollbar preserves range values and keyboard directions', 
     expect(await viewport.evaluate((node) => node.scrollLeft)).toBe(position);
   }
 });
+
+for (const cancellation of ['ancestor', 'caller'] as const) {
+  test(`ScrollArea honors ${cancellation} keyboard cancellation`, async ({
+    page,
+    render,
+    root,
+  }) => {
+    await render('cancelledKeyboard', { cancellation });
+    const viewport = root.locator('[data-slot="scroll-area-viewport"]');
+    const scrollbar = root.getByRole('scrollbar', { name: 'Vertical' });
+    await expect(scrollbar).toHaveAttribute('aria-disabled', 'false');
+    if (cancellation === 'ancestor') {
+      await page.evaluate(() =>
+        document.addEventListener(
+          'keydown',
+          (event) => event.preventDefault(),
+          { capture: true }
+        )
+      );
+    }
+    await scrollbar.focus();
+    await scrollbar.press('ArrowDown');
+    await page.evaluate(
+      () => new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
+    );
+    expect(await viewport.evaluate((node) => node.scrollTop)).toBe(0);
+  });
+}

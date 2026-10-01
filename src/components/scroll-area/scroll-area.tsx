@@ -1,6 +1,10 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeHandlers,
+  composeRefs,
+  mergeProps,
+} from '@askrjs/askr/foundations/utilities';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import { getSignal, readScope, defineScope, state } from '@askrjs/askr';
 import type {
@@ -300,6 +304,7 @@ export function ScrollAreaScrollbar(
     children,
     orientation = 'vertical',
     ref,
+    onKeyDown,
     style: _style,
     ...rest
   } = props;
@@ -326,21 +331,29 @@ export function ScrollAreaScrollbar(
     'data-slot': 'scroll-area-scrollbar',
     'data-orientation': orientation,
     'data-state': metrics.overflow ? 'visible' : 'hidden',
-    onKeyDown: (event: KeyboardEvent) => {
-      const orientationKey =
-        orientation === 'vertical'
-          ? ['ArrowUp', 'ArrowDown']
-          : ['ArrowLeft', 'ArrowRight'];
-      if (
-        !orientationKey.includes(event.key) &&
-        !['PageUp', 'PageDown', 'Home', 'End'].includes(event.key)
-      ) {
-        return;
+    onKeyDown: composeHandlers(
+      typeof onKeyDown === 'function'
+        ? (onKeyDown as (event: KeyboardEvent) => void)
+        : undefined,
+      (event: KeyboardEvent) => {
+        if (event.defaultPrevented) {
+          return;
+        }
+        const orientationKey =
+          orientation === 'vertical'
+            ? ['ArrowUp', 'ArrowDown']
+            : ['ArrowLeft', 'ArrowRight'];
+        if (
+          !orientationKey.includes(event.key) &&
+          !['PageUp', 'PageDown', 'Home', 'End'].includes(event.key)
+        ) {
+          return;
+        }
+        if (root.scroll(orientation, event.key)) {
+          event.preventDefault();
+        }
       }
-      if (root.scroll(orientation, event.key)) {
-        event.preventDefault();
-      }
-    },
+    ),
   });
 
   return (
