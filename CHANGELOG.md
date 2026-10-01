@@ -40,6 +40,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `VirtualTable` uses the browser's table-top scroll coordinate with its sticky
   header, keeping the terminal row reachable through `scrollToBottom()` and
   keeping the rendered window aligned with native scrolling.
+- `Tooltip` bounds a controlled open request caused by native focus. When an
+  owner keeps it closed, trigger focus adoption no longer emits repeated
+  `onOpenChange(true)` callbacks during the same focus turn.
 - `SliderThumb`, `SliderTrack`, and `SliderRange` update `aria-valuenow` and
   `data-percentage` when the value changes (#136). `Slider` passed the same
   mutated context object to its parts on every render, so they were not

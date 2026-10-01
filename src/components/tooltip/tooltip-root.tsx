@@ -111,6 +111,11 @@ export function Tooltip(props: TooltipProps) {
     },
     setOpen: updateOpen,
     openFromFocus: () => {
+      // A controlled owner may decline the open request, leaving openState
+      // false until focus adoption is released on the next frame. If the
+      // trigger ref is attached again in that interval, do not emit a second
+      // onOpenChange request for the same native focus event.
+      if (focusEntry.adoptTrigger) return;
       focusEntry.adoptTrigger = true;
       updateOpen(true);
       releaseTriggerAdoption();
