@@ -6,7 +6,7 @@ import { nativeRef } from '../_internal/native-ref';
 import {
   dynamicAttributeSelector,
   removeDynamicStyleRuleWhenUnused,
-  setDynamicStyleRule,
+  setCommittedDynamicStyleRule,
 } from '../_internal/dynamic-style';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import {
@@ -67,7 +67,7 @@ export function Progress(props: ProgressProps) {
   const progressSelector = dynamicAttributeSelector('id', progressId);
   const progressPercentageValue =
     percentage === null ? '100%' : `${percentage}%`;
-  setDynamicStyleRule(
+  setCommittedDynamicStyleRule(
     progressRuleKey,
     progressSelector,
     {

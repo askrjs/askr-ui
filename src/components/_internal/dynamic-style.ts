@@ -1,4 +1,5 @@
 import { registerSSRStyle } from '@askrjs/askr';
+import { watch } from '@askrjs/askr/resources';
 
 type StyleValue = number | string | null | undefined;
 
@@ -134,6 +135,26 @@ export function setDynamicStyleRule(
   }
   registry.rules.set(key, { rule, selector });
   syncRegistry(registry);
+}
+
+/** Publish render-derived browser CSS only after its render commits. */
+export function setCommittedDynamicStyleRule(
+  key: string,
+  selector: string,
+  declarations: Record<string, StyleValue>,
+  nonce?: string
+) {
+  // Keep validation synchronous, and collect styles during server rendering.
+  const rule = buildDynamicStyleRule(selector, declarations);
+  if (typeof document === 'undefined') {
+    setDynamicStyleRule(key, selector, declarations, nonce);
+    return;
+  }
+
+  watch(
+    () => [key, selector, rule, nonce] as const,
+    () => setDynamicStyleRule(key, selector, declarations, nonce)
+  );
 }
 
 export function removeDynamicStyleRule(key: string) {

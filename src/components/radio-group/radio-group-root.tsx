@@ -48,7 +48,7 @@ function RadioGroupRootView(props: {
       root.setCurrentIndex(index);
       root.focusItem(index);
 
-      if (next) {
+      if (next !== undefined) {
         root.setValue(next);
       }
     },

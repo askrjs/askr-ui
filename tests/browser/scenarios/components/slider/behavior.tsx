@@ -1,3 +1,4 @@
+import { state } from '@askrjs/askr';
 import {
   Slider,
   SliderRange,
@@ -195,4 +196,33 @@ export function disabled(root: HTMLElement): void {
     </Slider>,
     root
   );
+}
+
+export function dragLifecycle(root: HTMLElement) {
+  withLayout(root);
+  const changes: number[] = [];
+  let disabled!: ReturnType<typeof state<boolean>>;
+  function Demo() {
+    disabled = state(false);
+    return (
+      <Slider
+        defaultValue={20}
+        disabled={disabled()}
+        onValueChange={(value) => changes.push(value)}
+      >
+        <SliderTrack>
+          <SliderRange />
+          <SliderThumb aria-label="Volume" />
+        </SliderTrack>
+      </Slider>
+    );
+  }
+  mount(<Demo />, root);
+  return {
+    disable: async () => {
+      disabled.set(true);
+      await flushUpdates();
+    },
+    changes: () => changes,
+  };
 }

@@ -314,3 +314,19 @@ export function rtl(root: HTMLElement): void {
     root
   );
 }
+
+export function emptyStringSelection(root: HTMLElement) {
+  const changes: string[] = [];
+  mount(
+    <RadioGroup
+      name="empty-choice"
+      defaultValue="a"
+      onValueChange={(value) => changes.push(value)}
+    >
+      <RadioGroupItem value="a">A</RadioGroupItem>
+      <RadioGroupItem value="">Empty</RadioGroupItem>
+    </RadioGroup>,
+    root
+  );
+  return { changes: () => changes };
+}

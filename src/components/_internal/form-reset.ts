@@ -1,4 +1,5 @@
 import { getSignal, state } from '@askrjs/askr';
+import { watch } from '@askrjs/askr/resources';
 
 type FormResetEntry = {
   node: Element | null;
@@ -16,7 +17,13 @@ function detachFormReset(entry: FormResetEntry) {
   entry.document = null;
 }
 
-/** Bind an uncontrolled component root to its nearest native form reset. */
+function belongsToForm(node: Element, form: HTMLFormElement) {
+  // Native controls can override their ancestor form with a `form` attribute.
+  if ('form' in node) return node.form === form;
+  return form.contains(node);
+}
+
+/** Bind a component root to its owning native form reset. */
 export function formResetRef<T extends Element = HTMLElement>(
   onReset: () => void
 ) {
@@ -27,7 +34,12 @@ export function formResetRef<T extends Element = HTMLElement>(
     handleReset: null,
     cleanupSignal: null,
   })();
-  entry.onReset = onReset;
+  watch(
+    () => onReset,
+    (committedReset) => {
+      entry.onReset = committedReset;
+    }
+  );
 
   if (!entry.handleReset) {
     entry.handleReset = (event) => {
@@ -36,7 +48,7 @@ export function formResetRef<T extends Element = HTMLElement>(
           !event.defaultPrevented &&
           event.target instanceof HTMLFormElement &&
           entry.node &&
-          event.target.contains(entry.node)
+          belongsToForm(entry.node, event.target)
         ) {
           entry.onReset();
         }

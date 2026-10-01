@@ -286,3 +286,18 @@ test.describe('RadioGroup - Behavior', () => {
     await expect(radio(root, 'Middle')).toBeFocused();
   });
 });
+
+test('should select an empty string item through native arrow navigation', async ({
+  render,
+  root,
+  run,
+}) => {
+  await render('emptyStringSelection');
+  const radios = root.locator('[role="radio"]');
+  await radios.nth(0).press('ArrowDown');
+  await expect(radios.nth(1)).toBeFocused();
+  await expect(radios.nth(0)).toHaveAttribute('aria-checked', 'false');
+  await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true');
+  expect(await run('changes')).toEqual(['']);
+  await expect(root.locator('input[name="empty-choice"]')).toHaveValue('');
+});
