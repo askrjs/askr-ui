@@ -39,6 +39,19 @@ function nextAnimationFrame(): Promise<void> {
   });
 }
 
+/**
+ * Records whether the last event of `type` to reach `container` (bubble phase,
+ * after every handler inside the table) had its default prevented, so a spec
+ * driving real input can still read `defaultPrevented`.
+ */
+function recordDefaultPrevented(container: HTMLElement, type: string) {
+  let prevented: boolean | null = null;
+  container.addEventListener(type, (event) => {
+    prevented = event.defaultPrevented;
+  });
+  return () => prevented;
+}
+
 function dynamicStyles(): string {
   return Array.from(
     document.querySelectorAll<HTMLStyleElement>(
@@ -120,81 +133,23 @@ export async function stickyHeaderSelection(root: HTMLElement) {
   );
   await flushUpdates();
 
-  const table = container.querySelector(
-    '[data-slot="virtual-table-table"]'
-  ) as HTMLTableElement | null;
   const wrapper = container.querySelector(
     '[data-slot="virtual-table"]'
-  ) as HTMLElement | null;
-  const firstRow = container.querySelector(
-    '[data-row-key="row-0"]'
-  ) as HTMLTableRowElement | null;
+  ) as HTMLElement;
 
   return {
-    initial: () => {
-      const mountedRows = Array.from(
-        container.querySelectorAll('[data-slot="virtual-table-row"]')
-      );
-
-      return {
-        role: table?.getAttribute('role'),
-        ariaRowCount: table?.getAttribute('aria-rowcount'),
-        headerRowIndex: container
-          .querySelector('[data-slot="virtual-table-header-row"]')
-          ?.getAttribute('aria-rowindex'),
-        rowCount: mountedRows.length,
-        lastTerminalRow: mountedRows.at(-1)?.getAttribute('data-terminal-row'),
-        firstRowSelected: firstRow?.getAttribute('aria-selected'),
-        firstRowIndex: firstRow?.getAttribute('aria-rowindex'),
-        atTop: wrapper?.getAttribute('data-at-top'),
-        atBottom: wrapper?.getAttribute('data-at-bottom'),
-        empty: wrapper?.getAttribute('data-empty'),
-      };
+    /** Assigning scrollTop makes the browser fire a real scroll event. */
+    scrollTo: (top: number) => {
+      wrapper.scrollTop = top;
     },
-    scrollAwayFromTop: async () => {
-      if (!wrapper) return null;
-      wrapper.scrollTop = 1;
-      wrapper.dispatchEvent(new Event('scroll'));
-      await flushUpdates();
-      const atTop = wrapper.getAttribute('data-at-top');
-
-      wrapper.scrollTop = 0;
-      wrapper.dispatchEvent(new Event('scroll'));
-      await flushUpdates();
-      return atTop;
-    },
-    clickFirstRow: async () => {
-      firstRow?.click();
-      await flushUpdates();
-      return {
-        rowClickCount: onRowClick.count(),
-        selectedRowKey: api?.getSelectedRowKey() ?? null,
-        firstRowSelected: firstRow?.getAttribute('aria-selected'),
-      };
-    },
-    arrowDown: async () => {
-      table?.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
-      );
-      await flushUpdates();
-      return {
-        selectedRowIndex: api?.getSelectedRowIndex(),
-        secondRowSelected: container
-          .querySelector('[data-row-key="row-1"]')
-          ?.getAttribute('aria-selected'),
-      };
-    },
+    rowClickCount: () => onRowClick.count(),
+    selectedRowKey: () => api?.getSelectedRowKey() ?? null,
+    selectedRowIndex: () => api?.getSelectedRowIndex() ?? null,
     scrollToBottom: async () => {
       api?.scrollToBottom();
       await flushUpdates();
-      return {
-        isAtBottom: api?.isAtBottom(),
-        lastRowTerminal: container
-          .querySelector('[data-row-key="row-9"]')
-          ?.getAttribute('data-terminal-row'),
-        atBottom: wrapper?.getAttribute('data-at-bottom'),
-      };
     },
+    isAtBottom: () => api?.isAtBottom() ?? null,
   };
 }
 
@@ -202,7 +157,7 @@ export async function nestedInteractiveCell(root: HTMLElement) {
   let api: VirtualTableApi<Row> | null = null;
   const onCellAction = spy<[string]>();
 
-  const container = mount(
+  mount(
     <VirtualTable
       aria-label="Users"
       style={{ height: '120px', overflowY: 'auto' }}
@@ -230,31 +185,9 @@ export async function nestedInteractiveCell(root: HTMLElement) {
   );
   await flushUpdates();
 
-  const action = container.querySelector(
-    '[data-row-key="row-0"] button'
-  ) as HTMLButtonElement;
-
   return {
-    activate: async () => {
-      action.focus();
-      action.click();
-      await flushUpdates();
-      return {
-        actionArgs: onCellAction.calls.map(([id]) => id),
-        selectedRowKey: api?.getSelectedRowKey() ?? null,
-        actionFocused: document.activeElement === action,
-      };
-    },
-    arrowDown: async () => {
-      action.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
-      );
-      await flushUpdates();
-      return {
-        selectedRowKey: api?.getSelectedRowKey() ?? null,
-        actionFocused: document.activeElement === action,
-      };
-    },
+    actionArgs: () => onCellAction.calls.map(([id]) => id),
+    selectedRowKey: () => api?.getSelectedRowKey() ?? null,
   };
 }
 
@@ -348,25 +281,14 @@ export async function callerPreventedKeyboard(root: HTMLElement) {
     root
   );
   await flushUpdates();
-
-  const table = container.querySelector(
-    '[data-slot="virtual-table-table"]'
-  ) as HTMLTableElement;
+  const keydownPrevented = recordDefaultPrevented(container, 'keydown');
 
   return {
-    arrowDown: async () => {
-      const keyEvent = new KeyboardEvent('keydown', {
-        key: 'ArrowDown',
-        bubbles: true,
-        cancelable: true,
-      });
-      table.dispatchEvent(keyEvent);
+    keyDownCount: () => onKeyDown.count(),
+    keydownPrevented,
+    selectedRowKey: () => api?.getSelectedRowKey() ?? null,
+    flush: async () => {
       await flushUpdates();
-      return {
-        keyDownCount: onKeyDown.count(),
-        defaultPrevented: keyEvent.defaultPrevented,
-        selectedRowKey: api?.getSelectedRowKey() ?? null,
-      };
     },
   };
 }
@@ -449,21 +371,16 @@ export async function forwardedScrollHandler(root: HTMLElement) {
 
   const wrapper = container.querySelector(
     '[data-slot="virtual-table"]'
-  ) as HTMLElement | null;
+  ) as HTMLElement;
 
   return {
     scrollCount: () => onScroll.count(),
-    scroll: async () => {
-      if (wrapper) {
-        wrapper.scrollTop = 72;
-        wrapper.dispatchEvent(new Event('scroll', { bubbles: true }));
-      }
-      await flushUpdates();
-      return {
-        scrollCount: onScroll.count(),
-        scrollTop: api?.getScrollTop(),
-      };
+    /** Assigning scrollTop makes the browser fire one real scroll event. */
+    scrollTo: (top: number) => {
+      wrapper.scrollTop = top;
     },
+    scrollTop: () => api?.getScrollTop() ?? null,
+    nextFrame: () => nextAnimationFrame(),
   };
 }
 
@@ -527,52 +444,62 @@ export async function clampedPendingScrollCommit(root: HTMLElement) {
 }
 
 export async function resizeChurn(root: HTMLElement) {
-  const resizeErrors: string[] = [];
-  const onWindowError = (event: ErrorEvent) => {
-    if (event.message.includes('ResizeObserver loop')) {
-      resizeErrors.push(event.message);
-      event.preventDefault();
-    }
+  const container = mount(
+    <VirtualTable
+      aria-label="Resizable users"
+      style={{ height: '120px', overflowY: 'auto' }}
+      rows={createRows(1_000)}
+      rowHeight={24}
+      headerHeight={24}
+      getKey={(row) => row.id}
+      columns={columns}
+    />,
+    root
+  );
+  await flushUpdates();
+  const wrapper = container.querySelector(
+    '[data-slot="virtual-table"]'
+  ) as HTMLElement;
+
+  return {
+    /**
+     * Scrolls deep, then resizes the wrapper once per frame, collecting any
+     * ResizeObserver loop error reported through `window.onerror` or
+     * `console.error` (both are swallowed so they reach only this report).
+     */
+    churn: async () => {
+      const resizeErrors: string[] = [];
+      const onWindowError = (event: ErrorEvent) => {
+        if (event.message.includes('ResizeObserver loop')) {
+          resizeErrors.push(event.message);
+          event.preventDefault();
+        }
+      };
+      const originalConsoleError = console.error;
+      console.error = (...values: unknown[]) => {
+        const message = values.map(String).join(' ');
+        if (message.includes('ResizeObserver loop')) resizeErrors.push(message);
+        else originalConsoleError(...values);
+      };
+      window.addEventListener('error', onWindowError);
+
+      try {
+        wrapper.scrollTop = 10_000;
+        wrapper.dispatchEvent(new Event('scroll', { bubbles: true }));
+
+        for (const height of [0, 50, 400, 1, 10_000, 0, 300]) {
+          wrapper.style.height = `${height}px`;
+          await nextAnimationFrame();
+        }
+        await nextAnimationFrame();
+
+        return resizeErrors;
+      } finally {
+        window.removeEventListener('error', onWindowError);
+        console.error = originalConsoleError;
+      }
+    },
   };
-  const originalConsoleError = console.error;
-  console.error = (...values: unknown[]) => {
-    const message = values.map(String).join(' ');
-    if (message.includes('ResizeObserver loop')) resizeErrors.push(message);
-  };
-  window.addEventListener('error', onWindowError);
-
-  try {
-    const container = mount(
-      <VirtualTable
-        aria-label="Resizable users"
-        style={{ height: '120px', overflowY: 'auto' }}
-        rows={createRows(1_000)}
-        rowHeight={24}
-        headerHeight={24}
-        getKey={(row) => row.id}
-        columns={columns}
-      />,
-      root
-    );
-    await flushUpdates();
-
-    const wrapper = container.querySelector(
-      '[data-slot="virtual-table"]'
-    ) as HTMLElement;
-    wrapper.scrollTop = 10_000;
-    wrapper.dispatchEvent(new Event('scroll', { bubbles: true }));
-
-    for (const height of [0, 50, 400, 1, 10_000, 0, 300]) {
-      wrapper.style.height = `${height}px`;
-      await nextAnimationFrame();
-    }
-    await nextAnimationFrame();
-
-    return { resizeErrors: () => [...resizeErrors] };
-  } finally {
-    window.removeEventListener('error', onWindowError);
-    console.error = originalConsoleError;
-  }
 }
 
 export async function fixedRowHeightContract(root: HTMLElement) {

@@ -61,8 +61,8 @@ export function mountsWithoutRenderErrors(root: HTMLElement) {
   return { error: () => error };
 }
 
-export function openStateModes(root: HTMLElement) {
-  const container = mount(
+export function openStateModes(root: HTMLElement): void {
+  mount(
     <div>
       <Accordion key="single" defaultValue="one" collapsible>
         <AccordionItem value="one">
@@ -96,22 +96,6 @@ export function openStateModes(root: HTMLElement) {
     root
   );
 
-  return {
-    clickButton: async (text: string) => {
-      getButtonByText(container, text).click();
-      await flushUpdates();
-    },
-    expanded: (text: string) =>
-      getButtonByText(container, text).getAttribute(
-        ACCORDION_A11Y_CONTRACT.EXPANDED_ATTRIBUTE
-      ),
-    multipleOpenCount: () =>
-      Array.from(
-        container.querySelectorAll(
-          `[data-accordion] button[${ACCORDION_A11Y_CONTRACT.EXPANDED_ATTRIBUTE}="true"]`
-        )
-      ).filter((element) => element.textContent?.includes('multiple')).length,
-  };
 }
 
 export function consecutiveUncontrolledUpdates(root: HTMLElement) {
@@ -333,46 +317,22 @@ export function virtualizedWindow(root: HTMLElement) {
   const viewport = container.querySelector(
     '[data-slot="virtual-list"]'
   ) as HTMLElement;
+  let lastKeydownPrevented: boolean | null = null;
+  // Bubble-phase listener on the container: it runs after the trigger's own
+  // keydown handler, so it sees whether a real key press was consumed.
+  container.addEventListener('keydown', (event) => {
+    lastKeydownPrevented = event.defaultPrevented;
+  });
 
   return {
-    scrollWindow: async () => {
-      await flushUpdates();
-      viewport.scrollTop = 800;
-      viewport.dispatchEvent(new Event('scroll'));
-      await flushUpdates();
-      await flushUpdates();
-      await flushUpdates();
+    /** Assigning scrollTop makes the browser fire a real scroll event. */
+    scrollTo: (top: number) => {
+      viewport.scrollTop = top;
     },
-    visibleStartIndex: () => viewport.dataset.virtualVisibleStartIndex ?? null,
-    hasItem43Button: () =>
-      Array.from(container.querySelectorAll('button')).some(
-        (button) => button.textContent?.trim() === 'Item 43'
-      ),
-    activateItem42: async () => {
-      let item42 = getButtonByText(container, 'Item 42');
-      item42.click();
-      await flushUpdates();
-      item42 = getButtonByText(container, 'Item 42');
-      item42.focus({ preventScroll: true });
-      const rowHeight =
-        item42
-          .closest('[data-slot="virtual-list-row"]')
-          ?.getAttribute('data-askr-virtual-list-row-height') ?? null;
-      const arrowDown = new KeyboardEvent('keydown', {
-        bubbles: true,
-        cancelable: true,
-        key: 'ArrowDown',
-      });
-      item42.dispatchEvent(arrowDown);
-      return { rowHeight, defaultPrevented: arrowDown.defaultPrevented };
+    /** Focuses without scrolling, as the original test did. */
+    focusButton: (text: string) => {
+      getButtonByText(container, text).focus({ preventScroll: true });
     },
-    settle: async () => {
-      await flushUpdates();
-      await flushUpdates();
-      await flushUpdates();
-    },
-    visibleStartIndexNumber: () =>
-      Number(viewport.dataset.virtualVisibleStartIndex),
-    activeText: () => document.activeElement?.textContent ?? null,
+    lastKeydownPrevented: () => lastKeydownPrevented,
   };
 }
