@@ -1,5 +1,5 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { cspNonce, state } from '@askrjs/askr';
+import { cspNonce, getSignal, state } from '@askrjs/askr';
 import type { JSXElement } from '@askrjs/askr/foundations/structures';
 import type { Ref } from '@askrjs/askr/foundations/utilities';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
@@ -34,6 +34,7 @@ import {
   virtualTableLayoutProps,
 } from './style-injection';
 import { resolveVirtualTableScope } from './identity-wiring';
+import { prepareDynamicStyleRule } from '../_internal/dynamic-style';
 import {
   buildVirtualTableState,
   syncVirtualTableRows,
@@ -248,7 +249,13 @@ function getVirtualTableEntry<Row>(
     // stays aligned with the browser's actual scroll state.
     const nextScrollTop = node.scrollTop;
 
-    if (event && entry.pendingScrollTop !== null) {
+    // A delayed event for an already tracked programmatic write does not
+    // represent a new user position and must not cancel a newer anchor.
+    if (
+      event &&
+      entry.pendingScrollTop !== null &&
+      nextScrollTop !== scrollTopState()
+    ) {
       entry.pendingScrollTop = null;
       if (entry.pendingCommitFrame !== null) {
         cancelAnimationFrame(entry.pendingCommitFrame);
@@ -984,11 +991,27 @@ export function VirtualTable<Row>(
   const instanceState = state({}) as StateCell<object>;
   const scrollTopState = state(0) as StateCell<number>;
   const viewportHeightState = state(0) as StateCell<number>;
-  const entry = getVirtualTableEntry<Row>(
+  const committedEntry = getVirtualTableEntry<Row>(
     instanceState(),
     scrollTopState,
     viewportHeightState
   );
+  const layoutStyleRules = new Map<string, () => void>();
+  const setLayoutStyleRule: typeof prepareDynamicStyleRule = (
+    key,
+    selector,
+    declarations,
+    nonce
+  ) => {
+    const publish = prepareDynamicStyleRule(key, selector, declarations, nonce);
+    layoutStyleRules.set(key, publish);
+    return publish;
+  };
+  let entry = {
+    ...committedEntry,
+    setLayoutStyleRule,
+    nextLayoutRules: new Map(committedEntry.nextLayoutRules),
+  };
 
   const selectedRowKeyState = state<string | null>(
     defaultSelectedRowKey
@@ -1021,17 +1044,38 @@ export function VirtualTable<Row>(
   };
   const viewportHeightHint = resolveVirtualStyleHeight(wrapperRest.style);
 
-  const commitRef: (node: HTMLElement | null) => void =
+  const attachment = state({
+    node: null as HTMLElement | null,
+    root: null as Node | null,
+    binding: null as ((node: HTMLElement | null) => void) | null,
+    pendingDetach: 0,
+    cleanupRegistered: false,
+  })();
+  const cleanupSignal = getSignal();
+  const releaseAttachment = () => {
+    const binding = attachment.binding;
+    attachment.node = null;
+    attachment.root = null;
+    attachment.binding = null;
+    attachment.pendingDetach += 1;
+    binding?.(null);
+  };
+  if (!attachment.cleanupRegistered) {
+    attachment.cleanupRegistered = true;
+    cleanupSignal.addEventListener('abort', releaseAttachment, { once: true });
+  }
+
+  const bindingRef: (node: HTMLElement | null) => void =
     entry.userRef === ref && entry.apiRef === apiRef && entry.commitRef
       ? entry.commitRef
       : composeRefs(entry.rootRef, ref, (node: HTMLElement | null) => {
           if (node) {
             // Cache only bindings adopted by a committed DOM attachment.
-            entry.userRef = ref;
-            entry.apiRef = apiRef;
-            entry.commitRef = commitRef;
+            committedEntry.userRef = ref;
+            committedEntry.apiRef = apiRef;
+            committedEntry.commitRef = bindingRef;
           }
-          setRefValue(apiRef, node ? entry.api : null);
+          setRefValue(apiRef, node ? committedEntry.api : null);
         });
   entry.scrollTopState = scrollTopState;
   entry.viewportHeightState = viewportHeightState;
@@ -1045,6 +1089,22 @@ export function VirtualTable<Row>(
   entry.onRowClick = onRowClick;
   entry.onScroll = onScroll;
 
+  let scheduleScroll = false;
+  let measureResize = false;
+  if (entry.rowsRef !== rows || entry.getKey !== getKey) {
+    // Keep proposed keys and placement metadata private until DOM attachment.
+    entry = {
+      ...entry,
+      placements: new Map(entry.placements),
+      nextLayoutRules: new Map(entry.nextLayoutRules),
+      schedulePendingScrollTop: () => {
+        scheduleScroll = true;
+      },
+      handleResize: () => {
+        measureResize = true;
+      },
+    };
+  }
   syncVirtualTableRows(entry, rows, getKey);
 
   const currentScrollTop = scrollTopState();
@@ -1077,17 +1137,6 @@ export function VirtualTable<Row>(
     currentViewportHeight,
     selectedRowKeySnapshot
   );
-  const rootProps = mergeProps(wrapperRest, {
-    ref: commitRef,
-    'data-slot': 'virtual-table',
-    'data-virtual-table': 'true',
-    'data-viewport': viewport,
-    'data-table-width': tableWidth,
-    'data-at-top': effectiveScrollTop <= 0 ? 'true' : 'false',
-    'data-at-bottom': stateSnapshot.isAtBottom ? 'true' : 'false',
-    'data-empty': stateSnapshot.count === 0 ? 'true' : 'false',
-  });
-
   const tableProps = mergeProps(
     {
       ref: entry.tableRef,
@@ -1128,13 +1177,13 @@ export function VirtualTable<Row>(
     selectedRowKeySnapshot,
     getKey,
     (row, rowIndex, rowKey, event) => {
-      entry.selectedKeyState.set(rowKey);
+      committedEntry.selectedKeyState.set(rowKey);
 
-      if (entry.tableNode) {
-        entry.tableNode.focus();
+      if (committedEntry.tableNode) {
+        committedEntry.tableNode.focus();
       }
 
-      const visible = entry.visibleRange;
+      const visible = committedEntry.visibleRange;
 
       if (rowIndex < visible.visibleStartIndex) {
         entry.api.scrollToIndex(rowIndex, 'start');
@@ -1163,6 +1212,72 @@ export function VirtualTable<Row>(
     </table>
   );
   commitVirtualTableLayoutRules(entry);
+
+  const committedIdentity = {
+    scrollTopState: entry.scrollTopState,
+    viewportHeightState: entry.viewportHeightState,
+    rowHeight: entry.rowHeight,
+    layoutNonce: entry.layoutNonce,
+    headerHeight: entry.headerHeight,
+    overscan: entry.overscan,
+    columns: entry.columns,
+    viewportHeightHint: entry.viewportHeightHint,
+    selectedKeyState: entry.selectedKeyState,
+    onRowClick: entry.onRowClick,
+    onScroll: entry.onScroll,
+    keys: entry.keys,
+    keyIndexMap: entry.keyIndexMap,
+    rowsRef: entry.rowsRef,
+    getKey: entry.getKey,
+    placements: entry.placements,
+    pendingScrollTop: entry.pendingScrollTop,
+    visibleRange: entry.visibleRange,
+    layoutRules: entry.layoutRules,
+    nextLayoutRules: entry.nextLayoutRules,
+  };
+  const commitRef = (node: HTMLElement | null) => {
+    if (!node) {
+      if (!attachment.node) return;
+      if (
+        cleanupSignal.aborted ||
+        attachment.node.getRootNode() !== attachment.root
+      ) {
+        releaseAttachment();
+      } else {
+        // Ref replacement detaches the previous callback before attaching this
+        // render's callback. Retain unchanged caller bindings across that pair.
+        const pendingDetach = ++attachment.pendingDetach;
+        queueMicrotask(() => {
+          if (attachment.pendingDetach === pendingDetach) releaseAttachment();
+        });
+      }
+      return;
+    }
+    attachment.pendingDetach += 1;
+    const bindingChanged =
+      attachment.node !== node || attachment.binding !== bindingRef;
+    if (bindingChanged) releaseAttachment();
+    for (const publish of layoutStyleRules.values()) publish();
+    Object.assign(committedEntry, committedIdentity);
+    if (scheduleScroll) committedEntry.schedulePendingScrollTop();
+    if (measureResize) committedEntry.handleResize();
+    if (bindingChanged) {
+      attachment.node = node;
+      attachment.root = node.getRootNode();
+      attachment.binding = bindingRef;
+      bindingRef(node);
+    }
+  };
+  const rootProps = mergeProps(wrapperRest, {
+    ref: commitRef,
+    'data-slot': 'virtual-table',
+    'data-virtual-table': 'true',
+    'data-viewport': viewport,
+    'data-table-width': tableWidth,
+    'data-at-top': effectiveScrollTop <= 0 ? 'true' : 'false',
+    'data-at-bottom': stateSnapshot.isAtBottom ? 'true' : 'false',
+    'data-empty': stateSnapshot.count === 0 ? 'true' : 'false',
+  });
 
   if (asChild) {
     if (!isJsxElement(children)) {

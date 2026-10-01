@@ -102,14 +102,12 @@ export function dynamicAttributeSelector(name: string, value: string) {
   return `[${name}="${escapeCssString(value)}"]`;
 }
 
-export function setDynamicStyleRule(
+function publishSerializedRule(
   key: string,
   selector: string,
-  declarations: Record<string, StyleValue>,
+  rule: string | null,
   nonce?: string
 ) {
-  const rule = buildDynamicStyleRule(selector, declarations);
-
   if (!rule) {
     removeDynamicStyleRule(key);
     return;
@@ -137,6 +135,45 @@ export function setDynamicStyleRule(
   syncRegistry(registry);
 }
 
+/** Publish validated browser or server CSS immediately. */
+export function setDynamicStyleRule(
+  key: string,
+  selector: string,
+  declarations: Record<string, StyleValue>,
+  nonce?: string
+) {
+  publishSerializedRule(
+    key,
+    selector,
+    buildDynamicStyleRule(selector, declarations),
+    nonce
+  );
+}
+
+function prepareRule(
+  key: string,
+  selector: string,
+  declarations: Record<string, StyleValue>,
+  nonce?: string
+) {
+  const rule = buildDynamicStyleRule(selector, declarations);
+  if (rule) registerSSRStyle(`askr-dynamic:${nonce ?? ''}:${key}`, rule);
+  return {
+    rule,
+    publish: () => publishSerializedRule(key, selector, rule, nonce),
+  };
+}
+
+/** Validate and collect server CSS now, then publish DOM CSS after commit. */
+export function prepareDynamicStyleRule(
+  key: string,
+  selector: string,
+  declarations: Record<string, StyleValue>,
+  nonce?: string
+) {
+  return prepareRule(key, selector, declarations, nonce).publish;
+}
+
 /** Publish render-derived browser CSS only after its render commits. */
 export function setCommittedDynamicStyleRule(
   key: string,
@@ -144,17 +181,8 @@ export function setCommittedDynamicStyleRule(
   declarations: Record<string, StyleValue>,
   nonce?: string
 ) {
-  // Keep validation synchronous, and collect styles during server rendering.
-  const rule = buildDynamicStyleRule(selector, declarations);
-  if (typeof document === 'undefined') {
-    setDynamicStyleRule(key, selector, declarations, nonce);
-    return;
-  }
-
-  watch(
-    () => [key, selector, rule, nonce] as const,
-    () => setDynamicStyleRule(key, selector, declarations, nonce)
-  );
+  const { rule, publish } = prepareRule(key, selector, declarations, nonce);
+  watch(() => [key, selector, rule, nonce] as const, publish);
 }
 
 export function removeDynamicStyleRule(key: string) {

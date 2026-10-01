@@ -98,7 +98,7 @@ export function syncVirtualTableRows<Row>(
           host.visibleRange.visibleStartIndex,
           host.visibleRange.visibleEndIndex + 1
         );
-  const currentScrollTop = host.scrollTopState();
+  const currentScrollTop = host.pendingScrollTop ?? host.scrollTopState();
   const currentViewportHeight =
     host.viewportHeightState() || host.viewportHeightHint;
   const currentBodyViewportHeight = Math.max(

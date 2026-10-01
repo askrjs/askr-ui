@@ -1,3 +1,4 @@
+import { createIsland } from '@askrjs/askr/boot';
 import {
   VirtualList,
   type VirtualListApi,
@@ -424,7 +425,7 @@ export async function clampedPendingScrollCommit(root: HTMLElement) {
   const container = mount(<FilterableTable />, root);
   await flushUpdates();
 
-  api?.scrollToIndex(4_000, 'start');
+  (api as VirtualTableApi<Row> | null)?.scrollToIndex(4_000, 'start');
   replaceRows?.();
   await flushUpdates();
   await flushUpdates();
@@ -806,5 +807,247 @@ export function changedKeyResolver(root: HTMLElement) {
       list: listApi?.getScrollTop(),
       table: tableApi?.getScrollTop(),
     }),
+  };
+}
+
+export function discardedKeyResolver(root: HTMLElement) {
+  let rows = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
+  let proposed = false;
+  let rejected = false;
+  let insertSibling = false;
+  let listApi: VirtualListApi<string> | null = null;
+  let tableApi: VirtualTableApi<string> | null = null;
+  const counts = {
+    listNode: 0,
+    listNodeNull: 0,
+    listApi: 0,
+    listApiNull: 0,
+    tableNode: 0,
+    tableNodeNull: 0,
+    tableApi: 0,
+    tableApiNull: 0,
+  };
+  const listRef = (node: HTMLElement | null) => {
+    if (node) counts.listNode++;
+    else counts.listNodeNull++;
+  };
+  const tableRef = (node: HTMLElement | null) => {
+    if (node) counts.tableNode++;
+    else counts.tableNodeNull++;
+  };
+  const listApiRef = (api: VirtualListApi<string> | null) => {
+    listApi = api;
+    if (api) counts.listApi++;
+    else counts.listApiNull++;
+  };
+  const tableApiRef = (api: VirtualTableApi<string> | null) => {
+    tableApi = api;
+    if (api) counts.tableApi++;
+    else counts.tableApiNull++;
+  };
+  const oldKey = (row: string) => 'old-' + row;
+  const newKey = (row: string) => 'new-' + row;
+  const rowComponent = ({ item }: { item: string }) => <span>{item}</span>;
+  const dataColumns = [
+    {
+      id: 'value',
+      header: 'Value',
+      cellComponent: ({ row }: { row: string }) => <span>{row}</span>,
+    },
+  ];
+  function Rejection() {
+    if (rejected) throw Error('discarded key resolver');
+    return <span />;
+  }
+  function Root() {
+    return (
+      <div>
+        <VirtualList
+          items={rows}
+          getKey={proposed ? newKey : oldKey}
+          rowHeight={28}
+          overscan={0}
+          rowComponent={rowComponent}
+          style={{ height: '84px', overflowY: 'auto' }}
+          ref={listRef}
+          apiRef={listApiRef}
+        />
+        <VirtualTable
+          aria-label="Retained keys"
+          rows={rows}
+          getKey={proposed ? newKey : oldKey}
+          rowHeight={28}
+          headerHeight={28}
+          overscan={0}
+          columns={dataColumns}
+          style={{ height: '112px', overflowY: 'auto' }}
+          ref={tableRef}
+          apiRef={tableApiRef}
+        />
+        <div data-testid="insertion-host">
+          {insertSibling ? <span>Proposal</span> : null}
+        </div>
+        <Rejection />
+      </div>
+    );
+  }
+  const container = document.createElement('div');
+  root.appendChild(container);
+  createIsland({ root: container, component: Root });
+  return {
+    counts: () => ({ ...counts }),
+    scroll: async () => {
+      listApi?.scrollToIndex(2);
+      tableApi?.selectRowByKey('old-c');
+      tableApi?.scrollToIndex(2);
+      await flushUpdates();
+    },
+    selected: () => ({
+      key: tableApi?.getSelectedRowKey(),
+      index: tableApi?.getSelectedRowIndex(),
+    }),
+    scrollTops: () => ({
+      list: listApi?.getScrollTop(),
+      table: tableApi?.getScrollTop(),
+    }),
+    reject: (phase: 'render' | 'structural') => {
+      proposed = true;
+      rejected = phase === 'render';
+      insertSibling = phase === 'structural';
+      const host = container.querySelector('[data-testid="insertion-host"]')!;
+      const original = host.insertBefore;
+      if (phase === 'structural')
+        host.insertBefore = () => {
+          throw Error('discarded key resolver');
+        };
+      let message: string | null = null;
+      try {
+        createIsland({ root: container, component: Root });
+      } catch (error) {
+        message = error instanceof Error ? error.message : String(error);
+      } finally {
+        proposed = false;
+        rejected = false;
+        insertSibling = false;
+        host.insertBefore = original;
+      }
+      return message;
+    },
+    prepend: async () => {
+      proposed = false;
+      rows = ['z', ...rows];
+      createIsland({ root: container, component: Root });
+      await flushUpdates();
+    },
+    unmount: () => unmount(container),
+  };
+}
+
+export function rejectedVirtualProperties(root: HTMLElement) {
+  let proposed = false;
+  let rejected = false;
+  let insertSibling = false;
+  let listApi: VirtualListApi<string> | null = null;
+  let tableApi: VirtualTableApi<string> | null = null;
+  const events: Array<string> = [];
+  const rows = ['a', 'b', 'c', 'd'];
+  const key = (row: string) => row;
+  const oldListScroll = () => events.push('old-list-scroll');
+  const newListScroll = () => events.push('new-list-scroll');
+  const oldTableScroll = () => events.push('old-table-scroll');
+  const newTableScroll = () => events.push('new-table-scroll');
+  const oldSelection = () => events.push('old-selection');
+  const newSelection = () => events.push('new-selection');
+  const listApiRef = (api: typeof listApi) => {
+    listApi = api;
+  };
+  const tableApiRef = (api: typeof tableApi) => {
+    tableApi = api;
+  };
+  function Rejection() {
+    if (rejected) throw Error('discarded virtual properties');
+    return <span />;
+  }
+  const Root = () => (
+    <div>
+      <VirtualList
+        items={rows}
+        getKey={key}
+        rowHeight={proposed ? 56 : 28}
+        rowComponent={({ item }) => <span>{item}</span>}
+        apiRef={listApiRef}
+        onScroll={proposed ? newListScroll : oldListScroll}
+        style={{ height: '56px', overflowY: 'auto' }}
+      />
+      <VirtualTable
+        rows={rows}
+        getKey={key}
+        rowHeight={proposed ? 56 : 28}
+        headerHeight={28}
+        columns={[
+          {
+            id: 'value',
+            header: 'Value',
+            cellComponent: ({ row }) => <span>{row}</span>,
+          },
+        ]}
+        apiRef={tableApiRef}
+        onScroll={proposed ? newTableScroll : oldTableScroll}
+        onSelectedRowKeyChange={proposed ? newSelection : oldSelection}
+        style={{ height: '84px', overflowY: 'auto' }}
+      />
+      <div data-testid="insertion-host">
+        {insertSibling ? <span>Proposal</span> : null}
+      </div>
+      <Rejection />
+    </div>
+  );
+  const container = document.createElement('div');
+  root.appendChild(container);
+  createIsland({ root: container, component: Root });
+  return {
+    geometry: () => ({
+      list: listApi?.getState().totalHeight,
+      table: tableApi?.getState().totalHeight,
+    }),
+    reject: (phase: 'render' | 'structural') => {
+      proposed = true;
+      rejected = phase === 'render';
+      insertSibling = phase === 'structural';
+      const host = container.querySelector('[data-testid="insertion-host"]')!;
+      const original = host.insertBefore;
+      if (phase === 'structural')
+        host.insertBefore = () => {
+          throw Error('discarded virtual properties');
+        };
+      let message: string | null = null;
+      try {
+        createIsland({ root: container, component: Root });
+      } catch (error) {
+        message = error instanceof Error ? error.message : String(error);
+      } finally {
+        host.insertBefore = original;
+        proposed = false;
+        rejected = false;
+        insertSibling = false;
+      }
+      events.length = 0;
+      return message;
+    },
+    scrollCallbacks: () => {
+      events.length = 0;
+      container
+        .querySelector('[data-slot="virtual-list"]')!
+        .dispatchEvent(new Event('scroll'));
+      container
+        .querySelector('[data-slot="virtual-table"]')!
+        .dispatchEvent(new Event('scroll'));
+      return [...events];
+    },
+    selectCallback: () => {
+      events.length = 0;
+      tableApi?.selectRowByKey('b');
+      return [...events];
+    },
   };
 }

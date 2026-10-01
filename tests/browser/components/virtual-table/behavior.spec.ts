@@ -374,3 +374,75 @@ test('VirtualTable honors ancestor keyboard cancellation', async ({
   expect(await run<string | null>('selectedRowKey')).toBeNull();
   await expect(table).toBeFocused();
 });
+
+for (const phase of ['render', 'structural'] as const) {
+  test(`Virtual keys stay committed after discarded ${phase} resolver`, async ({
+    render,
+    root,
+    run,
+  }) => {
+    await render('discardedKeyResolver');
+    await run('scroll');
+    await expect.poll(() => run('scrollTops')).toEqual({ list: 56, table: 56 });
+    expect(await run('selected')).toEqual({ key: 'old-c', index: 2 });
+    expect(await run('reject', phase)).toBe('discarded key resolver');
+    await expect(
+      root.locator('[data-slot="virtual-table-row"][data-row-key="old-c"]')
+    ).toHaveCount(1);
+    expect(await run('selected')).toEqual({ key: 'old-c', index: 2 });
+    await run('prepend');
+    await expect.poll(() => run('scrollTops')).toEqual({ list: 84, table: 84 });
+    expect(await run('counts')).toEqual({
+      listNode: 1,
+      listNodeNull: 0,
+      listApi: 1,
+      listApiNull: 0,
+      tableNode: 1,
+      tableNodeNull: 0,
+      tableApi: 1,
+      tableApiNull: 0,
+    });
+    await run('unmount');
+    expect(await run('counts')).toEqual({
+      listNode: 1,
+      listNodeNull: 1,
+      listApi: 1,
+      listApiNull: 1,
+      tableNode: 1,
+      tableNodeNull: 1,
+      tableApi: 1,
+      tableApiNull: 1,
+    });
+  });
+}
+
+for (const phase of ['render', 'structural'] as const) {
+  test(`Virtual components retain committed geometry after rejected ${phase} properties`, async ({
+    render,
+    run,
+  }) => {
+    await render('rejectedVirtualProperties');
+    expect(await run('geometry')).toEqual({ list: 112, table: 140 });
+    expect(await run('reject', phase)).toBe('discarded virtual properties');
+    expect(await run('geometry')).toEqual({ list: 112, table: 140 });
+  });
+  test(`Virtual components retain native scroll callbacks after rejected ${phase} properties`, async ({
+    render,
+    run,
+  }) => {
+    await render('rejectedVirtualProperties');
+    expect(await run('reject', phase)).toBe('discarded virtual properties');
+    expect(await run('scrollCallbacks')).toEqual([
+      'old-list-scroll',
+      'old-table-scroll',
+    ]);
+  });
+  test(`VirtualTable retains selection callback after rejected ${phase} properties`, async ({
+    render,
+    run,
+  }) => {
+    await render('rejectedVirtualProperties');
+    expect(await run('reject', phase)).toBe('discarded virtual properties');
+    expect(await run('selectCallback')).toEqual(['old-selection']);
+  });
+}

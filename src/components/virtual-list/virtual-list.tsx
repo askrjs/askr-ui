@@ -1,5 +1,5 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { cspNonce, state } from '@askrjs/askr';
+import { cspNonce, getSignal, state } from '@askrjs/askr';
 import type { JSXElement } from '@askrjs/askr/foundations/structures';
 import type { Ref } from '@askrjs/askr/foundations/utilities';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
@@ -29,6 +29,7 @@ import {
   dynamicAttributeSelector,
   removeDynamicStyleRuleWhenUnused,
   setDynamicStyleRule,
+  prepareDynamicStyleRule,
 } from '../_internal/dynamic-style';
 import {
   extendVirtualCompositeIdentity,
@@ -58,7 +59,7 @@ function virtualListLayoutProps<Item>(
   const attribute = `data-askr-virtual-list-${kind}-height`;
   const key = `virtual-list:${kind}:${value}`;
   const selector = dynamicAttributeSelector(attribute, value);
-  setDynamicStyleRule(
+  (entry.setLayoutStyleRule ?? setDynamicStyleRule)(
     key,
     selector,
     {
@@ -122,6 +123,7 @@ type VirtualListEntry<Item> = {
   layoutRules: Map<string, string>;
   nextLayoutRules: Map<string, string>;
   layoutNonce: string | undefined;
+  setLayoutStyleRule?: typeof setDynamicStyleRule;
 };
 
 function resolveEntryTotalHeight<Item>(entry: VirtualListEntry<Item>): number {
@@ -918,7 +920,23 @@ export function VirtualList<Item>(
   const virtualCompositeOwner = readVirtualCompositeOwner();
   const layoutNonce = cspNonce();
   const instanceState = state({}) as StateCell<object>;
-  const entry = getVirtualListEntry<Item>(instanceState());
+  const committedEntry = getVirtualListEntry<Item>(instanceState());
+  const layoutStyleRules = new Map<string, () => void>();
+  const setLayoutStyleRule: typeof prepareDynamicStyleRule = (
+    key,
+    selector,
+    declarations,
+    nonce
+  ) => {
+    const publish = prepareDynamicStyleRule(key, selector, declarations, nonce);
+    layoutStyleRules.set(key, publish);
+    return publish;
+  };
+  let entry = {
+    ...committedEntry,
+    setLayoutStyleRule,
+    nextLayoutRules: new Map(committedEntry.nextLayoutRules),
+  };
   const scrollTopState = state(0) as StateCell<number>;
   const viewportHeightState = state(0) as StateCell<number>;
   const renderVersionState = state(0) as StateCell<number>;
@@ -926,17 +944,38 @@ export function VirtualList<Item>(
   const renderVersion = renderVersionState();
   const viewportHeightHint = resolveVirtualStyleHeight(rest.style);
 
-  const commitRef: (node: HTMLElement | null) => void =
+  const attachment = state({
+    node: null as HTMLElement | null,
+    root: null as Node | null,
+    binding: null as ((node: HTMLElement | null) => void) | null,
+    pendingDetach: 0,
+    cleanupRegistered: false,
+  })();
+  const cleanupSignal = getSignal();
+  const releaseAttachment = () => {
+    const binding = attachment.binding;
+    attachment.node = null;
+    attachment.root = null;
+    attachment.binding = null;
+    attachment.pendingDetach += 1;
+    binding?.(null);
+  };
+  if (!attachment.cleanupRegistered) {
+    attachment.cleanupRegistered = true;
+    cleanupSignal.addEventListener('abort', releaseAttachment, { once: true });
+  }
+
+  const bindingRef: (node: HTMLElement | null) => void =
     entry.userRef === ref && entry.apiRef === apiRef && entry.commitRef
       ? entry.commitRef
       : composeRefs(entry.rootRef, ref, (node: HTMLElement | null) => {
           if (node) {
             // Cache only bindings adopted by a committed DOM attachment.
-            entry.userRef = ref;
-            entry.apiRef = apiRef;
-            entry.commitRef = commitRef;
+            committedEntry.userRef = ref;
+            committedEntry.apiRef = apiRef;
+            committedEntry.commitRef = bindingRef;
           }
-          setRefValue(apiRef, node ? entry.api : null);
+          setRefValue(apiRef, node ? committedEntry.api : null);
         });
   entry.scrollTopState = scrollTopState;
   entry.viewportHeightState = viewportHeightState;
@@ -960,6 +999,19 @@ export function VirtualList<Item>(
       ? rowHeight
       : Math.max(0, followBottom.threshold ?? rowHeight);
 
+  let scheduleScroll = false;
+  if (entry.itemsRef !== items || entry.getKey !== getKey) {
+    // Reconcile proposed identities without exposing them to the live API or
+    // scheduling scroll writes before this render attaches to the DOM.
+    entry = {
+      ...entry,
+      placements: new Map(entry.placements),
+      nextLayoutRules: new Map(entry.nextLayoutRules),
+      schedulePendingScrollTop: () => {
+        scheduleScroll = true;
+      },
+    };
+  }
   syncVirtualListItems(entry, items, getKey, nextRowHeights);
 
   const currentScrollTop = entry.scrollTopState();
@@ -982,14 +1034,6 @@ export function VirtualList<Item>(
     getListHostElementName(semanticHost) === 'ul' ||
     getListHostElementName(semanticHost) === 'ol';
 
-  const finalProps = mergeProps(rest, {
-    ref: commitRef,
-    role: rendersSemanticListItems ? undefined : 'list',
-    'data-slot': 'virtual-list',
-    'data-virtual-list': 'true',
-    'data-viewport': viewport,
-  });
-
   const content = (
     <>
       {renderVirtualListRows(
@@ -1004,6 +1048,71 @@ export function VirtualList<Item>(
     </>
   );
   commitVirtualListLayoutRules(entry);
+
+  const committedIdentity = {
+    renderVersionState: entry.renderVersionState,
+    scrollTopState: entry.scrollTopState,
+    viewportHeightState: entry.viewportHeightState,
+    rowHeight: entry.rowHeight,
+    layoutNonce: entry.layoutNonce,
+    viewportHeightHint: entry.viewportHeightHint,
+    overscan: entry.overscan,
+    rowComponent: entry.rowComponent,
+    onScroll: entry.onScroll,
+    followBottomEnabled: entry.followBottomEnabled,
+    followBottomThreshold: entry.followBottomThreshold,
+    keys: entry.keys,
+    keyIndexMap: entry.keyIndexMap,
+    itemsRef: entry.itemsRef,
+    getKey: entry.getKey,
+    placements: entry.placements,
+    rowHeights: entry.rowHeights,
+    followBottomActive: entry.followBottomActive,
+    pendingUnseenCount: entry.pendingUnseenCount,
+    pendingScrollTop: entry.pendingScrollTop,
+    visibleRange: entry.visibleRange,
+    layoutRules: entry.layoutRules,
+    nextLayoutRules: entry.nextLayoutRules,
+  };
+  const commitRef = (node: HTMLElement | null) => {
+    if (!node) {
+      if (!attachment.node) return;
+      if (
+        cleanupSignal.aborted ||
+        attachment.node.getRootNode() !== attachment.root
+      ) {
+        releaseAttachment();
+      } else {
+        // Ref replacement detaches the previous callback before attaching this
+        // render's callback. Retain unchanged caller bindings across that pair.
+        const pendingDetach = ++attachment.pendingDetach;
+        queueMicrotask(() => {
+          if (attachment.pendingDetach === pendingDetach) releaseAttachment();
+        });
+      }
+      return;
+    }
+    attachment.pendingDetach += 1;
+    const bindingChanged =
+      attachment.node !== node || attachment.binding !== bindingRef;
+    if (bindingChanged) releaseAttachment();
+    for (const publish of layoutStyleRules.values()) publish();
+    Object.assign(committedEntry, committedIdentity);
+    if (scheduleScroll) committedEntry.schedulePendingScrollTop();
+    if (bindingChanged) {
+      attachment.node = node;
+      attachment.root = node.getRootNode();
+      attachment.binding = bindingRef;
+      bindingRef(node);
+    }
+  };
+  const finalProps = mergeProps(rest, {
+    ref: commitRef,
+    role: rendersSemanticListItems ? undefined : 'list',
+    'data-slot': 'virtual-list',
+    'data-virtual-list': 'true',
+    'data-viewport': viewport,
+  });
 
   if (asChild) {
     if (!isJsxElement(children)) {
