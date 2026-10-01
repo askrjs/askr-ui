@@ -168,7 +168,9 @@ export function RadioGroup(props: RadioGroupProps) {
     focusCollectionItemWithRestore(pendingFocus, collection, index);
   const rootContext: RadioGroupRootContextValue = {
     groupId,
-    value: valueState(),
+    get value() {
+      return valueState();
+    },
     setValue: valueState.set,
     notifyItemsChanged,
     scheduleItemsSync,

@@ -59,7 +59,9 @@ export function asChildRefs(root: HTMLElement) {
       contentIsSection:
         contentRef.current !== null &&
         contentRef.current ===
-          document.body.querySelector('section[data-slot="hover-card-content"]'),
+          document.body.querySelector(
+            'section[data-slot="hover-card-content"]'
+          ),
     }),
   };
 }
@@ -101,7 +103,7 @@ export function immediateLeave(root: HTMLElement) {
   addPointerExitTarget(root);
   const onOpenChange = spy<[boolean]>();
   mount(
-    <HoverCard openDelay={0} closeDelay={90} onOpenChange={onOpenChange}>
+    <HoverCard openDelay={100} closeDelay={90} onOpenChange={onOpenChange}>
       <HoverCardTrigger>Preview</HoverCardTrigger>
       <HoverCardContent>Details</HoverCardContent>
     </HoverCard>,

@@ -147,7 +147,7 @@ test.describe('Toast - Behavior', () => {
     const close = root.locator('[data-toast-close="true"]');
     await close.focus();
     await expect(close).toBeFocused();
-    await close.click();
+    await close.press('Enter');
 
     await expect(launcher).toBeFocused();
   });
@@ -213,7 +213,10 @@ test.describe('Toast - Behavior', () => {
     await expect(root.locator(TOAST)).toHaveCount(1);
   });
 
-  test('should dismiss on escape and action press', async ({ render, root }) => {
+  test('should dismiss on escape and action press', async ({
+    render,
+    root,
+  }) => {
     await render('undoable');
     await expect(root.locator(TOAST)).toHaveCount(1);
 

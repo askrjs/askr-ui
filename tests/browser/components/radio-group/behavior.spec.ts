@@ -55,11 +55,15 @@ test.describe('RadioGroup - Behavior', () => {
   test('should support nested radio items without relying on direct child cloning', async ({
     render,
     root,
+    run,
   }) => {
     await render('nestedItems');
+    expect(await run<number>('itemCount')).toBe(2);
 
     await radio(root, 'Medium').click();
 
+    expect(await run<string[]>('changes')).toEqual(['medium']);
+    expect(await run<number>('itemCount')).toBe(2);
     await expect(radio(root, 'Small')).toHaveAttribute('aria-checked', 'false');
     await expect(radio(root, 'Medium')).toHaveAttribute('aria-checked', 'true');
     await expect(root.locator('input[type="hidden"]')).toHaveAttribute(
@@ -200,7 +204,7 @@ test.describe('RadioGroup - Behavior', () => {
     );
   });
 
-  test('should not activate disabled items during keyboard navigation attempts', async ({
+  test('should skip disabled items during keyboard navigation', async ({
     render,
     root,
   }) => {
@@ -210,12 +214,12 @@ test.describe('RadioGroup - Behavior', () => {
     await small.press('ArrowDown');
     await small.press('ArrowRight');
 
-    await expect(radio(root, 'Small')).toHaveAttribute('aria-checked', 'true');
+    await expect(radio(root, 'Small')).toHaveAttribute('aria-checked', 'false');
     await expect(radio(root, 'Medium')).toHaveAttribute(
       'aria-checked',
       'false'
     );
-    await expect(radio(root, 'Large')).toHaveAttribute('aria-checked', 'false');
+    await expect(radio(root, 'Large')).toHaveAttribute('aria-checked', 'true');
   });
 
   test('should isolate generated ids and roving focus between identical sibling groups', async ({

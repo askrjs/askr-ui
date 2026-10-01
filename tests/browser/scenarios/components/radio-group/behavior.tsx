@@ -27,9 +27,14 @@ export function uncontrolledNamed(root: HTMLElement): void {
   );
 }
 
-export function nestedItems(root: HTMLElement): void {
+export function nestedItems(root: HTMLElement) {
+  const changes: string[] = [];
   mount(
-    <RadioGroup name="size" defaultValue="small">
+    <RadioGroup
+      name="size"
+      defaultValue="small"
+      onValueChange={(value) => changes.push(value)}
+    >
       <div>
         <RadioGroupItem value="small">Small</RadioGroupItem>
       </div>
@@ -39,6 +44,11 @@ export function nestedItems(root: HTMLElement): void {
     </RadioGroup>,
     root
   );
+  return {
+    itemCount: () =>
+      root.querySelectorAll('[data-slot="radio-group-item"]').length,
+    changes: () => changes,
+  };
 }
 
 export function controlled(root: HTMLElement) {
@@ -114,7 +124,11 @@ export function formReset(root: HTMLElement) {
   const onValueChange = spy<[string]>();
   const container = mount(
     <form>
-      <RadioGroup defaultValue="small" name="size" onValueChange={onValueChange}>
+      <RadioGroup
+        defaultValue="small"
+        name="size"
+        onValueChange={onValueChange}
+      >
         <RadioGroupItem value="small">Small</RadioGroupItem>
         <RadioGroupItem value="medium">Medium</RadioGroupItem>
       </RadioGroup>

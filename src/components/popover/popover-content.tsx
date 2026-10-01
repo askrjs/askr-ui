@@ -92,8 +92,16 @@ export function PopoverContent(
 
   return (
     <Presence present={forceMount || root.open}>
-      <FocusScope restoreFocus>
+      <FocusScope restoreFocus restoreFocusTarget={root.getTriggerNode}>
         <DismissableLayer
+          onPointerDownOutside={(event) => {
+            // The trigger sits outside the content layer in the DOM, but a
+            // pointer press on it is the popover's toggle action. Let its
+            // click handler observe the current open state and close it.
+            if (root.isTriggerTarget(event.target)) {
+              event.preventDefault();
+            }
+          }}
           onDismiss={() => {
             root.setOpen(false);
           }}

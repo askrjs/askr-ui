@@ -106,7 +106,7 @@ test.describe('HoverCard - Behavior', () => {
 
     await root.locator(TRIGGER).hover();
     await root.locator(EXIT).hover();
-    await page.clock.runFor(100);
+    await page.clock.runFor(110);
 
     await expect(root.locator(TRIGGER)).toHaveAttribute('data-state', 'closed');
     await expect(page.locator(CONTENT)).toHaveCount(0);

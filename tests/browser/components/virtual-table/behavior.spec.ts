@@ -109,7 +109,7 @@ test.describe('VirtualTable - Behavior', () => {
     const action = root.locator('[data-row-key="row-0"] button');
 
     await action.focus();
-    await action.click();
+    await action.press('Enter');
     await nextFrame(page);
 
     expect(await run<string[]>('actionArgs')).toContain('row-0');

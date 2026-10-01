@@ -20,6 +20,8 @@ export type PopoverRootContextValue = {
   portal: OverlayPortal;
   registerContentPosition: (position: PopoverPositionOptions) => void;
   setTriggerNode: (node: HTMLElement | null) => void;
+  getTriggerNode: () => HTMLElement | null;
+  isTriggerTarget: (target: EventTarget | null) => boolean;
   setContentNode: (node: HTMLElement | null) => void;
   syncPosition: () => void;
   clearPosition: () => void;

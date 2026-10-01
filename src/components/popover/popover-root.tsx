@@ -74,6 +74,11 @@ export function Popover(props: PopoverProps) {
     setTriggerNode: (node: HTMLElement | null) => {
       registerOverlayNode(overlayIdentity, 'trigger', node, triggerNodeOwner);
     },
+    getTriggerNode: () => overlayNodes.trigger,
+    isTriggerTarget: (target: EventTarget | null) =>
+      typeof Node !== 'undefined' &&
+      target instanceof Node &&
+      Boolean(overlayNodes.trigger?.contains(target)),
     setContentNode: (node: HTMLElement | null) => {
       registerOverlayNode(overlayIdentity, 'content', node, contentNodeOwner);
     },

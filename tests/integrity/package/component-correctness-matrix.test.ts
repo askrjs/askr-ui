@@ -13,38 +13,9 @@ const UNIVERSAL_SUITES = ['a11y', 'behavior', 'determinism'] as const;
  * then remove its entry. A new family must ship Playwright specs.
  */
 const UNPORTED_LEGACY_SUITES = new Set([
-  'accordion/behavior',
-  'alert-dialog/a11y',
-  'alert-dialog/behavior',
-  'alert-dialog/determinism',
-  'checkbox/a11y',
-  'checkbox/behavior',
-  'checkbox/determinism',
-  'dialog/behavior',
-  'dismissable-layer/a11y',
-  'dismissable-layer/behavior',
-  'dismissable-layer/determinism',
-  'hover-card/behavior',
   'input/a11y',
   'input/behavior',
   'input/determinism',
-  'popover/behavior',
-  'radio-group/a11y',
-  'radio-group/behavior',
-  'radio-group/determinism',
-  'scroll-area/a11y',
-  'scroll-area/behavior',
-  'scroll-area/determinism',
-  'switch/a11y',
-  'switch/behavior',
-  'switch/determinism',
-  'toast/behavior',
-  'toggle-group/behavior',
-  'tooltip/a11y',
-  'tooltip/behavior',
-  'tooltip/determinism',
-  'virtual-list/behavior',
-  'virtual-table/behavior',
 ]);
 
 function suitePath(name: string, file: string): string {
