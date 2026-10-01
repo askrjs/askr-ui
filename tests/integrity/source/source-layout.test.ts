@@ -392,12 +392,6 @@ describe('Source layout', () => {
 
   it('should keep async interaction families on lifecycle-specific browser guardrails', () => {
     const componentsDirectory = join(process.cwd(), 'src', 'components');
-    const browserDirectory = join(
-      process.cwd(),
-      'tests',
-      'browser',
-      'components'
-    );
     const hoverCardSuite = readBehaviorSuite('hover-card');
     expect(hoverCardSuite).toContain('pointer leaves immediately');
     expect(hoverCardSuite).toContain('pointer re-enters before its deadline');
