@@ -17,6 +17,7 @@ export type TooltipRootContextValue = {
   setOpen: (open: boolean) => void;
   openFromFocus: () => void;
   releaseFocusAdoption: () => void;
+  getTriggerNode: () => HTMLElement | null;
   contentId: string;
   portal: OverlayPortal;
   registerContentPosition: (position: TooltipPositionOptions) => void;

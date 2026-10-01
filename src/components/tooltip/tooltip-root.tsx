@@ -132,6 +132,7 @@ export function Tooltip(props: TooltipProps) {
       focusEntry.focusRequestSent = false;
       focusEntry.adoptTrigger = false;
     },
+    getTriggerNode: () => overlayNodes.trigger,
     contentId,
     portal,
     registerContentPosition: (nextPosition: TooltipPositionOptions) => {

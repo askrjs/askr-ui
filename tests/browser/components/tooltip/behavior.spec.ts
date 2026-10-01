@@ -99,6 +99,25 @@ test.describe('Tooltip - Behavior', () => {
     expect(await run<number>('openChanges')).toBe(2);
   });
 
+  test('should keep one controlled focus request while focus moves within an asChild trigger', async ({
+    render,
+    root,
+    run,
+  }) => {
+    await render('controlledClosedWithFocusChildren');
+
+    await root.getByTestId('tooltip-trigger').focus();
+    await run('settle');
+    expect(await run<number>('openChanges')).toBe(1);
+
+    await root.getByTestId('nested-focus-target').focus();
+    await run('settle');
+    await root.getByTestId('tooltip-trigger').focus();
+    await run('settle');
+    expect(await run<number>('openChanges')).toBe(1);
+    await expect(root.getByTestId('tooltip-trigger')).toBeFocused();
+  });
+
   test('should cancel pending focus-adoption work during teardown', async ({
     render,
     run,

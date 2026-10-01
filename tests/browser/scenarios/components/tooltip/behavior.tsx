@@ -118,6 +118,38 @@ export function controlledClosed(root: HTMLElement) {
   };
 }
 
+export function controlledClosedWithFocusChildren(root: HTMLElement) {
+  const onOpenChange = spy<[boolean]>();
+  const container = mount(
+    <Tooltip open={false} onOpenChange={onOpenChange}>
+      <TooltipTrigger asChild>
+        <div data-testid="tooltip-trigger" role="group" tabIndex={0}>
+          <span data-testid="nested-focus-target" tabIndex={-1}>
+            Nested focus target
+          </span>
+        </div>
+      </TooltipTrigger>
+      <TooltipPortal>
+        <TooltipContent>Helpful text</TooltipContent>
+      </TooltipPortal>
+    </Tooltip>,
+    root
+  );
+
+  return {
+    focusTrigger: () =>
+      focusReportingError(
+        container.querySelector('[data-testid="tooltip-trigger"]')
+      ),
+    focusNested: () =>
+      focusReportingError(
+        container.querySelector('[data-testid="nested-focus-target"]')
+      ),
+    settle,
+    openChanges: () => onOpenChange.count(),
+  };
+}
+
 export function teardownDuringFocusAdoption(root: HTMLElement) {
   const originalRequest = window.requestAnimationFrame;
   const originalCancel = window.cancelAnimationFrame;

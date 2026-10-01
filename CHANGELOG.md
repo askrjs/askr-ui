@@ -22,8 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `Tooltip` sends one controlled open request per focus cycle and keeps the
-  trigger focused if its DOM node is replaced after the next animation frame.
+- `Tooltip` sends one controlled open request per focus cycle, including focus
+  transitions within a composed trigger, and keeps the trigger focused if its
+  DOM node is replaced after the next animation frame.
 
 ## [0.4.2] - 2026-09-30
 

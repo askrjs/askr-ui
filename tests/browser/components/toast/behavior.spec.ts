@@ -49,7 +49,7 @@ test.describe('Toast - Behavior', () => {
     await render('infiniteDuration');
     await expect(root.locator(TOAST)).toHaveCount(1);
 
-    await page.clock.runFor('24:00:00');
+    await page.clock.fastForward('24:00:00');
 
     await expect(root.locator(TOAST)).toHaveCount(1);
   });
