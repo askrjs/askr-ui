@@ -44,6 +44,7 @@ export function Tooltip(props: TooltipProps) {
     generation: 0,
     releaseFrame: null as number | null,
   })();
+  let focusListenerAttached = false;
   captureOverlayNonce(overlayIdentity, cspNonce());
   const contentId = resolvePartId(tooltipId, 'content');
   const portal = getPersistentPortal(overlayIdentity);
@@ -72,12 +73,43 @@ export function Tooltip(props: TooltipProps) {
     });
   };
 
+  const onFocusIn = (event: FocusEvent) => {
+    if (!focusEntry.focusRequestSent) return;
+    const trigger = overlayNodes.trigger;
+    if (
+      trigger &&
+      event.target instanceof Node &&
+      trigger.contains(event.target)
+    ) {
+      return;
+    }
+    releaseFocusAdoption();
+  };
+
+  const releaseFocusAdoption = () => {
+    focusEntry.generation += 1;
+    if (focusEntry.releaseFrame !== null) {
+      cancelAnimationFrame(focusEntry.releaseFrame);
+      focusEntry.releaseFrame = null;
+    }
+    if (focusListenerAttached) {
+      document.removeEventListener('focusin', onFocusIn, true);
+      focusListenerAttached = false;
+    }
+    focusEntry.focusRequestSent = false;
+    focusEntry.adoptTrigger = false;
+  };
+
   cleanupSignal.addEventListener(
     'abort',
     () => {
       if (focusEntry.releaseFrame !== null) {
         cancelAnimationFrame(focusEntry.releaseFrame);
         focusEntry.releaseFrame = null;
+      }
+      if (focusListenerAttached) {
+        document.removeEventListener('focusin', onFocusIn, true);
+        focusListenerAttached = false;
       }
       focusEntry.focusRequestSent = false;
       focusEntry.adoptTrigger = false;
@@ -119,19 +151,13 @@ export function Tooltip(props: TooltipProps) {
       // trigger ref attachment cannot emit a duplicate open request.
       if (focusEntry.focusRequestSent) return;
       focusEntry.focusRequestSent = true;
+      document.addEventListener('focusin', onFocusIn, true);
+      focusListenerAttached = true;
       focusEntry.adoptTrigger = true;
       updateOpen(true);
       releaseTriggerAdoption();
     },
-    releaseFocusAdoption: () => {
-      focusEntry.generation += 1;
-      if (focusEntry.releaseFrame !== null) {
-        cancelAnimationFrame(focusEntry.releaseFrame);
-        focusEntry.releaseFrame = null;
-      }
-      focusEntry.focusRequestSent = false;
-      focusEntry.adoptTrigger = false;
-    },
+    releaseFocusAdoption,
     getTriggerNode: () => overlayNodes.trigger,
     contentId,
     portal,

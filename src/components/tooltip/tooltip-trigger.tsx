@@ -56,12 +56,8 @@ export function TooltipTrigger(
     onFocus: () => {
       root.openFromFocus();
     },
-    onBlur: (event: FocusEvent) => {
-      const trigger = event.currentTarget as HTMLElement;
+    onBlur: () => {
       queueMicrotask(() => {
-        // A focused trigger can be detached and replaced as part of the same
-        // focus-adoption update. That blur is still the active focus cycle.
-        if (!trigger.isConnected) return;
         const currentTrigger = root.getTriggerNode();
         if (currentTrigger && currentTrigger.contains(document.activeElement)) {
           return;

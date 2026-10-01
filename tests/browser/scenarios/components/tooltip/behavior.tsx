@@ -1,3 +1,4 @@
+import { state } from '@askrjs/askr';
 import { Button } from '../../../../../src/components/button';
 import {
   HoverCard,
@@ -145,6 +146,41 @@ export function controlledClosedWithFocusChildren(root: HTMLElement) {
       focusReportingError(
         container.querySelector('[data-testid="nested-focus-target"]')
       ),
+    settle,
+    openChanges: () => onOpenChange.count(),
+  };
+}
+
+export function controlledTriggerReplacement(root: HTMLElement) {
+  const onOpenChange = spy<[boolean]>();
+  let setTriggerMounted: ((mounted: boolean) => void) | undefined;
+  function Fixture() {
+    const triggerMounted = state(true);
+    setTriggerMounted = triggerMounted.set;
+
+    return (
+      <>
+        <button data-testid="outside">Outside</button>
+        <Tooltip open={false} onOpenChange={onOpenChange}>
+          {triggerMounted() ? (
+            <TooltipTrigger data-testid="tooltip-trigger">
+              Hover me
+            </TooltipTrigger>
+          ) : null}
+          <TooltipPortal>
+            <TooltipContent>Helpful text</TooltipContent>
+          </TooltipPortal>
+        </Tooltip>
+      </>
+    );
+  }
+
+  const container = mount(<Fixture />, root);
+  return {
+    removeTrigger: () => setTriggerMounted?.(false),
+    focusOutside: () =>
+      focusReportingError(container.querySelector('[data-testid="outside"]')),
+    remountTrigger: () => setTriggerMounted?.(true),
     settle,
     openChanges: () => onOpenChange.count(),
   };
