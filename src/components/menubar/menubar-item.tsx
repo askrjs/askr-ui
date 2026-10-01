@@ -4,6 +4,11 @@ import { Slot } from '@askrjs/askr/foundations/structures';
 import { state } from '@askrjs/askr';
 import { composeRefs } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
+import {
+  registerSsrPartId,
+  setSsrIdAssociation,
+  ssrAttributeRootProps,
+} from '../_internal/ssr-id-association';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { rovingFocus } from '../_internal/roving-focus';
 import {
@@ -216,19 +221,31 @@ export function MenubarSub(props: MenubarSubProps) {
   const surfaceIndex = resolvedPlacement.index;
   const subKey = props.value ?? `sub-${surfaceIndex}`;
   const overlayIdentity = state<object>({})();
-  const idAssociation = createMenubarIdAssociation(overlayIdentity);
+  const triggerId = resolvePartId(
+    content.contentId,
+    `sub-trigger-${surfaceIndex}`
+  );
+  const contentId = resolvePartId(
+    content.contentId,
+    `sub-content-${surfaceIndex}`
+  );
+  const idAssociation = createMenubarIdAssociation(
+    overlayIdentity,
+    triggerId,
+    contentId
+  );
   const subContext: MenubarSubContextValue = {
     surfaceIndex,
     placement: resolvedPlacement,
-    triggerId: resolvePartId(content.contentId, `sub-trigger-${surfaceIndex}`),
-    contentId: resolvePartId(content.contentId, `sub-content-${surfaceIndex}`),
+    triggerId,
+    contentId,
     path: [...content.path, subKey],
     overlayIdentity,
     idAssociation,
   };
 
   return (
-    <MenubarSubContext value={subContext}>
+    <MenubarSubContext {...ssrAttributeRootProps} value={subContext}>
       <MenubarSubScopeView>{props.children}</MenubarSubScopeView>
     </MenubarSubContext>
   );
@@ -400,6 +417,13 @@ export function MenubarSubTrigger(
       }
     },
   });
+  registerSsrPartId(finalProps, sub.idAssociation.ssrTriggerId);
+  setSsrIdAssociation(
+    finalProps,
+    'aria-controls',
+    sub.idAssociation.ssrContentId,
+    (rest as Record<string, unknown>)['aria-controls'] === undefined
+  );
   const nativeId = (finalProps as Record<string, unknown>).id;
   if (typeof nativeId === 'function') {
     (finalProps as Record<string, unknown>).id = () => {

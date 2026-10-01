@@ -1,7 +1,12 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
-import { state } from '@askrjs/askr';
+import { getSignal, state } from '@askrjs/askr';
+import {
+  createSsrIdRegistration,
+  setSsrIdAssociation,
+  ssrAttributeRootProps,
+} from '../_internal/ssr-id-association';
 import { nativeRef } from '../_internal/native-ref';
 import { resolvePartId } from '../_internal/id';
 import { isJsxElement } from '../_internal/jsx';
@@ -80,8 +85,9 @@ export function SelectGroup(props: SelectGroupProps | SelectGroupAsChildProps) {
   const labelId = `${groupId}-label`;
   const renderedLabel = {
     id: declaredSelectGroupLabelId(children, labelId),
-    resolved: false,
   };
+  const ssrLabelId = state(createSsrIdRegistration())();
+  const ssrLabels = state(new Map<AbortSignal, string | undefined>())();
   const callerLabelledBy = (rest as Record<string, unknown>)['aria-labelledby'];
   const association = state<{
     node: Element | null;
@@ -143,15 +149,38 @@ export function SelectGroup(props: SelectGroupProps | SelectGroupAsChildProps) {
   // attribute. Older renderers ignore the marker and retain literal labeling.
   (finalProps as Record<PropertyKey, unknown>)[SSR_CHILDREN_BEFORE_ATTRS] =
     true;
-  const registerRenderedLabel = (id: unknown) => {
-    if (!renderedLabel.resolved) {
-      renderedLabel.id =
-        id === null || id === undefined || id === '' ? undefined : String(id);
-      renderedLabel.resolved = true;
+  setSsrIdAssociation(
+    finalProps,
+    'aria-labelledby',
+    ssrLabelId,
+    callerLabelledBy === undefined
+  );
+  const syncRenderedLabels = () => {
+    const id = [...ssrLabels.values()].find((id) => id !== undefined);
+    ssrLabelId.cell.value = id;
+    renderedLabel.id = id;
+  };
+  const registerRenderedLabel = (id: unknown, signal: AbortSignal) => {
+    if (signal.aborted) return;
+    if (!ssrLabels.has(signal)) {
+      signal.addEventListener(
+        'abort',
+        () => {
+          ssrLabels.delete(signal);
+          syncRenderedLabels();
+        },
+        { once: true }
+      );
     }
+    ssrLabels.set(
+      signal,
+      id === null || id === undefined || id === '' ? undefined : String(id)
+    );
+    syncRenderedLabels();
   };
   return (
     <SelectGroupContext
+      {...ssrAttributeRootProps}
       value={{ groupId, labelId, registerLabel, registerRenderedLabel }}
     >
       <SelectGroupScopeView
@@ -173,6 +202,7 @@ export function SelectLabel(props: SelectLabelAsChildProps): JSX.Element | null;
 export function SelectLabel(props: SelectLabelProps | SelectLabelAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const groupContext = readSelectGroupContext();
+  const labelSignal = getSignal();
   const labelNode = state<{ current: Element | null }>({ current: null })();
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
@@ -194,7 +224,7 @@ export function SelectLabel(props: SelectLabelProps | SelectLabelAsChildProps) {
   const renderedId = finalProps.id as SelectLabelProps['id'];
   (finalProps as Record<string, unknown>).id = () => {
     const id = typeof renderedId === 'function' ? renderedId() : renderedId;
-    groupContext?.registerRenderedLabel(id);
+    groupContext?.registerRenderedLabel(id, labelSignal);
     // A reactive native ID can update without replacing the label ref. Read
     // the resulting committed DOM after the attribute update or rollback.
     const node = labelNode.current;

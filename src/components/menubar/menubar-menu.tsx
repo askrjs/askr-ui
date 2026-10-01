@@ -4,6 +4,11 @@ import { getSignal, state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
+import {
+  registerSsrPartId,
+  setSsrIdAssociation,
+  ssrAttributeRootProps,
+} from '../_internal/ssr-id-association';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { rovingFocus } from '../_internal/roving-focus';
 import {
@@ -49,7 +54,7 @@ function MenubarPortalMenuScopeView(props: {
   menuContext: MenubarMenuContextValue;
 }) {
   return (
-    <MenubarMenuContext value={props.menuContext}>
+    <MenubarMenuContext {...ssrAttributeRootProps} value={props.menuContext}>
       <MenubarMenuScopeView>{props.children}</MenubarMenuScopeView>
     </MenubarMenuContext>
   );
@@ -86,13 +91,19 @@ export function MenubarMenu(props: MenubarMenuProps) {
   const menuIndex = resolvedPlacement.index;
   const menuKey = props.value ?? `menu-${menuIndex}`;
   const portalRecord = root.ensureMenuPortal(menuKey, getSignal());
-  const idAssociation = createMenubarIdAssociation(portalRecord.identity);
+  const triggerId = resolvePartId(root.menubarId, `trigger-${menuKey}`);
+  const contentId = resolvePartId(root.menubarId, `content-${menuKey}`);
+  const idAssociation = createMenubarIdAssociation(
+    portalRecord.identity,
+    triggerId,
+    contentId
+  );
   const menuContext: MenubarMenuContextValue = {
     menuKey,
     menuIndex,
     placement: resolvedPlacement,
-    triggerId: resolvePartId(root.menubarId, `trigger-${menuKey}`),
-    contentId: resolvePartId(root.menubarId, `content-${menuKey}`),
+    triggerId,
+    contentId,
     portalId: resolvePartId(root.menubarId, `portal-${portalRecord.ordinal}`),
     overlayIdentity: portalRecord.identity,
     idAssociation,
@@ -100,7 +111,7 @@ export function MenubarMenu(props: MenubarMenuProps) {
   };
 
   return (
-    <MenubarMenuContext value={menuContext}>
+    <MenubarMenuContext {...ssrAttributeRootProps} value={menuContext}>
       <MenubarMenuScopeView>{props.children}</MenubarMenuScopeView>
     </MenubarMenuContext>
   );
@@ -260,6 +271,13 @@ export function MenubarTrigger(
       }
     },
   });
+  registerSsrPartId(finalProps, menu.idAssociation.ssrTriggerId);
+  setSsrIdAssociation(
+    finalProps,
+    'aria-controls',
+    menu.idAssociation.ssrContentId,
+    (rest as Record<string, unknown>)['aria-controls'] === undefined
+  );
   const nativeId = (finalProps as Record<string, unknown>).id;
   if (typeof nativeId === 'function') {
     (finalProps as Record<string, unknown>).id = () => {

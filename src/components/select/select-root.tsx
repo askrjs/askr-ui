@@ -5,6 +5,10 @@ import { controllableState } from '@askrjs/askr/foundations/state';
 import { formResetRef } from '../_internal/form-reset';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import { syncIdAssociation } from '../_internal/id-association';
+import {
+  createSsrIdRegistration,
+  ssrAttributeRootProps,
+} from '../_internal/ssr-id-association';
 import { collectJsxElements } from '../_internal/jsx';
 import {
   captureOverlayNonce,
@@ -59,6 +63,9 @@ export function Select(props: SelectProps) {
   const selectId = resolveCompoundId('select', id, children);
   const overlayIdentity = state(createOverlayIdentity())();
   const automaticIds = state({ controls: true })();
+  const ssrContentId = state(
+    createSsrIdRegistration(resolvePartId(selectId, 'content'))
+  )();
   const syncPartIds = () => {
     const nodes = getOverlayNodes(overlayIdentity);
     syncIdAssociation(
@@ -117,7 +124,7 @@ export function Select(props: SelectProps) {
   const rootContextBase = {
     selectId,
     overlayIdentity,
-    idAssociation: { automatic: automaticIds, sync: syncPartIds },
+    idAssociation: { automatic: automaticIds, sync: syncPartIds, ssrContentId },
     value: valueState(),
     open: openState(),
     currentIndexCandidate: currentIndexState(),
@@ -243,7 +250,7 @@ export function Select(props: SelectProps) {
   PortalHost.render({ children: null });
 
   return (
-    <SelectRootContext value={rootContext}>
+    <SelectRootContext {...ssrAttributeRootProps} value={rootContext}>
       <SelectRenderContext value={runtimeRenderContext}>
         <VirtualCompositeOwnerContext value>
           <>

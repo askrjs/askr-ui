@@ -1,4 +1,5 @@
 import { defineScope, readScope } from '@askrjs/askr';
+import type { SsrIdRegistration } from '../_internal/ssr-id-association';
 import {
   getMenuCollection,
   getMenuCollectionItems,
@@ -22,7 +23,11 @@ export type DropdownStateInput = {
 export type DropdownRootContextValue = {
   dropdownId: string;
   overlayIdentity: object;
-  idAssociation: { automatic: { controls: boolean }; sync: () => void };
+  idAssociation: {
+    automatic: { controls: boolean };
+    sync: () => void;
+    ssrContentId: SsrIdRegistration;
+  };
   open: boolean;
   setOpen: (open: boolean) => void;
   contentId: string;

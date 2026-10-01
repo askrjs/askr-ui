@@ -1,4 +1,5 @@
 import { defineScope, readScope } from '@askrjs/askr';
+import type { SsrIdRegistration } from '../_internal/ssr-id-association';
 import { getMenuCollection, getMenuCollectionItems } from '../_internal/menu';
 import type { OverlayPortal } from '../_internal/overlay';
 import {
@@ -32,7 +33,11 @@ export type SelectItemMetadata = {
 export type SelectRootContextValue = {
   selectId: string;
   overlayIdentity: object;
-  idAssociation: { automatic: { controls: boolean }; sync: () => void };
+  idAssociation: {
+    automatic: { controls: boolean };
+    sync: () => void;
+    ssrContentId: SsrIdRegistration;
+  };
   open: boolean;
   setOpen: (open: boolean) => void;
   contentId: string;
@@ -63,7 +68,7 @@ export type SelectGroupContextValue = {
   groupId: string;
   labelId: string;
   registerLabel: (node: Element | null, previous: Element | null) => void;
-  registerRenderedLabel: (id: unknown) => void;
+  registerRenderedLabel: (id: unknown, signal: AbortSignal) => void;
 };
 
 /** Select Resolved State. */

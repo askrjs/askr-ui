@@ -11,6 +11,10 @@ import {
 } from '../_internal/overlay';
 import { syncIdAssociation } from '../_internal/id-association';
 import {
+  createSsrIdRegistration,
+  ssrAttributeRootProps,
+} from '../_internal/ssr-id-association';
+import {
   focusCollectionItemWithRestore,
   restorePendingCollectionItemFocus,
   type PendingCollectionFocus,
@@ -46,6 +50,9 @@ export function Dropdown(props: DropdownProps) {
   const dropdownId = resolveCompoundId('dropdown', id, children);
   const overlayIdentity = state(createOverlayIdentity())();
   const automaticIds = state({ controls: true })();
+  const ssrContentId = state(
+    createSsrIdRegistration(resolvePartId(dropdownId, 'content'))
+  )();
   const syncPartIds = () => {
     const nodes = getOverlayNodes(overlayIdentity);
     syncIdAssociation(
@@ -69,7 +76,7 @@ export function Dropdown(props: DropdownProps) {
   const rootContextBase = {
     dropdownId,
     overlayIdentity,
-    idAssociation: { automatic: automaticIds, sync: syncPartIds },
+    idAssociation: { automatic: automaticIds, sync: syncPartIds, ssrContentId },
     currentIndexCandidate: currentIndexState(),
   };
   const resolvedState = resolveDropdownState(rootContextBase);
@@ -143,7 +150,7 @@ export function Dropdown(props: DropdownProps) {
   };
   const runtimeRenderContext = createDropdownRenderContext();
   return (
-    <DropdownRootContext value={rootContext}>
+    <DropdownRootContext {...ssrAttributeRootProps} value={rootContext}>
       <DropdownRenderContext value={runtimeRenderContext}>
         <VirtualCompositeOwnerContext value>
           {children as JSX.Element}

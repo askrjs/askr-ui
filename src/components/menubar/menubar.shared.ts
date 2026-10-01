@@ -2,6 +2,10 @@ import { defineScope, readScope, state } from '@askrjs/askr';
 import { getOverlayNodes } from '../_internal/overlay';
 import { syncIdAssociation } from '../_internal/id-association';
 import {
+  createSsrIdRegistration,
+  type SsrIdRegistration,
+} from '../_internal/ssr-id-association';
+import {
   getCompositeCollection,
   getCompositeCollectionItems,
 } from '../_internal/composite';
@@ -72,14 +76,22 @@ export type MenubarRootRenderContextValue = {
 export type MenubarIdAssociation = {
   automatic: { controls: boolean; labelledBy: boolean };
   sync: () => void;
+  ssrTriggerId: SsrIdRegistration;
+  ssrContentId: SsrIdRegistration;
 };
 
 export function createMenubarIdAssociation(
-  identity: object
+  identity: object,
+  triggerId: string,
+  contentId: string
 ): MenubarIdAssociation {
   const automatic = state({ controls: true, labelledBy: true })();
+  const ssrTriggerId = state(createSsrIdRegistration(triggerId))();
+  const ssrContentId = state(createSsrIdRegistration(contentId))();
   return {
     automatic,
+    ssrTriggerId,
+    ssrContentId,
     sync: () => {
       const nodes = getOverlayNodes(identity);
       syncIdAssociation(

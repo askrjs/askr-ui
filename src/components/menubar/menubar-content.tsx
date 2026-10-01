@@ -3,6 +3,10 @@ import { getSignal, state } from '@askrjs/askr';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
+import {
+  registerSsrPartId,
+  setSsrIdAssociation,
+} from '../_internal/ssr-id-association';
 import { rovingFocus } from '../_internal/roving-focus';
 import { DismissableLayer } from '../dismissable-layer';
 import { FocusScope } from '../focus-scope';
@@ -335,6 +339,13 @@ function renderMenubarSurfaceContent(
       }
     },
   });
+  registerSsrPartId(finalProps, owner.idAssociation.ssrContentId);
+  setSsrIdAssociation(
+    finalProps,
+    'aria-labelledby',
+    owner.idAssociation.ssrTriggerId,
+    (rest as Record<string, unknown>)['aria-labelledby'] === undefined
+  );
   const nativeId = (finalProps as Record<string, unknown>).id;
   if (typeof nativeId === 'function') {
     (finalProps as Record<string, unknown>).id = () => {

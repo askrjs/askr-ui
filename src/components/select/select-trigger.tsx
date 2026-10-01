@@ -4,6 +4,7 @@ import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
+import { setSsrIdAssociation } from '../_internal/ssr-id-association';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { registerOverlayNode } from '../_internal/overlay';
 import { runCancelablePress } from '../_internal/press';
@@ -107,6 +108,13 @@ export function SelectTrigger(
     'data-size': size && size !== 'md' ? size : undefined,
     'data-state': root.open ? 'open' : 'closed',
   });
+
+  setSsrIdAssociation(
+    finalProps,
+    'aria-controls',
+    root.idAssociation.ssrContentId,
+    (rest as Record<string, unknown>)['aria-controls'] === undefined
+  );
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;

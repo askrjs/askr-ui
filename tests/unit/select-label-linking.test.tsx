@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 import { renderToStringSync } from '@askrjs/askr/ssr';
 import { For } from '@askrjs/askr/control';
+import { ErrorBoundary } from '@askrjs/askr/components';
 import {
   Select,
   SelectContent,
@@ -40,6 +41,38 @@ function LabelledSelect(props: { wrapped?: boolean; unlabelled?: boolean }) {
 }
 
 describe('Select SSR label linking', () => {
+  it('should associate the first surviving own label after an earlier label owner fails', () => {
+    function FailingBody() {
+      throw new Error('discard earlier label');
+    }
+    const html = renderToStringSync(() => (
+      <Select>
+        <SelectGroup>
+          <ErrorBoundary fallback={<span>Recovered</span>}>
+            <SelectLabel id="discarded-label">Discarded</SelectLabel>
+            <FailingBody />
+          </ErrorBoundary>
+          <SelectLabel id="surviving-label">Surviving</SelectLabel>
+        </SelectGroup>
+      </Select>
+    ));
+    expect(html).toContain('Recovered');
+    expect(html).not.toContain('id="discarded-label"');
+    expect(groupTag(html)).toContain('aria-labelledby="surviving-label"');
+  });
+
+  it('should retain the first own label when multiple labels survive', () => {
+    const html = renderToStringSync(() => (
+      <Select>
+        <SelectGroup>
+          <SelectLabel id="first-label">First</SelectLabel>
+          <SelectLabel id="second-label">Second</SelectLabel>
+        </SelectGroup>
+      </Select>
+    ));
+    expect(groupTag(html)).toContain('aria-labelledby="first-label"');
+  });
+
   it('should preserve explicit null caller group labeling in server markup', () => {
     const html = renderToStringSync(() => (
       <Select>
