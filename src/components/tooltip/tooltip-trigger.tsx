@@ -56,9 +56,15 @@ export function TooltipTrigger(
     onFocus: () => {
       root.openFromFocus();
     },
-    onBlur: () => {
-      root.releaseFocusAdoption();
-      root.setOpen(false);
+    onBlur: (event: FocusEvent) => {
+      const trigger = event.currentTarget as HTMLElement;
+      queueMicrotask(() => {
+        // A focused trigger can be detached and replaced as part of the same
+        // focus-adoption update. That blur is still the active focus cycle.
+        if (!trigger.isConnected) return;
+        root.releaseFocusAdoption();
+        root.setOpen(false);
+      });
     },
     'aria-describedby': root.open ? root.contentId : undefined,
     'data-slot': 'tooltip-trigger',
