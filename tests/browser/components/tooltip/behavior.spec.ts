@@ -1,8 +1,10 @@
-import { expect, test } from '../../fixtures';
+import { expect, HARNESS_URL, test } from '../../fixtures';
 
 test.describe('Tooltip - Behavior', () => {
   test.beforeEach(async ({ page }) => {
-    // Keep the initial pointer away from the trigger. Chromium can deliver a
+    await page.goto(HARNESS_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => 'askrHarness' in window);
+    // Park in the harness document before mounting. Chromium can deliver a
     // pointerover after layout under a stationary pointer; that independent
     // hover request must not contaminate the focus-only callback assertions.
     const viewport = page.viewportSize();
@@ -97,6 +99,7 @@ test.describe('Tooltip - Behavior', () => {
     const pageErrors: string[] = [];
     page.on('pageerror', (error) => pageErrors.push(error.message));
     await render('controlledClosed');
+    expect(await run<number>('openChanges')).toBe(0);
 
     expect(await run('focusTrigger')).toBeNull();
     await run('settle');
@@ -113,6 +116,7 @@ test.describe('Tooltip - Behavior', () => {
     run,
   }) => {
     await render('controlledClosed');
+    expect(await run<number>('openChanges')).toBe(0);
 
     expect(await run('focusTrigger')).toBeNull();
     await run('settle');
@@ -130,6 +134,7 @@ test.describe('Tooltip - Behavior', () => {
     run,
   }) => {
     await render('controlledClosedWithFocusChildren');
+    expect(await run<number>('openChanges')).toBe(0);
 
     await root.getByTestId('tooltip-trigger').focus();
     await run('settle');

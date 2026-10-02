@@ -15,6 +15,9 @@ associations across wrapped parts, later siblings, and portals.
 
 ### Internal
 
+- Update Playwright to 1.63.0. Its bundled WebKit completes long native test
+  runs while the macOS display is asleep; the previous browser could stop
+  issuing navigation requests after roughly 64 pages.
 - Local Playwright runs start the browser harness on a free port instead of a
   fixed 4318, so parallel runs in different worktrees no longer reuse each
   other's harness and test the wrong checkout. Reusing a running harness is
