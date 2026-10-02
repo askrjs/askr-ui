@@ -7,7 +7,11 @@ import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
 import { DismissableLayer } from '../dismissable-layer';
-import { dismissPopupWithTab, getFocusableElements } from '../_internal/focus';
+import {
+  dismissPopupWithTab,
+  getActiveElement,
+  getFocusableElements,
+} from '../_internal/focus';
 import {
   readHoverCardRootContext,
   resolveHoverCardPositionOptions,
@@ -122,7 +126,8 @@ export function HoverCardContent(
         queueMicrotask(() => {
           queueMicrotask(() => {
             (
-              document.getElementById(root.triggerId) ?? root.getTriggerNode()
+              root.getTriggerNode() ??
+              content.ownerDocument.getElementById(root.triggerId)
             )?.focus();
           });
         });
@@ -132,10 +137,7 @@ export function HoverCardContent(
         return;
       }
       const focusable = getFocusableElements(content);
-      const active =
-        document.activeElement instanceof HTMLElement
-          ? document.activeElement
-          : null;
+      const active = getActiveElement(content.ownerDocument);
       if (event.shiftKey && active === focusable[0] && trigger) {
         event.preventDefault();
         root.requestTriggerFocus();
@@ -143,7 +145,8 @@ export function HoverCardContent(
         queueMicrotask(() => {
           queueMicrotask(() => {
             (
-              document.getElementById(root.triggerId) ?? root.getTriggerNode()
+              root.getTriggerNode() ??
+              content.ownerDocument.getElementById(root.triggerId)
             )?.focus();
           });
         });

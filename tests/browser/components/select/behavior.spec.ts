@@ -317,6 +317,18 @@ test.describe('Select - Behavior', () => {
     await expect(trigger).toHaveAttribute('aria-expanded', 'true');
   });
 
+  test('should close an open select after a native pointer click on its trigger', async ({
+    render,
+    root,
+  }) => {
+    await render('hiddenInput');
+    const trigger = root.locator('[aria-haspopup="listbox"]');
+    await trigger.click();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await trigger.click();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
   test('should render typed trigger size for themed select controls', async ({
     render,
     root,

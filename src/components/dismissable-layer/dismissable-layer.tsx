@@ -156,11 +156,11 @@ function getLayerEntry(identity: object): LayerEntry {
         return;
       }
 
-      if (!(event.target instanceof Node)) {
+      if (!event.target || !('nodeType' in event.target)) {
         return;
       }
 
-      if (!created.node || created.node.contains(event.target)) {
+      if (!created.node || created.node.contains(event.target as Node)) {
         return;
       }
 
@@ -296,7 +296,10 @@ export function DismissableLayer(
   registerLayerCleanup(identity, entry);
   const setNode = (node: HTMLElement | null) => {
     if (node) {
+      const becameEnabled = entry.disabled && !disabled;
       entry.disabled = disabled;
+      if (becameEnabled && mountedLayers.has(entry))
+        mountedLayers.set(entry, nextLayerOrder++);
       entry.disableOutsidePointerEvents = disableOutsidePointerEvents;
       entry.onEscapeKeyDown = onEscapeKeyDown;
       entry.onPointerDownOutside = onPointerDownOutside;

@@ -9,7 +9,7 @@ import {
   OVERLAY_Z_INDEX,
   primeOverlayStackNode,
   registerOverlayNode,
-  setOverlayStackActive,
+  syncOverlayStackActive,
   syncOverlayPosition,
 } from '../_internal/overlay';
 import { cspNonce, getSignal, state } from '@askrjs/askr';
@@ -93,8 +93,13 @@ export function Dialog(props: DialogProps) {
     onChange: onOpenChange,
   });
   const currentOpen = openState();
-  setOverlayStackActive(overlayIdentity, currentOpen, getSignal());
   const backdropStackId = resolvePartId(dialogId, 'backdrop-stack');
+  syncOverlayStackActive(
+    overlayIdentity,
+    currentOpen,
+    getSignal(),
+    backdropStackId
+  );
   primeOverlayStackNode(
     overlayIdentity,
     'backdrop',

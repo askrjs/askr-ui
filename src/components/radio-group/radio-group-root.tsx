@@ -96,11 +96,6 @@ export function RadioGroup(props: RadioGroupProps) {
     onChange: onValueChange,
   });
   const currentValue = valueState();
-  const resetRef = formResetRef(() => {
-    if (value === undefined && valueState() !== defaultValue) {
-      valueState.set(defaultValue);
-    }
-  });
   const items = getCompositeCollectionItems(collection).map((item) => ({
     index: item.index,
     setSize: item.setSize,
@@ -150,6 +145,18 @@ export function RadioGroup(props: RadioGroupProps) {
       ? selectedIndex
       : fallbackIndex
   );
+  const resetRef = formResetRef(() => {
+    if (value !== undefined) return;
+    const liveItems = getCompositeCollectionItems(collection);
+    const selected = liveItems.find(
+      (item) => String(item.value ?? '') === defaultValue && !item.disabled
+    );
+    const resetIndex =
+      selected?.index ?? firstEnabledCompositeItemIndex(liveItems);
+    valueState.set(defaultValue);
+    currentIndexState.set(resetIndex);
+    pendingFocus.index = null;
+  });
   const currentIndexCandidate = currentIndexState();
   const currentItem = items.find(
     (item) => item.index === currentIndexCandidate

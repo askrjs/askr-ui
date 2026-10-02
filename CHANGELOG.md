@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Dropdown and Select close on a native pointer press/click of their open
+  trigger and clear automatic `aria-controls` when content unmounts.
+- Persistent dismissable layers and trapped focus scopes follow activation
+  order, preserving nested scope priority and leaving lower modals inactive.
+- Overlay roots publish stack activation and backdrop styles after commit,
+  so rejected renders cannot consume open order or replace live backdrop CSS.
+- FocusScope, persistent overlay focus, Tooltip, and HoverCard focus restoration
+  use the attached node's owner document and window, including iframe hosts.
+- Tooltip retains focus-listener bookkeeping and registers one lifetime cleanup;
+  DebouncedInput owns one cancellable timer across delay changes.
+- VirtualList adopts actual scroll writes without retaining stale targets and
+  preserves newer scroll/follow state when child refs run before parent commit.
+- RadioGroup form reset restores the selected or first enabled roving tab stop,
+  including groups whose default value has no selected item.
+
 - Closed `forceMount` Dropdown, Select, and Menubar content no longer takes
   focus or intercepts Escape and outside presses meant for an open layer
   beneath it.

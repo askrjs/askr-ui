@@ -7,6 +7,7 @@ export type OverlayNodes = {
   title?: HTMLElement | null;
   description?: HTMLElement | null;
   cleanup?: () => void;
+  updatePosition?: () => void;
 };
 
 export type OverlayNodePart = 'trigger' | 'content' | 'title' | 'description';

@@ -64,7 +64,8 @@ export function TooltipTrigger(
     onBlur: (event: FocusEvent) => {
       const trigger = event.currentTarget as HTMLElement;
       queueMicrotask(() => {
-        const activeElement = document.activeElement;
+        const ownerDocument = trigger.ownerDocument;
+        const activeElement = ownerDocument.activeElement;
         const currentTrigger = root.getTriggerNode();
         if (currentTrigger && currentTrigger.contains(activeElement)) {
           return;
@@ -74,8 +75,8 @@ export function TooltipTrigger(
         // the adoption latch if the user moved to another control.
         if (
           !trigger.isConnected &&
-          (activeElement === document.body ||
-            activeElement === document.documentElement)
+          (activeElement === ownerDocument.body ||
+            activeElement === ownerDocument.documentElement)
         ) {
           return;
         }

@@ -1,8 +1,7 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { state } from '@askrjs/askr';
-import { watch } from '@askrjs/askr/resources';
+import { task, watch } from '@askrjs/askr/resources';
 import { nativeRef } from '../_internal/native-ref';
-import { debounceEvent } from '@askrjs/askr/fx';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { focusable } from '@askrjs/askr/foundations/interactions';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
@@ -45,12 +44,9 @@ export function Input(props: InputInputProps | InputAsChildProps) {
   );
 }
 
-type DebouncedEmitter = ReturnType<typeof debounceEvent>;
-
 /** Per-mount debounce state, kept across renders. */
 type DebounceStore = {
-  emitter: DebouncedEmitter | null;
-  emitterMs: number;
+  timer: ReturnType<typeof setTimeout> | null;
   debounceMs: number;
   onDebouncedInput: ((value: string) => void) | undefined;
   pending: InputEvent | null;
@@ -60,9 +56,8 @@ type DebounceStore = {
  * DebouncedInput is a convenience wrapper around Input that emits a settled
  * value for search and filter surfaces.
  *
- * The debounced emitter is created once per mount and replaced only when
- * `debounceMs` changes. A pending value is re-timed with the new delay (or
- * emitted at once when the delay drops to zero), is delivered to the latest
+ * One component-owned timer is re-timed when `debounceMs` changes (or emits
+ * at once when the delay drops to zero). A pending value is delivered to the latest
  * `onDebouncedInput`, is dropped when `onDebouncedInput` is removed, and is
  * cancelled on unmount.
  */
@@ -78,15 +73,15 @@ export function DebouncedInput(props: DebouncedInputProps) {
 
   const isDisabled = disabled === true;
   const store = state<DebounceStore>({
-    emitter: null,
-    emitterMs: 0,
+    timer: null,
     debounceMs,
     onDebouncedInput,
     pending: null,
   })();
 
   const cancelPending = () => {
-    store.emitter?.cancel();
+    if (store.timer !== null) clearTimeout(store.timer);
+    store.timer = null;
     store.pending = null;
   };
 
@@ -96,42 +91,39 @@ export function DebouncedInput(props: DebouncedInputProps) {
       return;
     }
 
-    if (!store.emitter) {
+    if (!(store.debounceMs > 0)) {
       cancelPending();
       store.onDebouncedInput((event.target as HTMLInputElement).value);
       return;
     }
 
+    if (store.timer !== null) clearTimeout(store.timer);
     store.pending = event;
-    store.emitter(event);
+    store.timer = setTimeout(() => {
+      store.timer = null;
+      store.pending = null;
+      store.onDebouncedInput?.((event.target as HTMLInputElement).value);
+    }, store.debounceMs);
   };
 
   watch(
     () => [debounceMs, onDebouncedInput] as const,
     ([committedMs, committedCallback]) => {
+      const previousMs = store.debounceMs;
       store.debounceMs = committedMs;
       store.onDebouncedInput = committedCallback;
-      const emitterMs = committedCallback && committedMs > 0 ? committedMs : 0;
-      if (!committedCallback) cancelPending();
-      if ((store.emitter ? store.emitterMs : 0) === emitterMs) return;
-
+      if (!committedCallback) {
+        cancelPending();
+        return;
+      }
+      if (previousMs === committedMs) return;
       const pending = store.pending;
       cancelPending();
-      store.emitterMs = emitterMs;
-      // The committed watch retains component ownership, so pending timers
-      // are cancelled on unmount without exposing rejected render inputs.
-      store.emitter =
-        emitterMs > 0
-          ? debounceEvent(emitterMs, (settled) => {
-              store.pending = null;
-              store.onDebouncedInput?.(
-                (settled.target as HTMLInputElement).value
-              );
-            })
-          : null;
       if (pending) emit(pending);
     }
   );
+
+  task(() => cancelPending);
 
   const handleInput = (event: Event) => {
     const inputEvent = event as InputEvent;
