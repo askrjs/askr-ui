@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { createIsland } from '@askrjs/askr/boot';
 import type { Ref } from '@askrjs/askr/foundations/utilities';
 import {
@@ -9,7 +9,7 @@ import {
   VirtualTable,
   type VirtualTableApi,
 } from '../../../../src/components/virtual-table';
-import { mount, unmount } from '../../test-utils';
+import { flushUpdates, mount, unmount } from '../../test-utils';
 
 type Api = VirtualListApi<number> | VirtualTableApi<number>;
 type Kind = 'list' | 'table';
@@ -53,6 +53,7 @@ let container: HTMLElement | undefined;
 afterEach(() => {
   unmount(container);
   container = undefined;
+  vi.unstubAllGlobals();
 });
 
 describe.each(['list', 'table'] as const)(
@@ -110,6 +111,68 @@ describe.each(['list', 'table'] as const)(
       expect(newApis).toEqual([api, null]);
       expect(oldNodes).toEqual([node, null]);
       expect(oldApis).toEqual([api, null]);
+    });
+    it('should discard stale queued observer setup when bindings change immediately after mount', async () => {
+      const observers: Array<{
+        observe: ReturnType<typeof vi.fn>;
+        disconnect: ReturnType<typeof vi.fn>;
+      }> = [];
+      class TestResizeObserver {
+        observe = vi.fn();
+        disconnect = vi.fn();
+        constructor() {
+          observers.push(this);
+        }
+      }
+      vi.stubGlobal('ResizeObserver', TestResizeObserver);
+      const oldNodes: Array<HTMLElement | null> = [];
+      const newNodes: Array<HTMLElement | null> = [];
+      const oldApis: Array<Api | null> = [];
+      const newApis: Array<Api | null> = [];
+      const oldRef = (value: HTMLElement | null) => oldNodes.push(value);
+      const newRef = (value: HTMLElement | null) => newNodes.push(value);
+      const oldApiRef = (value: Api | null) => oldApis.push(value);
+      const newApiRef = (value: Api | null) => newApis.push(value);
+      let replaced = false;
+      const Root = () =>
+        virtualElement(
+          kind,
+          replaced ? newRef : oldRef,
+          replaced ? newApiRef : oldApiRef
+        );
+      container = document.createElement('div');
+      document.body.appendChild(container);
+      const root = container;
+      createIsland({ root, component: Root });
+      const node = oldNodes[0];
+      const api = oldApis[0];
+      expect(observers).toHaveLength(0);
+      replaced = true;
+      createIsland({ root, component: Root });
+      expect(oldNodes).toEqual([node, null]);
+      expect(oldApis).toEqual([api, null]);
+      expect(newNodes).toEqual([node]);
+      expect(newApis).toEqual([api]);
+      await flushUpdates();
+      const observedNodes = observers.flatMap((observer) =>
+        observer.observe.mock.calls.map(([value]) => value)
+      );
+      unmount(container);
+      container = undefined;
+      await flushUpdates();
+      expect({
+        constructed: observers.length,
+        observedNodes,
+        disconnectCounts: observers.map(
+          (observer) => observer.disconnect.mock.calls.length
+        ),
+      }).toEqual({
+        constructed: 1,
+        observedNodes: [node],
+        disconnectCounts: [1],
+      });
+      expect(newNodes).toEqual([node, null]);
+      expect(newApis).toEqual([api, null]);
     });
     it('should leave committed refs untouched when replacement rendering is rejected', () => {
       const oldNode = { current: null as HTMLElement | null };

@@ -395,10 +395,12 @@ function getVirtualTableEntry<Row>(
     selectRowByIndex(nextIndex);
   };
 
+  let attachmentGeneration = 0;
   const rootRef = (node: HTMLElement | null) => {
     if (entry.wrapperNode === node) {
       return;
     }
+    const generation = ++attachmentGeneration;
 
     if (node === null) {
       clearVirtualTableLayoutRules(entry);
@@ -435,7 +437,7 @@ function getVirtualTableEntry<Row>(
     }
 
     queueMicrotask(() => {
-      if (entry.wrapperNode !== node) {
+      if (entry.wrapperNode !== node || attachmentGeneration !== generation) {
         return;
       }
 

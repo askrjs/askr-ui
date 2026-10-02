@@ -428,10 +428,12 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
     });
   };
 
+  let attachmentGeneration = 0;
   const rootRef = (node: HTMLElement | null) => {
     if (entry.node === node) {
       return;
     }
+    const generation = ++attachmentGeneration;
 
     if (node === null) {
       for (const [key, selector] of entry.layoutRules) {
@@ -471,7 +473,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
     }
 
     queueMicrotask(() => {
-      if (entry.node !== node) {
+      if (entry.node !== node || attachmentGeneration !== generation) {
         return;
       }
 

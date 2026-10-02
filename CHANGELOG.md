@@ -31,6 +31,9 @@ associations across wrapped parts, later siblings, and portals.
 
 ### Fixed
 
+- `VirtualList` and `VirtualTable` discard stale queued viewport setup when
+  refs are replaced immediately after mount, and release their resize observer
+  once on teardown.
 - `Tooltip` sends one controlled open request per focus cycle, including focus
   transitions within a composed trigger, preserves focus when a trigger is
   replaced, and releases that adoption when focus moves elsewhere.
