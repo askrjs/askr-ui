@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Closed `forceMount` Dropdown, Select, and Menubar content no longer takes
+  focus or intercepts Escape and outside presses meant for an open layer
+  beneath it.
+- `Slider` ends an active drag when it becomes disabled, so re-enabling it
+  before the pointer is released no longer resumes the drag.
+- `AvatarImage` publishes its source after commit, so a rejected render cannot
+  skip the loading reset on the next accepted source change.
+
 ## [0.4.3] - 2026-10-01
 
 No public component, prop, export, or compatible peer-range changes. No

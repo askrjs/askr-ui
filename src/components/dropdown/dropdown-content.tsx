@@ -172,8 +172,13 @@ export function DropdownContent(
 
   return (
     <Presence present={forceMount || root.open}>
-      <FocusScope restoreFocus restoreFocusTarget={() => overlayNodes.trigger}>
+      <FocusScope
+        autoFocus={root.open}
+        restoreFocus
+        restoreFocusTarget={() => overlayNodes.trigger}
+      >
         <DismissableLayer
+          disabled={!root.open}
           onDismiss={() => {
             root.setOpen(false);
           }}

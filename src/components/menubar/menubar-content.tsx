@@ -361,6 +361,7 @@ function renderMenubarSurfaceContent(
           <VirtualCompositeOwnerContext value>
             <FocusScope autoFocus={false} restoreFocus>
               <DismissableLayer
+                disabled={!open}
                 onDismiss={() => {
                   root.setOpenPath(contentContext.path.slice(0, -1));
                 }}

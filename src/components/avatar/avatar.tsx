@@ -105,14 +105,12 @@ export function AvatarImage(props: AvatarImageProps): JSX.Element {
   const normalizedSrc = typeof src === 'string' && src ? src : null;
   const sourceChanged = entry.src !== normalizedSrc;
 
-  if (sourceChanged) {
-    entry.src = normalizedSrc;
-    entry.status = normalizedSrc ? 'loading' : 'error';
-  }
-
+  // Publish the new source only once the render commits, so a rejected render
+  // cannot swallow the loading reset on the next accepted one.
   resource(() => {
     if (sourceChanged) {
-      setStatus(entry.status);
+      entry.src = normalizedSrc;
+      setStatus(normalizedSrc ? 'loading' : 'error');
     }
     return null;
   }, [identity, normalizedSrc, sourceChanged]);

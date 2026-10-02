@@ -251,6 +251,9 @@ export function Slider(props: SliderProps) {
     () => rootContext,
     (committedRoot) => {
       sliderContexts.set(identity, committedRoot);
+      if (committedRoot.disabled) {
+        endSliderDrag(identity);
+      }
     }
   );
   const sliderRuleKey = `slider:${sliderId}`;
