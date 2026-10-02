@@ -1,3 +1,4 @@
+import { captureFocusTarget } from '../../assertions';
 import type { Page } from '@playwright/test';
 
 import { expect, test } from '../../fixtures';
@@ -126,23 +127,31 @@ test.describe('HoverCard - Behavior', () => {
     await expect(content).toHaveCount(1);
   });
 
-  test('should cancel a pending open when the pointer leaves immediately', async ({
-    page,
-    render,
-    root,
-    run,
-  }) => {
-    await installClock(page);
-    await render('immediateLeave');
+  for (const openDelay of [0, 100]) {
+    test(`should cancel a pending open when the pointer leaves immediately given ${openDelay}ms delay`, async ({
+      page,
+      render,
+      root,
+      run,
+    }) => {
+      await installClock(page);
+      await render('immediateLeave', { openDelay });
+      // Pause the loaded realm too: navigation replays the clock log but can
+      // leave its initial raw timer armed, which may run a due 0ms callback.
+      await page.clock.pauseAt(CLOCK_START);
 
-    await root.locator(TRIGGER).hover();
-    await root.locator(EXIT).hover();
-    await page.clock.runFor(110);
+      await root.locator(TRIGGER).hover();
+      await root.locator(EXIT).hover();
+      await page.clock.runFor(110);
 
-    await expect(root.locator(TRIGGER)).toHaveAttribute('data-state', 'closed');
-    await expect(page.locator(CONTENT)).toHaveCount(0);
-    expect(await run<number>('openChanges')).toBe(0);
-  });
+      await expect(root.locator(TRIGGER)).toHaveAttribute(
+        'data-state',
+        'closed'
+      );
+      await expect(page.locator(CONTENT)).toHaveCount(0);
+      expect(await run<number>('openChanges')).toBe(0);
+    });
+  }
 
   test('should cancel the original pending timer after an unrelated re-render', async ({
     page,
@@ -241,6 +250,7 @@ test.describe('HoverCard - Behavior', () => {
   }) => {
     await render('interactiveContent');
     const before = root.getByTestId('before');
+    const checkBeforeFocus = await captureFocusTarget(before);
     const trigger = root.locator(TRIGGER);
     const first = page.locator(`${CONTENT} a`);
 
@@ -248,6 +258,7 @@ test.describe('HoverCard - Behavior', () => {
     await trigger.hover();
     await expect(page.locator(CONTENT)).toHaveCount(1);
     await expect(before).toBeFocused();
+    await checkBeforeFocus();
 
     await trigger.focus();
     await page.keyboard.press('Tab');

@@ -56,6 +56,98 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+const offsetItems = Array.from({ length: 20 }, (_, index) => index);
+function offsetProbe(
+  kind: Kind,
+  apiRef: Ref<Api | null>,
+  ref?: Ref<HTMLElement>,
+  rowRef?: (node: HTMLElement | null) => void
+) {
+  const common = {
+    ref,
+    'data-offset-probe': kind,
+    style: { height: '112px', overflow: 'auto' },
+    rowHeight: 28,
+    getKey: (item: number) => item,
+  };
+  return kind === 'list' ? (
+    <VirtualList
+      {...common}
+      items={offsetItems}
+      apiRef={apiRef as Ref<VirtualListApi<number> | null>}
+      rowComponent={({ item }) => <span ref={rowRef}>{item}</span>}
+    />
+  ) : (
+    <VirtualTable
+      {...common}
+      rows={offsetItems}
+      headerHeight={28}
+      apiRef={apiRef as Ref<VirtualTableApi<number> | null>}
+      columns={[
+        {
+          id: 'value',
+          header: 'Value',
+          cellComponent: ({ row }) => <span ref={rowRef}>{row}</span>,
+        },
+      ]}
+    />
+  );
+}
+
+describe.each(['list', 'table'] as const)(
+  'Virtual %s initial offset measurement',
+  (kind) => {
+    it('should still restore the physical offset before a caller DOM ref observes it', async () => {
+      const apiRef = { current: null as Api | null };
+      const observed: number[] = [];
+      const changeOffset = (node: HTMLElement | null) => {
+        const viewport = node?.closest<HTMLElement>(
+          `[data-offset-probe="${kind}"]`
+        );
+        if (viewport) viewport.scrollTop = 56;
+      };
+      container = mount(
+        offsetProbe(
+          kind,
+          apiRef,
+          (node) => {
+            if (node) observed.push(node.scrollTop);
+          },
+          changeOffset
+        )
+      );
+      expect(observed).toEqual([0]);
+      await flushUpdates();
+      expect(apiRef.current?.getScrollTop()).toBe(0);
+    });
+
+    it('should keep a newer API reveal requested before initial viewport setup', async () => {
+      const apiRef = { current: null as Api | null };
+      container = mount(offsetProbe(kind, apiRef));
+      apiRef.current?.scrollToIndex(6);
+      expect(apiRef.current?.getScrollTop()).toBe(168);
+      await flushUpdates();
+      await flushUpdates();
+      expect(apiRef.current?.getScrollTop()).toBe(168);
+    });
+
+    it('should keep a user scroll delivered after initial viewport setup', async () => {
+      const apiRef = { current: null as Api | null };
+      container = mount(offsetProbe(kind, apiRef));
+      await flushUpdates();
+      await flushUpdates();
+      const node = container.querySelector<HTMLElement>(
+        `[data-offset-probe="${kind}"]`
+      );
+      if (!node) throw new Error('Missing offset probe viewport');
+      node.scrollTop = 84;
+      node.dispatchEvent(new Event('scroll'));
+      await flushUpdates();
+      expect(apiRef.current?.getScrollTop()).toBe(84);
+    });
+  }
+);
+
 describe.each(['list', 'table'] as const)(
   'Virtual %s ref lifecycle',
   (kind) => {

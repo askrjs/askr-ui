@@ -1,3 +1,4 @@
+import { captureFocusTarget } from '../../assertions';
 import type { Page } from '@playwright/test';
 
 import { expect, test } from '../../fixtures';
@@ -271,6 +272,7 @@ test.describe('Select - Behavior', () => {
       await page.setViewportSize({ width: 1280, height: 800 });
       await render('viewportResize');
       const trigger = root.locator('[aria-haspopup="listbox"]');
+      const checkTriggerFocus = await captureFocusTarget(trigger);
 
       await trigger.focus();
       if (openMethod === 'pointer') {
@@ -296,6 +298,7 @@ test.describe('Select - Behavior', () => {
       await content.dispatchEvent('keydown', { key: 'Escape', bubbles: true });
 
       await expect(trigger).toBeFocused();
+      await checkTriggerFocus();
     });
   }
 

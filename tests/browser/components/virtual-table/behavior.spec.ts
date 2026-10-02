@@ -1,3 +1,4 @@
+import { captureFocusTarget } from '../../assertions';
 import type { Page } from '@playwright/test';
 
 import { expect, test } from '../../fixtures';
@@ -107,6 +108,7 @@ test.describe('VirtualTable - Behavior', () => {
   }) => {
     await render('nestedInteractiveCell');
     const action = root.locator('[data-row-key="row-0"] button');
+    const checkActionFocus = await captureFocusTarget(action);
 
     await action.focus();
     await action.press('Enter');
@@ -115,12 +117,45 @@ test.describe('VirtualTable - Behavior', () => {
     expect(await run<string[]>('actionArgs')).toContain('row-0');
     expect(await run<string | null>('selectedRowKey')).toBeNull();
     await expect(action).toBeFocused();
+    await checkActionFocus();
 
     await page.keyboard.press('ArrowDown');
     await nextFrame(page);
 
     expect(await run<string | null>('selectedRowKey')).toBeNull();
     await expect(action).toBeFocused();
+    await checkActionFocus();
+  });
+
+  test('should preserve nested cell selection and focus with default overscan', async ({
+    page,
+    render,
+    root,
+    run,
+  }) => {
+    await render('nestedInteractiveCell', { defaultOverscan: true });
+    const action = root.locator('[data-row-key="row-0"] button');
+    const checkActionFocus = await captureFocusTarget(action);
+
+    await action.focus();
+    // Preserve the retired case's programmatic click, which does not apply
+    // a browser's mouse-focus policy to the already-focused button.
+    await run('legacyClick');
+    await nextFrame(page);
+
+    expect(await run<string[]>('actionArgs')).toContain('row-0');
+    expect(await run<string | null>('selectedRowKey')).toBeNull();
+    await expect(action).toBeFocused();
+    await checkActionFocus();
+
+    // The retired case dispatched a synthetic key, which has no native
+    // scrolling default. Keep that precise premise alongside the real-key
+    // control above, whose overscan retains the cell during browser scrolling.
+    await run('legacyKeyDown');
+
+    expect(await run<string | null>('selectedRowKey')).toBeNull();
+    await expect(action).toBeFocused();
+    await checkActionFocus();
   });
 
   test('should honor default-prevented nested events before selecting a row', async ({
