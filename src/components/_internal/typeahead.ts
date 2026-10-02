@@ -19,6 +19,8 @@ type TypeaheadOptions = {
   onMatch: (index: number) => void;
 };
 
+type TypeaheadOptionsResolver = () => TypeaheadOptions;
+
 const typeaheadEntries = new WeakMap<object, TypeaheadEntry>();
 
 function getTypeaheadEntry(identity: object): TypeaheadEntry {
@@ -121,7 +123,7 @@ function findTypeaheadMatch(
 export function handleTypeaheadKeyDown(
   identity: object,
   event: KeyboardEvent,
-  options: TypeaheadOptions
+  options: TypeaheadOptions | TypeaheadOptionsResolver
 ): boolean {
   const entry = getTypeaheadEntry(identity);
   const key = resolvePrintableKey(event);
@@ -162,10 +164,15 @@ export function handleTypeaheadKeyDown(
     entry.suppressSpaceKeyUp = true;
   }
 
+  const resolvedOptions = typeof options === 'function' ? options() : options;
   entry.search += key;
   const query = normalizeTypeaheadText(resolveSearchQuery(entry.search));
-  const currentIndex = entry.currentMatchIndex ?? options.currentIndex;
-  const matchIndex = findTypeaheadMatch(options.items, query, currentIndex);
+  const currentIndex = entry.currentMatchIndex ?? resolvedOptions.currentIndex;
+  const matchIndex = findTypeaheadMatch(
+    resolvedOptions.items,
+    query,
+    currentIndex
+  );
 
   if (entry.timer !== null) {
     clearTimeout(entry.timer);
@@ -180,7 +187,7 @@ export function handleTypeaheadKeyDown(
     entry.currentMatchIndex = matchIndex;
 
     if (matchIndex !== currentIndex) {
-      options.onMatch(matchIndex);
+      resolvedOptions.onMatch(matchIndex);
     }
   }
 

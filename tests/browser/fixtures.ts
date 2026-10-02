@@ -90,7 +90,7 @@ function scenarioModuleFor(file: string): string {
 
 async function openHarness(page: Page): Promise<void> {
   if (new URL(page.url(), 'http://127.0.0.1').pathname === HARNESS_URL) return;
-  await page.goto(HARNESS_URL);
+  await page.goto(HARNESS_URL, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => 'askrHarness' in window);
 }
 
@@ -170,12 +170,14 @@ export const test = base.extend<Fixtures>({
         : [specModule, name];
       await openHarness(page);
       await page.evaluate(
-        ([scenarioFile, scenarioName, scenarioOptions]) =>
-          (window as unknown as HarnessWindow).askrHarness.mount(
+        async ([scenarioFile, scenarioName, scenarioOptions]) => {
+          await (window as unknown as HarnessWindow).askrHarness.mount(
             scenarioFile as string,
             scenarioName as string,
             scenarioOptions
-          ),
+          );
+          return null;
+        },
         [file, exportName, options ?? null] as const
       );
     });

@@ -5,6 +5,10 @@ import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { runCancelablePress } from '../_internal/press';
 import { readPopoverRootContext } from './popover.shared';
+import {
+  registerSsrPartId,
+  setSsrIdAssociation,
+} from '../_internal/ssr-id-association';
 import type {
   PopoverTriggerAsChildProps,
   PopoverTriggerProps,
@@ -48,7 +52,10 @@ export function PopoverTrigger(
         | null
         | undefined,
       (node: HTMLElement | null) => {
-        root.setTriggerNode(node);
+        root.setTriggerNode(
+          node,
+          (rest as Record<string, unknown>)['aria-controls'] === undefined
+        );
       }
     ),
     id: root.triggerId,
@@ -59,6 +66,13 @@ export function PopoverTrigger(
     'data-disabled': disabled ? 'true' : undefined,
     'data-state': root.open ? 'open' : 'closed',
   });
+  registerSsrPartId(finalProps, root.ssrTrigger);
+  setSsrIdAssociation(
+    finalProps,
+    'aria-controls',
+    root.ssrContent,
+    (rest as Record<string, unknown>)['aria-controls'] === undefined
+  );
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;

@@ -2,7 +2,8 @@ import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeButtonProps } from '../_internal/native-control';
 import { state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { mergeComponentProps } from '../_internal/component-props';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import {
   compositeItemFocusProps,
@@ -78,7 +79,7 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
   };
   const registrationOwner = {};
   const focusRepairProps = compositeItemFocusProps();
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
     onKeyUp: handleKeyUp,
@@ -129,6 +130,12 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
     'data-disabled': disabled ? 'true' : undefined,
     tabIndex: disabled ? -1 : itemFocusProps.tabIndex,
     ...focusRepairProps,
+    onFocus: (event: FocusEvent) => {
+      focusRepairProps.onFocus(event);
+      if (!disabled) {
+        root.setCurrentIndex(scopedVirtualPlacement?.index ?? placement.index);
+      }
+    },
   });
 
   if (asChild) {

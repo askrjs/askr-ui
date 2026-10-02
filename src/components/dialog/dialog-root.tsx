@@ -22,6 +22,12 @@ import {
 } from './dialog.shared';
 import type { DialogProps } from './dialog.types';
 import { OverlayPortalHost } from '../_internal/overlay-portal-host';
+import { syncIdAssociation } from '../_internal/id-association';
+import {
+  createSsrIdRegistration,
+  ssrAttributeRootProps,
+  type SsrIdRegistration,
+} from '../_internal/ssr-id-association';
 
 function scheduleDialogPortalSync(callback: () => void) {
   queueMicrotask(callback);
@@ -29,23 +35,26 @@ function scheduleDialogPortalSync(callback: () => void) {
 
 function syncDialogLabelAttributes(
   content: HTMLElement | null,
-  titleId: string,
   titleNode: HTMLElement | null | undefined,
-  descriptionId: string,
-  descriptionNode: HTMLElement | null | undefined
+  descriptionNode: HTMLElement | null | undefined,
+  associations: { title: boolean; description: boolean }
 ) {
   if (!content) return;
 
-  if (titleNode?.isConnected) {
-    content.setAttribute('aria-labelledby', titleId);
-  } else if (content.getAttribute('aria-labelledby') === titleId) {
-    content.removeAttribute('aria-labelledby');
+  if (associations.title) {
+    if (titleNode?.isConnected && titleNode.id) {
+      content.setAttribute('aria-labelledby', titleNode.id);
+    } else {
+      content.removeAttribute('aria-labelledby');
+    }
   }
 
-  if (descriptionNode?.isConnected) {
-    content.setAttribute('aria-describedby', descriptionId);
-  } else if (content.getAttribute('aria-describedby') === descriptionId) {
-    content.removeAttribute('aria-describedby');
+  if (associations.description) {
+    if (descriptionNode?.isConnected && descriptionNode.id) {
+      content.setAttribute('aria-describedby', descriptionNode.id);
+    } else {
+      content.removeAttribute('aria-describedby');
+    }
   }
 }
 
@@ -95,6 +104,14 @@ export function Dialog(props: DialogProps) {
   const contentId = resolvePartId(dialogId, 'content');
   const titleId = resolvePartId(dialogId, 'title');
   const descriptionId = resolvePartId(dialogId, 'description');
+  const ssrTitle = state(createSsrIdRegistration())();
+  const ssrDescription = state(createSsrIdRegistration())();
+  const ssrContent = state(createSsrIdRegistration(contentId))();
+  const contentAssociations = state({
+    title: true,
+    description: true,
+    controls: true,
+  })();
   const portal = getPersistentPortal(overlayIdentity);
   const overlayNodes = getOverlayNodes(overlayIdentity);
   const titleNodeOwner = {};
@@ -105,16 +122,38 @@ export function Dialog(props: DialogProps) {
   const syncLabelAttributes = () => {
     syncDialogLabelAttributes(
       overlayNodes.content,
-      titleId,
       overlayNodes.title,
-      descriptionId,
-      overlayNodes.description
+      overlayNodes.description,
+      contentAssociations
     );
+    if (
+      contentAssociations.controls &&
+      overlayNodes.trigger &&
+      overlayNodes.content?.isConnected
+    ) {
+      syncIdAssociation(
+        overlayNodes.trigger,
+        overlayNodes.content,
+        'aria-controls',
+        contentAssociations.controls
+      );
+    }
   };
   const syncLabelAttributesSoon = () => {
     syncLabelAttributes();
     scheduleDialogPortalSync(syncLabelAttributes);
   };
+  const withCommittedIdSync = (
+    registration: SsrIdRegistration
+  ): SsrIdRegistration => ({
+    cell: registration.cell,
+    register(renderedId, signal) {
+      registration.register(renderedId, signal);
+      scheduleDialogPortalSync(() => {
+        if (!signal.aborted) syncLabelAttributes();
+      });
+    },
+  });
 
   const rootContext: DialogRootContextValue = {
     dialogId,
@@ -139,8 +178,21 @@ export function Dialog(props: DialogProps) {
     contentId,
     titleId,
     descriptionId,
-    hasTitle: Boolean(overlayNodes.title?.isConnected),
-    hasDescription: Boolean(overlayNodes.description?.isConnected),
+    ssrTitle: withCommittedIdSync(ssrTitle),
+    ssrDescription: withCommittedIdSync(ssrDescription),
+    ssrContent: withCommittedIdSync(ssrContent),
+    getContentId: () =>
+      overlayNodes.content?.isConnected
+        ? overlayNodes.content.id || undefined
+        : ssrContent.cell.value,
+    getTitleId: () =>
+      overlayNodes.title?.isConnected
+        ? overlayNodes.title.id || undefined
+        : ssrTitle.cell.value,
+    getDescriptionId: () =>
+      overlayNodes.description?.isConnected
+        ? overlayNodes.description.id || undefined
+        : ssrDescription.cell.value,
     portal,
     backdropStackId,
     setTitleNode: (node: HTMLElement | null) => {
@@ -156,11 +208,21 @@ export function Dialog(props: DialogProps) {
       );
       syncLabelAttributesSoon();
     },
-    setTriggerNode: (node: HTMLElement | null) => {
+    setTriggerNode: (node, automaticControls) => {
       registerOverlayNode(overlayIdentity, 'trigger', node, triggerNodeOwner);
+      if (node && overlayNodes.trigger === node) {
+        contentAssociations.controls = automaticControls;
+      }
+      syncLabelAttributesSoon();
     },
-    setContentNode: (node: HTMLElement | null) => {
+    getTriggerNode: () => overlayNodes.trigger,
+    getContentNode: () => overlayNodes.content,
+    setContentNode: (node, associations) => {
       registerOverlayNode(overlayIdentity, 'content', node, contentNodeOwner);
+      if (node && overlayNodes.content === node) {
+        contentAssociations.title = associations.title;
+        contentAssociations.description = associations.description;
+      }
       syncLabelAttributesSoon();
     },
     syncPosition: () => {
@@ -174,7 +236,7 @@ export function Dialog(props: DialogProps) {
   };
 
   return (
-    <DialogRootContext value={rootContext}>
+    <DialogRootContext value={rootContext} {...ssrAttributeRootProps}>
       {children as JSX.Element}
       <OverlayPortalHost portal={portal} />
     </DialogRootContext>

@@ -27,10 +27,6 @@ export function AlertDialogContent(
   const isAsChild = props.asChild === true;
   const handleEscapeKeyDown = (event: KeyboardEvent) => {
     onEscapeKeyDown?.(event);
-
-    if (!event.defaultPrevented) {
-      root.setOpen(false);
-    }
   };
   const handlePointerDownOutside = (event: PointerEvent) => {
     onPointerDownOutside?.(event);
@@ -42,7 +38,10 @@ export function AlertDialogContent(
     onEscapeKeyDown: handleEscapeKeyDown,
     onPointerDownOutside: handlePointerDownOutside,
     onInteractOutside,
-    onDismiss,
+    onDismiss: () => {
+      root.setOpen(false);
+      onDismiss?.();
+    },
   };
 
   if (isAsChild) {

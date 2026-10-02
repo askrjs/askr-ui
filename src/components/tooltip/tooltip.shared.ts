@@ -1,4 +1,5 @@
 import { defineScope, readScope } from '@askrjs/askr';
+import type { SsrIdRegistration } from '../_internal/ssr-id-association';
 import { OVERLAY_Z_INDEX, type OverlayPortal } from '../_internal/overlay';
 import type { TooltipContentOwnProps } from './tooltip.types';
 
@@ -16,10 +17,16 @@ export type TooltipRootContextValue = {
   open: boolean;
   setOpen: (open: boolean) => void;
   openFromFocus: () => void;
+  releaseFocusAdoption: () => void;
+  getTriggerNode: () => HTMLElement | null;
   contentId: string;
+  ssrContent: SsrIdRegistration;
   portal: OverlayPortal;
   registerContentPosition: (position: TooltipPositionOptions) => void;
-  setTriggerNode: (node: HTMLElement | null) => void;
+  setTriggerNode: (
+    node: HTMLElement | null,
+    automaticDescription: boolean
+  ) => void;
   setContentNode: (node: HTMLElement | null) => void;
   syncPosition: () => void;
   clearPosition: () => void;

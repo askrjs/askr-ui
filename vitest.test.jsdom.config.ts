@@ -11,9 +11,12 @@ export default defineConfig({
       'tests/jsdom/components/icon/**/*.test.tsx',
       'tests/jsdom/components/input/**/*.test.tsx',
       'tests/jsdom/components/toast/**/*.test.tsx',
+      'tests/jsdom/components/virtual-table/ref-lifecycle.test.tsx',
+      'tests/jsdom/components/virtual-table/identity-transactions.test.tsx',
       'tests/jsdom/components/consistency-reset/**/*.test.tsx',
       'tests/jsdom/internal/overlay/**/*.test.ts',
       'tests/jsdom/internal/focus/**/*.test.ts',
+      'tests/jsdom/internal/typeahead.test.ts',
     ],
   },
 });

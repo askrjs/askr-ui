@@ -19,6 +19,12 @@ import {
 } from './tooltip.shared';
 import type { TooltipProps } from './tooltip.types';
 import { OverlayPortalHost } from '../_internal/overlay-portal-host';
+import { syncIdAssociation } from '../_internal/id-association';
+import {
+  createSsrIdRegistration,
+  ssrAttributeRootProps,
+  type SsrIdRegistration,
+} from '../_internal/ssr-id-association';
 
 function scheduleTooltipPortalSync(callback: () => void) {
   queueMicrotask(callback);
@@ -40,13 +46,29 @@ export function Tooltip(props: TooltipProps) {
   setOverlayStackActive(overlayIdentity, openState(), cleanupSignal);
   const focusEntry = state({
     adoptTrigger: false,
+    focusRequestSent: false,
     generation: 0,
     releaseFrame: null as number | null,
   })();
+  let focusListenerAttached = false;
   captureOverlayNonce(overlayIdentity, cspNonce());
   const contentId = resolvePartId(tooltipId, 'content');
+  const ssrContent = state(createSsrIdRegistration(contentId))();
   const portal = getPersistentPortal(overlayIdentity);
   const overlayNodes = getOverlayNodes(overlayIdentity);
+  const association = state({ automatic: true })();
+  const syncDescription = () => {
+    if (openState()) {
+      syncIdAssociation(
+        overlayNodes.trigger,
+        overlayNodes.content,
+        'aria-describedby',
+        association.automatic
+      );
+    } else if (association.automatic) {
+      overlayNodes.trigger?.removeAttribute('aria-describedby');
+    }
+  };
   const triggerNodeOwner = {};
   const contentNodeOwner = {};
   let contentPosition: TooltipPositionOptions = resolveTooltipPositionOptions();
@@ -61,6 +83,7 @@ export function Tooltip(props: TooltipProps) {
         focusEntry.adoptTrigger = false;
         return;
       }
+      if (focusEntry.generation !== generation) return;
       focusEntry.releaseFrame = requestAnimationFrame(() => {
         focusEntry.releaseFrame = null;
         if (focusEntry.generation === generation) {
@@ -70,6 +93,33 @@ export function Tooltip(props: TooltipProps) {
     });
   };
 
+  const onFocusIn = (event: FocusEvent) => {
+    if (!focusEntry.focusRequestSent) return;
+    const trigger = overlayNodes.trigger;
+    if (
+      trigger &&
+      event.target instanceof Node &&
+      trigger.contains(event.target)
+    ) {
+      return;
+    }
+    releaseFocusAdoption();
+  };
+
+  const releaseFocusAdoption = () => {
+    focusEntry.generation += 1;
+    if (focusEntry.releaseFrame !== null) {
+      cancelAnimationFrame(focusEntry.releaseFrame);
+      focusEntry.releaseFrame = null;
+    }
+    if (focusListenerAttached) {
+      document.removeEventListener('focusin', onFocusIn, true);
+      focusListenerAttached = false;
+    }
+    focusEntry.focusRequestSent = false;
+    focusEntry.adoptTrigger = false;
+  };
+
   cleanupSignal.addEventListener(
     'abort',
     () => {
@@ -77,6 +127,11 @@ export function Tooltip(props: TooltipProps) {
         cancelAnimationFrame(focusEntry.releaseFrame);
         focusEntry.releaseFrame = null;
       }
+      if (focusListenerAttached) {
+        document.removeEventListener('focusin', onFocusIn, true);
+        focusListenerAttached = false;
+      }
+      focusEntry.focusRequestSent = false;
       focusEntry.adoptTrigger = false;
       focusEntry.generation += 1;
     },
@@ -104,6 +159,24 @@ export function Tooltip(props: TooltipProps) {
     });
   };
 
+  const withCommittedIdSync = (
+    registration: SsrIdRegistration
+  ): SsrIdRegistration => ({
+    cell: registration.cell,
+    register(renderedId, signal) {
+      registration.register(renderedId, signal);
+      scheduleTooltipPortalSync(() => {
+        if (
+          !signal.aborted &&
+          overlayNodes.trigger?.isConnected &&
+          overlayNodes.content?.isConnected
+        ) {
+          syncDescription();
+        }
+      });
+    },
+  });
+
   const rootContext: TooltipRootContextValue = {
     tooltipId,
     get open() {
@@ -111,23 +184,44 @@ export function Tooltip(props: TooltipProps) {
     },
     setOpen: updateOpen,
     openFromFocus: () => {
+      // A controlled owner may decline the open request, leaving openState
+      // false. Keep the request latched through the focus cycle so delayed
+      // trigger ref attachment cannot emit a duplicate open request.
+      if (focusEntry.focusRequestSent) return;
+      focusEntry.focusRequestSent = true;
+      document.addEventListener('focusin', onFocusIn, true);
+      focusListenerAttached = true;
       focusEntry.adoptTrigger = true;
       updateOpen(true);
       releaseTriggerAdoption();
     },
+    releaseFocusAdoption,
+    getTriggerNode: () => overlayNodes.trigger,
     contentId,
+    ssrContent: withCommittedIdSync(ssrContent),
     portal,
     registerContentPosition: (nextPosition: TooltipPositionOptions) => {
       contentPosition = nextPosition;
     },
-    setTriggerNode: (node: HTMLElement | null) => {
+    setTriggerNode: (
+      node: HTMLElement | null,
+      automaticDescription: boolean
+    ) => {
       registerOverlayNode(overlayIdentity, 'trigger', node, triggerNodeOwner);
-      if (node && focusEntry.adoptTrigger && document.activeElement !== node) {
+      if (node && overlayNodes.trigger === node)
+        association.automatic = automaticDescription;
+      syncDescription();
+      if (
+        node &&
+        focusEntry.focusRequestSent &&
+        document.activeElement !== node
+      ) {
         node.focus();
       }
     },
     setContentNode: (node: HTMLElement | null) => {
       registerOverlayNode(overlayIdentity, 'content', node, contentNodeOwner);
+      syncDescription();
     },
     syncPosition: () => {
       if (overlayNodes.content) {
@@ -139,7 +233,7 @@ export function Tooltip(props: TooltipProps) {
     },
   };
   return (
-    <TooltipRootContext value={rootContext}>
+    <TooltipRootContext value={rootContext} {...ssrAttributeRootProps}>
       <>
         {children}
         <OverlayPortalHost portal={portal} />

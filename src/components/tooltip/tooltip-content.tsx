@@ -1,4 +1,5 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
+import { registerSsrPartId } from '../_internal/ssr-id-association';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { DismissableLayer } from '../dismissable-layer';
@@ -71,6 +72,7 @@ export function TooltipContent(
     'data-align': position.align,
     'data-side-offset': String(position.sideOffset),
   });
+  registerSsrPartId(finalProps, root.ssrContent);
   const contentNode = asChild ? (
     <Slot asChild {...finalProps} children={children} />
   ) : (
@@ -80,6 +82,7 @@ export function TooltipContent(
   return (
     <Presence present={forceMount || root.open}>
       <DismissableLayer
+        disabled={!root.open}
         onEscapeKeyDown={() => {
           root.setOpen(false);
         }}

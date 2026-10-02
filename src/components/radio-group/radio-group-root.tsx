@@ -48,7 +48,7 @@ function RadioGroupRootView(props: {
       root.setCurrentIndex(index);
       root.focusItem(index);
 
-      if (next) {
+      if (next !== undefined) {
         root.setValue(next);
       }
     },
@@ -168,7 +168,9 @@ export function RadioGroup(props: RadioGroupProps) {
     focusCollectionItemWithRestore(pendingFocus, collection, index);
   const rootContext: RadioGroupRootContextValue = {
     groupId,
-    value: valueState(),
+    get value() {
+      return valueState();
+    },
     setValue: valueState.set,
     notifyItemsChanged,
     scheduleItemsSync,

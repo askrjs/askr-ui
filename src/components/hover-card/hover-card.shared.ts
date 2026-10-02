@@ -1,4 +1,5 @@
 import { defineScope, readScope } from '@askrjs/askr';
+import type { SsrIdRegistration } from '../_internal/ssr-id-association';
 import {
   OVERLAY_Z_INDEX,
   type OverlayPortal,
@@ -25,10 +26,15 @@ export type HoverCardRootContextValue = {
   cancelClose: () => void;
   triggerId: string;
   contentId: string;
+  ssrTrigger: SsrIdRegistration;
+  ssrContent: SsrIdRegistration;
   portal: OverlayPortal;
   registerContentPosition: (position: HoverCardPositionOptions) => void;
-  setTriggerNode: (node: HTMLElement | null) => void;
-  setContentNode: (node: HTMLElement | null) => void;
+  setTriggerNode: (
+    node: HTMLElement | null,
+    automaticControls: boolean
+  ) => void;
+  setContentNode: (node: HTMLElement | null, automaticLabel: boolean) => void;
   getTriggerNode: () => HTMLElement | null;
   getContentNode: () => HTMLElement | null;
   requestTriggerFocus: () => void;

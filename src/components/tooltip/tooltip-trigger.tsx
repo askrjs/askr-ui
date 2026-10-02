@@ -4,6 +4,7 @@ import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { hoverable } from '@askrjs/askr/foundations/interactions';
 import { readTooltipRootContext } from './tooltip.shared';
+import { setSsrIdAssociation } from '../_internal/ssr-id-association';
 import type {
   TooltipTriggerAsChildProps,
   TooltipTriggerProps,
@@ -38,7 +39,10 @@ export function TooltipTrigger(
     },
   });
   const setNode = (node: HTMLElement | null) => {
-    root.setTriggerNode(node);
+    root.setTriggerNode(
+      node,
+      (rest as Record<string, unknown>)['aria-describedby'] === undefined
+    );
   };
   const refHandler = ref
     ? composeRefs(
@@ -54,16 +58,45 @@ export function TooltipTrigger(
     ...hoverProps,
     ref: refHandler,
     onFocus: () => {
+      if (disabled) return;
       root.openFromFocus();
     },
-    onBlur: () => {
-      root.setOpen(false);
+    onBlur: (event: FocusEvent) => {
+      const trigger = event.currentTarget as HTMLElement;
+      queueMicrotask(() => {
+        const activeElement = document.activeElement;
+        const currentTrigger = root.getTriggerNode();
+        if (currentTrigger && currentTrigger.contains(activeElement)) {
+          return;
+        }
+        // Removing a focused trigger can temporarily leave focus on the body
+        // while its replacement is being mounted. A focusin elsewhere clears
+        // the adoption latch if the user moved to another control.
+        if (
+          !trigger.isConnected &&
+          (activeElement === document.body ||
+            activeElement === document.documentElement)
+        ) {
+          return;
+        }
+        root.releaseFocusAdoption();
+        root.setOpen(false);
+      });
     },
     'aria-describedby': root.open ? root.contentId : undefined,
+    'aria-disabled': disabled ? 'true' : undefined,
     'data-slot': 'tooltip-trigger',
     'data-disabled': disabled ? 'true' : undefined,
     'data-state': root.open ? 'open' : 'closed',
   });
+
+  setSsrIdAssociation(
+    finalProps,
+    'aria-describedby',
+    root.ssrContent,
+    root.open &&
+      (rest as Record<string, unknown>)['aria-describedby'] === undefined
+  );
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;

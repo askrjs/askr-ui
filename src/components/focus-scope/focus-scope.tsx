@@ -1,7 +1,8 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { state } from '@askrjs/askr';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { mergeComponentProps } from '../_internal/component-props';
 import {
   focusFirstDescendant,
   getFocusableElements,
@@ -146,11 +147,15 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key !== 'Tab') {
+    if (event.defaultPrevented || event.key !== 'Tab') {
       return;
     }
 
     markKeyboardModality();
+
+    if (!loop && !trapped) {
+      return;
+    }
 
     const node = scopeEntry.node;
 
@@ -253,7 +258,7 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
       )
     : setNode;
 
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     id: scopeId,
     ref: refHandler,
     tabIndex: asChild ? tabIndex : (tabIndex ?? -1),

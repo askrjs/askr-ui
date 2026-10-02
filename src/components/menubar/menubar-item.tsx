@@ -2,7 +2,13 @@ import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { state } from '@askrjs/askr';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { mergeComponentProps } from '../_internal/component-props';
+import {
+  registerSsrPartId,
+  setSsrIdAssociation,
+  ssrAttributeRootProps,
+} from '../_internal/ssr-id-association';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { rovingFocus } from '../_internal/roving-focus';
 import {
@@ -22,6 +28,7 @@ import {
   MenubarSubContext,
   readMenubarContentContext,
   readMenubarContentRenderContext,
+  createMenubarIdAssociation,
   readOptionalMenubarRootContext,
   readMenubarSubContext,
   resolveMenubarContentState,
@@ -162,7 +169,7 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
         setNode
       )
     : setNode;
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
     onKeyUp: handleKeyUp,
@@ -176,6 +183,14 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
     'data-disabled': disabled ? 'true' : undefined,
     tabIndex: disabled ? -1 : itemFocusProps.tabIndex,
     ...focusRepairProps,
+    onFocus: (event: FocusEvent) => {
+      focusRepairProps.onFocus(event);
+      if (!disabled) {
+        content.setCurrentIndex(
+          scopedVirtualPlacement?.index ?? placement.index
+        );
+      }
+    },
   });
 
   if (asChild) {
@@ -206,17 +221,31 @@ export function MenubarSub(props: MenubarSubProps) {
   const surfaceIndex = resolvedPlacement.index;
   const subKey = props.value ?? `sub-${surfaceIndex}`;
   const overlayIdentity = state<object>({})();
+  const triggerId = resolvePartId(
+    content.contentId,
+    `sub-trigger-${surfaceIndex}`
+  );
+  const contentId = resolvePartId(
+    content.contentId,
+    `sub-content-${surfaceIndex}`
+  );
+  const idAssociation = createMenubarIdAssociation(
+    overlayIdentity,
+    triggerId,
+    contentId
+  );
   const subContext: MenubarSubContextValue = {
     surfaceIndex,
     placement: resolvedPlacement,
-    triggerId: resolvePartId(content.contentId, `sub-trigger-${surfaceIndex}`),
-    contentId: resolvePartId(content.contentId, `sub-content-${surfaceIndex}`),
+    triggerId,
+    contentId,
     path: [...content.path, subKey],
     overlayIdentity,
+    idAssociation,
   };
 
   return (
-    <MenubarSubContext value={subContext}>
+    <MenubarSubContext {...ssrAttributeRootProps} value={subContext}>
       <MenubarSubScopeView>{props.children}</MenubarSubScopeView>
     </MenubarSubContext>
   );
@@ -285,6 +314,9 @@ export function MenubarSubTrigger(
   const focusRepairProps = compositeItemFocusProps();
   const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
+    if (node)
+      sub.idAssociation.automatic.controls =
+        (rest as Record<string, unknown>)['aria-controls'] === undefined;
     const virtualPlacement =
       scopedTriggerPlacement ??
       (node ? resolveVirtualCompositePlacement(node) : null);
@@ -299,6 +331,7 @@ export function MenubarSubTrigger(
       node,
       registrationOwner
     );
+    sub.idAssociation.sync();
     registerCompositeNode(
       sub.triggerId,
       collection,
@@ -354,7 +387,7 @@ export function MenubarSubTrigger(
     interactionProps.onKeyUp?.(event);
   };
   const itemFocusProps = nav.item(sub.surfaceIndex);
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
     onKeyUp: handleKeyUp,
@@ -371,6 +404,12 @@ export function MenubarSubTrigger(
     'data-disabled': disabled ? 'true' : undefined,
     tabIndex: disabled ? -1 : itemFocusProps.tabIndex,
     ...focusRepairProps,
+    onFocus: (event: FocusEvent) => {
+      focusRepairProps.onFocus(event);
+      if (!disabled) {
+        content.setCurrentIndex(sub.surfaceIndex);
+      }
+    },
     onPointerEnter: () => {
       if (!disabled) {
         content.setCurrentIndex(sub.surfaceIndex);
@@ -378,6 +417,21 @@ export function MenubarSubTrigger(
       }
     },
   });
+  registerSsrPartId(finalProps, sub.idAssociation.ssrTriggerId);
+  setSsrIdAssociation(
+    finalProps,
+    'aria-controls',
+    sub.idAssociation.ssrContentId,
+    (rest as Record<string, unknown>)['aria-controls'] === undefined
+  );
+  const nativeId = (finalProps as Record<string, unknown>).id;
+  if (typeof nativeId === 'function') {
+    (finalProps as Record<string, unknown>).id = () => {
+      const id = nativeId();
+      queueMicrotask(sub.idAssociation.sync);
+      return id;
+    };
+  }
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;

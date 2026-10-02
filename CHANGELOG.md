@@ -7,6 +7,76 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.3] - 2026-10-01
+
+No public component, prop, export, or compatible peer-range changes. No
+deprecations. Upgrade `@askrjs/askr` to 0.4.2 for complete server-rendered
+associations across wrapped parts, later siblings, and portals.
+
+### Internal
+
+- Update Playwright to 1.63.0. Its bundled WebKit completes long native test
+  runs while the macOS display is asleep; the previous browser could stop
+  issuing navigation requests after roughly 64 pages.
+- Local Playwright runs start the browser harness on a free port instead of a
+  fixed 4318, so parallel runs in different worktrees no longer reuse each
+  other's harness and test the wrong checkout. Reusing a running harness is
+  opt-in with `PW_REUSE_SERVER=1`, and a reused harness that serves another
+  checkout is refused before any test runs. `ASKR_TEST_PORT` pins the port.
+  CI still uses port 4318 and never reuses a server.
+- Browser tests wait for the harness document and its exposed API, without
+  waiting for the page's later `load` event, which can stall in long WebKit runs.
+- Give the complete browser matrix more time on cross-platform CI runners after
+  the expanded public component suite and browser setup.
+- Restore the archived Input behavior, accessibility, and determinism cases to
+  the native browser suite, and retain targeted failed-update and identity
+  regressions in the package's default test gates.
+
+### Fixed
+
+- `VirtualList` and `VirtualTable` discard stale queued viewport setup when
+  refs are replaced immediately after mount, and release their resize observer
+  once on teardown.
+- `Tooltip` sends one controlled open request per focus cycle, including focus
+  transitions within a composed trigger, preserves focus when a trigger is
+  replaced, and releases that adoption when focus moves elsewhere.
+- Composite keyboard and pointer handlers honor caller and ancestor
+  cancellation before moving focus, selecting items, changing values, or
+  opening content. Supported caller handlers run before internal defaults.
+- `RadioGroup` navigates from an empty value; Accordion and menu-family focus
+  navigation use actual registered item positions, including virtual bounds
+  and disabled items.
+- `Select` retains the committed text of a wrapped selected item while closed.
+  `SelectGroup` associates its own surviving label through wrappers and caught
+  errors, preserving caller ARIA and nested group ownership.
+- Dialog, AlertDialog, Popover, HoverCard, Tooltip, Dropdown, Select, and Menubar
+  use actual custom and reactive part IDs for automatic ARIA associations.
+  Caller attributes remain authoritative. Server rendering resolves forward
+  references once and drops registrations from failed subtrees.
+- Closed force-mounted overlays retain their DOM without stealing focus or
+  intercepting dismissal of active layers. Persistent Dialog and Popover
+  content follows open/close focus transitions.
+- `FocusScope` permits native Tab exit when neither looping nor trapping, and
+  respects cancelled keyboard events.
+- Dismissable layers retain committed callbacks across rejected updates and
+  host replacement, and maintain independent stacks in each owner document.
+  AlertDialog and HoverCard request one close for one Escape event.
+- Disabled composed HoverCard and Tooltip triggers do not open on focus.
+  HoverCard avoids browser listeners during server rendering and retains its
+  committed close delay after a rejected update.
+- Debounced input, form reset, Slider, and ToggleGroup retain committed
+  callbacks, timing, geometry, and selection after rejected updates. Slider
+  cancels an active drag when disabled and handles pointer cancellation.
+- Progress, ProgressCircle, Menubar, VirtualList, and VirtualTable publish
+  dynamic browser styles after commit; abandoned updates do not leave CSS.
+- Virtual components retain accepted key caches, geometry, callbacks, and
+  scroll anchors after rejected renders. Ref and API bindings publish on
+  attachment and clear on replacement or teardown; stale programmatic scroll
+  notifications do not cancel a newer anchor.
+- Avatar resets fallback state when its image changes. Toast preserves reactive
+  ARIA, stack order, and composed viewport semantics; ScrollArea preserves RTL
+  accessibility and cancelled scrollbar interactions.
+
 ## [0.4.2] - 2026-09-30
 
 ### Fixed
@@ -28,6 +98,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stays paused through the change and uses the new duration once it resumes.
 - A portalled Select reads the current open state when an application
   `OverlayHost` renders its content outside the Select tree.
+- `VirtualTable` uses the browser's table-top scroll coordinate with its sticky
+  header, keeping the terminal row reachable through `scrollToBottom()` and
+  keeping the rendered window aligned with native scrolling.
+- `VirtualList` keeps a pending anchor or follow-bottom position when an older
+  programmatic scroll event arrives after a newer data update.
+- `Tooltip` bounds a controlled open request caused by native focus. When an
+  owner keeps it closed, trigger focus adoption no longer emits repeated
+  `onOpenChange(true)` callbacks during the same focus turn.
 - `SliderThumb`, `SliderTrack`, and `SliderRange` update `aria-valuenow` and
   `data-percentage` when the value changes (#136). `Slider` passed the same
   mutated context object to its parts on every render, so they were not
