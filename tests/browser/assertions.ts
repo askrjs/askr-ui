@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { type Locator, expect, test } from '@playwright/test';
 
 /**
  * One `(label, first, second)` triple produced by `deterministicRender` in a
@@ -27,4 +27,18 @@ export async function expectDeterministic(
       expect(render.first).toBe(render.second);
     });
   }
+}
+
+/** Pins the current host so later focus checks cannot accept a replacement. */
+export async function captureFocusTarget(
+  locator: Locator
+): Promise<() => Promise<void>> {
+  const original = await locator.elementHandle();
+  expect(original).not.toBeNull();
+
+  return async () => {
+    expect(
+      await original!.evaluate((node) => document.activeElement === node)
+    ).toBe(true);
+  };
 }

@@ -158,18 +158,21 @@ export async function stickyHeaderSelection(root: HTMLElement) {
   };
 }
 
-export async function nestedInteractiveCell(root: HTMLElement) {
+export async function nestedInteractiveCell(
+  root: HTMLElement,
+  options?: { defaultOverscan?: boolean }
+) {
   let api: VirtualTableApi<Row> | null = null;
   const onCellAction = spy<[string]>();
 
-  mount(
+  const container = mount(
     <VirtualTable
       aria-label="Users"
       style={{ height: '120px', overflowY: 'auto' }}
       rows={createRows(4)}
       rowHeight={40}
       headerHeight={40}
-      overscan={4}
+      overscan={options?.defaultOverscan ? undefined : 4}
       getKey={(row) => row.id}
       columns={[
         ...columns,
@@ -191,9 +194,23 @@ export async function nestedInteractiveCell(root: HTMLElement) {
   );
   await flushUpdates();
 
+  const originalAction = container.querySelector(
+    '[data-row-key="row-0"] button'
+  ) as HTMLButtonElement;
+
   return {
     actionArgs: () => onCellAction.calls.map(([id]) => id),
     selectedRowKey: () => api?.getSelectedRowKey() ?? null,
+    legacyClick: async () => {
+      originalAction.click();
+      await flushUpdates();
+    },
+    legacyKeyDown: async () => {
+      originalAction.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
+      );
+      await flushUpdates();
+    },
   };
 }
 

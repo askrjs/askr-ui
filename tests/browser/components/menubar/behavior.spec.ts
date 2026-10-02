@@ -1,3 +1,4 @@
+import { captureFocusTarget } from '../../assertions';
 import type { Locator, Page } from '@playwright/test';
 
 import { expect, test } from '../../fixtures';
@@ -444,9 +445,11 @@ test.describe('Menubar - Behavior', () => {
   }) => {
     await render('asChildTriggers');
     const file = root.locator('[data-slot="menubar-trigger"]');
+    const checkFileFocus = await captureFocusTarget(file);
 
     await file.focus();
     await expect(file).toBeFocused();
+    await checkFileFocus();
     await page.keyboard.press('Enter');
 
     await expect.poll(() => run<number>('filePressCount')).toBe(1);

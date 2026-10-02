@@ -133,11 +133,18 @@ export function openWithCloseDelay(root: HTMLElement): void {
   );
 }
 
-export function immediateLeave(root: HTMLElement) {
+export function immediateLeave(
+  root: HTMLElement,
+  options?: { openDelay?: number }
+) {
   addPointerExitTarget(root);
   const onOpenChange = spy<[boolean]>();
   mount(
-    <HoverCard openDelay={100} closeDelay={90} onOpenChange={onOpenChange}>
+    <HoverCard
+      openDelay={options?.openDelay ?? 100}
+      closeDelay={90}
+      onOpenChange={onOpenChange}
+    >
       <HoverCardTrigger>Preview</HoverCardTrigger>
       <HoverCardContent>Details</HoverCardContent>
     </HoverCard>,
