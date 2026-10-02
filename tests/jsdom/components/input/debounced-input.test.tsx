@@ -7,6 +7,7 @@ import {
   vi,
 } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
+import { flush } from '@askrjs/askr/testing';
 import { debounceEvent } from '@askrjs/askr/fx';
 import { DebouncedInput } from '../../../../src/components/input';
 import { flushUpdates, mount, unmount } from '../../test-utils';
@@ -263,6 +264,60 @@ describe('DebouncedInput - debounce state across renders', () => {
     await view.setProps({ version: 6 });
     expect(debounceEvent).toHaveBeenCalledTimes(2);
   });
+
+  it.each(['callback', 'removed', 'delay'] as const)(
+    'should preserve a pending debounce through a discarded %s change',
+    async (change) => {
+      const committed: string[] = [];
+      const discarded: string[] = [];
+      let rejected!: ReturnType<typeof state<boolean>>;
+      const Parent = () => {
+        rejected = state(false);
+        const isRejected = rejected();
+        return [
+          <DebouncedInput
+            debounceMs={isRejected && change === 'delay' ? 500 : 200}
+            onDebouncedInput={
+              isRejected && change === 'removed'
+                ? undefined
+                : isRejected
+                  ? (value) => discarded.push(value)
+                  : (value) => committed.push(value)
+            }
+          />,
+          isRejected ? <i>Insert failure</i> : null,
+        ];
+      };
+      container = mount(<Parent />);
+      await flushUpdates();
+      type(container.querySelector('input')!, 'north');
+      vi.advanceTimersByTime(50);
+      const before = container.innerHTML;
+      const failure = new Error('forced structural commit failure');
+      const insertion = vi
+        .spyOn(container, 'insertBefore')
+        .mockImplementation(() => {
+          throw failure;
+        });
+      rejected.set(true);
+      expect(() => flush()).toThrow(failure);
+      insertion.mockRestore();
+      expect(container.innerHTML).toBe(before);
+      vi.advanceTimersByTime(150);
+      await flushUpdates();
+      expect(committed).toEqual(['north']);
+      expect(discarded).toEqual([]);
+      rejected.set(false);
+      await flushUpdates();
+      rejected.set(true);
+      await flushUpdates();
+      type(container.querySelector('input')!, 'south');
+      vi.advanceTimersByTime(500);
+      await flushUpdates();
+      expect(committed).toEqual(['north']);
+      expect(discarded).toEqual(change === 'removed' ? [] : ['south']);
+    }
+  );
 
   it('should cancel a pending value when the user types into a disabled input', async () => {
     const committed: string[] = [];

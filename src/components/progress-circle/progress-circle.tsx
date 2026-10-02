@@ -6,7 +6,7 @@ import { nativeRef } from '../_internal/native-ref';
 import {
   dynamicAttributeSelector,
   removeDynamicStyleRuleWhenUnused,
-  setDynamicStyleRule,
+  setCommittedDynamicStyleRule,
 } from '../_internal/dynamic-style';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import {
@@ -77,7 +77,7 @@ export function ProgressCircle(props: ProgressCircleProps) {
   );
   const progressCirclePercentageValue =
     percentage === null ? '25%' : `${percentage}%`;
-  setDynamicStyleRule(
+  setCommittedDynamicStyleRule(
     progressCircleRuleKey,
     progressCircleSelector,
     {

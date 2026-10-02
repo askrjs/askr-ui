@@ -121,7 +121,7 @@ describe('Source layout', () => {
     ];
     for (const suite of behaviorSuites) {
       const source = readBehaviorSuite(suite);
-      expect(source).toContain('document.activeElement');
+      expect(source).toMatch(/document\.activeElement|toBeFocused\(/);
       expect(source).toMatch(/Arrow(?:Down|Up|Left|Right)/);
       expect(source).toContain('becomes disabled');
     }
@@ -386,7 +386,7 @@ describe('Source layout', () => {
     for (const suite of ['checkbox', 'switch', 'radio-group']) {
       const source = readBehaviorSuite(suite);
       expect(source).toContain('asChild');
-      expect(source).toMatch(/\{Enter\}/);
+      expect(source).toContain(".press('Enter')");
     }
   });
 
@@ -397,21 +397,40 @@ describe('Source layout', () => {
     expect(hoverCardSuite).toContain('pointer re-enters before its deadline');
     expect(hoverCardSuite).toContain('repeated timer churn');
     expect(hoverCardSuite).toContain('both transition timers during teardown');
-    expect(hoverCardSuite).toContain('userEvent.hover(getPointerExitTarget())');
+    expect(hoverCardSuite).toContain('root.locator(EXIT).hover()');
 
     const hoverCardSource = readFileSync(
       join(componentsDirectory, 'hover-card', 'hover-card.tsx'),
       'utf8'
     );
-    expect(hoverCardSource).toContain("addEventListener('pointerover'");
-    expect(hoverCardSource).toContain(
-      "removeEventListener(\n            'pointerover'"
+    const pointerWatchSource = hoverCardSource.slice(
+      hoverCardSource.indexOf('  watch(')
     );
+    expect(pointerWatchSource).toMatch(
+      /watch\(\s*\(\)\s*=>\s*syncPointer,\s*\(committedSync\)\s*=>\s*\{\s*pointerEntry\.sync\s*=\s*committedSync;/
+    );
+    expect(pointerWatchSource).toContain('if (pointerEntry.handler) return;');
+    expect(pointerWatchSource).toMatch(
+      /pointerEntry\.document\s*=\s*overlayNodes\.trigger\?\.ownerDocument\s*\?\?\s*overlayNodes\.content\?\.ownerDocument\s*\?\?\s*document;/
+    );
+    expect(pointerWatchSource).toMatch(
+      /pointerEntry\.document\.addEventListener\(\s*'pointerover',\s*pointerEntry\.handler\s*\)/
+    );
+    expect(
+      hoverCardSource.match(/\.addEventListener\(\s*'pointerover'/g)
+    ).toHaveLength(1);
+    expect(pointerWatchSource).toMatch(
+      /cleanupSignal\.addEventListener\(\s*'abort',[\s\S]*?pointerEntry\.document\.removeEventListener\(\s*'pointerover',\s*pointerEntry\.handler\s*\)/
+    );
+    expect(pointerWatchSource).toContain('pointerEntry.document = null;');
+    expect(pointerWatchSource).toContain('pointerEntry.handler = null;');
+    expect(pointerWatchSource).toContain('pointerEntry.sync = null;');
+    expect(pointerWatchSource).toContain('{ once: true }');
     expect(hoverCardSource).toContain('clearOpenTimer()');
 
     const tooltipSuite = readBehaviorSuite('tooltip');
-    expect(tooltipSuite).toContain('trigger.focus()');
-    expect(tooltipSuite).toContain('await userEvent.tab()');
+    expect(tooltipSuite).toContain("page.keyboard.press('Tab')");
+    expect(tooltipSuite).toContain('.toBeFocused()');
     expect(tooltipSuite).toContain('Button control');
     expect(tooltipSuite).toContain('HoverCard control');
     expect(tooltipSuite).toContain('controlled native-focus request bounded');
@@ -419,8 +438,8 @@ describe('Source layout', () => {
 
     const toastSuite = readBehaviorSuite('toast');
     expect(toastSuite).toContain('unrelated paused toast through sibling');
-    expect(toastSuite).toContain('toBe(original)');
-    expect(toastSuite).toContain('toBe(originalClose)');
+    expect(toastSuite).toContain("run<boolean>('isMarkedToast', original)");
+    expect(toastSuite).toContain('originalClose).toBeFocused()');
 
     const toastSource = readFileSync(
       join(componentsDirectory, 'toast', 'toast.tsx'),

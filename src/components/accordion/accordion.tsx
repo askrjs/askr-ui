@@ -1,6 +1,7 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeRef } from '../_internal/native-ref';
 import { nativeButtonProps } from '../_internal/native-control';
+import { mergeComponentProps } from '../_internal/component-props';
 import { state } from '@askrjs/askr';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
@@ -239,18 +240,54 @@ export function Accordion(props: AccordionProps) {
     'data-accordion': 'true',
     'data-orientation': orientation,
   });
-  const nav = rovingFocus({
-    currentIndex,
-    itemCount: Math.max(itemCount, 1),
-    orientation,
-    loop,
-    isDisabled: (index) => disabledIndexList.includes(index),
-    onNavigate: (index) => {
-      focusAccordionItem(collection, pendingFocus, index);
-      currentIndexState.set(index);
-    },
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    const target = event.target instanceof Element ? event.target : null;
+    const trigger = target
+      ? collection.items().find((item) => item.node.contains(target))
+      : undefined;
+    if (!trigger || trigger.metadata.disabled) {
+      return;
+    }
+
+    if (event.key === 'Home' || event.key === 'End') {
+      const step = event.key === 'Home' ? 1 : -1;
+      let boundary = event.key === 'Home' ? 0 : itemCount - 1;
+      while (
+        boundary >= 0 &&
+        boundary < itemCount &&
+        disabledIndexList.includes(boundary)
+      ) {
+        boundary += step;
+      }
+      if (boundary >= 0 && boundary < itemCount) {
+        event.preventDefault();
+        event.stopPropagation();
+        focusAccordionItem(collection, pendingFocus, boundary);
+        currentIndexState.set(boundary);
+      }
+      return;
+    }
+
+    const focusedNavigation = rovingFocus({
+      currentIndex: trigger.metadata.index,
+      itemCount: Math.max(itemCount, 1),
+      orientation,
+      loop,
+      isDisabled: (index) => disabledIndexList.includes(index),
+      onNavigate: (index) => {
+        focusAccordionItem(collection, pendingFocus, index);
+        currentIndexState.set(index);
+      },
+    });
+    focusedNavigation.container.onKeyDown(event);
+  };
+  const mergedProps = mergeComponentProps(finalProps, {
+    onKeyDown: handleKeyDown,
   });
-  const mergedProps = mergeProps(finalProps, nav.container);
 
   return (
     <AccordionRootContext value={rootContext}>

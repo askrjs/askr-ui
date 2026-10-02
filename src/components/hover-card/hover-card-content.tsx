@@ -1,6 +1,11 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
+import {
+  registerSsrPartId,
+  setSsrIdAssociation,
+} from '../_internal/ssr-id-association';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { mergeComponentProps } from '../_internal/component-props';
 import { DismissableLayer } from '../dismissable-layer';
 import { dismissPopupWithTab, getFocusableElements } from '../_internal/focus';
 import {
@@ -42,7 +47,7 @@ export function HoverCardContent(
     align,
     sideOffset,
   });
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ref: composeRefs(
       ref as
         | ((value: HTMLElement | null) => void)
@@ -50,7 +55,10 @@ export function HoverCardContent(
         | null
         | undefined,
       (node: HTMLElement | null) => {
-        root.setContentNode(node);
+        root.setContentNode(
+          node,
+          (rest as Record<string, unknown>)['aria-labelledby'] === undefined
+        );
 
         if (node && root.open) {
           root.syncPosition();
@@ -101,6 +109,7 @@ export function HoverCardContent(
       }
     },
     onKeyDown: (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return;
       const content = root.getContentNode();
       const trigger = root.getTriggerNode();
       if (!content) {
@@ -147,6 +156,13 @@ export function HoverCardContent(
       }
     },
   });
+  registerSsrPartId(finalProps, root.ssrContent);
+  setSsrIdAssociation(
+    finalProps,
+    'aria-labelledby',
+    root.ssrTrigger,
+    (rest as Record<string, unknown>)['aria-labelledby'] === undefined
+  );
   const contentNode = asChild ? (
     <Slot asChild {...finalProps} children={children} />
   ) : (
@@ -158,6 +174,7 @@ export function HoverCardContent(
   return (
     <Presence present={forceMount || root.open}>
       <DismissableLayer
+        disabled={!root.open}
         onEscapeKeyDown={() => root.requestTriggerFocus()}
         onDismiss={() => root.setOpen(false)}
       >

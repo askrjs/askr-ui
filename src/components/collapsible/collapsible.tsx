@@ -1,6 +1,7 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeRef } from '../_internal/native-ref';
 import { nativeButtonProps } from '../_internal/native-control';
+import { mergeComponentProps } from '../_internal/component-props';
 import { defineScope, readScope, state } from '@askrjs/askr';
 import { Slot, Presence } from '@askrjs/askr/foundations/structures';
 import { controllableState } from '@askrjs/askr/foundations/state';
@@ -123,7 +124,7 @@ export function CollapsibleTrigger(
     onPress: (event) => toggleOpen(event as Event),
     isNativeButton: !asChild,
   });
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ...interactionProps,
     ref: composeRefs(
       ref as

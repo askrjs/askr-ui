@@ -1,5 +1,6 @@
 import { controllableState } from '@askrjs/askr/foundations/state';
 import { cspNonce, getSignal, state } from '@askrjs/askr';
+import { watch } from '@askrjs/askr/resources';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import {
   captureOverlayNonce,
@@ -19,6 +20,12 @@ import {
 } from './hover-card.shared';
 import type { HoverCardProps } from './hover-card.types';
 import { OverlayPortalHost } from '../_internal/overlay-portal-host';
+import { syncIdAssociation } from '../_internal/id-association';
+import {
+  createSsrIdRegistration,
+  ssrAttributeRootProps,
+  type SsrIdRegistration,
+} from '../_internal/ssr-id-association';
 
 function scheduleHoverCardPortalSync(callback: () => void) {
   queueMicrotask(callback);
@@ -59,8 +66,25 @@ export function HoverCard(props: HoverCardProps) {
   captureOverlayNonce(overlayIdentity, cspNonce());
   const triggerId = resolvePartId(hoverCardId, 'trigger');
   const contentId = resolvePartId(hoverCardId, 'content');
+  const ssrTrigger = state(createSsrIdRegistration(triggerId))();
+  const ssrContent = state(createSsrIdRegistration(contentId))();
   const portal = getPersistentPortal(overlayIdentity);
   const overlayNodes = getOverlayNodes(overlayIdentity);
+  const associations = state({ controls: true, label: true })();
+  const syncAssociations = () => {
+    syncIdAssociation(
+      overlayNodes.trigger,
+      overlayNodes.content,
+      'aria-controls',
+      associations.controls
+    );
+    syncIdAssociation(
+      overlayNodes.content,
+      overlayNodes.trigger,
+      'aria-labelledby',
+      associations.label
+    );
+  };
   const triggerNodeOwner = {};
   const contentNodeOwner = {};
   const focusTrigger = (trigger: HTMLElement | null) => {
@@ -121,6 +145,24 @@ export function HoverCard(props: HoverCardProps) {
     { once: true }
   );
 
+  const withCommittedIdSync = (
+    registration: SsrIdRegistration
+  ): SsrIdRegistration => ({
+    cell: registration.cell,
+    register(renderedId, signal) {
+      registration.register(renderedId, signal);
+      scheduleHoverCardPortalSync(() => {
+        if (
+          !signal.aborted &&
+          overlayNodes.trigger?.isConnected &&
+          overlayNodes.content?.isConnected
+        ) {
+          syncAssociations();
+        }
+      });
+    },
+  });
+
   const rootContext: HoverCardRootContextValue = {
     hoverCardId,
     get open() {
@@ -169,18 +211,26 @@ export function HoverCard(props: HoverCardProps) {
     cancelClose: clearCloseTimer,
     triggerId,
     contentId,
+    ssrTrigger: withCommittedIdSync(ssrTrigger),
+    ssrContent: withCommittedIdSync(ssrContent),
     portal,
     registerContentPosition: (nextPosition: HoverCardPositionOptions) => {
       contentPosition = nextPosition;
     },
-    setTriggerNode: (node: HTMLElement | null) => {
+    setTriggerNode: (node: HTMLElement | null, automaticControls: boolean) => {
       registerOverlayNode(overlayIdentity, 'trigger', node, triggerNodeOwner);
+      if (node && overlayNodes.trigger === node)
+        associations.controls = automaticControls;
+      syncAssociations();
       if (node && focusEntry.restoreTrigger) {
         node.focus();
       }
     },
-    setContentNode: (node: HTMLElement | null) => {
+    setContentNode: (node: HTMLElement | null, automaticLabel: boolean) => {
       registerOverlayNode(overlayIdentity, 'content', node, contentNodeOwner);
+      if (node && overlayNodes.content === node)
+        associations.label = automaticLabel;
+      syncAssociations();
     },
     getTriggerNode: () => overlayNodes.trigger,
     getContentNode: () => overlayNodes.content,
@@ -206,7 +256,7 @@ export function HoverCard(props: HoverCardProps) {
     },
   };
 
-  pointerEntry.sync = (event: PointerEvent) => {
+  const syncPointer = (event: PointerEvent) => {
     const target = event.target;
     const isInside =
       target instanceof Node &&
@@ -223,31 +273,42 @@ export function HoverCard(props: HoverCardProps) {
     }
   };
 
-  if (!pointerEntry.handler) {
-    pointerEntry.document = document;
-    pointerEntry.handler = (event: PointerEvent) => {
-      pointerEntry.sync?.(event);
-    };
-    pointerEntry.document.addEventListener('pointerover', pointerEntry.handler);
-    cleanupSignal.addEventListener(
-      'abort',
-      () => {
-        if (pointerEntry.document && pointerEntry.handler) {
-          pointerEntry.document.removeEventListener(
-            'pointerover',
-            pointerEntry.handler
-          );
-        }
-        pointerEntry.document = null;
-        pointerEntry.handler = null;
-        pointerEntry.sync = null;
-      },
-      { once: true }
-    );
-  }
+  watch(
+    () => syncPointer,
+    (committedSync) => {
+      pointerEntry.sync = committedSync;
+      if (pointerEntry.handler) return;
+      pointerEntry.document =
+        overlayNodes.trigger?.ownerDocument ??
+        overlayNodes.content?.ownerDocument ??
+        document;
+      pointerEntry.handler = (event: PointerEvent) => {
+        pointerEntry.sync?.(event);
+      };
+      pointerEntry.document.addEventListener(
+        'pointerover',
+        pointerEntry.handler
+      );
+      cleanupSignal.addEventListener(
+        'abort',
+        () => {
+          if (pointerEntry.document && pointerEntry.handler) {
+            pointerEntry.document.removeEventListener(
+              'pointerover',
+              pointerEntry.handler
+            );
+          }
+          pointerEntry.document = null;
+          pointerEntry.handler = null;
+          pointerEntry.sync = null;
+        },
+        { once: true }
+      );
+    }
+  );
 
   return (
-    <HoverCardRootContext value={rootContext}>
+    <HoverCardRootContext value={rootContext} {...ssrAttributeRootProps}>
       <>
         {children}
         <OverlayPortalHost portal={portal} />

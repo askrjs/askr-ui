@@ -30,7 +30,11 @@ import { state } from '@askrjs/askr';
 import { For } from '@askrjs/askr/control';
 import { resource } from '@askrjs/askr/resources';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
-import { collectJsxElements, serializeForId } from '../_internal/jsx';
+import {
+  collectJsxElements,
+  isJsxElement,
+  serializeForId,
+} from '../_internal/jsx';
 import type {
   ToastActionAsChildProps,
   ToastActionProps,
@@ -347,17 +351,17 @@ export function ToastHost(props: ToastHostProps) {
       (entry) => entry.toastId === registration.toastId
     );
 
-    if (currentRegistration?.signature === registration.signature) {
-      const registrationIndex =
-        currentRegistrations.indexOf(currentRegistration);
-      currentRegistrations[registrationIndex] = registration;
+    if (currentRegistration === registration) {
       return;
     }
 
-    const nextRegistrations = currentRegistrations.filter(
-      (entry) => entry.toastId !== registration.toastId
-    );
-    nextRegistrations.push(registration);
+    const nextRegistrations = [...currentRegistrations];
+    if (currentRegistration) {
+      nextRegistrations[nextRegistrations.indexOf(currentRegistration)] =
+        registration;
+    } else {
+      nextRegistrations.push(registration);
+    }
     toastRegistrationsState.set(nextRegistrations);
   };
   const unregisterToast = (
@@ -418,19 +422,16 @@ export function ToastViewport(
 ) {
   const { asChild, children, ref, ...rest } = props;
   const host = readToastHostContext();
-  const content = (
-    <>
-      <For each={host.getToasts} by={(registration) => registration.toastId}>
-        {(registration) => (
-          <ToastRegistrationView
-            key={registration.toastId}
-            registration={registration}
-            host={host}
-          />
-        )}
-      </For>
-      {children}
-    </>
+  const toasts = (
+    <For each={host.getToasts} by={(registration) => registration.toastId}>
+      {(registration) => (
+        <ToastRegistrationView
+          key={registration.toastId}
+          registration={registration}
+          host={host}
+        />
+      )}
+    </For>
   );
   const finalProps = mergeProps(rest, {
     ref,
@@ -442,12 +443,35 @@ export function ToastViewport(
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={content as JSX.Element} />;
+    if (!isJsxElement(children)) {
+      throw new Error(
+        'ToastViewport asChild requires a single JSX element host'
+      );
+    }
+    return (
+      <Slot
+        asChild
+        {...finalProps}
+        children={{
+          ...children,
+          props: {
+            ...children.props,
+            children: (
+              <>
+                {toasts}
+                {children.props?.children}
+              </>
+            ),
+          },
+        }}
+      />
+    );
   }
 
   return (
     <div {...finalProps} ref={nativeRef<HTMLDivElement>(props)}>
-      {content}
+      {toasts}
+      {children}
     </div>
   );
 }
@@ -489,11 +513,7 @@ export function Toast(props: ToastProps): JSX.Element | null {
     [
       host.hostId,
       toastId,
-      childrenSignature,
-      props.defaultOpen,
-      props.duration,
-      props.open,
-      props.variant,
+      ...Object.entries(props).flatMap(([key, value]) => [key, value]),
     ]
   );
 

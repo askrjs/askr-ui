@@ -1,7 +1,7 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeRef } from '../_internal/native-ref';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { mergeComponentProps } from '../_internal/component-props';
 import { moveFocusOutsideCompositeWithTab } from '../_internal/focus';
 import { readMenuRootContext } from './menu.shared';
 import type { MenuContentAsChildProps, MenuContentProps } from './menu.types';
@@ -16,7 +16,7 @@ export function MenuContent(props: MenuContentAsChildProps): JSX.Element;
 export function MenuContent(props: MenuContentProps | MenuContentAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const root = readMenuRootContext();
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ref,
     'data-slot': 'menu-content',
     'data-orientation': root.orientation,
@@ -24,6 +24,10 @@ export function MenuContent(props: MenuContentProps | MenuContentAsChildProps) {
     'aria-orientation':
       root.orientation === 'both' ? undefined : root.orientation,
     onKeyDown: (event: KeyboardEvent) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
       if (root.handleTypeaheadKeyDown(event)) {
         return;
       }

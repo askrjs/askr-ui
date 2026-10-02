@@ -1,3 +1,4 @@
+import { state } from '@askrjs/askr';
 import {
   Avatar,
   AvatarFallback,
@@ -18,4 +19,27 @@ export function fallbackUntilLoad(root: HTMLElement) {
   return {
     fallbackSelector: () => `[${AVATAR_A11Y_CONTRACT.FALLBACK.marker}="true"]`,
   };
+}
+
+export function avatarLoadHandoff(root: HTMLElement) {
+  const statuses: string[] = [];
+  function Fixture() {
+    const src = state('/review-first.gif');
+    return (
+      <Avatar>
+        <AvatarImage
+          alt="Review"
+          src={src()}
+          onLoadingStatusChange={(next) => {
+            statuses.push(next);
+            if (next === 'loaded' && src() === '/review-first.gif')
+              src.set('/review-second.gif');
+          }}
+        />
+        <AvatarFallback>FB</AvatarFallback>
+      </Avatar>
+    );
+  }
+  mount(<Fixture />, root);
+  return { statuses: () => statuses };
 }

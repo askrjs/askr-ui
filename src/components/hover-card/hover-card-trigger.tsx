@@ -1,10 +1,15 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeButtonProps } from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { mergeComponentProps } from '../_internal/component-props';
 import { hoverable, pressable } from '@askrjs/askr/foundations/interactions';
 import { focusFirstDescendant } from '../_internal/focus';
 import { readHoverCardRootContext } from './hover-card.shared';
+import {
+  registerSsrPartId,
+  setSsrIdAssociation,
+} from '../_internal/ssr-id-association';
 import type {
   HoverCardTriggerAsChildProps,
   HoverCardTriggerProps,
@@ -46,7 +51,7 @@ export function HoverCardTrigger(
     onPress,
     isNativeButton: !asChild,
   });
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ...interactionProps,
     ...hoverProps,
     ref: composeRefs(
@@ -56,7 +61,10 @@ export function HoverCardTrigger(
         | null
         | undefined,
       (node: HTMLElement | null) => {
-        root.setTriggerNode(node);
+        root.setTriggerNode(
+          node,
+          (rest as Record<string, unknown>)['aria-controls'] === undefined
+        );
       }
     ),
     id: root.triggerId,
@@ -67,10 +75,12 @@ export function HoverCardTrigger(
     'data-disabled': disabled ? 'true' : undefined,
     'data-state': root.open ? 'open' : 'closed',
     onFocus: () => {
+      if (disabled) return;
       root.cancelClose();
       root.setOpen(true);
     },
     onFocusIn: () => {
+      if (disabled) return;
       root.cancelClose();
       root.setOpen(true);
     },
@@ -78,7 +88,12 @@ export function HoverCardTrigger(
       root.scheduleClose();
     },
     onKeyDown: (event: KeyboardEvent) => {
-      if (event.key !== 'Tab' || event.shiftKey || !root.open) {
+      if (
+        event.defaultPrevented ||
+        event.key !== 'Tab' ||
+        event.shiftKey ||
+        !root.open
+      ) {
         return;
       }
       const content = root.getContentNode();
@@ -88,6 +103,14 @@ export function HoverCardTrigger(
       }
     },
   });
+
+  registerSsrPartId(finalProps, root.ssrTrigger);
+  setSsrIdAssociation(
+    finalProps,
+    'aria-controls',
+    root.ssrContent,
+    (rest as Record<string, unknown>)['aria-controls'] === undefined
+  );
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;

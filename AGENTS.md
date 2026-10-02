@@ -32,6 +32,89 @@ theme composition belong in `@askrjs/themes`.
 6. Add public exports only with matching behavior, accessibility, determinism,
    type, documentation, and benchmark coverage.
 
+## Jev Review Aid
+
+Jev is TypeSafe's System One model: it returns typed judgments from a supplied
+state and questions. It is not a chat or code-generation model. Use it to
+prioritize component-review hypotheses; a Jev answer is not evidence that a bug
+exists or that a component is correct.
+
+Call the HTTP API with `POST https://api.typesafe.ai/v1/systemone`, model
+`jev-latest`, and a JSON body containing `state` and named `questions`. Keep
+`TYPESAFE_API_KEY` in the environment and send it only as a Bearer token; never
+print, commit, or include the key in the state. A focused component-review
+request can look like this; replace the placeholders with the exact contract
+and evidence being reviewed:
+
+```json
+{
+  "model": "jev-latest",
+  "state": {
+    "component": "Popover",
+    "contract": "<expected trigger, dismissal, and focus behavior>",
+    "source_excerpt": "<relevant implementation or diff>",
+    "tests_and_observations": "<relevant regressions and observed behavior>",
+    "benchmark_evidence": "<measurement, or state that none is available>"
+  },
+  "questions": {
+    "disposition": {
+      "type": "choice",
+      "instructions": "Which review disposition is best supported by the supplied evidence?",
+      "criteria": {
+        "fix": "A concrete contract, interaction, accessibility, or correctness defect is evidenced.",
+        "optimize": "A measured hot path has a plausible safe improvement.",
+        "golden": "No actionable issue is supported by the supplied evidence."
+      }
+    }
+  }
+}
+```
+
+Save the request as `jev-request.json` and run:
+
+```sh
+curl --fail-with-body https://api.typesafe.ai/v1/systemone \
+  -H "Authorization: Bearer ${TYPESAFE_API_KEY:?set TYPESAFE_API_KEY}" \
+  -H 'Content-Type: application/json' \
+  --data @jev-request.json
+```
+
+Use the question type that fits the decision: `choice` for a bounded
+disposition, `score` for an ordered rubric, and `noul` for one yes/no
+judgment. For a component walk, give Jev a compact, structured state with the
+component name, public behavior/accessibility contract, relevant source or diff
+excerpt, observed behavior, existing regression tests, and benchmark evidence
+(or say when it is absent). Ask narrow, component-specific questions. A useful
+disposition `choice` can distinguish `fix` (a contract or behavior defect),
+`optimize` (a measured hot path with a plausible safe improvement), and
+`golden` (no actionable issue supported by the supplied evidence). Do not use
+`golden` to claim exhaustive correctness. Batch independent questions over the
+same state in one request; split questions when one answer is needed to form the
+next state or candidate set.
+
+Inspect the returned answer, probabilities, and confidence, then independently
+verify every actionable lead in the implementation and the relevant browser,
+accessibility, type, or benchmark tests. Treat low confidence as a reason to
+inspect the evidence or narrow the question, not as a severity measure. If the
+API or credentials are unavailable, say Jev was not run; do not imply otherwise.
+
+For code review, predict a concrete observable outcome from the contract, exact
+source, and event order. Include an `insufficient_source` outcome. Withhold our
+proposed diagnosis and test results for that prediction; compare the saved answer
+with a failing regression afterward. Separate request ordering, cancellation,
+identity, and teardown into independent questions. A post-fix question may inspect
+a specific remaining gap, but do not ask Jev to approve a patch or a release.
+
+Retain requests, raw responses, contradictions, and the tests that resolved them.
+Evaluate which questions contributed useful cases or found verified defects;
+request counts and confident `golden` judgments do not measure review coverage.
+Choice confidence measures the concentration of its distribution, not code
+correctness. Prefer fewer useful questions over repetitive approval calls.
+
+See TypeSafe's [coding-agent guidance](https://docs.typesafe.ai/introduction/coding-agents),
+[HTTP API reference](https://docs.typesafe.ai/api), [question types](https://docs.typesafe.ai/primitives),
+and [confidence guide](https://docs.typesafe.ai/confidence).
+
 ## Askr North Star
 
 Keep each component's state transition narratable from an explicit user event

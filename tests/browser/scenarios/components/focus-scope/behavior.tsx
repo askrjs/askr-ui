@@ -1,6 +1,63 @@
 import { FocusScope } from '../../../../../src/components/focus-scope';
 import { mount } from '../../_mount';
 
+export function ancestorCanceledTab(root: HTMLElement): void {
+  root.addEventListener('keydown', (event) => event.preventDefault(), {
+    capture: true,
+  });
+  mount(
+    <FocusScope autoFocus={false} loop>
+      <button data-testid="first" tabIndex={0}>
+        First
+      </button>
+      <button data-testid="last" tabIndex={0}>
+        Last
+      </button>
+    </FocusScope>,
+    root
+  );
+}
+
+export function callerCanceledTab(root: HTMLElement): void {
+  mount(
+    <FocusScope
+      autoFocus={false}
+      loop
+      onKeyDown={(event) => event.preventDefault()}
+    >
+      <button data-testid="first" tabIndex={0}>
+        First
+      </button>
+      <button data-testid="last" tabIndex={0}>
+        Last
+      </button>
+    </FocusScope>,
+    root
+  );
+}
+
+export function nativeTabLeavesScope(root: HTMLElement): void {
+  mount(
+    <>
+      <button data-testid="before" tabIndex={0}>
+        Before
+      </button>
+      <FocusScope autoFocus={false}>
+        <button data-testid="first" tabIndex={0}>
+          First
+        </button>
+        <button data-testid="last" tabIndex={0}>
+          Last
+        </button>
+      </FocusScope>
+      <button data-testid="after" tabIndex={0}>
+        After
+      </button>
+    </>,
+    root
+  );
+}
+
 export function manualFocusInsideScope(root: HTMLElement) {
   const trigger = document.createElement('button');
   trigger.textContent = 'Before';

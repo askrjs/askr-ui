@@ -1,6 +1,10 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeHandlers,
+  composeRefs,
+  mergeProps,
+} from '@askrjs/askr/foundations/utilities';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import { getSignal, readScope, defineScope, state } from '@askrjs/askr';
 import type {
@@ -84,13 +88,20 @@ export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
     }
     const maxTop = Math.max(0, viewport.scrollHeight - viewport.clientHeight);
     const maxLeft = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+    const horizontalOffset =
+      getComputedStyle(viewport).direction === 'rtl'
+        ? -viewport.scrollLeft
+        : viewport.scrollLeft;
     const nextVertical = {
       overflow: maxTop > 0,
       percentage: maxTop > 0 ? (viewport.scrollTop / maxTop) * 100 : 0,
     };
     const nextHorizontal = {
       overflow: maxLeft > 0,
-      percentage: maxLeft > 0 ? (viewport.scrollLeft / maxLeft) * 100 : 0,
+      percentage:
+        maxLeft > 0
+          ? (Math.min(maxLeft, Math.max(0, horizontalOffset)) / maxLeft) * 100
+          : 0,
     };
     entry.metrics.vertical = nextVertical;
     entry.metrics.horizontal = nextHorizontal;
@@ -181,7 +192,12 @@ export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
         return false;
       }
       const vertical = orientation === 'vertical';
-      const current = vertical ? viewport.scrollTop : viewport.scrollLeft;
+      const rtl = !vertical && getComputedStyle(viewport).direction === 'rtl';
+      const current = vertical
+        ? viewport.scrollTop
+        : rtl
+          ? -viewport.scrollLeft
+          : viewport.scrollLeft;
       const viewportSize = vertical
         ? viewport.clientHeight
         : viewport.clientWidth;
@@ -189,15 +205,23 @@ export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
         ? viewport.scrollHeight - viewport.clientHeight
         : viewport.scrollWidth - viewport.clientWidth;
       const delta =
-        key === 'ArrowUp' || key === 'ArrowLeft'
+        key === 'ArrowUp'
           ? -40
-          : key === 'ArrowDown' || key === 'ArrowRight'
+          : key === 'ArrowDown'
             ? 40
-            : key === 'PageUp'
-              ? -viewportSize
-              : key === 'PageDown'
-                ? viewportSize
-                : null;
+            : key === 'ArrowLeft'
+              ? rtl
+                ? 40
+                : -40
+              : key === 'ArrowRight'
+                ? rtl
+                  ? -40
+                  : 40
+                : key === 'PageUp'
+                  ? -viewportSize
+                  : key === 'PageDown'
+                    ? viewportSize
+                    : null;
       const next =
         key === 'Home'
           ? 0
@@ -212,7 +236,7 @@ export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
       if (vertical) {
         viewport.scrollTop = next;
       } else {
-        viewport.scrollLeft = next;
+        viewport.scrollLeft = rtl ? -next : next;
       }
       syncMetrics();
       return true;
@@ -280,6 +304,7 @@ export function ScrollAreaScrollbar(
     children,
     orientation = 'vertical',
     ref,
+    onKeyDown,
     style: _style,
     ...rest
   } = props;
@@ -306,21 +331,29 @@ export function ScrollAreaScrollbar(
     'data-slot': 'scroll-area-scrollbar',
     'data-orientation': orientation,
     'data-state': metrics.overflow ? 'visible' : 'hidden',
-    onKeyDown: (event: KeyboardEvent) => {
-      const orientationKey =
-        orientation === 'vertical'
-          ? ['ArrowUp', 'ArrowDown']
-          : ['ArrowLeft', 'ArrowRight'];
-      if (
-        !orientationKey.includes(event.key) &&
-        !['PageUp', 'PageDown', 'Home', 'End'].includes(event.key)
-      ) {
-        return;
+    onKeyDown: composeHandlers(
+      typeof onKeyDown === 'function'
+        ? (onKeyDown as (event: KeyboardEvent) => void)
+        : undefined,
+      (event: KeyboardEvent) => {
+        if (event.defaultPrevented) {
+          return;
+        }
+        const orientationKey =
+          orientation === 'vertical'
+            ? ['ArrowUp', 'ArrowDown']
+            : ['ArrowLeft', 'ArrowRight'];
+        if (
+          !orientationKey.includes(event.key) &&
+          !['PageUp', 'PageDown', 'Home', 'End'].includes(event.key)
+        ) {
+          return;
+        }
+        if (root.scroll(orientation, event.key)) {
+          event.preventDefault();
+        }
       }
-      if (root.scroll(orientation, event.key)) {
-        event.preventDefault();
-      }
-    },
+    ),
   });
 
   return (

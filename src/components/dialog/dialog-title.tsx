@@ -2,6 +2,7 @@ import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { readDialogRootContext } from './dialog.shared';
+import { registerSsrPartId } from '../_internal/ssr-id-association';
 import type { DialogTitleAsChildProps, DialogTitleProps } from './dialog.types';
 
 /**
@@ -32,6 +33,7 @@ export function DialogTitle(props: DialogTitleProps | DialogTitleAsChildProps) {
     id: root.titleId,
     'data-slot': 'dialog-title',
   });
+  registerSsrPartId(finalProps, root.ssrTitle);
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;

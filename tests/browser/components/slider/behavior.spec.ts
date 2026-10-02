@@ -200,3 +200,49 @@ test.describe('Slider - Behavior', () => {
     ).toBe(true);
   });
 });
+
+test('should suppress pointer movement after disabling an active slider drag', async ({
+  page,
+  render,
+  root,
+  run,
+}) => {
+  await render('dragLifecycle');
+  const track = root.locator('[data-slider-track]');
+  const rect = (await track.boundingBox())!;
+  await page.mouse.move(rect.x + rect.width * 0.2, rect.y + rect.height / 2);
+  await page.mouse.down();
+  await run('disable');
+  await page.mouse.move(rect.x + rect.width * 0.8, rect.y + rect.height / 2);
+  await page.mouse.up();
+  await expect(root.locator('[role="slider"]')).toHaveAttribute(
+    'aria-valuenow',
+    '20'
+  );
+  expect(await run('changes')).toEqual([]);
+});
+
+test('should stop updating after native pointercancel ends a slider drag', async ({
+  page,
+  render,
+  root,
+  run,
+}) => {
+  await render('dragLifecycle');
+  const track = root.locator('[data-slider-track]');
+  const rect = (await track.boundingBox())!;
+  await page.mouse.move(rect.x + rect.width * 0.2, rect.y + rect.height / 2);
+  await page.mouse.down();
+  await track.dispatchEvent('pointercancel', {
+    pointerId: 1,
+    pointerType: 'mouse',
+    bubbles: true,
+  });
+  await page.mouse.move(rect.x + rect.width * 0.8, rect.y + rect.height / 2);
+  await page.mouse.up();
+  await expect(root.locator('[role="slider"]')).toHaveAttribute(
+    'aria-valuenow',
+    '20'
+  );
+  expect(await run('changes')).toEqual([]);
+});

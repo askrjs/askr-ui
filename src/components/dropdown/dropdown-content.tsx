@@ -1,6 +1,8 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { mergeComponentProps } from '../_internal/component-props';
+import { registerSsrPartId } from '../_internal/ssr-id-association';
 import { rovingFocus } from '../_internal/roving-focus';
 import { DismissableLayer } from '../dismissable-layer';
 import { FocusScope } from '../focus-scope';
@@ -74,6 +76,7 @@ export function DropdownContent(
       node,
       overlayNodeOwner
     );
+    root.idAssociation.sync();
 
     if (node && root.open) {
       syncOverlayPosition(root.overlayIdentity, root.dropdownId, {
@@ -118,7 +121,7 @@ export function DropdownContent(
         setNode
       )
     : setNode;
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ref: refHandler,
     id: root.contentId,
     role: 'menu',
@@ -128,6 +131,10 @@ export function DropdownContent(
     'data-align': align,
     'data-side-offset': String(sideOffset),
     onKeyDown: (event: KeyboardEvent) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
       if (root.handleTypeaheadKeyDown(event)) {
         return;
       }
@@ -148,6 +155,15 @@ export function DropdownContent(
       );
     },
   });
+  registerSsrPartId(finalProps, root.idAssociation.ssrContentId);
+  const nativeId = (finalProps as Record<string, unknown>).id;
+  if (typeof nativeId === 'function') {
+    (finalProps as Record<string, unknown>).id = () => {
+      const id = nativeId();
+      queueMicrotask(root.idAssociation.sync);
+      return id;
+    };
+  }
   const contentNode = asChild ? (
     <Slot asChild {...finalProps} children={children} />
   ) : (

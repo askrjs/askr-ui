@@ -2,7 +2,13 @@ import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeButtonProps } from '../_internal/native-control';
 import { getSignal, state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { mergeComponentProps } from '../_internal/component-props';
+import {
+  registerSsrPartId,
+  setSsrIdAssociation,
+  ssrAttributeRootProps,
+} from '../_internal/ssr-id-association';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { rovingFocus } from '../_internal/roving-focus';
 import {
@@ -26,6 +32,7 @@ import {
   readMenubarMenuContext,
   readMenubarRootContext,
   readMenubarRootRenderContext,
+  createMenubarIdAssociation,
   MenubarMenuContext,
   MenubarRootContext,
   type MenubarMenuContextValue,
@@ -47,7 +54,7 @@ function MenubarPortalMenuScopeView(props: {
   menuContext: MenubarMenuContextValue;
 }) {
   return (
-    <MenubarMenuContext value={props.menuContext}>
+    <MenubarMenuContext {...ssrAttributeRootProps} value={props.menuContext}>
       <MenubarMenuScopeView>{props.children}</MenubarMenuScopeView>
     </MenubarMenuContext>
   );
@@ -84,19 +91,27 @@ export function MenubarMenu(props: MenubarMenuProps) {
   const menuIndex = resolvedPlacement.index;
   const menuKey = props.value ?? `menu-${menuIndex}`;
   const portalRecord = root.ensureMenuPortal(menuKey, getSignal());
+  const triggerId = resolvePartId(root.menubarId, `trigger-${menuKey}`);
+  const contentId = resolvePartId(root.menubarId, `content-${menuKey}`);
+  const idAssociation = createMenubarIdAssociation(
+    portalRecord.identity,
+    triggerId,
+    contentId
+  );
   const menuContext: MenubarMenuContextValue = {
     menuKey,
     menuIndex,
     placement: resolvedPlacement,
-    triggerId: resolvePartId(root.menubarId, `trigger-${menuKey}`),
-    contentId: resolvePartId(root.menubarId, `content-${menuKey}`),
+    triggerId,
+    contentId,
     portalId: resolvePartId(root.menubarId, `portal-${portalRecord.ordinal}`),
     overlayIdentity: portalRecord.identity,
+    idAssociation,
     path: [menuKey],
   };
 
   return (
-    <MenubarMenuContext value={menuContext}>
+    <MenubarMenuContext {...ssrAttributeRootProps} value={menuContext}>
       <MenubarMenuScopeView>{props.children}</MenubarMenuScopeView>
     </MenubarMenuContext>
   );
@@ -156,6 +171,9 @@ export function MenubarTrigger(
   const focusRepairProps = compositeItemFocusProps();
   const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
+    if (node)
+      menu.idAssociation.automatic.controls =
+        (rest as Record<string, unknown>)['aria-controls'] === undefined;
     const virtualPlacement =
       scopedVirtualPlacement ??
       (node ? resolveVirtualCompositePlacement(node) : null);
@@ -170,6 +188,7 @@ export function MenubarTrigger(
       node,
       registrationOwner
     );
+    menu.idAssociation.sync();
     registerCompositeNode(
       menu.triggerId,
       collection,
@@ -224,7 +243,7 @@ export function MenubarTrigger(
     interactionProps.onKeyUp?.(event);
   };
   const itemFocusProps = nav.item(menu.menuIndex);
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
     onKeyUp: handleKeyUp,
@@ -252,6 +271,21 @@ export function MenubarTrigger(
       }
     },
   });
+  registerSsrPartId(finalProps, menu.idAssociation.ssrTriggerId);
+  setSsrIdAssociation(
+    finalProps,
+    'aria-controls',
+    menu.idAssociation.ssrContentId,
+    (rest as Record<string, unknown>)['aria-controls'] === undefined
+  );
+  const nativeId = (finalProps as Record<string, unknown>).id;
+  if (typeof nativeId === 'function') {
+    (finalProps as Record<string, unknown>).id = () => {
+      const id = nativeId();
+      queueMicrotask(menu.idAssociation.sync);
+      return id;
+    };
+  }
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;

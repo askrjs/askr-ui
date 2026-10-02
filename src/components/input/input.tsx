@@ -1,5 +1,6 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { getSignal, state } from '@askrjs/askr';
+import { state } from '@askrjs/askr';
+import { watch } from '@askrjs/askr/resources';
 import { nativeRef } from '../_internal/native-ref';
 import { debounceEvent } from '@askrjs/askr/fx';
 import { Slot } from '@askrjs/askr/foundations/structures';
@@ -83,8 +84,6 @@ export function DebouncedInput(props: DebouncedInputProps) {
     onDebouncedInput,
     pending: null,
   })();
-  store.debounceMs = debounceMs;
-  store.onDebouncedInput = onDebouncedInput;
 
   const cancelPending = () => {
     store.emitter?.cancel();
@@ -107,36 +106,32 @@ export function DebouncedInput(props: DebouncedInputProps) {
     store.emitter(event);
   };
 
-  // Create the emitter during render so it belongs to this component and is
-  // cancelled on unmount, and replace it only when the delay changes.
-  const emitterMs = onDebouncedInput && debounceMs > 0 ? debounceMs : 0;
-  if (!onDebouncedInput) {
-    cancelPending();
-  }
-  if ((store.emitter ? store.emitterMs : 0) !== emitterMs) {
-    const pending = store.pending;
-    cancelPending();
-    store.emitterMs = emitterMs;
-    store.emitter =
-      emitterMs > 0
-        ? debounceEvent(emitterMs, (settled) => {
-            store.pending = null;
-            store.onDebouncedInput?.(
-              (settled.target as HTMLInputElement).value
-            );
-          })
-        : null;
+  watch(
+    () => [debounceMs, onDebouncedInput] as const,
+    ([committedMs, committedCallback]) => {
+      store.debounceMs = committedMs;
+      store.onDebouncedInput = committedCallback;
+      const emitterMs = committedCallback && committedMs > 0 ? committedMs : 0;
+      if (!committedCallback) cancelPending();
+      if ((store.emitter ? store.emitterMs : 0) === emitterMs) return;
 
-    if (pending) {
-      // The emitter cannot be called during render, so re-time the pending
-      // value with the new delay once this render has finished.
-      const signal = getSignal();
-      store.pending = pending;
-      queueMicrotask(() => {
-        if (!signal.aborted && store.pending === pending) emit(pending);
-      });
+      const pending = store.pending;
+      cancelPending();
+      store.emitterMs = emitterMs;
+      // The committed watch retains component ownership, so pending timers
+      // are cancelled on unmount without exposing rejected render inputs.
+      store.emitter =
+        emitterMs > 0
+          ? debounceEvent(emitterMs, (settled) => {
+              store.pending = null;
+              store.onDebouncedInput?.(
+                (settled.target as HTMLInputElement).value
+              );
+            })
+          : null;
+      if (pending) emit(pending);
     }
-  }
+  );
 
   const handleInput = (event: Event) => {
     const inputEvent = event as InputEvent;

@@ -1,5 +1,5 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { Slot, createLayer } from '@askrjs/askr/foundations/structures';
+import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { getSignal, state } from '@askrjs/askr';
 import { resolveCompoundId } from '../_internal/id';
@@ -27,8 +27,52 @@ type LayerEntry = {
   cleanupSignal: AbortSignal | null;
 };
 
-const layerManager = createLayer();
 const layerEntries = new Map<object, LayerEntry>();
+
+/**
+ * Mounted layers mapped to their registration order. A later registration is
+ * above an earlier one, except that a layer nested inside another layer's
+ * element is always above that ancestor: nested refs attach child-first, so
+ * registration order alone would put the outer layer on top.
+ */
+const mountedLayers = new Map<LayerEntry, number>();
+let nextLayerOrder = 1;
+
+function isAbove(candidate: LayerEntry, other: LayerEntry): boolean {
+  const candidateNode = candidate.node;
+  const otherNode = other.node;
+
+  if (candidateNode && otherNode && candidateNode !== otherNode) {
+    if (otherNode.contains(candidateNode)) {
+      return true;
+    }
+
+    if (candidateNode.contains(otherNode)) {
+      return false;
+    }
+  }
+
+  return (mountedLayers.get(candidate) ?? 0) > (mountedLayers.get(other) ?? 0);
+}
+
+function isTopLayer(entry: LayerEntry): boolean {
+  if (entry.disabled || !mountedLayers.has(entry)) {
+    return false;
+  }
+
+  for (const other of mountedLayers.keys()) {
+    if (
+      other !== entry &&
+      !other.disabled &&
+      other.node?.ownerDocument === entry.node?.ownerDocument &&
+      isAbove(other, entry)
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
 
 function getLayerEntry(identity: object): LayerEntry {
   const existing = layerEntries.get(identity);
@@ -42,20 +86,25 @@ function getLayerEntry(identity: object): LayerEntry {
     unregister: null,
     isTop: null,
     setNode: (node: HTMLElement | null) => {
+      if (!node) {
+        const detached = created.node;
+        queueMicrotask(() => {
+          if (created.node === detached && !detached?.isConnected) {
+            unregisterLayer(created);
+          }
+        });
+        return;
+      }
+
       if (created.node === node) {
         return;
       }
 
+      const order = mountedLayers.get(created);
       unregisterLayer(created);
 
-      if (!node) {
-        return;
-      }
-
       created.node = node;
-      const layer = layerManager.register({
-        node,
-      });
+      mountedLayers.set(created, order ?? nextLayerOrder++);
       const ownerDocument = node.ownerDocument;
       const handleDocumentKeyDown = (event: KeyboardEvent) => {
         created.handleKeyDown(event);
@@ -71,7 +120,7 @@ function getLayerEntry(identity: object): LayerEntry {
         true
       );
       created.unregister = () => {
-        layer.unregister();
+        mountedLayers.delete(created);
       };
       created.unregisterDocumentListeners = () => {
         ownerDocument.removeEventListener(
@@ -85,7 +134,7 @@ function getLayerEntry(identity: object): LayerEntry {
           true
         );
       };
-      created.isTop = () => layer.isTop();
+      created.isTop = () => isTopLayer(created);
     },
     handleKeyDown: (event: KeyboardEvent) => {
       if (created.disabled) {
@@ -245,12 +294,17 @@ export function DismissableLayer(
   })();
   const entry = getLayerEntry(identity);
   registerLayerCleanup(identity, entry);
-  entry.disabled = disabled;
-  entry.disableOutsidePointerEvents = disableOutsidePointerEvents;
-  entry.onEscapeKeyDown = onEscapeKeyDown;
-  entry.onPointerDownOutside = onPointerDownOutside;
-  entry.onInteractOutside = onInteractOutside;
-  entry.onDismiss = onDismiss;
+  const setNode = (node: HTMLElement | null) => {
+    if (node) {
+      entry.disabled = disabled;
+      entry.disableOutsidePointerEvents = disableOutsidePointerEvents;
+      entry.onEscapeKeyDown = onEscapeKeyDown;
+      entry.onPointerDownOutside = onPointerDownOutside;
+      entry.onInteractOutside = onInteractOutside;
+      entry.onDismiss = onDismiss;
+    }
+    entry.setNode(node);
+  };
 
   const refHandler = ref
     ? composeRefs(
@@ -259,9 +313,9 @@ export function DismissableLayer(
           | { current: HTMLElement | null }
           | null
           | undefined,
-        entry.setNode
+        setNode
       )
-    : entry.setNode;
+    : setNode;
 
   const finalProps = mergeProps(rest, {
     ref: refHandler,

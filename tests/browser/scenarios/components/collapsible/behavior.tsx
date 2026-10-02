@@ -302,3 +302,25 @@ export function uniqueIds(root: HTMLElement) {
       ),
   };
 }
+export function callerCancellation(
+  root: HTMLElement,
+  options: { cancel?: boolean } = {}
+) {
+  let calls = 0;
+  mount(
+    <Collapsible>
+      <CollapsibleTrigger
+        data-caller="preserved"
+        onClick={(event) => {
+          calls += 1;
+          if (options.cancel) event.preventDefault();
+        }}
+      >
+        Details
+      </CollapsibleTrigger>
+      <CollapsibleContent>Body</CollapsibleContent>
+    </Collapsible>,
+    root
+  );
+  return { calls: () => calls };
+}

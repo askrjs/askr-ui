@@ -1,13 +1,15 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeRef } from '../_internal/native-ref';
+import { mergeComponentProps } from '../_internal/component-props';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { controllableState } from '@askrjs/askr/foundations/state';
+import { watch } from '@askrjs/askr/resources';
 import { cspNonce, getSignal, state } from '@askrjs/askr';
 import {
   dynamicAttributeSelector,
   removeDynamicStyleRuleWhenUnused,
-  setDynamicStyleRule,
+  setCommittedDynamicStyleRule,
 } from '../_internal/dynamic-style';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import {
@@ -107,7 +109,7 @@ function updateSliderValueFromPointer(
 ) {
   const entry = getSliderEntry(root.identity);
 
-  if (!entry.track) {
+  if (root.disabled || !entry.track) {
     return;
   }
 
@@ -150,6 +152,7 @@ function beginSliderDrag(identity: object, sliderId: string) {
   };
   window.addEventListener('pointermove', entry.dragMove);
   window.addEventListener('pointerup', entry.dragEnd);
+  window.addEventListener('pointercancel', entry.dragEnd);
 }
 
 function endSliderDrag(identity: object) {
@@ -162,6 +165,7 @@ function endSliderDrag(identity: object) {
   }
   if (entry.dragEnd) {
     window.removeEventListener('pointerup', entry.dragEnd);
+    window.removeEventListener('pointercancel', entry.dragEnd);
   }
   entry.dragMove = null;
   entry.dragEnd = null;
@@ -243,13 +247,18 @@ export function Slider(props: SliderProps) {
     trackId: resolvePartId(sliderId, 'track'),
     thumbId: resolvePartId(sliderId, 'thumb'),
   };
-  sliderContexts.set(identity, rootContext);
+  watch(
+    () => rootContext,
+    (committedRoot) => {
+      sliderContexts.set(identity, committedRoot);
+    }
+  );
   const sliderRuleKey = `slider:${sliderId}`;
   const sliderSelector = dynamicAttributeSelector(
     'data-askr-slider-id',
     sliderId
   );
-  setDynamicStyleRule(
+  setCommittedDynamicStyleRule(
     sliderRuleKey,
     sliderSelector,
     {
@@ -310,7 +319,7 @@ export function SliderTrack(props: SliderTrackProps | SliderTrackAsChildProps) {
   const root = readSliderRootContext();
   const entry = getSliderEntry(root.identity);
   const percentage = rangePercentage(root.value, root.min, root.max);
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ref: composeRefs(
       ref as
         | ((value: HTMLElement | null) => void)
@@ -327,7 +336,7 @@ export function SliderTrack(props: SliderTrackProps | SliderTrackAsChildProps) {
     'data-orientation': root.orientation,
     'data-percentage': String(percentage),
     onPointerDown: (event: PointerEvent) => {
-      if (root.disabled) {
+      if (event.defaultPrevented || root.disabled) {
         return;
       }
 
@@ -394,7 +403,7 @@ export function SliderThumb(props: SliderThumbProps | SliderThumbAsChildProps) {
   const root = readSliderRootContext();
   const entry = getSliderEntry(root.identity);
   const percentage = rangePercentage(root.value, root.min, root.max);
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ref: composeRefs(
       ref as
         | ((value: HTMLElement | null) => void)
@@ -418,7 +427,7 @@ export function SliderThumb(props: SliderThumbProps | SliderThumbAsChildProps) {
     'data-orientation': root.orientation,
     'data-percentage': String(percentage),
     onPointerDown: (event: PointerEvent) => {
-      if (root.disabled) {
+      if (event.defaultPrevented || root.disabled) {
         return;
       }
 
@@ -426,7 +435,7 @@ export function SliderThumb(props: SliderThumbProps | SliderThumbAsChildProps) {
       beginSliderDrag(root.identity, root.sliderId);
     },
     onKeyDown: (event: KeyboardEvent) => {
-      if (root.disabled) {
+      if (event.defaultPrevented || root.disabled) {
         return;
       }
 

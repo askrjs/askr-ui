@@ -1,6 +1,49 @@
 import { expect, test } from '../../fixtures';
 
 test.describe('FocusScope - Behavior', () => {
+  test('should preserve focus when a caller cancels looping Tab defaults', async ({
+    page,
+    render,
+    root,
+  }) => {
+    await render('callerCanceledTab');
+    await root.getByTestId('last').focus();
+    await page.keyboard.press('Tab');
+    await expect(root.getByTestId('last')).toBeFocused();
+    await root.getByTestId('first').focus();
+    await page.keyboard.press('Shift+Tab');
+    await expect(root.getByTestId('first')).toBeFocused();
+  });
+
+  test('should preserve focus after an ancestor cancels looping Tab defaults', async ({
+    page,
+    render,
+    root,
+  }) => {
+    await render('ancestorCanceledTab');
+    await root.getByTestId('last').focus();
+    await page.keyboard.press('Tab');
+    await expect(root.getByTestId('last')).toBeFocused();
+    await root.getByTestId('first').focus();
+    await page.keyboard.press('Shift+Tab');
+    await expect(root.getByTestId('first')).toBeFocused();
+  });
+
+  test('should let native Tab leave a scope when looping and trapping are disabled', async ({
+    page,
+    render,
+    root,
+  }) => {
+    await render('nativeTabLeavesScope');
+    await root.getByTestId('last').focus();
+    await page.keyboard.press('Tab');
+    await expect(root.getByTestId('after')).toBeFocused();
+
+    await root.getByTestId('first').focus();
+    await page.keyboard.press('Shift+Tab');
+    await expect(root.getByTestId('before')).toBeFocused();
+  });
+
   test('should support manual focus inside the scope without breaking the focus target', async ({
     render,
     run,

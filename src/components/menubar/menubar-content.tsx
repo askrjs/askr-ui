@@ -1,7 +1,12 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { getSignal, state } from '@askrjs/askr';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { mergeComponentProps } from '../_internal/component-props';
+import {
+  registerSsrPartId,
+  setSsrIdAssociation,
+} from '../_internal/ssr-id-association';
 import { rovingFocus } from '../_internal/roving-focus';
 import { DismissableLayer } from '../dismissable-layer';
 import { FocusScope } from '../focus-scope';
@@ -41,6 +46,7 @@ import {
   resolveMenubarContentOwner,
   resolveMenubarContentState,
   type MenubarContentContextValue,
+  type MenubarIdAssociation,
 } from './menubar.shared';
 import type {
   MenubarContentAsChildProps,
@@ -61,6 +67,7 @@ function renderMenubarSurfaceContent(
     triggerId: string;
     overlayId: string;
     overlayIdentity: object;
+    idAssociation: MenubarIdAssociation;
     path: string[];
   }
 ) {
@@ -159,12 +166,16 @@ function renderMenubarSurfaceContent(
     },
   });
   const setNode = (node: HTMLElement | null) => {
+    if (node)
+      owner.idAssociation.automatic.labelledBy =
+        (rest as Record<string, unknown>)['aria-labelledby'] === undefined;
     registerOverlayNode(
       contentContext.overlayIdentity,
       'content',
       node,
       overlayNodeOwner
     );
+    owner.idAssociation.sync();
     if (!node) {
       registerOverlayNode(
         contentContext.overlayIdentity,
@@ -241,7 +252,7 @@ function renderMenubarSurfaceContent(
       queueMicrotask(() => {
         queueMicrotask(() => {
           if (
-            document.getElementById(contentContext.contentId) !== node ||
+            overlayNodes.content !== node ||
             !node.isConnected ||
             node.contains(document.activeElement)
           ) {
@@ -270,7 +281,7 @@ function renderMenubarSurfaceContent(
         setNode
       )
     : setNode;
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeComponentProps(rest, {
     ref: refHandler,
     id: contentContext.contentId,
     role: 'menu',
@@ -282,6 +293,10 @@ function renderMenubarSurfaceContent(
     'data-side-offset': String(sideOffset),
     'data-askr-overlay-id': open ? contentContext.overlayId : undefined,
     onKeyDown: (event: KeyboardEvent) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
       if (contentContext.handleTypeaheadKeyDown(event)) {
         return;
       }
@@ -324,6 +339,21 @@ function renderMenubarSurfaceContent(
       }
     },
   });
+  registerSsrPartId(finalProps, owner.idAssociation.ssrContentId);
+  setSsrIdAssociation(
+    finalProps,
+    'aria-labelledby',
+    owner.idAssociation.ssrTriggerId,
+    (rest as Record<string, unknown>)['aria-labelledby'] === undefined
+  );
+  const nativeId = (finalProps as Record<string, unknown>).id;
+  if (typeof nativeId === 'function') {
+    (finalProps as Record<string, unknown>).id = () => {
+      const id = nativeId();
+      queueMicrotask(owner.idAssociation.sync);
+      return id;
+    };
+  }
   return (
     <Presence present={forceMount || open}>
       <MenubarContentContext value={contentContext}>
@@ -384,6 +414,7 @@ export function MenubarSubContent(
     triggerId: sub.triggerId,
     overlayId: sub.triggerId,
     overlayIdentity: sub.overlayIdentity,
+    idAssociation: sub.idAssociation,
     path: sub.path,
   });
 }

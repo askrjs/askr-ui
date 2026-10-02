@@ -1,5 +1,6 @@
 import { defineScope, readScope } from '@askrjs/askr';
 import { OVERLAY_Z_INDEX, type OverlayPortal } from '../_internal/overlay';
+import type { SsrIdRegistration } from '../_internal/ssr-id-association';
 
 /** Dialog Position Options. */
 export type DialogPositionOptions = {
@@ -17,14 +18,26 @@ export type DialogRootContextValue = {
   contentId: string;
   titleId: string;
   descriptionId: string;
-  hasTitle: boolean;
-  hasDescription: boolean;
+  ssrTitle: SsrIdRegistration;
+  ssrDescription: SsrIdRegistration;
+  ssrContent: SsrIdRegistration;
+  getContentId: () => string | undefined;
+  getTitleId: () => string | undefined;
+  getDescriptionId: () => string | undefined;
   portal: OverlayPortal;
   backdropStackId: string;
   setTitleNode: (node: HTMLElement | null) => void;
   setDescriptionNode: (node: HTMLElement | null) => void;
-  setTriggerNode: (node: HTMLElement | null) => void;
-  setContentNode: (node: HTMLElement | null) => void;
+  setTriggerNode: (
+    node: HTMLElement | null,
+    automaticControls: boolean
+  ) => void;
+  getTriggerNode: () => HTMLElement | null;
+  getContentNode: () => HTMLElement | null;
+  setContentNode: (
+    node: HTMLElement | null,
+    associations: { title: boolean; description: boolean }
+  ) => void;
   syncPosition: () => void;
   clearPosition: () => void;
 };

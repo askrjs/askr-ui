@@ -12,6 +12,7 @@ import {
  */
 export type VirtualTableStyleHost = {
   layoutNonce: string | undefined;
+  setLayoutStyleRule?: typeof setDynamicStyleRule;
   layoutRules: Map<string, string>;
   nextLayoutRules: Map<string, string>;
 };
@@ -32,7 +33,12 @@ export function virtualTableLayoutProps(
   const attribute = `data-askr-virtual-table-${kind}`;
   const key = `virtual-table:${kind}:${value}`;
   const selector = dynamicAttributeSelector(attribute, value);
-  setDynamicStyleRule(key, selector, declarations, host.layoutNonce);
+  (host.setLayoutStyleRule ?? setDynamicStyleRule)(
+    key,
+    selector,
+    declarations,
+    host.layoutNonce
+  );
   host.nextLayoutRules.set(key, selector);
   return { [attribute]: value };
 }
