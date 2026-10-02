@@ -1,3 +1,4 @@
+import { captureFocusTarget } from '../../assertions';
 import { expect, test } from '../../fixtures';
 
 test.describe('Menu - Behavior', () => {
@@ -95,16 +96,22 @@ test.describe('Menu - Behavior', () => {
   }) => {
     await render('navigationLinks');
     const links = root.locator('a');
+    const checkFirstLinkFocus = await captureFocusTarget(links.nth(0));
+    const checkSecondLinkFocus = await captureFocusTarget(links.nth(1));
 
     await links.nth(0).focus();
     await page.keyboard.press('ArrowDown');
     await expect(links.nth(1)).toBeFocused();
+    await checkSecondLinkFocus();
     await page.keyboard.press('a');
     await expect(links.nth(0)).toBeFocused();
+    await checkFirstLinkFocus();
     await page.keyboard.press('End');
     await expect(links.nth(1)).toBeFocused();
+    await checkSecondLinkFocus();
     await page.keyboard.press('Home');
     await expect(links.nth(0)).toBeFocused();
+    await checkFirstLinkFocus();
     expect(
       await links
         .nth(0)
@@ -157,16 +164,20 @@ test.describe('Menu - Behavior', () => {
   }) => {
     await render('verticalArrows');
     const items = root.getByRole('menuitem');
+    const checkFirstItemFocus = await captureFocusTarget(items.nth(0));
+    const checkThirdItemFocus = await captureFocusTarget(items.nth(2));
 
     await items.nth(0).focus();
     await page.keyboard.press('ArrowDown');
 
     await expect(items.nth(2)).toBeFocused();
+    await checkThirdItemFocus();
     await expect(items.nth(2)).toHaveAttribute('tabindex', '0');
     await expect(items.nth(2)).toHaveAttribute('data-roving-index', '2');
 
     await page.keyboard.press('ArrowUp');
     await expect(items.nth(0)).toBeFocused();
+    await checkFirstItemFocus();
   });
 
   test('should move focus when the focused item becomes disabled', async ({
@@ -192,12 +203,16 @@ test.describe('Menu - Behavior', () => {
   }) => {
     await render('rtlHorizontal');
     const items = root.getByRole('menuitem');
+    const checkFirstItemFocus = await captureFocusTarget(items.nth(0));
+    const checkSecondItemFocus = await captureFocusTarget(items.nth(1));
 
     await items.nth(0).focus();
     await page.keyboard.press('ArrowLeft');
     await expect(items.nth(1)).toBeFocused();
+    await checkSecondItemFocus();
 
     await page.keyboard.press('ArrowRight');
     await expect(items.nth(0)).toBeFocused();
+    await checkFirstItemFocus();
   });
 });

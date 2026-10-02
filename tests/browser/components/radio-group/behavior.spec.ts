@@ -1,3 +1,4 @@
+import { captureFocusTarget } from '../../assertions';
 import { type Locator, expect, test } from '../../fixtures';
 
 /** The radio item whose trimmed text is exactly `text`. */
@@ -212,6 +213,7 @@ test.describe('RadioGroup - Behavior', () => {
     const small = radio(root, 'Small');
 
     await small.press('ArrowDown');
+    await expect(radio(root, 'Large')).toBeFocused();
     await small.press('ArrowRight');
 
     await expect(radio(root, 'Small')).toHaveAttribute('aria-checked', 'false');
@@ -231,6 +233,7 @@ test.describe('RadioGroup - Behavior', () => {
     const groups = root.locator('[data-slot="radio-group"]');
     const firstItems = groups.nth(0).locator('[data-slot="radio-group-item"]');
     const secondItems = groups.nth(1).locator('[data-slot="radio-group-item"]');
+    const checkSelectedFocus = await captureFocusTarget(firstItems.nth(1));
 
     const ids = await run<{ first: string[]; second: string[] }>('ids');
     expect(ids.first).not.toEqual(ids.second);
@@ -238,6 +241,7 @@ test.describe('RadioGroup - Behavior', () => {
     await firstItems.nth(0).press('ArrowDown');
 
     await expect(firstItems.nth(1)).toBeFocused();
+    await checkSelectedFocus();
     await expect(firstItems.nth(1)).toHaveAttribute('aria-checked', 'true');
     await expect(secondItems.nth(0)).toHaveAttribute('aria-checked', 'true');
   });

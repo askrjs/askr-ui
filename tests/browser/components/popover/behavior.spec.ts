@@ -1,3 +1,4 @@
+import { captureFocusTarget } from '../../assertions';
 import type { Locator } from '@playwright/test';
 
 import { expect, test } from '../../fixtures';
@@ -102,6 +103,7 @@ test.describe('Popover - Behavior', () => {
   }) => {
     await render('clippingAncestor');
     const trigger = root.locator('[data-slot="popover-trigger"]');
+    const checkTriggerFocus = await captureFocusTarget(trigger);
     const content = page.locator('[data-slot="popover-content"]');
 
     await trigger.focus();
@@ -114,6 +116,7 @@ test.describe('Popover - Behavior', () => {
 
     await expect(content).toHaveCount(0);
     await expect(trigger).toBeFocused();
+    await checkTriggerFocus();
 
     await trigger.click();
     await expect(page.locator('[role="dialog"]')).toHaveCount(1);

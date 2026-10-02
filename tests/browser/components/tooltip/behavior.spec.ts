@@ -1,3 +1,4 @@
+import { captureFocusTarget } from '../../assertions';
 import { expect, HARNESS_URL, test } from '../../fixtures';
 
 test.describe('Tooltip - Behavior', () => {
@@ -52,9 +53,13 @@ test.describe('Tooltip - Behavior', () => {
     const pageErrors: string[] = [];
     page.on('pageerror', (error) => pageErrors.push(error.message));
     await render('nativeFocusAlongsideControls');
+    const checkButtonFocus = await captureFocusTarget(
+      root.getByTestId('button-control')
+    );
 
     expect(await run('focus', '[data-testid="button-control"]')).toBeNull();
     await expect(root.getByTestId('button-control')).toBeFocused();
+    await checkButtonFocus();
 
     expect(await run('focus', '[data-slot="hover-card-trigger"]')).toBeNull();
     await run('settle');
@@ -77,9 +82,11 @@ test.describe('Tooltip - Behavior', () => {
   }) => {
     await render('keyboardTab');
     const before = root.getByTestId('before');
+    const checkBeforeFocus = await captureFocusTarget(before);
 
     await before.focus();
     await expect(before).toBeFocused();
+    await checkBeforeFocus();
     await page.keyboard.press('Tab');
 
     const trigger = root.locator('[data-slot="tooltip-trigger"]');
@@ -99,6 +106,9 @@ test.describe('Tooltip - Behavior', () => {
     const pageErrors: string[] = [];
     page.on('pageerror', (error) => pageErrors.push(error.message));
     await render('controlledClosed');
+    const checkTriggerFocus = await captureFocusTarget(
+      root.locator('[data-slot="tooltip-trigger"]')
+    );
     expect(await run<number>('openChanges')).toBe(0);
 
     expect(await run('focusTrigger')).toBeNull();
@@ -108,6 +118,7 @@ test.describe('Tooltip - Behavior', () => {
     expect(await run<number>('openChanges')).toBe(1);
     await expect(trigger).toHaveAttribute('data-state', 'closed');
     await expect(trigger).toBeFocused();
+    await checkTriggerFocus();
     expect(pageErrors).toEqual([]);
   });
 

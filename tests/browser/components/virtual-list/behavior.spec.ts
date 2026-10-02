@@ -1,3 +1,4 @@
+import { captureFocusTarget } from '../../assertions';
 import type { Locator } from '@playwright/test';
 
 import { expect, test } from '../../fixtures';
@@ -180,6 +181,7 @@ test.describe('VirtualList - Behavior', () => {
 
     await root.locator('[data-key="item-0"] button').click();
     const inspect = root.getByRole('button', { name: 'Inspect Item 0' });
+    const checkInspectFocus = await captureFocusTarget(inspect);
     await inspect.focus();
 
     const first = root.locator('[data-key="item-0"]');
@@ -190,6 +192,7 @@ test.describe('VirtualList - Behavior', () => {
     expect(secondBox.y - firstBox.y).toBeCloseTo(80, 0);
     expect(await scrollHeight()).toBe(140);
     await expect(inspect).toBeFocused();
+    await checkInspectFocus();
   });
 });
 

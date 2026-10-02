@@ -1,3 +1,4 @@
+import { captureFocusTarget } from '../../assertions';
 import type { Locator } from '@playwright/test';
 
 import { expect, test } from '../../fixtures';
@@ -449,6 +450,7 @@ test.describe('Dialog - Behavior', () => {
   }) => {
     await render('nestedDropdown');
     const trigger = page.locator('[data-slot="dropdown-trigger"]');
+    const checkTriggerFocus = await captureFocusTarget(trigger);
 
     await trigger.click();
 
@@ -458,6 +460,7 @@ test.describe('Dialog - Behavior', () => {
     await page.keyboard.press('Escape');
 
     await expect(trigger).toBeFocused();
+    await checkTriggerFocus();
     await expect(page.locator('[data-slot="dialog-content"]')).toHaveCount(1);
   });
 

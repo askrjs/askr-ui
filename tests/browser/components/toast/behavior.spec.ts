@@ -1,3 +1,4 @@
+import { captureFocusTarget } from '../../assertions';
 import type { Page } from '@playwright/test';
 
 import { expect, test } from '../../fixtures';
@@ -108,6 +109,7 @@ test.describe('Toast - Behavior', () => {
     await render('siblingRegistration');
     const original = '#original-toast';
     const originalClose = root.locator(`${original} button`);
+    const checkOriginalCloseFocus = await captureFocusTarget(originalClose);
     await expect(root.locator(original)).toHaveCount(1);
     expect(await run<boolean>('markToast', original)).toBe(true);
     await originalClose.focus();
@@ -117,6 +119,7 @@ test.describe('Toast - Behavior', () => {
 
     expect(await run<boolean>('isMarkedToast', original)).toBe(true);
     await expect(originalClose).toBeFocused();
+    await checkOriginalCloseFocus();
     await expect(root.locator('#sibling-toast')).toHaveCount(1);
 
     await page.clock.runFor(5);
@@ -124,6 +127,7 @@ test.describe('Toast - Behavior', () => {
 
     expect(await run<boolean>('isMarkedToast', original)).toBe(true);
     await expect(originalClose).toBeFocused();
+    await checkOriginalCloseFocus();
     await expect(root.locator('#sibling-toast')).toHaveCount(0);
 
     await page.clock.runFor(40);
@@ -140,16 +144,20 @@ test.describe('Toast - Behavior', () => {
   }) => {
     await render('controlledToast');
     const launcher = root.locator('#launcher');
+    const checkLauncherFocus = await captureFocusTarget(launcher);
 
     await launcher.focus();
     await expect(root.locator(TOAST)).toHaveCount(1);
 
     const close = root.locator('[data-toast-close="true"]');
+    const checkCloseFocus = await captureFocusTarget(close);
     await close.focus();
     await expect(close).toBeFocused();
+    await checkCloseFocus();
     await close.press('Enter');
 
     await expect(launcher).toBeFocused();
+    await checkLauncherFocus();
   });
 
   test('should not steal focus when focus moved outside a closing toast', async ({
@@ -160,6 +168,7 @@ test.describe('Toast - Behavior', () => {
     await render('controlledToast');
     const launcher = root.locator('#launcher');
     const elsewhere = root.locator('#elsewhere');
+    const checkElsewhereFocus = await captureFocusTarget(elsewhere);
 
     await launcher.focus();
     await expect(root.locator(TOAST)).toHaveCount(1);
@@ -170,6 +179,7 @@ test.describe('Toast - Behavior', () => {
 
     await expect(root.locator(TOAST)).toHaveCount(0);
     await expect(elsewhere).toBeFocused();
+    await checkElsewhereFocus();
   });
 
   test('should open a controlled toast from a user action without locking the page', async ({
