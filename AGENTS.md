@@ -97,6 +97,20 @@ verify every actionable lead in the implementation and the relevant browser,
 accessibility, type, or benchmark tests. Treat low confidence as a reason to
 inspect the evidence or narrow the question, not as a severity measure. If the
 API or credentials are unavailable, say Jev was not run; do not imply otherwise.
+
+For code review, predict a concrete observable outcome from the contract, exact
+source, and event order. Include an `insufficient_source` outcome. Withhold our
+proposed diagnosis and test results for that prediction; compare the saved answer
+with a failing regression afterward. Separate request ordering, cancellation,
+identity, and teardown into independent questions. A post-fix question may inspect
+a specific remaining gap, but do not ask Jev to approve a patch or a release.
+
+Retain requests, raw responses, contradictions, and the tests that resolved them.
+Evaluate which questions contributed useful cases or found verified defects;
+request counts and confident `golden` judgments do not measure review coverage.
+Choice confidence measures the concentration of its distribution, not code
+correctness. Prefer fewer useful questions over repetitive approval calls.
+
 See TypeSafe's [coding-agent guidance](https://docs.typesafe.ai/introduction/coding-agents),
 [HTTP API reference](https://docs.typesafe.ai/api), [question types](https://docs.typesafe.ai/primitives),
 and [confidence guide](https://docs.typesafe.ai/confidence).
