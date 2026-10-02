@@ -8,7 +8,7 @@ import {
   getOverlayNodes,
   getPersistentPortal,
   registerOverlayNode,
-  setOverlayStackActive,
+  syncOverlayStackActive,
   syncOverlayPosition,
 } from '../_internal/overlay';
 import {
@@ -42,7 +42,7 @@ export function Popover(props: PopoverProps) {
   });
   const popoverId = resolveCompoundId('popover', id, children);
   const overlayIdentity = state(createOverlayIdentity())();
-  setOverlayStackActive(overlayIdentity, openState(), getSignal());
+  syncOverlayStackActive(overlayIdentity, openState(), getSignal());
   captureOverlayNonce(overlayIdentity, cspNonce());
   const triggerId = resolvePartId(popoverId, 'trigger');
   const contentId = resolvePartId(popoverId, 'content');

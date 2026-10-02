@@ -15,7 +15,7 @@ import {
   createOverlayIdentity,
   getOverlayNodes,
   getPersistentPortal,
-  setOverlayStackActive,
+  syncOverlayStackActive,
 } from '../_internal/overlay';
 import {
   focusCollectionItemWithRestore,
@@ -68,6 +68,11 @@ export function Select(props: SelectProps) {
   )();
   const syncPartIds = () => {
     const nodes = getOverlayNodes(overlayIdentity);
+    if (!nodes.content) {
+      if (automaticIds.controls)
+        nodes.trigger?.removeAttribute('aria-controls');
+      return;
+    }
     syncIdAssociation(
       nodes.trigger,
       nodes.content,
@@ -93,7 +98,7 @@ export function Select(props: SelectProps) {
       valueState.set(defaultValue);
     }
   });
-  setOverlayStackActive(overlayIdentity, openState(), cleanupSignal);
+  syncOverlayStackActive(overlayIdentity, openState(), cleanupSignal);
   const declaredItems = collectJsxElements(
     children,
     (element) => element.type === SelectItem

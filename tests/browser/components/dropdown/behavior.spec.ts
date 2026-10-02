@@ -168,6 +168,18 @@ test.describe('Dropdown - Behavior', () => {
     await expect(trigger).toHaveAttribute('aria-expanded', 'false');
   });
 
+  test('should close an open dropdown after a native pointer click on its trigger', async ({
+    render,
+    root,
+  }) => {
+    await render('toggleExpansion');
+    const trigger = root.locator('[aria-haspopup="menu"]');
+    await trigger.click();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await trigger.click();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
   test('should focus the first item when pointer activation mounts content', async ({
     page,
     render,

@@ -1,5 +1,6 @@
 import {
   dynamicAttributeSelector,
+  prepareDynamicStyleRule,
   removeDynamicStyleRule,
   setDynamicStyleRule,
 } from '../dynamic-style';
@@ -18,7 +19,7 @@ export function primeOverlayStackNode(
 ) {
   const attribute = 'data-askr-overlay-stack-id';
   const styleKey = `${overlayStyleKey(identity)}:stack:${part}`;
-  setDynamicStyleRule(
+  return prepareDynamicStyleRule(
     styleKey,
     dynamicAttributeSelector(attribute, domId),
     { 'z-index': resolveOverlayStackZIndex(identity, requested, part) },
@@ -375,6 +376,7 @@ export function syncOverlayPosition(
     });
   };
 
+  nodes.updatePosition = update;
   update();
   scheduleUpdate();
   window.addEventListener('resize', scheduleUpdate);
@@ -393,6 +395,7 @@ export function syncOverlayPosition(
   }
 
   nodes.cleanup = () => {
+    if (nodes.updatePosition === update) nodes.updatePosition = undefined;
     if (frame) {
       cancelAnimationFrame(frame);
       frame = 0;
