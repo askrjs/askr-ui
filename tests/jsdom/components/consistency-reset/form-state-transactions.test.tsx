@@ -223,6 +223,54 @@ describe('form primitives committed state', () => {
     pointer(window, 'pointerup', 80);
   });
 
+  it('should cancel a slider drag that was active when it became disabled', async () => {
+    let disabled!: ReturnType<typeof state<boolean>>;
+    const changes: number[] = [];
+    const view = render(() => {
+      disabled = state(false);
+      return (
+        <Slider
+          disabled={disabled()}
+          defaultValue={20}
+          onValueChange={(value) => changes.push(value)}
+        >
+          <SliderTrack>
+            <SliderThumb aria-label="Value" />
+          </SliderTrack>
+        </Slider>
+      );
+    });
+    await settle();
+    const track = view.container.querySelector<HTMLElement>(
+      '[data-slider-track]'
+    )!;
+    vi.spyOn(track, 'getBoundingClientRect').mockReturnValue({
+      left: 0,
+      right: 100,
+      top: 0,
+      bottom: 10,
+      width: 100,
+      height: 10,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+    pointer(track, 'pointerdown', 20);
+    await settle();
+    disabled.set(true);
+    await settle();
+    disabled.set(false);
+    await settle();
+    pointer(window, 'pointermove', 80);
+    await settle();
+    expect(changes).toEqual([]);
+    expect(
+      view.container
+        .querySelector('[role="slider"]')!
+        .getAttribute('aria-valuenow')
+    ).toBe('20');
+  });
+
   it('should end a slider drag when its pointer sequence is cancelled', async () => {
     const changes: number[] = [];
     const view = render(() => (

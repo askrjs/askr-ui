@@ -173,8 +173,9 @@ export function SelectContent(
 
   return (
     <Presence present={forceMount || root.open}>
-      <FocusScope restoreFocus>
+      <FocusScope autoFocus={root.open} restoreFocus>
         <DismissableLayer
+          disabled={!root.open}
           onDismiss={() => {
             const trigger = overlayNodes.trigger;
             root.setOpen(false);
