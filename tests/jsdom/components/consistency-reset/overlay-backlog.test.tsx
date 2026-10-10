@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
-import { flush, mount, type RenderResult } from '@askrjs/askr/testing';
+import { flush, render, type RenderResult } from '@askrjs/askr/testing';
 import { Dialog, DialogOverlay } from '../../../../src/components/dialog';
 import { DismissableLayer } from '../../../../src/components/dismissable-layer';
 import { FocusScope } from '../../../../src/components/focus-scope';
@@ -52,7 +52,7 @@ it('should give a persistent layer priority when it opens after a later mounted 
   let enabled!: ReturnType<typeof state<boolean>>;
   const calls: string[] = [];
   views.push(
-    mount(() => {
+    render(() => {
       enabled = state(false);
       return (
         <>
@@ -82,7 +82,7 @@ it('should remove the focused tooltip listener after rerendering and blurring to
   const add = vi.spyOn(document, 'addEventListener');
   const remove = vi.spyOn(document, 'removeEventListener');
   let revision!: ReturnType<typeof state<number>>;
-  const view = mount(() => {
+  const view = render(() => {
     revision = state(0);
     return (
       <>
@@ -133,7 +133,7 @@ it('should register tooltip owner cleanup once across rerenders', async () => {
   );
   let revision!: ReturnType<typeof state<number>>;
   views.push(
-    mount(() => {
+    render(() => {
       revision = state(0);
       return (
         <Tooltip id={`hint-${revision()}`}>
@@ -153,7 +153,7 @@ it('should register tooltip owner cleanup once across rerenders', async () => {
 
 it('should retain committed backdrop CSS after a rejected dialog ID and open update', async () => {
   let rejected!: ReturnType<typeof state<boolean>>;
-  const view = mount(() => {
+  const view = render(() => {
     rejected = state(false);
     return (
       <>
@@ -199,7 +199,7 @@ it('should loop and restore focus in the scope owner document', async () => {
   before.focus();
   const container = ownerDocument.createElement('div');
   ownerDocument.body.append(container);
-  const view = mount(
+  const view = render(
     () => (
       <FocusScope loop>
         <button>First</button>
@@ -231,7 +231,7 @@ it.each(['dropdown', 'select'] as const)(
   'should clear automatic %s controls when content unmounts',
   async (family) => {
     let open!: ReturnType<typeof state<boolean>>;
-    const view = mount(() => {
+    const view = render(() => {
       open = state(true);
       return family === 'dropdown' ? (
         <Dropdown open={open()}>
@@ -261,7 +261,7 @@ it.each(['dropdown', 'select'] as const)(
 );
 
 it('should reset an unselected radio group to its first enabled tab stop', async () => {
-  const view = mount(() => (
+  const view = render(() => (
     <form>
       <RadioGroup defaultValue="">
         <RadioGroupItem value="a">A</RadioGroupItem>
@@ -350,7 +350,7 @@ it.each(rootTriggers)(
   'should not consume an overlay open order for a rejected %s render',
   async (_family, component) => {
     let rejected!: ReturnType<typeof state<boolean>>;
-    const view = mount(() => {
+    const view = render(() => {
       rejected = state(false);
       return (
         <>

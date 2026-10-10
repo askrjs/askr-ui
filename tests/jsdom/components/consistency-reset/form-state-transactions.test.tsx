@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
-import { flush, mount, type RenderResult } from '@askrjs/askr/testing';
+import { flush, render, type RenderResult } from '@askrjs/askr/testing';
 import {
   RadioGroup,
   RadioGroupItem,
@@ -27,8 +27,8 @@ import { Checkbox } from '../../../../src/components/checkbox';
 import { Switch } from '../../../../src/components/switch';
 
 const views: RenderResult[] = [];
-function render(component: () => unknown) {
-  const view = mount(() => <>{component()}</>);
+function renderForm(component: () => unknown) {
+  const view = render(() => <>{component()}</>);
   views.push(view);
   return view;
 }
@@ -71,7 +71,7 @@ afterEach(async () => {
 describe('form primitives committed state', () => {
   it('should select an empty string radio value when arrow navigation reaches it', async () => {
     const changes: string[] = [];
-    const view = render(() => (
+    const view = renderForm(() => (
       <RadioGroup
         name="choice"
         defaultValue="a"
@@ -109,7 +109,7 @@ describe('form primitives committed state', () => {
     'should retain %s toggle group roving state through a rejected selection update',
     async (mode) => {
       let selected!: ReturnType<typeof state<string>>;
-      const view = render(() => {
+      const view = renderForm(() => {
         selected = state('a');
         const selection = selected();
         const selectionProps =
@@ -172,7 +172,7 @@ describe('form primitives committed state', () => {
   it('should suppress value changes when a slider becomes disabled during a drag', async () => {
     let disabled!: ReturnType<typeof state<boolean>>;
     const changes: number[] = [];
-    const view = render(() => {
+    const view = renderForm(() => {
       disabled = state(false);
       return (
         <Slider
@@ -226,7 +226,7 @@ describe('form primitives committed state', () => {
   it('should cancel a slider drag that was active when it became disabled', async () => {
     let disabled!: ReturnType<typeof state<boolean>>;
     const changes: number[] = [];
-    const view = render(() => {
+    const view = renderForm(() => {
       disabled = state(false);
       return (
         <Slider
@@ -273,7 +273,7 @@ describe('form primitives committed state', () => {
 
   it('should end a slider drag when its pointer sequence is cancelled', async () => {
     const changes: number[] = [];
-    const view = render(() => (
+    const view = renderForm(() => (
       <Slider defaultValue={20} onValueChange={(value) => changes.push(value)}>
         <SliderTrack>
           <SliderThumb aria-label="Value" />
@@ -314,7 +314,7 @@ describe('form primitives committed state', () => {
   it('should retain committed slider keyboard inputs after a structural commit failure', async () => {
     let rejected!: ReturnType<typeof state<boolean>>;
     const changes: string[] = [];
-    const view = render(() => {
+    const view = renderForm(() => {
       rejected = state(false);
       const isRejected = rejected();
       return [
@@ -368,7 +368,7 @@ describe('form primitives committed state', () => {
     'should retain committed %s progress CSS after a structural commit failure',
     async (_name, Root, Indicator) => {
       let rejected!: ReturnType<typeof state<boolean>>;
-      const view = render(() => {
+      const view = renderForm(() => {
         rejected = state(false);
         const isRejected = rejected();
         return [
@@ -401,7 +401,7 @@ describe('form primitives committed state', () => {
 
   it('should replace progress CSS identities and clean their committed rules on unmount', async () => {
     let id!: ReturnType<typeof state<string>>;
-    const view = render(() => {
+    const view = renderForm(() => {
       id = state('old-identity');
       return (
         <Progress id={id()} value={25}>
@@ -423,7 +423,7 @@ describe('form primitives committed state', () => {
 
   it('should reset an externally associated uncontrolled native checkbox', async () => {
     const changes: boolean[] = [];
-    const view = render(() => (
+    const view = renderForm(() => (
       <div>
         <form id="external-checkbox-form" />
         <Checkbox
@@ -450,7 +450,7 @@ describe('form primitives committed state', () => {
 
   it('should ignore an ancestor form reset when a native checkbox belongs to another form', async () => {
     const changes: boolean[] = [];
-    const view = render(() => (
+    const view = renderForm(() => (
       <div>
         <form id="owner-checkbox-form" />
         <form id="ancestor-checkbox-form">
@@ -484,7 +484,7 @@ describe('form primitives committed state', () => {
   it('should reset an uncontrolled switch to its committed default after a structural commit failure', async () => {
     let rejected!: ReturnType<typeof state<boolean>>;
     const changes: string[] = [];
-    const view = render(() => {
+    const view = renderForm(() => {
       rejected = state(false);
       const isRejected = rejected();
       return [

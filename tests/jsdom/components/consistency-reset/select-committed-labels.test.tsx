@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
-import { flush, mount, type RenderResult } from '@askrjs/askr/testing';
+import { flush, render, type RenderResult } from '@askrjs/askr/testing';
 import {
   Select,
   SelectGroup,
@@ -13,8 +13,8 @@ afterEach(() => {
   vi.restoreAllMocks();
   for (const view of views.splice(0)) view.unmount();
 });
-function render(component: Parameters<typeof mount>[0]) {
-  const view = mount(component);
+function renderSelect(component: Parameters<typeof render>[0]) {
+  const view = render(component);
   views.push(view);
   return view;
 }
@@ -31,7 +31,7 @@ function WrappedLabel() {
 describe('Select committed group label association', () => {
   it('should retain the committed caller label id after a rejected update', async () => {
     let changed!: ReturnType<typeof state<boolean>>;
-    const view = render(() => {
+    const view = renderSelect(() => {
       changed = state(false);
       return (
         <Select>
@@ -82,7 +82,7 @@ describe('Select committed group label association', () => {
         <SelectLabel id={labelId()}>Frameworks</SelectLabel>
       ) : null;
     }
-    const view = render(() => (
+    const view = renderSelect(() => (
       <Select>
         <SelectGroup>
           <CallerLabel />
@@ -113,7 +113,7 @@ describe('Select committed group label association', () => {
         </SelectLabel>
       );
     }
-    const view = render(() => (
+    const view = renderSelect(() => (
       <Select>
         <SelectGroup ref={groupRef}>
           <AsChildLabel />
@@ -137,7 +137,7 @@ describe('Select committed group label association', () => {
 
   it('should restore an unlabelled group after a rejected structural update', async () => {
     let shown!: ReturnType<typeof state<boolean>>;
-    const view = render(() => {
+    const view = renderSelect(() => {
       shown = state(false);
       return (
         <Select>
@@ -172,7 +172,7 @@ describe('Select committed group label association', () => {
   });
 
   it('should associate each nested group with only its own label', async () => {
-    const view = render(() => (
+    const view = renderSelect(() => (
       <Select>
         <SelectGroup>
           <SelectGroup>

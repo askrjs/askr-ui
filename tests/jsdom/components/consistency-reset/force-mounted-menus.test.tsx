@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
-import { flush, mount, type RenderResult } from '@askrjs/askr/testing';
+import { flush, render, type RenderResult } from '@askrjs/askr/testing';
 import { Dialog, DialogContent } from '../../../../src/components/dialog';
 import {
   Dropdown,
@@ -80,7 +80,7 @@ describe('closed force-mounted menus', () => {
     'should not intercept Escape meant for an open dialog or take focus (%s)',
     async (_name, menu, contentSelector) => {
       const close = vi.fn();
-      const view = mount(() => (
+      const view = render(() => (
         <>
           <Dialog open onOpenChange={close}>
             <DialogContent>Dialog body</DialogContent>
