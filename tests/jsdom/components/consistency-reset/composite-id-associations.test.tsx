@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
-import { flush, mount, type RenderResult } from '@askrjs/askr/testing';
+import { flush, render, type RenderResult } from '@askrjs/askr/testing';
 import {
   Dropdown,
   DropdownContent,
@@ -39,7 +39,7 @@ async function settle() {
 describe('Composite committed ID associations', () => {
   for (const family of ['dropdown', 'select', 'menubar'] as const) {
     it(`should preserve ${family} explicit null caller ARIA omission`, async () => {
-      const view = mount(() => {
+      const view = render(() => {
         if (family === 'dropdown')
           return (
             <Dropdown defaultOpen>
@@ -98,7 +98,7 @@ describe('Composite committed ID associations', () => {
     for (const failurePart of ['trigger', 'content'] as const) {
       it(`should retain ${family} committed IDs and caller association policy after a rejected ${failurePart} update`, async () => {
         let changed!: ReturnType<typeof state<boolean>>;
-        const view = mount(() => {
+        const view = render(() => {
           changed = state(false);
           const contentId =
             failurePart === 'content' && changed()

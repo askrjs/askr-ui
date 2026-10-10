@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
-import { flush, mount, type RenderResult } from '@askrjs/askr/testing';
+import { flush, render, type RenderResult } from '@askrjs/askr/testing';
 import {
   Menubar,
   MenubarMenu,
@@ -22,7 +22,7 @@ it('should publish menubar structural styles only after a successful commit', ()
     .querySelectorAll('[data-askr-dynamic-styles]')
     .forEach((node) => node.remove());
   let visible!: ReturnType<typeof state<boolean>>;
-  view = mount(() => {
+  view = render(() => {
     visible = state(false);
     return (
       <div data-testid="host">

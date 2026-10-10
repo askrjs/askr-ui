@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
-import { flush, mount, type RenderResult } from '@askrjs/askr/testing';
+import { flush, render, type RenderResult } from '@askrjs/askr/testing';
 import {
   Avatar,
   AvatarFallback,
@@ -24,7 +24,7 @@ describe('avatar source transactions', () => {
   it('should reset to loading when an image source change follows a rejected update', async () => {
     let source!: ReturnType<typeof state<string>>;
     let rejected!: ReturnType<typeof state<boolean>>;
-    const view = mount(() => {
+    const view = render(() => {
       source = state('/a.png');
       rejected = state(false);
       const isRejected = rejected();
