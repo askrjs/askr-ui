@@ -7,7 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking
+
+- Retire 27 accessibility metadata constants and 26 metadata type aliases from
+  root and owning family barrels (106 name/path pairs). All 36 export keys,
+  component functions, and component input types remain. See the complete
+  [migration list](./docs/migration-0.5.0.md) and [API review](./docs/0.5.0-public-api.md).
+
+### Internal
+
+- Qualify all retained and retired installed names under actual TypeScript 6 and
+  7, exact ESM/native require family identities, recursive export targets, and private paths.
+- Add native browser assertions for controlled mode transitions, nested portal
+  close orders, removed overlay triggers, and dynamic Select collection recovery.
+  Pause browser time in the two controlled Toast focus tests so their 1000ms
+  expiry does not race setup; timer behavior remains separately tested.
+- Correct Tier 1–3 benchmark workloads to render through an owning SSR context
+  or mount real DOM for activation and cleanup. Fail on callback errors instead
+  of reporting empty measurements; these corrected workloads establish samples
+  and make no performance improvement claim.
+- Update compatible development-only Vite Plus, formatter, worker, and source-map
+  lock resolutions; add the TypeScript 6 development compiler. Runtime and peer
+  dependency ranges remain unchanged.
+
 ### Fixed
+
+- Route both `import` and native Node 24 `require` conditions through the same
+  canonical ESM files and declarations. This fixes the duplicate CommonJS build's
+  failure on the ESM-only Core peer and preserves one component/runtime identity.
+  All 36 package keys and supported CommonJS calls remain.
+
+- Select restores owned focus after a focused dynamic option is removed,
+  preserving value and callbacks, disabled filtering, and intentional external
+  focus. Empty collections fall back to the owned focusable content/scope host;
+  closed and unmounted owners cancel pending repair.
 
 - Dropdown and Select close on a native pointer press/click of their open
   trigger and clear automatic `aria-controls` when content unmounts.

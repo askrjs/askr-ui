@@ -498,6 +498,97 @@ test.describe('Select - Behavior', () => {
     await run('stopRecording');
   });
 
+  for (const defaultContent of [false, true]) {
+    test(`should recover focus and typeahead after a live collection changes with ${defaultContent ? 'default content' : 'explicit focusable content'}`, async ({
+      page,
+      render,
+      root,
+      run,
+    }) => {
+      await page.clock.install();
+      await render('dynamicTypeaheadRecovery', { defaultContent });
+      await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 1_000);
+      const content = page.locator('[data-slot="select-content"]');
+      const focused = focusedText(page);
+      const fallback = defaultContent
+        ? page.locator('[data-focus-scope="true"]')
+        : content;
+      if (defaultContent)
+        await page.getByRole('option', { name: 'Alpha' }).focus();
+      else await content.focus();
+      await page.keyboard.press('d');
+      await expect.poll(focused).toBe('Delta');
+      await run('removeDelta');
+      expect(await run('removedDetached')).toBe(true);
+      await expect.poll(() => run('focusWithinEnabledOwner')).toBe(true);
+      // A stale 'd' buffer would form 'da' and leave repaired Beta focused.
+      await page.keyboard.press('a');
+      await expect.poll(focused).toBe('Alpha');
+      await run('clear');
+      await expect(page.getByRole('option')).toHaveCount(0);
+      await expect(fallback).toBeFocused();
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('Enter');
+      await page.keyboard.press(' ');
+      await run('refillDisabled');
+      await expect(fallback).toBeFocused();
+      const options = page.getByRole('option');
+      await expect(options).toHaveCount(3);
+      for (const option of await options.all()) {
+        await expect(option).toHaveAttribute('tabindex', '-1');
+        await expect(option).toHaveAttribute('aria-disabled', 'true');
+        await option.evaluate((node: HTMLElement) => node.click());
+      }
+      await page.keyboard.press('d');
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('Enter');
+      await expect(fallback).toBeFocused();
+      expect(await run('requests')).toEqual([]);
+      await expect(root.locator('input[name="dynamic"]')).toHaveValue('alpha');
+      await run('recover');
+      await run('reorder');
+      expect(await run('stableBeta')).toBe(true);
+      await page.keyboard.press(defaultContent ? 'Tab' : 'ArrowDown');
+      await expect.poll(() => run('focusWithinEnabledOwner')).toBe(true);
+      await page.clock.runFor(600);
+      await page.keyboard.press('b');
+      await expect.poll(focused).toBe('Beta');
+      await page.keyboard.press('Enter');
+      await expect(root.locator('input[name="dynamic"]')).toHaveValue('beta');
+      await expect(
+        page.locator('[data-slot="select-trigger"]')
+      ).toHaveAttribute('aria-expanded', 'false');
+      expect(await run('requests')).toEqual(['beta']);
+    });
+  }
+
+  for (const action of ['external', 'close', 'unmount'] as const) {
+    test(`should preserve external focus when a focused option is removed during ${action}`, async ({
+      page,
+      render,
+      root,
+      run,
+    }) => {
+      await render('removedFocusGuard');
+      const content = page.locator('[data-slot="select-content"]');
+      await content.focus();
+      await page.keyboard.press('d');
+      await expect(page.getByRole('option', { name: 'Delta' })).toBeFocused();
+      await run('remove', action);
+      await expect(
+        root.getByRole('button', { name: 'External focus owner' })
+      ).toBeFocused();
+      await expect(page.getByRole('option', { name: 'Delta' })).toHaveCount(0);
+      expect(await run('requests')).toEqual([]);
+      if (action === 'external') {
+        await expect(root.locator('input[name="guard"]')).toHaveValue('alpha');
+        await expect(content).toHaveCount(1);
+      } else {
+        await expect(content).toHaveCount(0);
+      }
+    });
+  }
+
   test('should keep arrow, Space, Enter, and Tab interactions intuitive', async ({
     page,
     render,

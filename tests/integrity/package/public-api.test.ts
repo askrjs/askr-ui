@@ -5,6 +5,7 @@ import * as askrUi from '../../../src';
 import {
   componentSurface,
   publicValueExports,
+  publicEntryValueExports,
   removedPublicExports,
 } from '../../fixtures/public-surface';
 
@@ -27,7 +28,15 @@ describe('Public API', () => {
       publicValueExports
     );
 
+    expect(publicValueExports).toHaveLength(127);
+    expect(Object.keys(publicEntryValueExports)).toHaveLength(34);
     for (const entry of componentSurface) {
+      expect(
+        Object.keys(entry.module).filter(isPublicValueExport).sort()
+      ).toEqual(publicEntryValueExports[`./${entry.name}`]);
+      for (const removedExport of removedPublicExports) {
+        expect(removedExport in entry.module).toBe(false);
+      }
       for (const exportName of Object.keys(entry.module).filter(
         isPublicValueExport
       )) {

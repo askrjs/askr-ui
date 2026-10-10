@@ -1,30 +1,136 @@
 import { expect, test } from '../../fixtures';
 
 test.describe('Cross-component contracts', () => {
-  test('should preserve controlled-to-uncontrolled state transitions given native controls when the value or checked prop changes from defined to undefined', async ({
+  test('should preserve internal values and current callbacks across controlled mode transitions', async ({
     render,
     root,
     run,
   }) => {
     await render('controlledToUncontrolled');
     const checkbox = root.locator('[data-slot="checkbox"]');
-
+    const alpha = root.getByRole('radio', { name: 'Alpha' });
+    const beta = root.getByRole('radio', { name: 'Beta' });
+    const value = root.locator('input[name="workspace"]');
+    await expect(checkbox).toBeChecked();
     await expect(checkbox).toHaveAttribute('data-state', 'checked');
-
-    await run('clearChecked');
-
-    await expect(checkbox).toHaveCount(1);
+    await expect(beta).toHaveAttribute('aria-checked', 'true');
+    await expect(value).toHaveValue('beta');
+    await checkbox.click();
+    await alpha.click();
+    await expect(checkbox).toBeChecked();
+    await expect(beta).toHaveAttribute('data-state', 'checked');
+    await expect(value).toHaveValue('beta');
+    await run('clearValues');
+    await expect(checkbox).not.toBeChecked();
+    await expect(checkbox).toHaveAttribute('data-state', 'unchecked');
+    await expect(alpha).toHaveAttribute('aria-checked', 'true');
+    await expect(value).toHaveValue('alpha');
+    await checkbox.click();
+    await beta.click();
+    await expect(checkbox).toBeChecked();
+    await expect(beta).toHaveAttribute('aria-checked', 'true');
+    await expect(value).toHaveValue('beta');
+    await run('defineValues');
+    await expect(checkbox).not.toBeChecked();
+    await expect(alpha).toHaveAttribute('aria-checked', 'true');
+    await expect(value).toHaveValue('alpha');
+    await checkbox.click();
+    await beta.click();
+    await expect(checkbox).not.toBeChecked();
+    await expect(checkbox).toHaveAttribute('data-state', 'unchecked');
+    await expect(alpha).toHaveAttribute('data-state', 'checked');
+    await expect(value).toHaveValue('alpha');
+    expect(await run('sameNodes')).toBe(true);
+    expect(await run('requests')).toEqual([
+      { control: 'checkbox', next: false, phase: 0 },
+      { control: 'radio', next: 'alpha', phase: 0 },
+      { control: 'checkbox', next: true, phase: 1 },
+      { control: 'radio', next: 'beta', phase: 1 },
+      { control: 'checkbox', next: true, phase: 2 },
+      { control: 'radio', next: 'beta', phase: 2 },
+    ]);
   });
 
-  test('should restore focus through nested overlays given dialog and popover content when overlays close in different orders', async ({
+  test('should dismiss nested portals inner-first and restore focus one owner at a time', async ({
     page,
     render,
+    run,
   }) => {
     await render('nestedOverlays');
-
+    const outerTrigger = page.getByRole('button', { name: 'Open outer' });
+    await outerTrigger.focus();
+    await outerTrigger.press('Enter');
+    const innerTrigger = page.getByRole('button', {
+      name: 'More',
+      exact: true,
+    });
+    await page.getByRole('button', { name: 'Inner action' }).focus();
+    await run('clearRequests');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-slot="popover-content"]')).toHaveCount(0);
+    await expect(innerTrigger).toBeFocused();
     await expect(page.locator('[data-slot="dialog-content"]')).toHaveCount(1);
-    await expect(page.locator('[data-slot="popover-content"]')).toHaveCount(1);
+    expect(await run('requests')).toEqual([{ owner: 'inner', open: false }]);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-slot="dialog-content"]')).toHaveCount(0);
+    await expect(outerTrigger).toBeFocused();
+    expect(await run('requests')).toEqual([
+      { owner: 'inner', open: false },
+      { owner: 'outer', open: false },
+    ]);
   });
+
+  for (const removeTrigger of [false, true]) {
+    test(`should clean nested portals on outer-first removal with ${removeTrigger ? 'an explicit persistent target' : 'a surviving trigger'}`, async ({
+      page,
+      render,
+      run,
+    }) => {
+      await render('nestedOverlays', { removeTrigger });
+      const outerTrigger = page.getByRole('button', { name: 'Open outer' });
+      await outerTrigger.focus();
+      await outerTrigger.press('Enter');
+      await page.getByRole('button', { name: 'Inner action' }).focus();
+      await run('clearRequests');
+      await run('closeOuter');
+      await expect(page.locator('[data-slot="dialog-content"]')).toHaveCount(0);
+      await expect(page.locator('[data-slot="popover-content"]')).toHaveCount(
+        0
+      );
+      await expect(
+        page.getByRole('button', {
+          name: removeTrigger ? 'Persistent restore target' : 'Open outer',
+          exact: true,
+        })
+      ).toBeFocused();
+      expect(await run('detached')).toEqual({
+        outer: true,
+        inner: true,
+        staleFocus: 0,
+      });
+      expect(await run('requests')).toEqual([]);
+      const survivor = page.getByRole('button', {
+        name: 'Survivor',
+        exact: true,
+      });
+      await survivor.click();
+      await page.getByRole('button', { name: 'Surviving action' }).focus();
+      await run('clearRequests');
+      await page.keyboard.press('Escape');
+      await expect(page.locator('[data-slot="popover-content"]')).toHaveCount(
+        0
+      );
+      await expect(survivor).toBeFocused();
+      expect(await run('requests')).toEqual([
+        { owner: 'survivor', open: false },
+      ]);
+      expect(await run('detached')).toEqual({
+        outer: true,
+        inner: true,
+        staleFocus: 0,
+      });
+    });
+  }
 
   test('should preserve form state and nested overlays given mixed controls inside a modal when the form submits', async ({
     page,

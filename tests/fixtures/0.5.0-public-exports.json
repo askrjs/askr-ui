@@ -1,0 +1,459 @@
+{
+  "counts": {
+    "beforeNamedPairs": 970,
+    "afterNamedPairs": 864,
+    "remove": 106,
+    "move": 0,
+    "exportKeysBefore": 36,
+    "exportKeysAfter": 36,
+    "uniqueNamesBefore": 485,
+    "uniqueNamesAfter": 432,
+    "uniqueRuntimeValuesBefore": 154,
+    "uniqueRuntimeValuesAfter": 127,
+    "uniqueTypeNamesBefore": 331,
+    "uniqueTypeNamesAfter": 305
+  },
+  "exportKeys": [
+    ".",
+    "./avatar",
+    "./button",
+    "./checkbox",
+    "./input",
+    "./form",
+    "./label",
+    "./progress",
+    "./progress-circle",
+    "./radio-group",
+    "./select",
+    "./slider",
+    "./switch",
+    "./table",
+    "./virtual-list",
+    "./virtual-table",
+    "./textarea",
+    "./toggle",
+    "./toggle-group",
+    "./visually-hidden",
+    "./accordion",
+    "./alert-dialog",
+    "./collapsible",
+    "./dialog",
+    "./dismissable-layer",
+    "./dropdown",
+    "./focus-scope",
+    "./hover-card",
+    "./menu",
+    "./menubar",
+    "./overlay-host",
+    "./popover",
+    "./scroll-area",
+    "./toast",
+    "./tooltip",
+    "./package.json"
+  ],
+  "entries": {
+    ".": {
+      "values": [
+        "Accordion",
+        "AccordionContent",
+        "AccordionHeader",
+        "AccordionItem",
+        "AccordionTrigger",
+        "AlertDialog",
+        "AlertDialogAction",
+        "AlertDialogCancel",
+        "AlertDialogContent",
+        "AlertDialogDescription",
+        "AlertDialogOverlay",
+        "AlertDialogPortal",
+        "AlertDialogTitle",
+        "AlertDialogTrigger",
+        "Avatar",
+        "AvatarFallback",
+        "AvatarImage",
+        "Button",
+        "Checkbox",
+        "Collapsible",
+        "CollapsibleContent",
+        "CollapsibleTrigger",
+        "DebouncedInput",
+        "Dialog",
+        "DialogClose",
+        "DialogContent",
+        "DialogDescription",
+        "DialogOverlay",
+        "DialogPortal",
+        "DialogTitle",
+        "DialogTrigger",
+        "DismissableLayer",
+        "Dropdown",
+        "DropdownContent",
+        "DropdownGroup",
+        "DropdownItem",
+        "DropdownLabel",
+        "DropdownPortal",
+        "DropdownSeparator",
+        "DropdownTrigger",
+        "FocusScope",
+        "Form",
+        "HoverCard",
+        "HoverCardContent",
+        "HoverCardPortal",
+        "HoverCardTrigger",
+        "Input",
+        "Label",
+        "Menu",
+        "MenuContent",
+        "MenuGroup",
+        "MenuItem",
+        "MenuItemDescription",
+        "MenuItemIcon",
+        "MenuItemLabel",
+        "MenuLabel",
+        "MenuSeparator",
+        "Menubar",
+        "MenubarContent",
+        "MenubarGroup",
+        "MenubarItem",
+        "MenubarLabel",
+        "MenubarMenu",
+        "MenubarPortal",
+        "MenubarSeparator",
+        "MenubarSub",
+        "MenubarSubContent",
+        "MenubarSubTrigger",
+        "MenubarTrigger",
+        "OverlayHost",
+        "Popover",
+        "PopoverClose",
+        "PopoverContent",
+        "PopoverPortal",
+        "PopoverTrigger",
+        "Progress",
+        "ProgressCircle",
+        "ProgressCircleIndicator",
+        "ProgressIndicator",
+        "RadioGroup",
+        "RadioGroupItem",
+        "ScrollArea",
+        "ScrollAreaCorner",
+        "ScrollAreaScrollbar",
+        "ScrollAreaThumb",
+        "ScrollAreaViewport",
+        "Select",
+        "SelectContent",
+        "SelectGroup",
+        "SelectItem",
+        "SelectItemText",
+        "SelectLabel",
+        "SelectPortal",
+        "SelectSeparator",
+        "SelectTrigger",
+        "SelectValue",
+        "Slider",
+        "SliderRange",
+        "SliderThumb",
+        "SliderTrack",
+        "Switch",
+        "Table",
+        "TableBody",
+        "TableCaption",
+        "TableCell",
+        "TableFoot",
+        "TableHead",
+        "TableHeaderCell",
+        "TableRow",
+        "Textarea",
+        "Toast",
+        "ToastAction",
+        "ToastClose",
+        "ToastDescription",
+        "ToastHost",
+        "ToastTitle",
+        "ToastViewport",
+        "Toggle",
+        "ToggleGroup",
+        "ToggleGroupItem",
+        "Tooltip",
+        "TooltipContent",
+        "TooltipPortal",
+        "TooltipTrigger",
+        "VirtualList",
+        "VirtualTable",
+        "VisuallyHidden"
+      ],
+      "removedValues": [
+        "ACCORDION_A11Y_CONTRACT",
+        "ALERT_DIALOG_A11Y_CONTRACT",
+        "AVATAR_A11Y_CONTRACT",
+        "BUTTON_A11Y_CONTRACT",
+        "CHECKBOX_A11Y_CONTRACT",
+        "COLLAPSIBLE_A11Y_CONTRACT",
+        "DIALOG_A11Y_CONTRACT",
+        "DISMISSABLE_LAYER_A11Y_CONTRACT",
+        "DROPDOWN_A11Y_CONTRACT",
+        "FOCUS_SCOPE_A11Y_CONTRACT",
+        "INPUT_A11Y_CONTRACT",
+        "LABEL_A11Y_CONTRACT",
+        "MENUBAR_A11Y_CONTRACT",
+        "MENU_A11Y_CONTRACT",
+        "POPOVER_A11Y_CONTRACT",
+        "PROGRESS_A11Y_CONTRACT",
+        "PROGRESS_CIRCLE_A11Y_CONTRACT",
+        "RADIO_GROUP_A11Y_CONTRACT",
+        "SELECT_A11Y_CONTRACT",
+        "SLIDER_A11Y_CONTRACT",
+        "SWITCH_A11Y_CONTRACT",
+        "TEXTAREA_A11Y_CONTRACT",
+        "TOAST_A11Y_CONTRACT",
+        "TOGGLE_A11Y_CONTRACT",
+        "TOGGLE_GROUP_A11Y_CONTRACT",
+        "TOOLTIP_A11Y_CONTRACT",
+        "VISUALLY_HIDDEN_A11Y_CONTRACT"
+      ]
+    },
+    "./accordion": {
+      "values": [
+        "Accordion",
+        "AccordionContent",
+        "AccordionHeader",
+        "AccordionItem",
+        "AccordionTrigger"
+      ],
+      "removedValues": ["ACCORDION_A11Y_CONTRACT"]
+    },
+    "./alert-dialog": {
+      "values": [
+        "AlertDialog",
+        "AlertDialogAction",
+        "AlertDialogCancel",
+        "AlertDialogContent",
+        "AlertDialogDescription",
+        "AlertDialogOverlay",
+        "AlertDialogPortal",
+        "AlertDialogTitle",
+        "AlertDialogTrigger"
+      ],
+      "removedValues": ["ALERT_DIALOG_A11Y_CONTRACT"]
+    },
+    "./avatar": {
+      "values": ["Avatar", "AvatarFallback", "AvatarImage"],
+      "removedValues": ["AVATAR_A11Y_CONTRACT"]
+    },
+    "./button": {
+      "values": ["Button"],
+      "removedValues": ["BUTTON_A11Y_CONTRACT"]
+    },
+    "./checkbox": {
+      "values": ["Checkbox"],
+      "removedValues": ["CHECKBOX_A11Y_CONTRACT"]
+    },
+    "./collapsible": {
+      "values": ["Collapsible", "CollapsibleContent", "CollapsibleTrigger"],
+      "removedValues": ["COLLAPSIBLE_A11Y_CONTRACT"]
+    },
+    "./dialog": {
+      "values": [
+        "Dialog",
+        "DialogClose",
+        "DialogContent",
+        "DialogDescription",
+        "DialogOverlay",
+        "DialogPortal",
+        "DialogTitle",
+        "DialogTrigger"
+      ],
+      "removedValues": ["DIALOG_A11Y_CONTRACT"]
+    },
+    "./dismissable-layer": {
+      "values": ["DismissableLayer"],
+      "removedValues": ["DISMISSABLE_LAYER_A11Y_CONTRACT"]
+    },
+    "./dropdown": {
+      "values": [
+        "Dropdown",
+        "DropdownContent",
+        "DropdownGroup",
+        "DropdownItem",
+        "DropdownLabel",
+        "DropdownPortal",
+        "DropdownSeparator",
+        "DropdownTrigger"
+      ],
+      "removedValues": ["DROPDOWN_A11Y_CONTRACT"]
+    },
+    "./focus-scope": {
+      "values": ["FocusScope"],
+      "removedValues": ["FOCUS_SCOPE_A11Y_CONTRACT"]
+    },
+    "./form": {
+      "values": ["Form"],
+      "removedValues": []
+    },
+    "./hover-card": {
+      "values": [
+        "HoverCard",
+        "HoverCardContent",
+        "HoverCardPortal",
+        "HoverCardTrigger"
+      ],
+      "removedValues": []
+    },
+    "./input": {
+      "values": ["DebouncedInput", "Input"],
+      "removedValues": ["INPUT_A11Y_CONTRACT"]
+    },
+    "./label": {
+      "values": ["Label"],
+      "removedValues": ["LABEL_A11Y_CONTRACT"]
+    },
+    "./menu": {
+      "values": [
+        "Menu",
+        "MenuContent",
+        "MenuGroup",
+        "MenuItem",
+        "MenuItemDescription",
+        "MenuItemIcon",
+        "MenuItemLabel",
+        "MenuLabel",
+        "MenuSeparator"
+      ],
+      "removedValues": ["MENU_A11Y_CONTRACT"]
+    },
+    "./menubar": {
+      "values": [
+        "Menubar",
+        "MenubarContent",
+        "MenubarGroup",
+        "MenubarItem",
+        "MenubarLabel",
+        "MenubarMenu",
+        "MenubarPortal",
+        "MenubarSeparator",
+        "MenubarSub",
+        "MenubarSubContent",
+        "MenubarSubTrigger",
+        "MenubarTrigger"
+      ],
+      "removedValues": ["MENUBAR_A11Y_CONTRACT"]
+    },
+    "./overlay-host": {
+      "values": ["OverlayHost"],
+      "removedValues": []
+    },
+    "./popover": {
+      "values": [
+        "Popover",
+        "PopoverClose",
+        "PopoverContent",
+        "PopoverPortal",
+        "PopoverTrigger"
+      ],
+      "removedValues": ["POPOVER_A11Y_CONTRACT"]
+    },
+    "./progress": {
+      "values": ["Progress", "ProgressIndicator"],
+      "removedValues": ["PROGRESS_A11Y_CONTRACT"]
+    },
+    "./progress-circle": {
+      "values": ["ProgressCircle", "ProgressCircleIndicator"],
+      "removedValues": ["PROGRESS_CIRCLE_A11Y_CONTRACT"]
+    },
+    "./radio-group": {
+      "values": ["RadioGroup", "RadioGroupItem"],
+      "removedValues": ["RADIO_GROUP_A11Y_CONTRACT"]
+    },
+    "./scroll-area": {
+      "values": [
+        "ScrollArea",
+        "ScrollAreaCorner",
+        "ScrollAreaScrollbar",
+        "ScrollAreaThumb",
+        "ScrollAreaViewport"
+      ],
+      "removedValues": []
+    },
+    "./select": {
+      "values": [
+        "Select",
+        "SelectContent",
+        "SelectGroup",
+        "SelectItem",
+        "SelectItemText",
+        "SelectLabel",
+        "SelectPortal",
+        "SelectSeparator",
+        "SelectTrigger",
+        "SelectValue"
+      ],
+      "removedValues": ["SELECT_A11Y_CONTRACT"]
+    },
+    "./slider": {
+      "values": ["Slider", "SliderRange", "SliderThumb", "SliderTrack"],
+      "removedValues": ["SLIDER_A11Y_CONTRACT"]
+    },
+    "./switch": {
+      "values": ["Switch"],
+      "removedValues": ["SWITCH_A11Y_CONTRACT"]
+    },
+    "./table": {
+      "values": [
+        "Table",
+        "TableBody",
+        "TableCaption",
+        "TableCell",
+        "TableFoot",
+        "TableHead",
+        "TableHeaderCell",
+        "TableRow"
+      ],
+      "removedValues": []
+    },
+    "./textarea": {
+      "values": ["Textarea"],
+      "removedValues": ["TEXTAREA_A11Y_CONTRACT"]
+    },
+    "./toast": {
+      "values": [
+        "Toast",
+        "ToastAction",
+        "ToastClose",
+        "ToastDescription",
+        "ToastHost",
+        "ToastTitle",
+        "ToastViewport"
+      ],
+      "removedValues": ["TOAST_A11Y_CONTRACT"]
+    },
+    "./toggle": {
+      "values": ["Toggle"],
+      "removedValues": ["TOGGLE_A11Y_CONTRACT"]
+    },
+    "./toggle-group": {
+      "values": ["ToggleGroup", "ToggleGroupItem"],
+      "removedValues": ["TOGGLE_GROUP_A11Y_CONTRACT"]
+    },
+    "./tooltip": {
+      "values": [
+        "Tooltip",
+        "TooltipContent",
+        "TooltipPortal",
+        "TooltipTrigger"
+      ],
+      "removedValues": ["TOOLTIP_A11Y_CONTRACT"]
+    },
+    "./virtual-list": {
+      "values": ["VirtualList"],
+      "removedValues": []
+    },
+    "./virtual-table": {
+      "values": ["VirtualTable"],
+      "removedValues": []
+    },
+    "./visually-hidden": {
+      "values": ["VisuallyHidden"],
+      "removedValues": ["VISUALLY_HIDDEN_A11Y_CONTRACT"]
+    }
+  }
+}
