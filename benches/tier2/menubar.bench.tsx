@@ -1,3 +1,4 @@
+import { renderToStringSync } from '@askrjs/askr/ssr';
 import { bench, describe } from 'vite-plus/test';
 import {
   Menubar,
@@ -7,25 +8,40 @@ import {
   MenubarPortal,
   MenubarTrigger,
 } from '../../src/components';
-
 describe('Menubar benches', () => {
-  bench('create menubar', () => {
-    Menubar({
-      children: [
-        MenubarMenu({
-          value: 'file',
-          children: [
-            MenubarTrigger({ children: 'File' }),
-            MenubarPortal({
-              children: [
-                MenubarContent({
-                  children: [MenubarItem({ children: 'New' })],
-                }),
-              ],
-            }),
-          ],
-        }),
-      ],
-    });
-  });
+  bench(
+    'SSR render menubar',
+    () => {
+      renderToStringSync(() => (
+        <Menubar
+          {...{
+            children: [
+              <MenubarMenu
+                {...{
+                  value: 'file',
+                  children: [
+                    <MenubarTrigger {...{ children: 'File' }} />,
+                    <MenubarPortal
+                      {...{
+                        children: [
+                          <MenubarContent
+                            {...{
+                              children: [
+                                <MenubarItem {...{ children: 'New' }} />,
+                              ],
+                            }}
+                          />,
+                        ],
+                      }}
+                    />,
+                  ],
+                }}
+              />,
+            ],
+          }}
+        />
+      ));
+    },
+    { throws: true }
+  );
 });

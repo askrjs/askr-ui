@@ -7,7 +7,6 @@ export {
   MenuItemLabel,
 } from './menu-item-parts';
 export { MenuGroup, MenuLabel, MenuSeparator } from './menu-group';
-export { MENU_A11Y_CONTRACT, type MenuA11yContract } from './menu.a11y';
 export type {
   MenuOwnProps,
   MenuProps,

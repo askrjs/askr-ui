@@ -40,7 +40,7 @@ export default defineConfig({
   },
   pack: {
     entry: packageEntries,
-    format: ['esm', 'cjs'],
+    format: ['esm'],
     outDir: 'dist',
     platform: 'neutral',
     tsconfig: 'tsconfig.pack.json',
@@ -66,14 +66,6 @@ export default defineConfig({
           entryFileNames: '[name].js',
           exports: 'named',
           format: 'es',
-          preserveModules: true,
-          preserveModulesRoot: 'src',
-        },
-        {
-          dir: 'dist',
-          entryFileNames: '[name].cjs',
-          exports: 'named',
-          format: 'cjs',
           preserveModules: true,
           preserveModulesRoot: 'src',
         },

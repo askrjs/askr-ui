@@ -3,7 +3,6 @@ export { SelectTrigger, SelectValue, SelectPortal } from './select-trigger';
 export { SelectContent } from './select-content';
 export { SelectItem, SelectItemText } from './select-item';
 export { SelectGroup, SelectLabel, SelectSeparator } from './select-group';
-export { SELECT_A11Y_CONTRACT, type SelectA11yContract } from './select.a11y';
 export type {
   SelectOwnProps,
   SelectProps,

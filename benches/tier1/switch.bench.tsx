@@ -1,24 +1,40 @@
+import { renderToStringSync } from '@askrjs/askr/ssr';
 import { bench, describe } from 'vite-plus/test';
 import { Switch } from '../../src/components/switch';
-
 describe('Switch benches - native', () => {
-  bench('create native switch', () => {
-    Switch({ children: 'Power' });
-  });
+  bench(
+    'SSR render native switch',
+    () => {
+      renderToStringSync(() => <Switch {...{ children: 'Power' }} />);
+    },
+    { throws: true }
+  );
 });
-
 describe('Switch benches - checked', () => {
-  bench('create checked switch', () => {
-    Switch({ checked: true, children: 'Power' });
-  });
+  bench(
+    'SSR render checked switch',
+    () => {
+      renderToStringSync(() => (
+        <Switch {...{ checked: true, children: 'Power' }} />
+      ));
+    },
+    { throws: true }
+  );
 });
-
 describe('Switch benches - asChild', () => {
-  bench('create switch with asChild host', () => {
-    Switch({
-      asChild: true,
-      children: <div>Power</div>,
-      'data-from-switch': 'yes',
-    });
-  });
+  bench(
+    'SSR render switch with asChild host',
+    () => {
+      renderToStringSync(() => (
+        <Switch
+          {...{
+            asChild: true,
+            children: <div>Power</div>,
+            'data-from-switch': 'yes',
+          }}
+        />
+      ));
+    },
+    { throws: true }
+  );
 });

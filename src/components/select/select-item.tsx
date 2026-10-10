@@ -1,4 +1,5 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
+import { getCompositeItemFocusTracker } from '../_internal/focus/composite';
 import { nativeRef } from '../_internal/native-ref';
 import { nativeButtonProps } from '../_internal/native-control';
 import { state } from '@askrjs/askr';
@@ -114,6 +115,11 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
   };
   const registrationOwner = {};
   const setNode = (node: HTMLElement | null) => {
+    const previousNode = focusNode.current;
+    const wasFocused =
+      previousNode &&
+      (previousNode.ownerDocument.activeElement === previousNode ||
+        getCompositeItemFocusTracker(previousNode).focused);
     focusNode.current = node;
     const virtualPlacement =
       scopedVirtualPlacement ??
@@ -136,6 +142,9 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
       },
       registrationOwner
     );
+    if (!node && previousNode && wasFocused) {
+      root.repairRemovedItemFocus(previousNode, resolvedIndex);
+    }
     root.restoreItemFocus(resolvedIndex, node);
     repairFocusForDisabledItem({
       collection,

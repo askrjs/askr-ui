@@ -186,6 +186,43 @@ export function Select(props: SelectProps) {
     if (mounted) focus();
     else queueMicrotask(focus);
   };
+  const repairRemovedItemFocus = (
+    removedNode: HTMLElement,
+    removedIndex: number
+  ) => {
+    queueMicrotask(() => {
+      const content = getOverlayNodes(overlayIdentity).content;
+      if (
+        cleanupSignal.aborted ||
+        removedNode.isConnected ||
+        !content?.isConnected ||
+        content.dataset.state !== 'open'
+      )
+        return;
+      const active = content.ownerDocument.activeElement;
+      if (active !== content.ownerDocument.body && active !== removedNode)
+        return;
+
+      pendingFocus.index = null;
+      resetTypeahead(overlayIdentity);
+      const enabled = collection
+        .items()
+        .filter((item) => !item.metadata.disabled && item.node.isConnected)
+        .sort((left, right) => left.metadata.index - right.metadata.index);
+      const target =
+        enabled.find((item) => item.metadata.index >= removedIndex) ??
+        enabled[enabled.length - 1];
+      if (target) {
+        setCurrentIndex(target.metadata.index);
+        target.node.focus({ preventScroll: true });
+      } else {
+        const host = content.hasAttribute('tabindex')
+          ? content
+          : content.closest<HTMLElement>('[data-focus-scope="true"]');
+        host?.focus({ preventScroll: true });
+      }
+    });
+  };
   const setOpen = (nextOpen: boolean) => {
     resetTypeahead(overlayIdentity);
 
@@ -212,6 +249,7 @@ export function Select(props: SelectProps) {
     setValue: valueState.set,
     setCurrentIndex,
     focusItem,
+    repairRemovedItemFocus,
     restoreItemFocus: (index, node) => {
       restorePendingCollectionItemFocus(pendingFocus, index, node);
     },

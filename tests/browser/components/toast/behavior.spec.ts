@@ -139,9 +139,11 @@ test.describe('Toast - Behavior', () => {
   });
 
   test('should restore focus after closing a controlled toast', async ({
+    page,
     render,
     root,
   }) => {
+    await installPausedClock(page);
     await render('controlledToast');
     const launcher = root.locator('#launcher');
     const checkLauncherFocus = await captureFocusTarget(launcher);
@@ -161,10 +163,12 @@ test.describe('Toast - Behavior', () => {
   });
 
   test('should not steal focus when focus moved outside a closing toast', async ({
+    page,
     render,
     root,
     run,
   }) => {
+    await installPausedClock(page);
     await render('controlledToast');
     const launcher = root.locator('#launcher');
     const elsewhere = root.locator('#elsewhere');

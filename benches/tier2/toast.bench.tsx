@@ -1,3 +1,4 @@
+import { renderToStringSync } from '@askrjs/askr/ssr';
 import { bench, describe } from 'vite-plus/test';
 import {
   Toast,
@@ -5,17 +6,26 @@ import {
   ToastTitle,
   ToastViewport,
 } from '../../src/components';
-
 describe('Toast benches', () => {
-  bench('create toast stack', () => {
-    ToastHost({
-      children: [
-        ToastViewport({}),
-        Toast({
-          defaultOpen: true,
-          children: [ToastTitle({ children: 'Saved' })],
-        }),
-      ],
-    });
-  });
+  bench(
+    'SSR render toast stack',
+    () => {
+      renderToStringSync(() => (
+        <ToastHost
+          {...{
+            children: [
+              <ToastViewport {...{}} />,
+              <Toast
+                {...{
+                  defaultOpen: true,
+                  children: [<ToastTitle {...{ children: 'Saved' }} />],
+                }}
+              />,
+            ],
+          }}
+        />
+      ));
+    },
+    { throws: true }
+  );
 });
