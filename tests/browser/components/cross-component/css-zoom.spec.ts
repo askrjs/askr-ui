@@ -34,6 +34,8 @@ for (const mode of modes) {
     await render('anchored', mode);
     const trigger = root.locator('[data-zoom-trigger]');
     const checkTrigger = await captureFocusTarget(trigger);
+    await trigger.focus();
+    await expect(trigger).toBeFocused();
     await trigger.click();
     const content = page.getByRole('dialog', { name: 'Zoom details' });
     await expect(content).toBeVisible();
@@ -65,7 +67,7 @@ for (const mode of modes) {
       .toBeLessThanOrEqual(2);
     expect(
       await content.evaluate((node) =>
-        document.querySelector('#mount-root')!.contains(node)
+        document.querySelector('[data-zoom-authoring-branch]')!.contains(node)
       )
     ).toBe(false);
     await expect(content).not.toHaveAttribute('style');
@@ -94,6 +96,8 @@ for (const fallback of [false, true]) {
     await page.setViewportSize({ width: 390, height: 300 });
     await render('anchored', { html: 2, oversized: true, fallback });
     const trigger = root.locator('[data-zoom-trigger]');
+    await trigger.focus();
+    await expect(trigger).toBeFocused();
     await trigger.click();
     const content = page.getByRole('dialog', { name: 'Zoom details' });
     await expect(content).toBeVisible();
@@ -128,6 +132,8 @@ for (const mode of modes.filter((mode) => mode.trigger === 1)) {
     await render('centered', mode);
     const trigger = root.locator('[data-zoom-trigger]');
     const checkTrigger = await captureFocusTarget(trigger);
+    await trigger.focus();
+    await expect(trigger).toBeFocused();
     await trigger.click();
     const content = page.getByRole('dialog', { name: 'Zoom preferences' });
     await expect(content).toBeVisible();
@@ -160,7 +166,9 @@ for (const mode of modes.filter((mode) =>
   }) => {
     await page.setViewportSize({ width: 1000, height: 800 });
     await render('matchedWidth', mode);
-    const trigger = root.getByRole('combobox', { name: 'Zoom choice' });
+    const trigger = root.getByRole('button', { name: 'Zoom choice' });
+    await trigger.focus();
+    await expect(trigger).toBeFocused();
     await trigger.click();
     const content = page.getByRole('listbox');
     await expect(content).toBeVisible();

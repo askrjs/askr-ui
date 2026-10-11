@@ -73,19 +73,21 @@ export function anchored(root: HTMLElement, options: Options) {
   const ref = prepare(root, options);
   mount(
     <Popover>
-      <PopoverTrigger data-zoom-trigger>Inspect</PopoverTrigger>
-      <PopoverPortal>
-        <PopoverContent
-          data-zoom-content
-          ref={ref}
-          side="right"
-          align="start"
-          sideOffset={8}
-          aria-label="Zoom details"
-        >
-          <button>Details action</button>
-        </PopoverContent>
-      </PopoverPortal>
+      <div data-zoom-authoring-branch>
+        <PopoverTrigger data-zoom-trigger>Inspect</PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent
+            data-zoom-content
+            ref={ref}
+            side="right"
+            align="start"
+            sideOffset={8}
+            aria-label="Zoom details"
+          >
+            <button>Details action</button>
+          </PopoverContent>
+        </PopoverPortal>
+      </div>
     </Popover>,
     root
   );
