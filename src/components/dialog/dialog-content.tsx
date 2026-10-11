@@ -47,13 +47,14 @@ export function DialogContent(
     ...contentProps
   } = rest as JSX.IntrinsicElements['div'];
   const root = readDialogRootContext();
+  const getRestoreTarget = () =>
+    (typeof restoreFocus === 'function' ? restoreFocus() : restoreFocus) ??
+    root.getTriggerNode();
   syncPersistentOverlayFocus(
     root.open,
     forceMount,
     root.getContentNode,
-    () =>
-      (typeof restoreFocus === 'function' ? restoreFocus() : restoreFocus) ??
-      root.getTriggerNode()
+    getRestoreTarget
   );
   const setNode = (node: HTMLElement | null) => {
     root.setContentNode(node, {
@@ -116,7 +117,7 @@ export function DialogContent(
         loop={root.open}
         autoFocus={root.open}
         restoreFocus
-        restoreFocusTarget={restoreFocus}
+        restoreFocusTarget={getRestoreTarget}
       >
         <DismissableLayer
           disabled={!root.open}
