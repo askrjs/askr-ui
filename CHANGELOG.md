@@ -34,6 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Position portaled overlays in the content's CSS coordinate space under root,
   nested and content-only zoom, including constrained sizes and Select widths.
+- Restore Dialog focus to its trigger after closing when no explicit target is
+  supplied, including WebKit pointer activation; explicit targets remain supported.
 
 - Route both `import` and native Node 24 `require` conditions through the same
   canonical ESM files and declarations. This fixes the duplicate CommonJS build's
