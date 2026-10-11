@@ -2,6 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
+    "tsBuildInfoFile": ".cache/tsconfig.type-tests.tsbuildinfo",
     "jsx": "react-jsx",
     "jsxImportSource": "@askrjs/askr",
     "paths": {

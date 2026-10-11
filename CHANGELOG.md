@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Keep type-check build metadata outside the published package contents.
 - Position portaled overlays in the content's CSS coordinate space under root,
   nested and content-only zoom, including constrained sizes and Select widths.
 - Restore Dialog focus to its trigger after closing when no explicit target is
