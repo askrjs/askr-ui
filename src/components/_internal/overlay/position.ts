@@ -45,6 +45,39 @@ function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(value, max));
 }
 
+// Geometry APIs include CSS zoom, while fixed-position CSS lengths do not.
+// Use the content's effective zoom: a portaled trigger can have another zoom.
+function contentZoom(content: HTMLElement): number {
+  const nativeZoom = content.currentCSSZoom;
+  if (Number.isFinite(nativeZoom) && nativeZoom > 0) return nativeZoom;
+
+  let zoom = 1;
+  let node: Element | null = content;
+  while (node) {
+    const ownZoom = Number(window.getComputedStyle(node).zoom);
+    // CSS zoom: 0 has the same used value as 1.
+    if (Number.isFinite(ownZoom) && ownZoom > 0) zoom *= ownZoom;
+    if (node.assignedSlot) {
+      node = node.assignedSlot;
+    } else if (node.parentElement) {
+      node = node.parentElement;
+    } else {
+      const root = node.getRootNode();
+      node = root instanceof ShadowRoot ? root.host : null;
+    }
+  }
+  return Number.isFinite(zoom) && zoom > 0 ? zoom : 1;
+}
+
+function rectInContentSpace(rect: DOMRect, zoom: number): DOMRect {
+  return new DOMRect(
+    rect.left / zoom,
+    rect.top / zoom,
+    rect.width / zoom,
+    rect.height / zoom
+  );
+}
+
 function resolveAnchoredSide(
   side: OverlaySide,
   triggerRect: DOMRect,
@@ -119,10 +152,11 @@ function applyAnchoredPosition(
   content: HTMLElement,
   options: Required<OverlayPositionOptions>
 ): OverlayPositionDeclarations {
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
-  const triggerRect = trigger.getBoundingClientRect();
-  const contentRect = content.getBoundingClientRect();
+  const zoom = contentZoom(content);
+  const viewportWidth = window.innerWidth / zoom;
+  const viewportHeight = window.innerHeight / zoom;
+  const triggerRect = rectInContentSpace(trigger.getBoundingClientRect(), zoom);
+  const contentRect = rectInContentSpace(content.getBoundingClientRect(), zoom);
   const contentWidth = options.matchTriggerWidth
     ? Math.max(contentRect.width, triggerRect.width)
     : contentRect.width;
@@ -201,9 +235,10 @@ function applyCenteredPosition(
   content: HTMLElement,
   options: Required<OverlayPositionOptions>
 ): OverlayPositionDeclarations {
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
-  const contentRect = content.getBoundingClientRect();
+  const zoom = contentZoom(content);
+  const viewportWidth = window.innerWidth / zoom;
+  const viewportHeight = window.innerHeight / zoom;
+  const contentRect = rectInContentSpace(content.getBoundingClientRect(), zoom);
   const contentTransform = window.getComputedStyle(content).transform;
   const measureFromLayoutBox = contentTransform !== 'none';
   const contentWidth =

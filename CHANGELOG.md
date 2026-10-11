@@ -32,6 +32,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Position portaled overlays in the content's CSS coordinate space under root,
+  nested and content-only zoom, including constrained sizes and Select widths.
+
 - Route both `import` and native Node 24 `require` conditions through the same
   canonical ESM files and declarations. This fixes the duplicate CommonJS build's
   failure on the ESM-only Core peer and preserves one component/runtime identity.
