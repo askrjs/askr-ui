@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-10
+
 ### Breaking
 
 - Retire 27 accessibility metadata constants and 26 metadata type aliases from
@@ -32,6 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Keep checkable interaction declarations portable through Core's public
+  pressable result type.
 - Keep type-check build metadata outside the published package contents.
 - Position portaled overlays in the content's CSS coordinate space under root,
   nested and content-only zoom, including constrained sizes and Select widths.
@@ -70,6 +74,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   before the pointer is released no longer resumes the drag.
 - `AvatarImage` publishes its source after commit, so a rejected render cannot
   skip the loading reset on the next accepted source change.
+
+### Development
+
+- First-party development workflows use Vite+; specialized compiler, runtime,
+  browser, and package checks remain part of validation.
 
 ## [0.4.3] - 2026-10-01
 
