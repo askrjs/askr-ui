@@ -42,6 +42,11 @@ are a new measurement baseline, not a performance improvement comparison.
 
 ## Current focused follow-ups
 
+Collection focus restoration must preserve a newer outside focus target when an
+item ref reattaches during blur. Select removal scenarios freeze animation frames
+to retain the pending typeahead claim, then remove, close or unmount the focused
+option. The outside button keeps focus and no value-change callback fires.
+
 - Slider, toast, avatar, virtual list, virtual table, and toggle group regressions
   are covered by the current browser suites.
 - Form, ScrollArea, and HoverCard have behavior, accessibility, and

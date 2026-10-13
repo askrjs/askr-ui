@@ -32,6 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Preserve outside focus when an item ref reattaches during blur. Complete the
+  focus transition before restoring a pending collection item, and cancel its
+  pending claim when another element has received focus.
+
 - Keep type-check build metadata outside the published package contents.
 - Position portaled overlays in the content's CSS coordinate space under root,
   nested and content-only zoom, including constrained sizes and Select widths.

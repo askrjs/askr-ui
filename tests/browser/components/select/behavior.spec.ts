@@ -569,6 +569,10 @@ test.describe('Select - Behavior', () => {
       root,
       run,
     }) => {
+      // Keep the typeahead focus claim pending until removal. A frame can
+      // otherwise settle it before the external focus transition begins.
+      await page.clock.install();
+      await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 1000);
       await render('removedFocusGuard');
       const content = page.locator('[data-slot="select-content"]');
       await content.focus();
