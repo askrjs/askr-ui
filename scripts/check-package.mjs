@@ -147,11 +147,10 @@ console.log('ESM and native require: 254 retained value/path identities, 54 remo
       files: fixtures.map((fixture) => basename(fixture)),
     })
   );
-  execFileSync(
-    'npm',
-    ['install', '--ignore-scripts', '--no-audit', '--no-fund'],
-    { cwd: consumer, stdio: 'inherit' }
-  );
+  execFileSync('npm', ['install', '--no-audit', '--no-fund'], {
+    cwd: consumer,
+    stdio: 'inherit',
+  });
   execFileSync(process.execPath, ['consumer.mjs'], {
     cwd: consumer,
     stdio: 'inherit',
