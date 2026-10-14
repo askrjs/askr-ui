@@ -6,7 +6,6 @@ export { DialogContent } from './dialog-content';
 export { DialogTitle } from './dialog-title';
 export { DialogDescription } from './dialog-description';
 export { DialogClose } from './dialog-close';
-export { DIALOG_A11Y_CONTRACT, type DialogA11yContract } from './dialog.a11y';
 export type {
   DialogOwnProps,
   DialogProps,

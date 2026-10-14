@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../../../../src/components/select';
-import { flushUpdates, mount, spy } from '../../_mount';
+import { flushUpdates, mount, spy, unmount } from '../../_mount';
 
 export function customContentId(
   root: HTMLElement,
@@ -622,4 +622,137 @@ export function removedLiteralOption(root: HTMLElement) {
   }
   mount(<LiteralOptions />, root);
   return { removeSelected: () => shown.set(false) };
+}
+
+export async function dynamicTypeaheadRecovery(
+  root: HTMLElement,
+  options?: { defaultContent?: boolean }
+) {
+  type Item = { value: string; text: string; disabled?: boolean };
+  const initial: Item[] = [
+    { value: 'alpha', text: 'Alpha' },
+    { value: 'beta', text: 'Beta' },
+    { value: 'delta', text: 'Delta' },
+  ];
+  let items!: ReturnType<typeof state<Item[]>>;
+  const requests: string[] = [];
+  let removed: HTMLElement | null = null;
+  let recoveredBeta: HTMLElement | null = null;
+  function DynamicSelect() {
+    items = state(initial);
+    return (
+      <Select
+        defaultOpen
+        defaultValue="alpha"
+        name="dynamic"
+        onValueChange={(value) => requests.push(value)}
+      >
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectContent tabIndex={options?.defaultContent ? undefined : 0}>
+            <For each={items()} by={(item) => item.value}>
+              {(item) => (
+                <SelectItem value={item.value} disabled={item.disabled}>
+                  {item.text}
+                </SelectItem>
+              )}
+            </For>
+          </SelectContent>
+        </SelectPortal>
+      </Select>
+    );
+  }
+  mount(<DynamicSelect />, root);
+  await flushUpdates();
+  const update = async (next: Item[]) => {
+    items.set(next);
+    await flushUpdates();
+  };
+  return {
+    removeDelta: async () => {
+      removed = document.querySelector<HTMLElement>(
+        '[role="option"][id$="item-delta"]'
+      );
+      await update(initial.slice(0, 2));
+    },
+    clear: () => update([]),
+    refillDisabled: () =>
+      update(initial.map((item) => ({ ...item, disabled: true }))),
+    recover: async () => {
+      await update([initial[1], initial[0], initial[2]]);
+      recoveredBeta = document.querySelector<HTMLElement>(
+        '[role="option"][id$="item-beta"]'
+      );
+    },
+    reorder: () => update([initial[2], initial[1], initial[0]]),
+    stableBeta: () =>
+      !!recoveredBeta &&
+      recoveredBeta ===
+        document.querySelector('[role="option"][id$="item-beta"]'),
+    removedDetached: () => !!removed && !removed.isConnected,
+    focusWithinEnabledOwner: () => {
+      const active = document.activeElement;
+      return (
+        active instanceof HTMLElement &&
+        active.isConnected &&
+        (active.dataset.slot === 'select-content' ||
+          (active.dataset.slot === 'select-item' &&
+            active.getAttribute('aria-disabled') !== 'true'))
+      );
+    },
+    requests: () => requests,
+  };
+}
+
+export async function removedFocusGuard(root: HTMLElement) {
+  const outside = document.createElement('button');
+  outside.textContent = 'External focus owner';
+  root.appendChild(outside);
+  outside.focus();
+  let items!: ReturnType<typeof state<string[]>>;
+  let open!: ReturnType<typeof state<boolean>>;
+  const requests: unknown[] = [];
+  function GuardSelect() {
+    items = state(['Alpha', 'Delta']);
+    open = state(true);
+    return (
+      <Select
+        open={open()}
+        defaultValue="alpha"
+        name="guard"
+        onValueChange={(value) => requests.push({ value })}
+        onOpenChange={(value) => {
+          requests.push({ open: value });
+          open.set(value);
+        }}
+      >
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectContent tabIndex={0}>
+            <For each={items()} by={(item) => item}>
+              {(item) => (
+                <SelectItem value={item.toLowerCase()}>{item}</SelectItem>
+              )}
+            </For>
+          </SelectContent>
+        </SelectPortal>
+      </Select>
+    );
+  }
+  const container = mount(<GuardSelect />, root);
+  await flushUpdates();
+  return {
+    remove: async (action: 'external' | 'close' | 'unmount') => {
+      items.set(['Alpha']);
+      if (action === 'external') outside.focus();
+      if (action === 'close') open.set(false);
+      if (action === 'unmount') unmount(container);
+      await flushUpdates();
+    },
+    requests: () => requests,
+  };
 }

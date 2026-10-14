@@ -47,6 +47,7 @@ export type SelectRootContextValue = {
   currentIndexCandidate: number;
   setCurrentIndex: (index: number) => void;
   focusItem: (index: number) => void;
+  repairRemovedItemFocus: (node: HTMLElement, index: number) => void;
   restoreItemFocus: (index: number, node: HTMLElement | null) => void;
   disabled: boolean;
   bindFormReset: (node: Element | null) => void;

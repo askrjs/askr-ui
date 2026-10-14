@@ -99,7 +99,7 @@ export function SelectContent(
             if (
               overlayNodes.content !== node ||
               !node.isConnected ||
-              node.contains(document.activeElement)
+              node.contains(node.ownerDocument.activeElement)
             ) {
               return;
             }
@@ -173,8 +173,19 @@ export function SelectContent(
 
   return (
     <Presence present={forceMount || root.open}>
-      <FocusScope restoreFocus>
+      <FocusScope autoFocus={root.open} restoreFocus>
         <DismissableLayer
+          onPointerDownOutside={(event) => {
+            const trigger = getOverlayNodes(root.overlayIdentity).trigger;
+            if (
+              trigger &&
+              event.target &&
+              'nodeType' in event.target &&
+              trigger.contains(event.target as Node)
+            )
+              event.preventDefault();
+          }}
+          disabled={!root.open}
           onDismiss={() => {
             const trigger = overlayNodes.trigger;
             root.setOpen(false);

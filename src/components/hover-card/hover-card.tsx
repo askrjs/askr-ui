@@ -9,7 +9,7 @@ import {
   getOverlayNodes,
   getPersistentPortal,
   registerOverlayNode,
-  setOverlayStackActive,
+  syncOverlayStackActive,
   syncOverlayPosition,
 } from '../_internal/overlay';
 import {
@@ -52,10 +52,11 @@ export function HoverCard(props: HoverCardProps) {
   const hoverCardId = resolveCompoundId('hover-card', id, children);
   const overlayIdentity = state(createOverlayIdentity())();
   const cleanupSignal = getSignal();
-  setOverlayStackActive(overlayIdentity, openState(), cleanupSignal);
+  syncOverlayStackActive(overlayIdentity, openState(), cleanupSignal);
   const focusEntry = state({
     restoreTrigger: false,
     restoreFrame: null as number | null,
+    restoreWindow: null as Window | null,
     restoreGeneration: 0,
   })();
   const pointerEntry = state({
@@ -139,7 +140,7 @@ export function HoverCard(props: HoverCardProps) {
       clearTimers();
       clearOverlayPosition(overlayIdentity);
       if (focusEntry.restoreFrame !== null) {
-        cancelAnimationFrame(focusEntry.restoreFrame);
+        focusEntry.restoreWindow?.cancelAnimationFrame(focusEntry.restoreFrame);
       }
     },
     { once: true }
@@ -235,14 +236,24 @@ export function HoverCard(props: HoverCardProps) {
     getTriggerNode: () => overlayNodes.trigger,
     getContentNode: () => overlayNodes.content,
     requestTriggerFocus: () => {
-      focusTrigger(document.getElementById(triggerId) ?? overlayNodes.trigger);
+      const ownerDocument =
+        overlayNodes.trigger?.ownerDocument ??
+        overlayNodes.content?.ownerDocument;
+      focusTrigger(
+        overlayNodes.trigger ?? ownerDocument?.getElementById(triggerId) ?? null
+      );
       if (focusEntry.restoreFrame !== null) {
-        cancelAnimationFrame(focusEntry.restoreFrame);
+        focusEntry.restoreWindow?.cancelAnimationFrame(focusEntry.restoreFrame);
       }
-      focusEntry.restoreFrame = requestAnimationFrame(() => {
+      const ownerWindow = ownerDocument?.defaultView;
+      if (!ownerWindow) return;
+      focusEntry.restoreWindow = ownerWindow;
+      focusEntry.restoreFrame = ownerWindow.requestAnimationFrame(() => {
         focusEntry.restoreFrame = null;
         const trigger =
-          document.getElementById(triggerId) ?? overlayNodes.trigger;
+          overlayNodes.trigger ??
+          ownerDocument?.getElementById(triggerId) ??
+          null;
         focusTrigger(trigger);
       });
     },
@@ -259,9 +270,10 @@ export function HoverCard(props: HoverCardProps) {
   const syncPointer = (event: PointerEvent) => {
     const target = event.target;
     const isInside =
-      target instanceof Node &&
-      (overlayNodes.trigger?.contains(target) === true ||
-        overlayNodes.content?.contains(target) === true);
+      target &&
+      'nodeType' in target &&
+      (overlayNodes.trigger?.contains(target as Node) === true ||
+        overlayNodes.content?.contains(target as Node) === true);
     if (isInside) {
       clearCloseTimer();
       return;

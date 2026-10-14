@@ -1,16 +1,22 @@
 import { state } from '@askrjs/askr';
 import { Checkbox } from '../../../../../src/components/checkbox';
+import {
+  RadioGroup,
+  RadioGroupItem,
+} from '../../../../../src/components/radio-group';
 import { Form } from '../../../../../src/components/form';
 import { Input } from '../../../../../src/components/input';
 import {
   Dialog,
   DialogContent,
+  DialogPortal,
   DialogTitle,
   DialogTrigger,
 } from '../../../../../src/components/dialog';
 import {
   Popover,
   PopoverContent,
+  PopoverPortal,
   PopoverTrigger,
 } from '../../../../../src/components/popover';
 import { VirtualList } from '../../../../../src/components/virtual-list';
@@ -32,41 +38,171 @@ import { flushUpdates, mount, spy, unmount } from '../../_mount';
 
 export async function controlledToUncontrolled(root: HTMLElement) {
   let checked!: ReturnType<typeof state<boolean | undefined>>;
-  function ControlledCheckbox() {
+  let value!: ReturnType<typeof state<string | undefined>>;
+  let phase!: ReturnType<typeof state<number>>;
+  const requests: { control: string; next: boolean | string; phase: number }[] =
+    [];
+  const checkboxRef = { current: null as HTMLInputElement | null };
+  const radioRef = { current: null as HTMLElement | null };
+  function Controls() {
     checked = state<boolean | undefined>(true);
+    value = state<string | undefined>('beta');
+    phase = state(0);
+    const currentPhase = phase();
     return (
-      <Checkbox
-        checked={checked()}
-        onCheckedChange={(next) => checked.set(next)}
-      />
+      <div>
+        <Checkbox
+          ref={checkboxRef}
+          checked={checked()}
+          defaultChecked={false}
+          onCheckedChange={(next) =>
+            requests.push({ control: 'checkbox', next, phase: currentPhase })
+          }
+        />
+        <RadioGroup
+          ref={radioRef}
+          name="workspace"
+          value={value()}
+          defaultValue="alpha"
+          onValueChange={(next) =>
+            requests.push({ control: 'radio', next, phase: currentPhase })
+          }
+        >
+          <RadioGroupItem value="alpha">Alpha</RadioGroupItem>
+          <RadioGroupItem value="beta">Beta</RadioGroupItem>
+        </RadioGroup>
+      </div>
     );
   }
-  mount(<ControlledCheckbox />, root);
+  mount(<Controls />, root);
   await flushUpdates();
-
+  const originalCheckbox = checkboxRef.current;
+  const originalRadio = radioRef.current;
   return {
-    clearChecked: async () => {
+    clearValues: async () => {
       checked.set(undefined);
+      value.set(undefined);
+      phase.set(1);
       await flushUpdates();
     },
+    defineValues: async () => {
+      checked.set(false);
+      value.set('alpha');
+      phase.set(2);
+      await flushUpdates();
+    },
+    requests: () => requests,
+    sameNodes: () =>
+      checkboxRef.current === originalCheckbox &&
+      radioRef.current === originalRadio &&
+      !!originalCheckbox?.isConnected &&
+      !!originalRadio?.isConnected,
   };
 }
 
-export async function nestedOverlays(root: HTMLElement) {
-  mount(
-    <Dialog defaultOpen>
-      <DialogTrigger>Open</DialogTrigger>
-      <DialogContent>
-        <DialogTitle>Dialog</DialogTitle>
-        <Popover defaultOpen>
-          <PopoverTrigger>More</PopoverTrigger>
-          <PopoverContent>Details</PopoverContent>
+export async function nestedOverlays(
+  root: HTMLElement,
+  options?: { removeTrigger?: boolean }
+) {
+  let outerOpen!: ReturnType<typeof state<boolean>>;
+  let innerOpen!: ReturnType<typeof state<boolean>>;
+  let triggerShown!: ReturnType<typeof state<boolean>>;
+  let survivorOpen!: ReturnType<typeof state<boolean>>;
+  const requests: { owner: string; open: boolean }[] = [];
+  const restoreRef = { current: null as HTMLButtonElement | null };
+  const outerRef = { current: null as HTMLElement | null };
+  const innerRef = { current: null as HTMLElement | null };
+  let capturedOuter: HTMLElement | null = null;
+  let capturedInner: HTMLElement | null = null;
+  let staleFocus = 0;
+  function Overlays() {
+    outerOpen = state(false);
+    innerOpen = state(true);
+    triggerShown = state(true);
+    survivorOpen = state(false);
+    return (
+      <div>
+        <button ref={restoreRef}>Persistent restore target</button>
+        <Dialog
+          open={outerOpen()}
+          onOpenChange={(open) => {
+            requests.push({ owner: 'outer', open });
+            outerOpen.set(open);
+          }}
+        >
+          {triggerShown() ? <DialogTrigger>Open outer</DialogTrigger> : null}
+          <DialogPortal>
+            <DialogContent
+              ref={outerRef}
+              restoreFocus={
+                options?.removeTrigger ? () => restoreRef.current : undefined
+              }
+            >
+              <DialogTitle>Outer dialog</DialogTitle>
+              <Popover
+                open={innerOpen()}
+                onOpenChange={(open) => {
+                  requests.push({ owner: 'inner', open });
+                  innerOpen.set(open);
+                }}
+              >
+                <PopoverTrigger>More</PopoverTrigger>
+                <PopoverPortal>
+                  <PopoverContent ref={innerRef}>
+                    <button>Inner action</button>
+                  </PopoverContent>
+                </PopoverPortal>
+              </Popover>
+            </DialogContent>
+          </DialogPortal>
+        </Dialog>
+        <Popover
+          open={survivorOpen()}
+          onOpenChange={(open) => {
+            requests.push({ owner: 'survivor', open });
+            survivorOpen.set(open);
+          }}
+        >
+          <PopoverTrigger>Survivor</PopoverTrigger>
+          <PopoverPortal>
+            <PopoverContent>
+              <button>Surviving action</button>
+            </PopoverContent>
+          </PopoverPortal>
         </Popover>
-      </DialogContent>
-    </Dialog>,
-    root
-  );
+      </div>
+    );
+  }
+  mount(<Overlays />, root);
   await flushUpdates();
+  return {
+    requests: () => requests,
+    clearRequests: () => {
+      requests.length = 0;
+    },
+    closeOuter: async () => {
+      capturedOuter = outerRef.current;
+      capturedInner = innerRef.current;
+      capturedOuter?.querySelectorAll('button').forEach((node) =>
+        node.addEventListener('focus', () => {
+          staleFocus += 1;
+        })
+      );
+      capturedInner?.querySelectorAll('button').forEach((node) =>
+        node.addEventListener('focus', () => {
+          staleFocus += 1;
+        })
+      );
+      if (options?.removeTrigger) triggerShown.set(false);
+      outerOpen.set(false);
+      await flushUpdates();
+    },
+    detached: () => ({
+      outer: !!capturedOuter && !capturedOuter.isConnected,
+      inner: !!capturedInner && !capturedInner.isConnected,
+      staleFocus,
+    }),
+  };
 }
 
 export async function formInsideModal(root: HTMLElement) {

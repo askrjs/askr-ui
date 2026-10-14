@@ -8,16 +8,8 @@ import {
 } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
 import { flush } from '@askrjs/askr/testing';
-import { debounceEvent } from '@askrjs/askr/fx';
 import { DebouncedInput } from '../../../../src/components/input';
 import { flushUpdates, mount, unmount } from '../../test-utils';
-
-// Count debounced emitters: each one owns a timer and registers an owner
-// cleanup, so a render must not create a new one.
-vi.mock('@askrjs/askr/fx', async (importOriginal) => {
-  const fx = await importOriginal<typeof import('@askrjs/askr/fx')>();
-  return { ...fx, debounceEvent: vi.fn(fx.debounceEvent) };
-});
 
 type Props = {
   debounceMs: number;
@@ -73,7 +65,6 @@ describe('DebouncedInput - debounce state across renders', () => {
 
   beforeEach(() => {
     vi.useFakeTimers();
-    vi.mocked(debounceEvent).mockClear();
   });
 
   afterEach(() => {
@@ -249,7 +240,7 @@ describe('DebouncedInput - debounce state across renders', () => {
     expect(committed).toEqual([]);
   });
 
-  it('should create one debounced emitter per mount and one per delay change', async () => {
+  it('should retain only one pending timer across renders and repeated delay changes', async () => {
     const onDebouncedInput = () => {};
     const view = renderWithProps({ debounceMs: 200, onDebouncedInput });
     container = view.container;
@@ -258,11 +249,20 @@ describe('DebouncedInput - debounce state across renders', () => {
       await view.setProps({ version });
     }
     expect(view.renders.count).toBe(6);
-    expect(debounceEvent).toHaveBeenCalledTimes(1);
+    expect(vi.getTimerCount()).toBe(0);
+    type(view.input(), 'north');
+    expect(vi.getTimerCount()).toBe(1);
 
     await view.setProps({ debounceMs: 300 });
     await view.setProps({ version: 6 });
-    expect(debounceEvent).toHaveBeenCalledTimes(2);
+    expect(vi.getTimerCount()).toBe(1);
+    for (const debounceMs of [400, 500, 600]) {
+      await view.setProps({ debounceMs });
+      expect(vi.getTimerCount()).toBe(1);
+    }
+    unmount(container);
+    container = undefined;
+    expect(vi.getTimerCount()).toBe(0);
   });
 
   it.each(['callback', 'removed', 'delay'] as const)(

@@ -7,10 +7,6 @@ export { AlertDialogTitle } from './alert-dialog-title';
 export { AlertDialogDescription } from './alert-dialog-description';
 export { AlertDialogAction } from './alert-dialog-action';
 export { AlertDialogCancel } from './alert-dialog-cancel';
-export {
-  ALERT_DIALOG_A11Y_CONTRACT,
-  type AlertDialogA11yContract,
-} from './alert-dialog.a11y';
 export type {
   AlertDialogOwnProps,
   AlertDialogProps,

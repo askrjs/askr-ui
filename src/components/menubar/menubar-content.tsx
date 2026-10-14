@@ -34,7 +34,7 @@ import {
   OVERLAY_Z_INDEX,
   primeOverlayPosition,
   registerOverlayNode,
-  setOverlayStackActive,
+  syncOverlayStackActive,
   syncOverlayPosition,
 } from '../_internal/overlay';
 import {
@@ -142,7 +142,7 @@ function renderMenubarSurfaceContent(
     resolveMenubarContentState(contentContext);
   const open = pathIsOpen(root.openPath, contentContext.path);
   claimOpenAutoFocus(contentContext.overlayIdentity, open, null);
-  setOverlayStackActive(contentContext.overlayIdentity, open, cleanupSignal);
+  syncOverlayStackActive(contentContext.overlayIdentity, open, cleanupSignal);
   const overlayNodes = getOverlayNodes(contentContext.overlayIdentity);
   const overlayNodeOwner = {};
 
@@ -361,6 +361,7 @@ function renderMenubarSurfaceContent(
           <VirtualCompositeOwnerContext value>
             <FocusScope autoFocus={false} restoreFocus>
               <DismissableLayer
+                disabled={!open}
                 onDismiss={() => {
                   root.setOpenPath(contentContext.path.slice(0, -1));
                 }}

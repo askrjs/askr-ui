@@ -1,5 +1,6 @@
 import { controllableState } from '@askrjs/askr/foundations/state';
 import { cspNonce, getSignal, state } from '@askrjs/askr';
+import { task } from '@askrjs/askr/resources';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import {
   captureOverlayNonce,
@@ -8,7 +9,7 @@ import {
   getOverlayNodes,
   getPersistentPortal,
   registerOverlayNode,
-  setOverlayStackActive,
+  syncOverlayStackActive,
   syncOverlayPosition,
 } from '../_internal/overlay';
 import {
@@ -43,14 +44,16 @@ export function Tooltip(props: TooltipProps) {
   const tooltipId = resolveCompoundId('tooltip', id, children);
   const overlayIdentity = state(createOverlayIdentity())();
   const cleanupSignal = getSignal();
-  setOverlayStackActive(overlayIdentity, openState(), cleanupSignal);
+  syncOverlayStackActive(overlayIdentity, openState(), cleanupSignal);
   const focusEntry = state({
     adoptTrigger: false,
     focusRequestSent: false,
     generation: 0,
     releaseFrame: null as number | null,
+    frameWindow: null as Window | null,
+    listenerDocument: null as Document | null,
+    focusListener: null as ((event: FocusEvent) => void) | null,
   })();
-  let focusListenerAttached = false;
   captureOverlayNonce(overlayIdentity, cspNonce());
   const contentId = resolvePartId(tooltipId, 'content');
   const ssrContent = state(createSsrIdRegistration(contentId))();
@@ -76,7 +79,7 @@ export function Tooltip(props: TooltipProps) {
     const generation = focusEntry.generation + 1;
     focusEntry.generation = generation;
     if (focusEntry.releaseFrame !== null) {
-      cancelAnimationFrame(focusEntry.releaseFrame);
+      focusEntry.frameWindow?.cancelAnimationFrame(focusEntry.releaseFrame);
     }
     queueMicrotask(() => {
       if (cleanupSignal.aborted) {
@@ -84,7 +87,13 @@ export function Tooltip(props: TooltipProps) {
         return;
       }
       if (focusEntry.generation !== generation) return;
-      focusEntry.releaseFrame = requestAnimationFrame(() => {
+      const ownerWindow = overlayNodes.trigger?.ownerDocument.defaultView;
+      if (!ownerWindow) {
+        focusEntry.adoptTrigger = false;
+        return;
+      }
+      focusEntry.frameWindow = ownerWindow;
+      focusEntry.releaseFrame = ownerWindow.requestAnimationFrame(() => {
         focusEntry.releaseFrame = null;
         if (focusEntry.generation === generation) {
           focusEntry.adoptTrigger = false;
@@ -98,8 +107,9 @@ export function Tooltip(props: TooltipProps) {
     const trigger = overlayNodes.trigger;
     if (
       trigger &&
-      event.target instanceof Node &&
-      trigger.contains(event.target)
+      event.target &&
+      'nodeType' in event.target &&
+      trigger.contains(event.target as Node)
     ) {
       return;
     }
@@ -109,34 +119,23 @@ export function Tooltip(props: TooltipProps) {
   const releaseFocusAdoption = () => {
     focusEntry.generation += 1;
     if (focusEntry.releaseFrame !== null) {
-      cancelAnimationFrame(focusEntry.releaseFrame);
+      focusEntry.frameWindow?.cancelAnimationFrame(focusEntry.releaseFrame);
       focusEntry.releaseFrame = null;
     }
-    if (focusListenerAttached) {
-      document.removeEventListener('focusin', onFocusIn, true);
-      focusListenerAttached = false;
+    if (focusEntry.listenerDocument && focusEntry.focusListener) {
+      focusEntry.listenerDocument.removeEventListener(
+        'focusin',
+        focusEntry.focusListener,
+        true
+      );
+      focusEntry.listenerDocument = null;
+      focusEntry.focusListener = null;
     }
     focusEntry.focusRequestSent = false;
     focusEntry.adoptTrigger = false;
   };
 
-  cleanupSignal.addEventListener(
-    'abort',
-    () => {
-      if (focusEntry.releaseFrame !== null) {
-        cancelAnimationFrame(focusEntry.releaseFrame);
-        focusEntry.releaseFrame = null;
-      }
-      if (focusListenerAttached) {
-        document.removeEventListener('focusin', onFocusIn, true);
-        focusListenerAttached = false;
-      }
-      focusEntry.focusRequestSent = false;
-      focusEntry.adoptTrigger = false;
-      focusEntry.generation += 1;
-    },
-    { once: true }
-  );
+  task(() => () => releaseFocusAdoption());
 
   const updateOpen = (nextOpen: boolean) => {
     if (!nextOpen && focusEntry.adoptTrigger) {
@@ -189,8 +188,12 @@ export function Tooltip(props: TooltipProps) {
       // trigger ref attachment cannot emit a duplicate open request.
       if (focusEntry.focusRequestSent) return;
       focusEntry.focusRequestSent = true;
-      document.addEventListener('focusin', onFocusIn, true);
-      focusListenerAttached = true;
+      const ownerDocument = overlayNodes.trigger?.ownerDocument;
+      if (ownerDocument) {
+        focusEntry.listenerDocument = ownerDocument;
+        focusEntry.focusListener = onFocusIn;
+        ownerDocument.addEventListener('focusin', onFocusIn, true);
+      }
       focusEntry.adoptTrigger = true;
       updateOpen(true);
       releaseTriggerAdoption();
@@ -214,7 +217,7 @@ export function Tooltip(props: TooltipProps) {
       if (
         node &&
         focusEntry.focusRequestSent &&
-        document.activeElement !== node
+        node.ownerDocument.activeElement !== node
       ) {
         node.focus();
       }

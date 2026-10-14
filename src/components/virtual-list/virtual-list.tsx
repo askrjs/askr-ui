@@ -108,7 +108,7 @@ type VirtualListEntry<Item> = {
   followBottomThreshold: number;
   pendingUnseenCount: number;
   pendingScrollTop: number | null;
-  pendingProgrammaticScrollTops: number[];
+  interactionVersion: number;
   pendingCommitFrame: number | null;
   resizeCommitFrame: number | null;
   resizeObserver: ResizeObserver | null;
@@ -132,11 +132,10 @@ function writeVirtualListScrollTop<Item>(
   nextScrollTop: number
 ) {
   if (node.scrollTop === nextScrollTop) return;
-  entry.pendingProgrammaticScrollTops.push(nextScrollTop);
-  if (entry.pendingProgrammaticScrollTops.length > 8) {
-    entry.pendingProgrammaticScrollTops.shift();
-  }
   node.scrollTop = nextScrollTop;
+  // A queued native scroll event is programmatic only if it still matches the
+  // live position adopted by this write. Clamped/no-op writes leave no targets.
+  entry.scrollTopState?.set(node.scrollTop);
 }
 
 function resolveEntryTotalHeight<Item>(entry: VirtualListEntry<Item>): number {
@@ -317,11 +316,9 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
     const nextScrollTop = node.scrollTop;
 
     if (event) {
-      const programmaticIndex =
-        entry.pendingProgrammaticScrollTops.indexOf(nextScrollTop);
-      if (programmaticIndex >= 0) {
-        entry.pendingProgrammaticScrollTops.splice(0, programmaticIndex + 1);
-      } else if (entry.pendingScrollTop !== null) {
+      entry.interactionVersion += 1;
+      const programmatic = nextScrollTop === readScrollTop();
+      if (!programmatic && entry.pendingScrollTop !== null) {
         entry.pendingScrollTop = null;
         if (entry.pendingCommitFrame !== null) {
           cancelAnimationFrame(entry.pendingCommitFrame);
@@ -505,6 +502,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
 
   const api: VirtualListApi<Item> = {
     scrollToIndex(index, alignment = 'start') {
+      entry.interactionVersion += 1;
       const node = entry.node;
       const viewportHeight = readViewportHeight() || entry.viewportHeightHint;
       const nextScrollTop = entry.rowHeights
@@ -538,6 +536,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
       this.scrollToIndex(0, 'start');
     },
     scrollToBottom() {
+      entry.interactionVersion += 1;
       const node = entry.node;
       const viewportHeight = readViewportHeight() || entry.viewportHeightHint;
       const totalHeight = resolveEntryTotalHeight(entry);
@@ -598,6 +597,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
       return entry.pendingUnseenCount;
     },
     setFollowBottom(nextFollowBottom: boolean) {
+      entry.interactionVersion += 1;
       entry.followBottomEnabled = nextFollowBottom;
       entry.followBottomActive =
         nextFollowBottom && entry.visibleRange.isAtBottom;
@@ -635,8 +635,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
   entry.followBottomThreshold = entry.followBottomThreshold ?? 0;
   entry.pendingUnseenCount = entry.pendingUnseenCount ?? 0;
   entry.pendingScrollTop = entry.pendingScrollTop ?? null;
-  entry.pendingProgrammaticScrollTops =
-    entry.pendingProgrammaticScrollTops ?? [];
+  entry.interactionVersion = 0;
   entry.pendingCommitFrame = entry.pendingCommitFrame ?? null;
   entry.resizeCommitFrame = entry.resizeCommitFrame ?? null;
   entry.visibleRange =
@@ -932,6 +931,8 @@ export function VirtualList<Item>(
   const instanceState = state({}) as StateCell<object>;
   const committedEntry = getVirtualListEntry<Item>(instanceState());
   const pendingScrollTopAtRender = committedEntry.pendingScrollTop;
+  const interactionVersionAtRender = committedEntry.interactionVersion;
+  const unseenCountAtRender = committedEntry.pendingUnseenCount;
   const layoutStyleRules = new Map<string, () => void>();
   const setLayoutStyleRule: typeof prepareDynamicStyleRule = (
     key,
@@ -1108,13 +1109,33 @@ export function VirtualList<Item>(
       attachment.node !== node || attachment.binding !== bindingRef;
     if (bindingChanged) releaseAttachment();
     for (const publish of layoutStyleRules.values()) publish();
+    const interactionChanged =
+      committedEntry.interactionVersion !== interactionVersionAtRender;
     const pendingScrollTop = committedEntry.pendingScrollTop;
-    const pendingScrollChanged = pendingScrollTop !== pendingScrollTopAtRender;
+    const pendingScrollChanged =
+      interactionChanged || pendingScrollTop !== pendingScrollTopAtRender;
+    const followBottomActive = committedEntry.followBottomActive;
+    const pendingUnseenCount = committedEntry.pendingUnseenCount;
     const restoreScrollTop =
       scrollTopState() === currentScrollTop && !pendingScrollChanged;
     Object.assign(committedEntry, committedIdentity);
     if (pendingScrollChanged)
       committedEntry.pendingScrollTop = pendingScrollTop;
+    if (interactionChanged) {
+      committedEntry.followBottomActive = followBottomActive;
+      committedEntry.pendingUnseenCount = followBottomActive
+        ? 0
+        : pendingUnseenCount +
+          Math.max(
+            0,
+            committedIdentity.pendingUnseenCount - unseenCountAtRender
+          );
+      committedEntry.visibleRange = resolveEntryRange(
+        committedEntry,
+        pendingScrollTop ?? scrollTopState(),
+        viewportHeightState() || viewportHeightHint
+      );
+    }
     // Child focus can clamp the viewport before new row and spacer CSS commits.
     // Keep a later row-ref reveal and track restoration like other API writes.
     if (restoreScrollTop) {
