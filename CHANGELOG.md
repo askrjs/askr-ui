@@ -34,8 +34,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Preserve external focus when a pending composite item ref commits during a
-  Firefox blur event, including removal of the previously focused Select option.
+- Preserve outside focus when a pending composite item ref commits during a
+  Firefox blur event. Complete the focus transition before restoring the item,
+  and cancel its pending claim when another element owns focus, including
+  removal of the previously focused Select option.
 - Keep checkable interaction declarations portable through Core's public
   pressable result type.
 - Keep type-check build metadata outside the published package contents.
