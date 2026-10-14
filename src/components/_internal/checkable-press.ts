@@ -1,6 +1,7 @@
 import {
   pressable,
   type PressableOptions,
+  type PressableResult,
 } from '@askrjs/askr/foundations/interactions';
 
 type CheckablePressOptions = {
@@ -9,7 +10,12 @@ type CheckablePressOptions = {
 };
 
 /** Apply click and Space activation without generic button Enter semantics. */
-export function checkablePress(options: CheckablePressOptions) {
+export function checkablePress(options: CheckablePressOptions): Omit<
+  PressableResult,
+  'onKeyDown'
+> & {
+  onKeyDown: (event: KeyboardEvent) => void;
+} {
   const interaction = pressable({
     ...options,
     isNativeButton: false,

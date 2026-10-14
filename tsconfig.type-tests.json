@@ -2,6 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
+    "tsBuildInfoFile": ".cache/tsconfig.type-tests.tsbuildinfo",
     "jsx": "react-jsx",
     "jsxImportSource": "@askrjs/askr",
     "paths": {
@@ -9,7 +10,8 @@
       "@askrjs/ui/virtual-list": ["./src/components/virtual-list/index.ts"],
       "@askrjs/ui/virtual-table": ["./src/components/virtual-table/index.ts"],
       "@askrjs/ui/button": ["./src/components/button/index.ts"],
-      "@askrjs/ui/dialog": ["./src/components/dialog/index.ts"]
+      "@askrjs/ui/dialog": ["./src/components/dialog/index.ts"],
+      "@askrjs/ui/*": ["./src/components/*/index.ts"]
     }
   },
   "include": [

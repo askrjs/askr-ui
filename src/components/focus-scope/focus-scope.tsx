@@ -4,6 +4,8 @@ import { state } from '@askrjs/askr';
 import { composeRefs } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
 import {
+  getActiveElement,
+  isHTMLElement,
   focusFirstDescendant,
   getFocusableElements,
   markKeyboardModality,
@@ -18,9 +20,31 @@ type ScopeEntry = {
   node: HTMLElement | null;
   previousFocused: HTMLElement | null;
   pendingDetachedNode: HTMLElement | null;
+  trapped: boolean;
 };
 
 const focusScopeEntries = new WeakMap<HTMLElement, ScopeEntry>();
+const trappedScopes = new Map<ScopeEntry, number>();
+let nextScopeOrder = 0;
+
+function isTopTrappedScope(scope: ScopeEntry): boolean {
+  if (!scope.trapped || !scope.node) return false;
+  for (const [other, order] of trappedScopes) {
+    if (
+      other === scope ||
+      !other.node ||
+      other.node.ownerDocument !== scope.node.ownerDocument
+    )
+      continue;
+    if (scope.node.contains(other.node)) return false;
+    if (
+      !other.node.contains(scope.node) &&
+      order > (trappedScopes.get(scope) ?? 0)
+    )
+      return false;
+  }
+  return true;
+}
 
 function isInsideDescendantScope(
   scope: ScopeEntry,
@@ -77,10 +101,18 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
     node: null,
     previousFocused: null,
     pendingDetachedNode: null,
+    trapped: false,
   })();
 
   const setNode = (node: HTMLElement | null) => {
     if (node) {
+      const becameTrapped = trapped && !scopeEntry.trapped;
+      scopeEntry.trapped = trapped;
+      if (trapped && !trappedScopes.has(scopeEntry))
+        trappedScopes.set(scopeEntry, ++nextScopeOrder);
+      if (!trapped) trappedScopes.delete(scopeEntry);
+      if (becameTrapped)
+        scopeEntry.previousFocused = getActiveElement(node.ownerDocument);
       const pendingDetachedNode = scopeEntry.pendingDetachedNode;
       scopeEntry.pendingDetachedNode = null;
       scopeEntry.node = node;
@@ -90,10 +122,7 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
         if (
           trapped &&
           pendingDetachedNode !== node &&
-          !(
-            document.activeElement instanceof HTMLElement &&
-            node.contains(document.activeElement)
-          )
+          !node.contains(node.ownerDocument.activeElement)
         ) {
           if (!focusFirstDescendant(node)) {
             node.focus();
@@ -102,18 +131,9 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
         return;
       }
 
-      scopeEntry.previousFocused =
-        document.activeElement instanceof HTMLElement
-          ? document.activeElement
-          : null;
+      scopeEntry.previousFocused = getActiveElement(node.ownerDocument);
 
-      if (
-        autoFocus &&
-        !(
-          document.activeElement instanceof HTMLElement &&
-          node.contains(document.activeElement)
-        )
-      ) {
+      if (autoFocus && !node.contains(node.ownerDocument.activeElement)) {
         if (!focusFirstDescendant(node)) {
           node.focus();
         }
@@ -133,6 +153,8 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
       }
 
       scopeEntry.pendingDetachedNode = null;
+      trappedScopes.delete(scopeEntry);
+      if (trappedScopes.size === 0) nextScopeOrder = 0;
       if (restoreFocus) {
         const explicitTarget =
           typeof restoreFocusTarget === 'function'
@@ -153,6 +175,7 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
 
     markKeyboardModality();
 
+    if (trapped && !isTopTrappedScope(scopeEntry)) return;
     if (!loop && !trapped) {
       return;
     }
@@ -175,10 +198,7 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
 
     const first = focusableElements[0];
     const last = focusableElements[focusableElements.length - 1];
-    const active =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
+    const active = getActiveElement(node.ownerDocument);
 
     if (event.shiftKey) {
       if (active === first || (trapped && active && !node.contains(active))) {
@@ -199,7 +219,7 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
   };
 
   const handleFocusOut = (event: FocusEvent) => {
-    if (!trapped) {
+    if (!trapped || !isTopTrappedScope(scopeEntry)) {
       return;
     }
 
@@ -209,18 +229,16 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
       return;
     }
 
-    const relatedTarget =
-      event.relatedTarget instanceof HTMLElement ? event.relatedTarget : null;
+    const relatedTarget = isHTMLElement(event.relatedTarget)
+      ? event.relatedTarget
+      : null;
 
     if (!relatedTarget) {
       queueMicrotask(() => {
-        if (scopeEntry.node !== node) {
+        if (scopeEntry.node !== node || !isTopTrappedScope(scopeEntry)) {
           return;
         }
-        const active =
-          document.activeElement instanceof HTMLElement
-            ? document.activeElement
-            : null;
+        const active = getActiveElement(node.ownerDocument);
         if (
           active &&
           (node.contains(active) || isInsideDescendantScope(scopeEntry, active))

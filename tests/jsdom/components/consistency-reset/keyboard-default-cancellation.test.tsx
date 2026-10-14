@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
-import { flush, mount, type RenderResult } from '@askrjs/askr/testing';
+import { flush, render, type RenderResult } from '@askrjs/askr/testing';
 import {
   RadioGroup,
   RadioGroupItem,
@@ -61,7 +61,7 @@ describe('ancestor cancellation of keyboard defaults', () => {
           source === 'caller'
             ? (event: PointerEvent) => event.preventDefault()
             : undefined;
-        const view = mount(() => (
+        const view = render(() => (
           <Slider defaultValue={20}>
             <SliderTrack
               onPointerDown={part === 'track' ? onPointerDown : undefined}
@@ -131,7 +131,7 @@ describe('ancestor cancellation of keyboard defaults', () => {
           source === 'caller'
             ? (event: KeyboardEvent) => event.preventDefault()
             : undefined;
-        const view = mount(() =>
+        const view = render(() =>
           family === 'radio' ? (
             <RadioGroup
               onKeyDown={onKeyDown}

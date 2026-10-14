@@ -1,17 +1,34 @@
+/** Realm-independent HTML checks also accept nodes adopted from another document. */
+export function isHTMLElement(
+  node: EventTarget | null | undefined
+): node is HTMLElement {
+  return (
+    (node as Node | null)?.nodeType === 1 &&
+    (node as Element).namespaceURI === 'http://www.w3.org/1999/xhtml'
+  );
+}
+
+export function getActiveElement(ownerDocument: Document): HTMLElement | null {
+  const active = ownerDocument.activeElement;
+  return isHTMLElement(active) ? active : null;
+}
+
 function flattenedElements(root: ParentNode): HTMLElement[] {
   const result: HTMLElement[] = [];
   const visit = (parent: ParentNode) => {
     for (const child of parent.children) {
-      if (!(child instanceof HTMLElement)) {
+      if (!isHTMLElement(child)) {
         continue;
       }
       result.push(child);
 
-      if (child instanceof HTMLSlotElement) {
-        const assigned = child.assignedElements({ flatten: true });
+      if (child.tagName === 'SLOT') {
+        const assigned = (child as HTMLSlotElement).assignedElements({
+          flatten: true,
+        });
         if (assigned.length > 0) {
           for (const assignedElement of assigned) {
-            if (assignedElement instanceof HTMLElement) {
+            if (isHTMLElement(assignedElement)) {
               result.push(assignedElement);
               visit(assignedElement);
             }
@@ -36,14 +53,16 @@ function isHidden(element: HTMLElement): boolean {
     if (current.hidden || current.hasAttribute('inert')) {
       return true;
     }
-    const style = getComputedStyle(current);
-    if (style.display === 'none' || style.visibility === 'hidden') {
+    const style = current.ownerDocument.defaultView?.getComputedStyle(current);
+    if (style?.display === 'none' || style?.visibility === 'hidden') {
       return true;
     }
     const root = current.getRootNode();
     current =
       current.parentElement ??
-      (root instanceof ShadowRoot ? (root.host as HTMLElement) : null);
+      ('host' in root && isHTMLElement(root.host as Node)
+        ? (root.host as HTMLElement)
+        : null);
   }
   return false;
 }
@@ -54,7 +73,7 @@ function isDisabledByFieldset(element: HTMLElement): boolean {
     return false;
   }
   const firstLegend = Array.from(fieldset.children).find(
-    (child): child is HTMLLegendElement => child instanceof HTMLLegendElement
+    (child): child is HTMLLegendElement => child.tagName === 'LEGEND'
   );
   return !firstLegend?.contains(element);
 }
@@ -65,30 +84,12 @@ function isInsideClosedDetails(element: HTMLElement): boolean {
 }
 
 function isNaturallyFocusable(element: HTMLElement): boolean {
-  if (
-    element instanceof HTMLButtonElement ||
-    element instanceof HTMLSelectElement ||
-    element instanceof HTMLTextAreaElement ||
-    element instanceof HTMLIFrameElement
-  ) {
-    return true;
-  }
-  if (element instanceof HTMLInputElement) {
-    return element.type !== 'hidden';
-  }
-  if (
-    (element instanceof HTMLAnchorElement ||
-      element instanceof HTMLAreaElement) &&
-    element.hasAttribute('href')
-  ) {
-    return true;
-  }
-  if (
-    element instanceof HTMLAudioElement ||
-    element instanceof HTMLVideoElement
-  ) {
+  const tag = element.tagName;
+  if (['BUTTON', 'SELECT', 'TEXTAREA', 'IFRAME'].includes(tag)) return true;
+  if (tag === 'INPUT') return (element as HTMLInputElement).type !== 'hidden';
+  if (tag === 'A' || tag === 'AREA') return element.hasAttribute('href');
+  if (tag === 'AUDIO' || tag === 'VIDEO')
     return element.hasAttribute('controls');
-  }
   return element.isContentEditable;
 }
 
@@ -105,22 +106,28 @@ function isFocusable(element: HTMLElement): boolean {
 function filterRadioGroups(elements: HTMLElement[]): HTMLElement[] {
   const selected = new Map<string, HTMLInputElement>();
   for (const element of elements) {
-    if (!(element instanceof HTMLInputElement) || element.type !== 'radio') {
+    if (
+      element.tagName !== 'INPUT' ||
+      (element as HTMLInputElement).type !== 'radio'
+    ) {
       continue;
     }
-    const formKey = element.form?.id ?? '';
-    const key = `${formKey}\0${element.name}`;
+    const radio = element as HTMLInputElement;
+    const formKey = radio.form?.id ?? '';
+    const key = `${formKey}\0${radio.name}`;
     const current = selected.get(key);
-    if (!current || element.checked) {
-      selected.set(key, element);
+    if (!current || radio.checked) {
+      selected.set(key, radio);
     }
   }
   return elements.filter(
     (element) =>
-      !(element instanceof HTMLInputElement) ||
-      element.type !== 'radio' ||
-      !element.name ||
-      selected.get(`${element.form?.id ?? ''}\0${element.name}`) === element
+      element.tagName !== 'INPUT' ||
+      (element as HTMLInputElement).type !== 'radio' ||
+      !(element as HTMLInputElement).name ||
+      selected.get(
+        `${(element as HTMLInputElement).form?.id ?? ''}\0${(element as HTMLInputElement).name}`
+      ) === element
   );
 }
 

@@ -32,3 +32,5 @@ export {
   primeOverlayStackNode,
   syncOverlayPosition,
 } from './overlay/position';
+
+export { syncOverlayStackActive } from './overlay/commit';

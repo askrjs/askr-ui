@@ -7,10 +7,6 @@ export {
   DropdownLabel,
   DropdownSeparator,
 } from './dropdown-group';
-export {
-  DROPDOWN_A11Y_CONTRACT,
-  type DropdownA11yContract,
-} from './dropdown.a11y';
 export type {
   DropdownOwnProps,
   DropdownProps,

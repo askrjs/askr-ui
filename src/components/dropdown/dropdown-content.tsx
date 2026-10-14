@@ -94,7 +94,7 @@ export function DropdownContent(
         if (
           overlayNodes.content !== node ||
           !node.isConnected ||
-          node.contains(document.activeElement)
+          node.contains(node.ownerDocument.activeElement)
         ) {
           return;
         }
@@ -172,8 +172,23 @@ export function DropdownContent(
 
   return (
     <Presence present={forceMount || root.open}>
-      <FocusScope restoreFocus restoreFocusTarget={() => overlayNodes.trigger}>
+      <FocusScope
+        autoFocus={root.open}
+        restoreFocus
+        restoreFocusTarget={() => overlayNodes.trigger}
+      >
         <DismissableLayer
+          onPointerDownOutside={(event) => {
+            const trigger = getOverlayNodes(root.overlayIdentity).trigger;
+            if (
+              trigger &&
+              event.target &&
+              'nodeType' in event.target &&
+              trigger.contains(event.target as Node)
+            )
+              event.preventDefault();
+          }}
+          disabled={!root.open}
           onDismiss={() => {
             root.setOpen(false);
           }}

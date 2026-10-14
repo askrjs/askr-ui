@@ -7,6 +7,83 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-10
+
+### Breaking
+
+- Retire 27 accessibility metadata constants and 26 metadata type aliases from
+  root and owning family barrels (106 name/path pairs). All 36 export keys,
+  component functions, and component input types remain. See the complete
+  [migration list](./docs/migration-0.5.0.md) and [API review](./docs/0.5.0-public-api.md).
+
+### Internal
+
+- Qualify all retained and retired installed names under actual TypeScript 6 and
+  7, exact ESM/native require family identities, recursive export targets, and private paths.
+- Add native browser assertions for controlled mode transitions, nested portal
+  close orders, removed overlay triggers, and dynamic Select collection recovery.
+  Pause browser time in the two controlled Toast focus tests so their 1000ms
+  expiry does not race setup; timer behavior remains separately tested.
+- Correct Tier 1–3 benchmark workloads to render through an owning SSR context
+  or mount real DOM for activation and cleanup. Fail on callback errors instead
+  of reporting empty measurements; these corrected workloads establish samples
+  and make no performance improvement claim.
+- Update compatible development-only Vite Plus, formatter, worker, and source-map
+  lock resolutions; add the TypeScript 6 development compiler. Runtime and peer
+  dependency ranges remain unchanged.
+
+### Fixed
+
+- Preserve outside focus when a pending composite item ref commits during a
+  Firefox blur event. Complete the focus transition before restoring the item,
+  and cancel its pending claim when another element owns focus, including
+  removal of the previously focused Select option.
+- Keep checkable interaction declarations portable through Core's public
+  pressable result type.
+- Keep type-check build metadata outside the published package contents.
+- Position portaled overlays in the content's CSS coordinate space under root,
+  nested and content-only zoom, including constrained sizes and Select widths.
+- Restore Dialog focus to its trigger after closing when no explicit target is
+  supplied, including WebKit pointer activation; explicit targets remain supported.
+
+- Route both `import` and native Node 24 `require` conditions through the same
+  canonical ESM files and declarations. This fixes the duplicate CommonJS build's
+  failure on the ESM-only Core peer and preserves one component/runtime identity.
+  All 36 package keys and supported CommonJS calls remain.
+
+- Select restores owned focus after a focused dynamic option is removed,
+  preserving value and callbacks, disabled filtering, and intentional external
+  focus. Empty collections fall back to the owned focusable content/scope host;
+  closed and unmounted owners cancel pending repair.
+
+- Dropdown and Select close on a native pointer press/click of their open
+  trigger and clear automatic `aria-controls` when content unmounts.
+- Persistent dismissable layers and trapped focus scopes follow activation
+  order, preserving nested scope priority and leaving lower modals inactive.
+- Overlay roots publish stack activation and backdrop styles after commit,
+  so rejected renders cannot consume open order or replace live backdrop CSS.
+- FocusScope, persistent overlay focus, Tooltip, and HoverCard focus restoration
+  use the attached node's owner document and window, including iframe hosts.
+- Tooltip retains focus-listener bookkeeping and registers one lifetime cleanup;
+  DebouncedInput owns one cancellable timer across delay changes.
+- VirtualList adopts actual scroll writes without retaining stale targets and
+  preserves newer scroll/follow state when child refs run before parent commit.
+- RadioGroup form reset restores the selected or first enabled roving tab stop,
+  including groups whose default value has no selected item.
+
+- Closed `forceMount` Dropdown, Select, and Menubar content no longer takes
+  focus or intercepts Escape and outside presses meant for an open layer
+  beneath it.
+- `Slider` ends an active drag when it becomes disabled, so re-enabling it
+  before the pointer is released no longer resumes the drag.
+- `AvatarImage` publishes its source after commit, so a rejected render cannot
+  skip the loading reset on the next accepted source change.
+
+### Development
+
+- First-party development workflows use Vite+; specialized compiler, runtime,
+  browser, and package checks remain part of validation.
+
 ## [0.4.3] - 2026-10-01
 
 No public component, prop, export, or compatible peer-range changes. No

@@ -10,6 +10,8 @@ export {
 } from './focus/modality';
 
 export {
+  getActiveElement,
+  isHTMLElement,
   focusFirstDescendant,
   focusLastDescendant,
   getFocusableElements,

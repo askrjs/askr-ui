@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { state } from '@askrjs/askr';
-import { flush, mount, type RenderResult } from '@askrjs/askr/testing';
+import { flush, render, type RenderResult } from '@askrjs/askr/testing';
 import { renderToStringSync } from '@askrjs/askr/ssr';
 import { syncIdAssociation } from '../../../../src/components/_internal/id-association';
 import { DismissableLayer } from '../../../../src/components/dismissable-layer';
@@ -41,7 +41,7 @@ afterEach(async () => {
 describe('overlay committed inputs', () => {
   it('should request a single controlled hover-card close for content Escape', async () => {
     const close = vi.fn();
-    const view = mount(() => (
+    const view = render(() => (
       <HoverCard open onOpenChange={close}>
         <HoverCardTrigger>Preview</HoverCardTrigger>
         <HoverCardContent>Details</HoverCardContent>
@@ -67,7 +67,7 @@ describe('overlay committed inputs', () => {
       const close = vi.fn();
       const dismiss = vi.fn();
       views.push(
-        mount(() => (
+        render(() => (
           <AlertDialog open onOpenChange={close}>
             <AlertDialogContent
               onDismiss={dismiss}
@@ -96,7 +96,7 @@ describe('overlay committed inputs', () => {
   it('should retain committed callbacks when an asChild layer replaces its host node', async () => {
     let replacement!: ReturnType<typeof state<boolean>>;
     const calls: string[] = [];
-    const view = mount(() => {
+    const view = render(() => {
       replacement = state(false);
       const next = replacement();
       return (
@@ -131,14 +131,14 @@ describe('overlay committed inputs', () => {
     const otherContainer = otherDocument.createElement('div');
     otherDocument.body.append(otherContainer);
     views.push(
-      mount(() => (
+      render(() => (
         <DismissableLayer onDismiss={firstDismiss}>
           First layer
         </DismissableLayer>
       ))
     );
     views.push(
-      mount(
+      render(
         () => (
           <DismissableLayer onDismiss={secondDismiss}>
             Second layer
@@ -171,7 +171,7 @@ describe('overlay committed inputs', () => {
     'should keep closed force-mounted %s content out of the active layer stack',
     async (family) => {
       const dismiss = vi.fn();
-      const view = mount(() => (
+      const view = render(() => (
         <>
           <DismissableLayer onDismiss={dismiss}>Active layer</DismissableLayer>
           {family === 'tooltip' ? (
@@ -214,7 +214,7 @@ describe('overlay committed inputs', () => {
   it('should retain the committed hover-card close delay after a rejected structural update', async () => {
     let rejected!: ReturnType<typeof state<boolean>>;
     const close = vi.fn();
-    const view = mount(() => {
+    const view = render(() => {
       rejected = state(false);
       return (
         <>
@@ -255,7 +255,7 @@ describe('overlay committed inputs', () => {
     async (variant) => {
       let rejected!: ReturnType<typeof state<boolean>>;
       const calls: string[] = [];
-      const view = mount(() => {
+      const view = render(() => {
         rejected = state(false);
         const discarded = rejected();
         return [
@@ -297,7 +297,7 @@ describe('overlay committed inputs', () => {
   it('should preserve layer order when the lower layer receives new callbacks', async () => {
     let revision!: ReturnType<typeof state<number>>;
     const calls: string[] = [];
-    const view = mount(() => {
+    const view = render(() => {
       revision = state(0);
       const current = revision();
       return (
@@ -330,7 +330,7 @@ describe('popover part identity associations', () => {
   it.each(['trigger', 'content'] as const)(
     'should associate actual custom %s IDs in committed markup',
     async (part) => {
-      const view = mount(() => (
+      const view = render(() => (
         <Popover defaultOpen>
           <PopoverTrigger
             id={part === 'trigger' ? 'custom-popover-trigger' : undefined}
@@ -362,7 +362,7 @@ describe('hover and tooltip part identity associations', () => {
   it.each(['hover-trigger', 'hover-content', 'tooltip-content'] as const)(
     'should associate actual native IDs for %s',
     async (part) => {
-      const view = mount(() =>
+      const view = render(() =>
         part === 'tooltip-content' ? (
           <Tooltip open>
             <TooltipTrigger>Preview</TooltipTrigger>

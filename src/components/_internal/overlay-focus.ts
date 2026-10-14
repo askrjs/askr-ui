@@ -1,6 +1,6 @@
 import { state } from '@askrjs/askr';
 import { watch } from '@askrjs/askr/resources';
-import { focusFirstDescendant } from './focus';
+import { getActiveElement, focusFirstDescendant } from './focus';
 
 /** Keep focus transitions working when presence retains the content node. */
 export function syncPersistentOverlayFocus(
@@ -9,13 +9,7 @@ export function syncPersistentOverlayFocus(
   getContentNode: () => HTMLElement | null,
   getRestoreTarget: () => HTMLElement | null
 ) {
-  const entry = state({
-    previousFocused:
-      typeof document !== 'undefined' &&
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null,
-  })();
+  const entry = state({ previousFocused: null as HTMLElement | null })();
 
   watch(
     () => [open, forceMount] as const,
@@ -23,10 +17,7 @@ export function syncPersistentOverlayFocus(
       if (!persistent) return;
       const content = getContentNode();
       if (isOpen && !previous?.[0]) {
-        const active =
-          document.activeElement instanceof HTMLElement
-            ? document.activeElement
-            : null;
+        const active = content ? getActiveElement(content.ownerDocument) : null;
         if (content && !content.contains(active)) {
           entry.previousFocused = active;
           if (!focusFirstDescendant(content)) content.focus();

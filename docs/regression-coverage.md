@@ -31,9 +31,21 @@ here.
 | Native form reset                     | Every uncontrolled form primitive must return to its declared default after native `form.reset()` while controlled values remain caller-owned.                                                                                                                                                               |
 | Virtualized composition               | Components that retain ordinal, focus-restore, or roving state must be mounted in a real VirtualList/VirtualTable window and cross an unmounted dataset boundary.                                                                                                                                            |
 | Persistent timers                     | Timer handles must survive unrelated rerenders, cancel the original pending work, and be released with their component lifetime.                                                                                                                                                                             |
-| Export/version drift                  | Root exports, ESM subpath exports, and type tests must fail before a downstream package consumes a broken surface. CJS runtime loading is not part of the current release gate because `@askrjs/askr` is ESM-only.                                                                                           |
+| Export/version drift                  | Root exports, ESM subpath exports, and type tests must fail before a downstream package consumes a broken surface. ESM and native Node 24 CommonJS loading must share exact component identities and declarations at root and every family entrypoint.                                                       |
+
+Benchmarks must execute components through an owning render context. Creation
+cases use real SSR rendering; activation and transition cases mount actual DOM
+and clean up each iteration. Tier 1–3 callbacks use `throws: true` so warmup
+errors fail the gate. Qualification requires finite timings and nonzero samples;
+empty or `NaN` summaries provide no performance evidence. Corrected workloads
+are a new measurement baseline, not a performance improvement comparison.
 
 ## Current focused follow-ups
+
+Collection focus restoration must preserve a newer outside focus target when an
+item ref reattaches during blur. Select removal scenarios freeze animation frames
+to retain the pending typeahead claim, then remove, close or unmount the focused
+option. The outside button keeps focus and no value-change callback fires.
 
 - Slider, toast, avatar, virtual list, virtual table, and toggle group regressions
   are covered by the current browser suites.

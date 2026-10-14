@@ -1,6 +1,6 @@
 {
   "name": "@askrjs/ui",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "description": "Headless Askr components",
   "keywords": [
     "accessible",
@@ -29,7 +29,7 @@
   ],
   "type": "module",
   "sideEffects": false,
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
@@ -38,179 +38,349 @@
         "default": "./dist/index.js"
       },
       "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
       }
     },
     "./avatar": {
-      "types": "./dist/components/avatar/index.d.ts",
-      "import": "./dist/components/avatar/index.js",
-      "require": "./dist/components/avatar/index.cjs"
+      "import": {
+        "types": "./dist/components/avatar/index.d.ts",
+        "default": "./dist/components/avatar/index.js"
+      },
+      "require": {
+        "types": "./dist/components/avatar/index.d.ts",
+        "default": "./dist/components/avatar/index.js"
+      }
     },
     "./button": {
-      "types": "./dist/components/button/index.d.ts",
-      "import": "./dist/components/button/index.js",
-      "require": "./dist/components/button/index.cjs"
+      "import": {
+        "types": "./dist/components/button/index.d.ts",
+        "default": "./dist/components/button/index.js"
+      },
+      "require": {
+        "types": "./dist/components/button/index.d.ts",
+        "default": "./dist/components/button/index.js"
+      }
     },
     "./checkbox": {
-      "types": "./dist/components/checkbox/index.d.ts",
-      "import": "./dist/components/checkbox/index.js",
-      "require": "./dist/components/checkbox/index.cjs"
+      "import": {
+        "types": "./dist/components/checkbox/index.d.ts",
+        "default": "./dist/components/checkbox/index.js"
+      },
+      "require": {
+        "types": "./dist/components/checkbox/index.d.ts",
+        "default": "./dist/components/checkbox/index.js"
+      }
     },
     "./input": {
-      "types": "./dist/components/input/index.d.ts",
-      "import": "./dist/components/input/index.js",
-      "require": "./dist/components/input/index.cjs"
+      "import": {
+        "types": "./dist/components/input/index.d.ts",
+        "default": "./dist/components/input/index.js"
+      },
+      "require": {
+        "types": "./dist/components/input/index.d.ts",
+        "default": "./dist/components/input/index.js"
+      }
     },
     "./form": {
-      "types": "./dist/components/form/index.d.ts",
-      "import": "./dist/components/form/index.js",
-      "require": "./dist/components/form/index.cjs"
+      "import": {
+        "types": "./dist/components/form/index.d.ts",
+        "default": "./dist/components/form/index.js"
+      },
+      "require": {
+        "types": "./dist/components/form/index.d.ts",
+        "default": "./dist/components/form/index.js"
+      }
     },
     "./label": {
-      "types": "./dist/components/label/index.d.ts",
-      "import": "./dist/components/label/index.js",
-      "require": "./dist/components/label/index.cjs"
+      "import": {
+        "types": "./dist/components/label/index.d.ts",
+        "default": "./dist/components/label/index.js"
+      },
+      "require": {
+        "types": "./dist/components/label/index.d.ts",
+        "default": "./dist/components/label/index.js"
+      }
     },
     "./progress": {
-      "types": "./dist/components/progress/index.d.ts",
-      "import": "./dist/components/progress/index.js",
-      "require": "./dist/components/progress/index.cjs"
+      "import": {
+        "types": "./dist/components/progress/index.d.ts",
+        "default": "./dist/components/progress/index.js"
+      },
+      "require": {
+        "types": "./dist/components/progress/index.d.ts",
+        "default": "./dist/components/progress/index.js"
+      }
     },
     "./progress-circle": {
-      "types": "./dist/components/progress-circle/index.d.ts",
-      "import": "./dist/components/progress-circle/index.js",
-      "require": "./dist/components/progress-circle/index.cjs"
+      "import": {
+        "types": "./dist/components/progress-circle/index.d.ts",
+        "default": "./dist/components/progress-circle/index.js"
+      },
+      "require": {
+        "types": "./dist/components/progress-circle/index.d.ts",
+        "default": "./dist/components/progress-circle/index.js"
+      }
     },
     "./radio-group": {
-      "types": "./dist/components/radio-group/index.d.ts",
-      "import": "./dist/components/radio-group/index.js",
-      "require": "./dist/components/radio-group/index.cjs"
+      "import": {
+        "types": "./dist/components/radio-group/index.d.ts",
+        "default": "./dist/components/radio-group/index.js"
+      },
+      "require": {
+        "types": "./dist/components/radio-group/index.d.ts",
+        "default": "./dist/components/radio-group/index.js"
+      }
     },
     "./select": {
-      "types": "./dist/components/select/index.d.ts",
-      "import": "./dist/components/select/index.js",
-      "require": "./dist/components/select/index.cjs"
+      "import": {
+        "types": "./dist/components/select/index.d.ts",
+        "default": "./dist/components/select/index.js"
+      },
+      "require": {
+        "types": "./dist/components/select/index.d.ts",
+        "default": "./dist/components/select/index.js"
+      }
     },
     "./slider": {
-      "types": "./dist/components/slider/index.d.ts",
-      "import": "./dist/components/slider/index.js",
-      "require": "./dist/components/slider/index.cjs"
+      "import": {
+        "types": "./dist/components/slider/index.d.ts",
+        "default": "./dist/components/slider/index.js"
+      },
+      "require": {
+        "types": "./dist/components/slider/index.d.ts",
+        "default": "./dist/components/slider/index.js"
+      }
     },
     "./switch": {
-      "types": "./dist/components/switch/index.d.ts",
-      "import": "./dist/components/switch/index.js",
-      "require": "./dist/components/switch/index.cjs"
+      "import": {
+        "types": "./dist/components/switch/index.d.ts",
+        "default": "./dist/components/switch/index.js"
+      },
+      "require": {
+        "types": "./dist/components/switch/index.d.ts",
+        "default": "./dist/components/switch/index.js"
+      }
     },
     "./table": {
-      "types": "./dist/components/table/index.d.ts",
-      "import": "./dist/components/table/index.js",
-      "require": "./dist/components/table/index.cjs"
+      "import": {
+        "types": "./dist/components/table/index.d.ts",
+        "default": "./dist/components/table/index.js"
+      },
+      "require": {
+        "types": "./dist/components/table/index.d.ts",
+        "default": "./dist/components/table/index.js"
+      }
     },
     "./virtual-list": {
-      "types": "./dist/components/virtual-list/index.d.ts",
-      "import": "./dist/components/virtual-list/index.js",
-      "require": "./dist/components/virtual-list/index.cjs"
+      "import": {
+        "types": "./dist/components/virtual-list/index.d.ts",
+        "default": "./dist/components/virtual-list/index.js"
+      },
+      "require": {
+        "types": "./dist/components/virtual-list/index.d.ts",
+        "default": "./dist/components/virtual-list/index.js"
+      }
     },
     "./virtual-table": {
-      "types": "./dist/components/virtual-table/index.d.ts",
-      "import": "./dist/components/virtual-table/index.js",
-      "require": "./dist/components/virtual-table/index.cjs"
+      "import": {
+        "types": "./dist/components/virtual-table/index.d.ts",
+        "default": "./dist/components/virtual-table/index.js"
+      },
+      "require": {
+        "types": "./dist/components/virtual-table/index.d.ts",
+        "default": "./dist/components/virtual-table/index.js"
+      }
     },
     "./textarea": {
-      "types": "./dist/components/textarea/index.d.ts",
-      "import": "./dist/components/textarea/index.js",
-      "require": "./dist/components/textarea/index.cjs"
+      "import": {
+        "types": "./dist/components/textarea/index.d.ts",
+        "default": "./dist/components/textarea/index.js"
+      },
+      "require": {
+        "types": "./dist/components/textarea/index.d.ts",
+        "default": "./dist/components/textarea/index.js"
+      }
     },
     "./toggle": {
-      "types": "./dist/components/toggle/index.d.ts",
-      "import": "./dist/components/toggle/index.js",
-      "require": "./dist/components/toggle/index.cjs"
+      "import": {
+        "types": "./dist/components/toggle/index.d.ts",
+        "default": "./dist/components/toggle/index.js"
+      },
+      "require": {
+        "types": "./dist/components/toggle/index.d.ts",
+        "default": "./dist/components/toggle/index.js"
+      }
     },
     "./toggle-group": {
-      "types": "./dist/components/toggle-group/index.d.ts",
-      "import": "./dist/components/toggle-group/index.js",
-      "require": "./dist/components/toggle-group/index.cjs"
+      "import": {
+        "types": "./dist/components/toggle-group/index.d.ts",
+        "default": "./dist/components/toggle-group/index.js"
+      },
+      "require": {
+        "types": "./dist/components/toggle-group/index.d.ts",
+        "default": "./dist/components/toggle-group/index.js"
+      }
     },
     "./visually-hidden": {
-      "types": "./dist/components/visually-hidden/index.d.ts",
-      "import": "./dist/components/visually-hidden/index.js",
-      "require": "./dist/components/visually-hidden/index.cjs"
+      "import": {
+        "types": "./dist/components/visually-hidden/index.d.ts",
+        "default": "./dist/components/visually-hidden/index.js"
+      },
+      "require": {
+        "types": "./dist/components/visually-hidden/index.d.ts",
+        "default": "./dist/components/visually-hidden/index.js"
+      }
     },
     "./accordion": {
-      "types": "./dist/components/accordion/index.d.ts",
-      "import": "./dist/components/accordion/index.js",
-      "require": "./dist/components/accordion/index.cjs"
+      "import": {
+        "types": "./dist/components/accordion/index.d.ts",
+        "default": "./dist/components/accordion/index.js"
+      },
+      "require": {
+        "types": "./dist/components/accordion/index.d.ts",
+        "default": "./dist/components/accordion/index.js"
+      }
     },
     "./alert-dialog": {
-      "types": "./dist/components/alert-dialog/index.d.ts",
-      "import": "./dist/components/alert-dialog/index.js",
-      "require": "./dist/components/alert-dialog/index.cjs"
+      "import": {
+        "types": "./dist/components/alert-dialog/index.d.ts",
+        "default": "./dist/components/alert-dialog/index.js"
+      },
+      "require": {
+        "types": "./dist/components/alert-dialog/index.d.ts",
+        "default": "./dist/components/alert-dialog/index.js"
+      }
     },
     "./collapsible": {
-      "types": "./dist/components/collapsible/index.d.ts",
-      "import": "./dist/components/collapsible/index.js",
-      "require": "./dist/components/collapsible/index.cjs"
+      "import": {
+        "types": "./dist/components/collapsible/index.d.ts",
+        "default": "./dist/components/collapsible/index.js"
+      },
+      "require": {
+        "types": "./dist/components/collapsible/index.d.ts",
+        "default": "./dist/components/collapsible/index.js"
+      }
     },
     "./dialog": {
-      "types": "./dist/components/dialog/index.d.ts",
-      "import": "./dist/components/dialog/index.js",
-      "require": "./dist/components/dialog/index.cjs"
+      "import": {
+        "types": "./dist/components/dialog/index.d.ts",
+        "default": "./dist/components/dialog/index.js"
+      },
+      "require": {
+        "types": "./dist/components/dialog/index.d.ts",
+        "default": "./dist/components/dialog/index.js"
+      }
     },
     "./dismissable-layer": {
-      "types": "./dist/components/dismissable-layer/index.d.ts",
-      "import": "./dist/components/dismissable-layer/index.js",
-      "require": "./dist/components/dismissable-layer/index.cjs"
+      "import": {
+        "types": "./dist/components/dismissable-layer/index.d.ts",
+        "default": "./dist/components/dismissable-layer/index.js"
+      },
+      "require": {
+        "types": "./dist/components/dismissable-layer/index.d.ts",
+        "default": "./dist/components/dismissable-layer/index.js"
+      }
     },
     "./dropdown": {
-      "types": "./dist/components/dropdown/index.d.ts",
-      "import": "./dist/components/dropdown/index.js",
-      "require": "./dist/components/dropdown/index.cjs"
+      "import": {
+        "types": "./dist/components/dropdown/index.d.ts",
+        "default": "./dist/components/dropdown/index.js"
+      },
+      "require": {
+        "types": "./dist/components/dropdown/index.d.ts",
+        "default": "./dist/components/dropdown/index.js"
+      }
     },
     "./focus-scope": {
-      "types": "./dist/components/focus-scope/index.d.ts",
-      "import": "./dist/components/focus-scope/index.js",
-      "require": "./dist/components/focus-scope/index.cjs"
+      "import": {
+        "types": "./dist/components/focus-scope/index.d.ts",
+        "default": "./dist/components/focus-scope/index.js"
+      },
+      "require": {
+        "types": "./dist/components/focus-scope/index.d.ts",
+        "default": "./dist/components/focus-scope/index.js"
+      }
     },
     "./hover-card": {
-      "types": "./dist/components/hover-card/index.d.ts",
-      "import": "./dist/components/hover-card/index.js",
-      "require": "./dist/components/hover-card/index.cjs"
+      "import": {
+        "types": "./dist/components/hover-card/index.d.ts",
+        "default": "./dist/components/hover-card/index.js"
+      },
+      "require": {
+        "types": "./dist/components/hover-card/index.d.ts",
+        "default": "./dist/components/hover-card/index.js"
+      }
     },
     "./menu": {
-      "types": "./dist/components/menu/index.d.ts",
-      "import": "./dist/components/menu/index.js",
-      "require": "./dist/components/menu/index.cjs"
+      "import": {
+        "types": "./dist/components/menu/index.d.ts",
+        "default": "./dist/components/menu/index.js"
+      },
+      "require": {
+        "types": "./dist/components/menu/index.d.ts",
+        "default": "./dist/components/menu/index.js"
+      }
     },
     "./menubar": {
-      "types": "./dist/components/menubar/index.d.ts",
-      "import": "./dist/components/menubar/index.js",
-      "require": "./dist/components/menubar/index.cjs"
+      "import": {
+        "types": "./dist/components/menubar/index.d.ts",
+        "default": "./dist/components/menubar/index.js"
+      },
+      "require": {
+        "types": "./dist/components/menubar/index.d.ts",
+        "default": "./dist/components/menubar/index.js"
+      }
     },
     "./overlay-host": {
-      "types": "./dist/components/overlay-host/index.d.ts",
-      "import": "./dist/components/overlay-host/index.js",
-      "require": "./dist/components/overlay-host/index.cjs"
+      "import": {
+        "types": "./dist/components/overlay-host/index.d.ts",
+        "default": "./dist/components/overlay-host/index.js"
+      },
+      "require": {
+        "types": "./dist/components/overlay-host/index.d.ts",
+        "default": "./dist/components/overlay-host/index.js"
+      }
     },
     "./popover": {
-      "types": "./dist/components/popover/index.d.ts",
-      "import": "./dist/components/popover/index.js",
-      "require": "./dist/components/popover/index.cjs"
+      "import": {
+        "types": "./dist/components/popover/index.d.ts",
+        "default": "./dist/components/popover/index.js"
+      },
+      "require": {
+        "types": "./dist/components/popover/index.d.ts",
+        "default": "./dist/components/popover/index.js"
+      }
     },
     "./scroll-area": {
-      "types": "./dist/components/scroll-area/index.d.ts",
-      "import": "./dist/components/scroll-area/index.js",
-      "require": "./dist/components/scroll-area/index.cjs"
+      "import": {
+        "types": "./dist/components/scroll-area/index.d.ts",
+        "default": "./dist/components/scroll-area/index.js"
+      },
+      "require": {
+        "types": "./dist/components/scroll-area/index.d.ts",
+        "default": "./dist/components/scroll-area/index.js"
+      }
     },
     "./toast": {
-      "types": "./dist/components/toast/index.d.ts",
-      "import": "./dist/components/toast/index.js",
-      "require": "./dist/components/toast/index.cjs"
+      "import": {
+        "types": "./dist/components/toast/index.d.ts",
+        "default": "./dist/components/toast/index.js"
+      },
+      "require": {
+        "types": "./dist/components/toast/index.d.ts",
+        "default": "./dist/components/toast/index.js"
+      }
     },
     "./tooltip": {
-      "types": "./dist/components/tooltip/index.d.ts",
-      "import": "./dist/components/tooltip/index.js",
-      "require": "./dist/components/tooltip/index.cjs"
+      "import": {
+        "types": "./dist/components/tooltip/index.d.ts",
+        "default": "./dist/components/tooltip/index.js"
+      },
+      "require": {
+        "types": "./dist/components/tooltip/index.d.ts",
+        "default": "./dist/components/tooltip/index.js"
+      }
     },
     "./package.json": "./package.json"
   },
@@ -232,7 +402,7 @@
     "test:browser": "playwright test",
     "test:component": "npm run test:browser",
     "test:jsdom": "npm run build && vp test run --config vitest.test.jsdom.config.ts",
-    "test:types": "tsc -p tsconfig.type-tests.json --noEmit",
+    "test:types": "tsc6 -p tsconfig.type-tests.json --noEmit && tsc -p tsconfig.type-tests.json --noEmit",
     "test:unit": "npm run test:types && vp test run --config vitest.test.unit.config.ts",
     "test:publint": "publint",
     "pack:check": "node scripts/check-package.mjs",
@@ -244,10 +414,11 @@
     "test:integrity": "vp test run -c vitest.test.integrity.config.ts"
   },
   "devDependencies": {
-    "@askrjs/askr": ">=0.4.0 <0.5.0",
-    "@askrjs/vite": ">=0.4.0 <0.5.0",
+    "@askrjs/askr": ">=0.5.0 <0.6.0",
+    "@askrjs/vite": ">=0.5.0 <0.6.0",
     "@playwright/test": "1.63.0",
     "@types/node": "^26.3.0",
+    "@typescript/typescript6": "^6.0.2",
     "axe-core": "^4.13.0",
     "cross-env": "^10.1.0",
     "jsdom": "^30.0.1",
@@ -258,7 +429,7 @@
     "vite-plus": "^0.3.1"
   },
   "peerDependencies": {
-    "@askrjs/askr": ">=0.4.0 <0.5.0"
+    "@askrjs/askr": ">=0.5.0 <0.6.0"
   },
   "engines": {
     "node": ">=24.0.0"

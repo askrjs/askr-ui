@@ -137,19 +137,21 @@ export function restorePendingCollectionItemFocus(
   node: HTMLElement | null
 ) {
   if (node && pendingFocus.index === index) {
-    if (node.isConnected) {
+    // Ref commits can run inside a blur event, while activeElement is body.
+    // Let that focus transition finish before deciding whether to restore.
+    queueMicrotask(() => {
+      if (pendingFocus.index !== index || !node.isConnected) return;
+      const active = node.ownerDocument.activeElement;
+      if (
+        active !== node.ownerDocument.body &&
+        active !== node &&
+        !node.contains(active)
+      ) {
+        pendingFocus.index = null;
+        return;
+      }
       node.focus({ preventScroll: true });
-    } else {
-      queueMicrotask(() => {
-        if (
-          pendingFocus.index === index &&
-          node.isConnected &&
-          document.activeElement === document.body
-        ) {
-          node.focus({ preventScroll: true });
-        }
-      });
-    }
+    });
   }
 }
 

@@ -1,3 +1,4 @@
+import { renderToStringSync } from '@askrjs/askr/ssr';
 import { bench, describe } from 'vite-plus/test';
 import {
   Dialog,
@@ -9,46 +10,60 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../../src/components/dialog';
-
 describe('Dialog benches - default tree', () => {
-  bench('create dialog tree', () => {
-    Dialog({
-      defaultOpen: true,
-      children: (
-        <>
-          <DialogTrigger>Open dialog</DialogTrigger>
-          <DialogPortal>
-            <DialogOverlay />
-            <DialogContent>
-              <DialogTitle>Title</DialogTitle>
-              <DialogDescription>Body</DialogDescription>
-              <DialogClose>Close</DialogClose>
-            </DialogContent>
-          </DialogPortal>
-        </>
-      ),
-    });
-  });
+  bench(
+    'SSR render dialog tree',
+    () => {
+      renderToStringSync(() => (
+        <Dialog
+          {...{
+            defaultOpen: true,
+            children: (
+              <>
+                <DialogTrigger>Open dialog</DialogTrigger>
+                <DialogPortal>
+                  <DialogOverlay />
+                  <DialogContent>
+                    <DialogTitle>Title</DialogTitle>
+                    <DialogDescription>Body</DialogDescription>
+                    <DialogClose>Close</DialogClose>
+                  </DialogContent>
+                </DialogPortal>
+              </>
+            ),
+          }}
+        />
+      ));
+    },
+    { throws: true }
+  );
 });
-
 describe('Dialog benches - asChild content', () => {
-  bench('create dialog tree with asChild content', () => {
-    Dialog({
-      defaultOpen: true,
-      children: (
-        <>
-          <DialogTrigger>Open dialog</DialogTrigger>
-          <DialogPortal>
-            <DialogOverlay />
-            <DialogContent asChild>
-              <section aria-label="Preferences">
-                Body
-                <DialogClose>Close</DialogClose>
-              </section>
-            </DialogContent>
-          </DialogPortal>
-        </>
-      ),
-    });
-  });
+  bench(
+    'SSR render dialog tree with asChild content',
+    () => {
+      renderToStringSync(() => (
+        <Dialog
+          {...{
+            defaultOpen: true,
+            children: (
+              <>
+                <DialogTrigger>Open dialog</DialogTrigger>
+                <DialogPortal>
+                  <DialogOverlay />
+                  <DialogContent asChild>
+                    <section aria-label="Preferences">
+                      Body
+                      <DialogClose>Close</DialogClose>
+                    </section>
+                  </DialogContent>
+                </DialogPortal>
+              </>
+            ),
+          }}
+        />
+      ));
+    },
+    { throws: true }
+  );
 });

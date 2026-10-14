@@ -7,7 +7,7 @@ import {
   createOverlayIdentity,
   getOverlayNodes,
   getPersistentPortal,
-  setOverlayStackActive,
+  syncOverlayStackActive,
 } from '../_internal/overlay';
 import { syncIdAssociation } from '../_internal/id-association';
 import {
@@ -55,6 +55,11 @@ export function Dropdown(props: DropdownProps) {
   )();
   const syncPartIds = () => {
     const nodes = getOverlayNodes(overlayIdentity);
+    if (!nodes.content) {
+      if (automaticIds.controls)
+        nodes.trigger?.removeAttribute('aria-controls');
+      return;
+    }
     syncIdAssociation(
       nodes.trigger,
       nodes.content,
@@ -63,7 +68,7 @@ export function Dropdown(props: DropdownProps) {
     );
   };
   const cleanupSignal = getSignal();
-  setOverlayStackActive(overlayIdentity, openState(), cleanupSignal);
+  syncOverlayStackActive(overlayIdentity, openState(), cleanupSignal);
   captureOverlayNonce(overlayIdentity, cspNonce());
   registerTypeaheadCleanup(overlayIdentity, cleanupSignal);
   const currentIndexState = state(0);
