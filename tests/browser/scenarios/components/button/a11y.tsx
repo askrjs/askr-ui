@@ -9,7 +9,7 @@ export function axeNative(root: HTMLElement): void {
 export function axeAsChild(root: HTMLElement): void {
   mount(
     <Button asChild>
-      <a href="/docs" aria-label="Read documentation">
+      <a href="/docs" aria-label="Docs">
         Docs
       </a>
     </Button>,

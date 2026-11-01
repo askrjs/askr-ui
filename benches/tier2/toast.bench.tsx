@@ -1,5 +1,6 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   Toast,
   ToastHost,
@@ -7,7 +8,7 @@ import {
   ToastViewport,
 } from '../../src/components';
 describe('Toast benches', () => {
-  bench(
+  registerBench(
     'SSR render toast stack',
     () => {
       renderToStringSync(() => (

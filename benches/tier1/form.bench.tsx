@@ -1,8 +1,9 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import { Form } from '../../src/components/form';
 describe('Form benches', () => {
-  bench(
+  registerBench(
     'SSR render native form',
     () => {
       renderToStringSync(() => (
@@ -16,7 +17,7 @@ describe('Form benches', () => {
     },
     { throws: true }
   );
-  bench(
+  registerBench(
     'SSR render form with asChild host',
     () => {
       renderToStringSync(() => (

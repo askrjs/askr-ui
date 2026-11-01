@@ -3,14 +3,15 @@ import {
   flushBrowserBenchUpdates,
 } from '../tier4/browser-bench';
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   Collapsible,
   CollapsibleTrigger,
   CollapsibleContent,
 } from '../../src/components';
 describe('Collapsible benches - closed', () => {
-  bench(
+  registerBench(
     'SSR render closed collapsible',
     () => {
       renderToStringSync(() => (
@@ -28,7 +29,7 @@ describe('Collapsible benches - closed', () => {
   );
 });
 describe('Collapsible benches - open', () => {
-  bench(
+  registerBench(
     'SSR render open collapsible',
     () => {
       renderToStringSync(() => (
@@ -47,7 +48,7 @@ describe('Collapsible benches - open', () => {
   );
 });
 describe('Collapsible benches - disabled', () => {
-  bench(
+  registerBench(
     'SSR render disabled collapsible',
     () => {
       renderToStringSync(() => (
@@ -66,7 +67,7 @@ describe('Collapsible benches - disabled', () => {
   );
 });
 describe('Collapsible benches - forceMount', () => {
-  bench(
+  registerBench(
     'SSR render with forceMount',
     () => {
       renderToStringSync(() => (
@@ -87,7 +88,7 @@ describe('Collapsible benches - forceMount', () => {
   );
 });
 describe('Collapsible benches - state toggle', () => {
-  bench(
+  registerBench(
     'mount, toggle open/closed/open, and clean up',
     async () => {
       await runBrowserBench(

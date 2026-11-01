@@ -1,13 +1,14 @@
 import { runBrowserBench } from '../tier4/browser-bench';
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   Toggle,
   type ToggleAsChildProps,
   type ToggleButtonProps,
 } from '../../src/components';
 describe('Toggle benches', () => {
-  bench(
+  registerBench(
     'SSR render native <button>',
     () => {
       renderToStringSync(() => (
@@ -16,7 +17,7 @@ describe('Toggle benches', () => {
     },
     { throws: true }
   );
-  bench(
+  registerBench(
     'SSR render with pressed state',
     () => {
       renderToStringSync(() => (
@@ -27,7 +28,7 @@ describe('Toggle benches', () => {
     },
     { throws: true }
   );
-  bench(
+  registerBench(
     'SSR render with asChild and prop merging',
     () => {
       const child = <div />;
@@ -47,7 +48,7 @@ describe('Toggle benches', () => {
   );
 });
 describe('Toggle benches - activation native', () => {
-  bench(
+  registerBench(
     'mount, activate, and clean up native toggle',
     async () => {
       let calls = 0;
@@ -74,7 +75,7 @@ describe('Toggle benches - activation native', () => {
   );
 });
 describe('Toggle benches - activation asChild', () => {
-  bench(
+  registerBench(
     'mount, activate, and clean up asChild toggle',
     async () => {
       let calls = 0;

@@ -1,12 +1,13 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from '../../src/components/hover-card';
 describe('HoverCard benches - default tree', () => {
-  bench(
+  registerBench(
     'SSR render hover card tree',
     () => {
       renderToStringSync(() => (
@@ -25,7 +26,7 @@ describe('HoverCard benches - default tree', () => {
   );
 });
 describe('HoverCard benches - asChild parts', () => {
-  bench(
+  registerBench(
     'SSR render hover card tree with asChild parts',
     () => {
       renderToStringSync(() => (

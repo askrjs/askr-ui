@@ -13,7 +13,7 @@ import { mount } from '../../_mount';
 export function openSelect(root: HTMLElement): void {
   mount(
     <Select defaultOpen defaultValue="askr">
-      <SelectTrigger aria-label="Framework">
+      <SelectTrigger aria-label="Framework: Askr">
         <SelectValue placeholder="Choose one" />
       </SelectTrigger>
       <SelectPortal>

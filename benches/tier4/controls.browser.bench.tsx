@@ -1,6 +1,7 @@
 import { state } from '@askrjs/askr';
 import { For } from '@askrjs/askr/control';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   Button,
   Checkbox,
@@ -163,7 +164,7 @@ function SwitchUpdateFixture() {
 // Keep each benchmark in its own describe so the summary prints absolute
 // measurements instead of invalid cross-bench ratios.
 describe('Button native mount bench', () => {
-  bench(
+  registerBench(
     'mount 1k native buttons',
     () => {
       return runBrowserBench(<div>{renderButtons(false)}</div>, () => {});
@@ -173,7 +174,7 @@ describe('Button native mount bench', () => {
 });
 
 describe('Button asChild mount bench', () => {
-  bench(
+  registerBench(
     'mount 1k asChild buttons',
     () => {
       return runBrowserBench(<div>{renderButtons(true)}</div>, () => {});
@@ -183,7 +184,7 @@ describe('Button asChild mount bench', () => {
 });
 
 describe('Button native dispatch bench', () => {
-  bench(
+  registerBench(
     'dispatch 1k clicks on native buttons',
     async () => {
       await runBrowserBench(
@@ -204,7 +205,7 @@ describe('Button native dispatch bench', () => {
 });
 
 describe('Button asChild dispatch bench', () => {
-  bench(
+  registerBench(
     'dispatch 1k clicks on asChild buttons',
     async () => {
       await runBrowserBench(
@@ -227,7 +228,7 @@ describe('Button asChild dispatch bench', () => {
 });
 
 describe('Input native mount bench', () => {
-  bench(
+  registerBench(
     'mount 1k native inputs',
     () => {
       return runBrowserBench(<div>{renderInputs(false)}</div>, () => {});
@@ -237,7 +238,7 @@ describe('Input native mount bench', () => {
 });
 
 describe('Input asChild mount bench', () => {
-  bench(
+  registerBench(
     'mount 1k asChild inputs',
     () => {
       return runBrowserBench(<div>{renderInputs(true)}</div>, () => {});
@@ -247,7 +248,7 @@ describe('Input asChild mount bench', () => {
 });
 
 describe('Input native dispatch bench', () => {
-  bench(
+  registerBench(
     'dispatch 1k change events on native inputs',
     async () => {
       await runBrowserBench(
@@ -272,7 +273,7 @@ describe('Input native dispatch bench', () => {
 });
 
 describe('Input asChild dispatch bench', () => {
-  bench(
+  registerBench(
     'dispatch 1k change events on asChild inputs',
     async () => {
       await runBrowserBench(
@@ -297,7 +298,7 @@ describe('Input asChild dispatch bench', () => {
 });
 
 describe('Textarea native mount bench', () => {
-  bench(
+  registerBench(
     'mount 1k native textareas',
     () => {
       return runBrowserBench(<div>{renderTextareas(false)}</div>, () => {});
@@ -307,7 +308,7 @@ describe('Textarea native mount bench', () => {
 });
 
 describe('Textarea asChild mount bench', () => {
-  bench(
+  registerBench(
     'mount 1k asChild textareas',
     () => {
       return runBrowserBench(<div>{renderTextareas(true)}</div>, () => {});
@@ -317,7 +318,7 @@ describe('Textarea asChild mount bench', () => {
 });
 
 describe('Textarea native dispatch bench', () => {
-  bench(
+  registerBench(
     'dispatch 1k change events on native textareas',
     async () => {
       await runBrowserBench(
@@ -342,7 +343,7 @@ describe('Textarea native dispatch bench', () => {
 });
 
 describe('Textarea asChild dispatch bench', () => {
-  bench(
+  registerBench(
     'dispatch 1k change events on asChild textareas',
     async () => {
       await runBrowserBench(
@@ -367,7 +368,7 @@ describe('Textarea asChild dispatch bench', () => {
 });
 
 describe('Checkbox native mount bench', () => {
-  bench(
+  registerBench(
     'mount 1k native checkboxes',
     () => {
       return runBrowserBench(
@@ -380,7 +381,7 @@ describe('Checkbox native mount bench', () => {
 });
 
 describe('Checkbox asChild mount bench', () => {
-  bench(
+  registerBench(
     'mount 1k asChild checkboxes',
     () => {
       return runBrowserBench(
@@ -393,7 +394,7 @@ describe('Checkbox asChild mount bench', () => {
 });
 
 describe('Checkbox native dispatch bench', () => {
-  bench(
+  registerBench(
     'dispatch 1k clicks on native checkboxes',
     async () => {
       await runBrowserBench(
@@ -416,7 +417,7 @@ describe('Checkbox native dispatch bench', () => {
 });
 
 describe('Checkbox asChild dispatch bench', () => {
-  bench(
+  registerBench(
     'dispatch 1k clicks on asChild checkboxes',
     async () => {
       await runBrowserBench(
@@ -439,7 +440,7 @@ describe('Checkbox asChild dispatch bench', () => {
 });
 
 describe('Checkbox native update bench', () => {
-  bench(
+  registerBench(
     'update 1k native checkbox checked states',
     async () => {
       await runBrowserBench(
@@ -459,7 +460,7 @@ describe('Checkbox native update bench', () => {
 });
 
 describe('Toggle benches', () => {
-  bench(
+  registerBench(
     'update 1k pressed toggle states',
     async () => {
       await runBrowserBench(<ButtonUpdateFixture />, async (container) => {
@@ -476,7 +477,7 @@ describe('Toggle benches', () => {
 });
 
 describe('Switch benches', () => {
-  bench(
+  registerBench(
     'update 1k checked switch states',
     async () => {
       await runBrowserBench(<SwitchUpdateFixture />, async (container) => {

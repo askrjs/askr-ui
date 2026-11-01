@@ -1,8 +1,9 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import { Switch } from '../../src/components/switch';
 describe('Switch benches - native', () => {
-  bench(
+  registerBench(
     'SSR render native switch',
     () => {
       renderToStringSync(() => <Switch {...{ children: 'Power' }} />);
@@ -11,7 +12,7 @@ describe('Switch benches - native', () => {
   );
 });
 describe('Switch benches - checked', () => {
-  bench(
+  registerBench(
     'SSR render checked switch',
     () => {
       renderToStringSync(() => (
@@ -22,7 +23,7 @@ describe('Switch benches - checked', () => {
   );
 });
 describe('Switch benches - asChild', () => {
-  bench(
+  registerBench(
     'SSR render switch with asChild host',
     () => {
       renderToStringSync(() => (

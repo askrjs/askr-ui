@@ -1,8 +1,9 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import { Textarea } from '../../src/components/textarea';
 describe('Textarea benches', () => {
-  bench(
+  registerBench(
     'SSR render native textarea',
     () => {
       renderToStringSync(() => (
@@ -11,7 +12,7 @@ describe('Textarea benches', () => {
     },
     { throws: true }
   );
-  bench(
+  registerBench(
     'SSR render textarea with asChild host',
     () => {
       renderToStringSync(() => (

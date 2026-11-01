@@ -1,5 +1,6 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   Slider,
   SliderRange,
@@ -7,7 +8,7 @@ import {
   SliderTrack,
 } from '../../src/components';
 describe('Slider benches', () => {
-  bench(
+  registerBench(
     'SSR render slider',
     () => {
       renderToStringSync(() => (

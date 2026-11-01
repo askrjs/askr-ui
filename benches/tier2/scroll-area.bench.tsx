@@ -1,5 +1,6 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   ScrollArea,
   ScrollAreaCorner,
@@ -8,7 +9,7 @@ import {
   ScrollAreaViewport,
 } from '../../src/components/scroll-area';
 describe('ScrollArea benches - shell', () => {
-  bench(
+  registerBench(
     'SSR render scroll area shell',
     () => {
       renderToStringSync(() => (
@@ -38,7 +39,7 @@ describe('ScrollArea benches - shell', () => {
   );
 });
 describe('ScrollArea benches - asChild viewport', () => {
-  bench(
+  registerBench(
     'SSR render scroll area with asChild viewport',
     () => {
       renderToStringSync(() => (

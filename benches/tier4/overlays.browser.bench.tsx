@@ -1,5 +1,6 @@
 import { state } from '@askrjs/askr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   Dialog,
   DialogContent,
@@ -139,7 +140,7 @@ function ToastLifecycleFixture() {
 }
 
 describe('Dialog lifecycle benches', () => {
-  bench(
+  registerBench(
     'cycle 100 dialog open/close with listener cleanup',
     async () => {
       await runOverlayLifecycleBench({
@@ -168,7 +169,7 @@ describe('Dialog lifecycle benches', () => {
 });
 
 describe('Popover lifecycle benches', () => {
-  bench(
+  registerBench(
     'cycle 100 popover open/close with listener cleanup',
     async () => {
       await runOverlayLifecycleBench({
@@ -197,7 +198,7 @@ describe('Popover lifecycle benches', () => {
 });
 
 describe('Dropdown lifecycle benches', () => {
-  bench(
+  registerBench(
     'cycle 100 dropdown open/close with listener cleanup',
     async () => {
       await runOverlayLifecycleBench({
@@ -228,7 +229,7 @@ describe('Dropdown lifecycle benches', () => {
 });
 
 describe('Select lifecycle benches', () => {
-  bench(
+  registerBench(
     'cycle 100 select open/close with listener cleanup',
     async () => {
       await runOverlayLifecycleBench({
@@ -262,7 +263,7 @@ describe('Select lifecycle benches', () => {
 });
 
 describe('Tooltip lifecycle benches', () => {
-  bench(
+  registerBench(
     'cycle 100 tooltip open/close with listener cleanup',
     async () => {
       await runOverlayLifecycleBench({
@@ -294,7 +295,7 @@ describe('Tooltip lifecycle benches', () => {
 });
 
 describe('Toast lifecycle benches', () => {
-  bench(
+  registerBench(
     'cycle 100 toast open/close with listener cleanup',
     async () => {
       await runOverlayLifecycleBench({
