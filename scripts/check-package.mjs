@@ -156,8 +156,8 @@ console.log('ESM and native require: 254 retained value/path identities, 54 remo
     stdio: 'inherit',
   });
   for (const compiler of [
-    join(root, 'node_modules/@typescript/typescript6/bin/tsc6'),
-    join(root, 'node_modules/typescript/bin/tsc'),
+    join(root, 'node_modules/typescript/bin/tsc6'),
+    join(root, 'node_modules/@typescript/native/bin/tsc'),
   ]) {
     console.log(
       execFileSync(process.execPath, [compiler, '--version'], {
