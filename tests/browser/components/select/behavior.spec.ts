@@ -657,6 +657,87 @@ test.describe('Select - Behavior', () => {
     await expect.poll(focusedText(page)).toBe('Alpha');
   });
 
+  test('should preserve a disabled native asChild trigger', async ({
+    render,
+    root,
+  }) => {
+    await render('asChildDisabledTrigger');
+    const trigger = root.getByTestId('disabled-select-trigger');
+
+    await expect(trigger).toBeDisabled();
+    await trigger.evaluate((node: HTMLButtonElement) => node.click());
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('should preserve a disabled native asChild option', async ({
+    page,
+    render,
+    root,
+  }) => {
+    await render('asChildDisabledItem');
+    const trigger = root.locator('[data-slot="select-trigger"]');
+    const item = page.getByRole('option', { name: 'Beta', exact: true });
+    const hidden = root.locator('input[name="framework"]');
+
+    await trigger.click();
+    await expect(item).toBeDisabled();
+    await item.evaluate((node: HTMLButtonElement) => node.click());
+    await expect(hidden).toHaveValue('alpha');
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  test('should compose child refs for every asChild part', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildPartRefs');
+
+    expect(await run<Record<string, boolean>>('refStatus')).toEqual({
+      'trigger-component': true,
+      'trigger-child': true,
+      'value-component': true,
+      'value-child': true,
+      'content-component': true,
+      'content-child': true,
+      'group-component': true,
+      'group-child': true,
+      'label-component': true,
+      'label-child': true,
+      'item-component': true,
+      'item-child': true,
+      'item-text-component': true,
+      'item-text-child': true,
+      'separator-component': true,
+      'separator-child': true,
+    });
+  });
+
+  test('should render and update the selected value inside an asChild value host', async ({
+    page,
+    render,
+    root,
+  }) => {
+    await render('asChildValue', { defaultValue: 'alpha' });
+    const trigger = root.locator('[data-slot="select-trigger"]');
+    const value = root.getByTestId('as-child-select-value');
+
+    await expect(value).toHaveText('Alpha');
+    await trigger.click();
+    await page.getByRole('option', { name: 'Beta', exact: true }).click();
+    await expect(value).toHaveText('Beta');
+  });
+
+  test('should render the placeholder inside an empty asChild value host', async ({
+    render,
+    root,
+  }) => {
+    await render('asChildValue', { defaultValue: undefined });
+
+    await expect(root.getByTestId('as-child-select-value')).toHaveText(
+      'Choose one'
+    );
+  });
+
   test('should throw when SelectContent is used without Select', async ({
     render,
     run,

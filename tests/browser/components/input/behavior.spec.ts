@@ -61,6 +61,45 @@ test.describe('Input - Behavior', () => {
     await expect(input).toHaveAttribute('tabindex', '-1');
   });
 
+  test('should preserve a child disabled attribute when Input omits disabled', async ({
+    render,
+    root,
+  }) => {
+    await render('asChildChildDisabled');
+
+    await expect(
+      root.locator('[data-testid="already-disabled"]')
+    ).toBeDisabled();
+  });
+
+  test('should preserve child and Input refs for an asChild host', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildChildRef');
+
+    expect(await run<Record<string, boolean>>('refChecks')).toEqual({
+      child: true,
+      component: true,
+    });
+  });
+
+  test('should not detach and reattach asChild refs on a sibling-only rerender', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildStableRefsOnRerender');
+    const initial = {
+      sameInput: true,
+      childRefCalls: ['host'],
+      componentRefCalls: ['host'],
+    };
+
+    expect(await run('snapshot')).toEqual(initial);
+    await run('rerender');
+    expect(await run('snapshot')).toEqual(initial);
+  });
+
   test('should use search as the default debounced input type', async ({
     render,
     root,

@@ -25,8 +25,51 @@ export function asChildComposition(root: HTMLElement): void {
 export function asChildDisabled(root: HTMLElement): void {
   mount(
     <Textarea asChild disabled>
-      <textarea aria-label="Notes" />
+      <textarea aria-label="Notes" aria-disabled={false} />
     </Textarea>,
+    root
+  );
+}
+
+export function asChildChildDisabled(root: HTMLElement): void {
+  mount(
+    <Textarea asChild>
+      <textarea aria-label="Disabled notes" disabled />
+    </Textarea>,
+    root
+  );
+}
+
+export function asChildChildTabIndex(root: HTMLElement): void {
+  mount(
+    <Textarea asChild>
+      <textarea aria-label="Notes" tabIndex={-1} />
+    </Textarea>,
+    root
+  );
+}
+
+export function asChildRefs(root: HTMLElement) {
+  const childRef = { current: null as HTMLTextAreaElement | null };
+  const componentRef = { current: null as Element | null };
+  const container = mount(
+    <Textarea asChild ref={componentRef}>
+      <textarea ref={childRef} aria-label="Notes" />
+    </Textarea>,
+    root
+  );
+
+  return {
+    bothRefsAreHost: () => {
+      const host = container.querySelector('textarea');
+      return childRef.current === host && componentRef.current === host;
+    },
+  };
+}
+
+export function nativeAriaDisabledOverride(root: HTMLElement): void {
+  mount(
+    <Textarea aria-label="Disabled notes" disabled aria-disabled={false} />,
     root
   );
 }

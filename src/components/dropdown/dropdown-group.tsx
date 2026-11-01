@@ -1,6 +1,11 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { nativeRef } from '../_internal/native-ref';
+import { readDropdownChildRef } from './dropdown.shared';
 import type {
   DropdownGroupAsChildProps,
   DropdownGroupProps,
@@ -9,6 +14,17 @@ import type {
   DropdownSeparatorAsChildProps,
   DropdownSeparatorProps,
 } from './dropdown.types';
+
+function resolveDropdownSlotRef(
+  asChild: boolean | undefined,
+  children: unknown,
+  ref: Ref<Element> | undefined
+): Ref<Element> | undefined {
+  if (!asChild) return ref;
+  const childRef = readDropdownChildRef(children);
+  if (ref === undefined && childRef === undefined) return undefined;
+  return composeRefs(ref, childRef);
+}
 
 /**
  * Renders the `dropdown-group` part of `dropdown` with `role="group"`.
@@ -19,8 +35,13 @@ export function DropdownGroup(
   props: DropdownGroupProps | DropdownGroupAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
+  const slotRef = resolveDropdownSlotRef(
+    asChild,
+    children,
+    ref as Ref<Element> | undefined
+  );
   const finalProps = mergeProps(rest, {
-    ref,
+    ...(asChild && slotRef === undefined ? {} : { ref: slotRef }),
     role: 'group',
     'data-slot': 'dropdown-group',
   });
@@ -45,8 +66,13 @@ export function DropdownLabel(
   props: DropdownLabelProps | DropdownLabelAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
+  const slotRef = resolveDropdownSlotRef(
+    asChild,
+    children,
+    ref as Ref<Element> | undefined
+  );
   const finalProps = mergeProps(rest, {
-    ref,
+    ...(asChild && slotRef === undefined ? {} : { ref: slotRef }),
     'data-slot': 'dropdown-label',
     'data-dropdown-label': 'true',
   });
@@ -71,8 +97,13 @@ export function DropdownSeparator(
   props: DropdownSeparatorProps | DropdownSeparatorAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
+  const slotRef = resolveDropdownSlotRef(
+    asChild,
+    children,
+    ref as Ref<Element> | undefined
+  );
   const finalProps = mergeProps(rest, {
-    ref,
+    ...(asChild && slotRef === undefined ? {} : { ref: slotRef }),
     role: 'separator',
     'data-slot': 'dropdown-separator',
   });

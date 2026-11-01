@@ -1,6 +1,6 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, type Ref } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
 import { registerSsrPartId } from '../_internal/ssr-id-association';
 import { rovingFocus } from '../_internal/roving-focus';
@@ -15,7 +15,10 @@ import {
   registerOverlayNode,
   syncOverlayPosition,
 } from '../_internal/overlay';
-import { readDropdownRootContext } from './dropdown.shared';
+import {
+  readDropdownChildRef,
+  readDropdownRootContext,
+} from './dropdown.shared';
 import type {
   DropdownContentAsChildProps,
   DropdownContentProps,
@@ -46,6 +49,7 @@ export function DropdownContent(
     ...rest
   } = props;
   const root = readDropdownRootContext();
+  const childRef = asChild ? readDropdownChildRef(children) : undefined;
   claimOpenAutoFocus(root.overlayIdentity, root.open, null);
   const { items, currentIndex, disabledIndexes } = root.resolvedState;
   const hasEnabledItems = items.some(
@@ -111,16 +115,14 @@ export function DropdownContent(
       });
     }
   };
-  const refHandler = ref
-    ? composeRefs(
-        ref as
-          | ((value: HTMLElement | null) => void)
-          | { current: HTMLElement | null }
-          | null
-          | undefined,
-        setNode
-      )
-    : setNode;
+  const refHandler =
+    asChild || ref
+      ? composeRefs(
+          ref as Ref<HTMLElement>,
+          childRef as Ref<HTMLElement>,
+          setNode
+        )
+      : setNode;
   const finalProps = mergeComponentProps(rest, {
     ref: refHandler,
     id: root.contentId,

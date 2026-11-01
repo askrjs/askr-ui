@@ -135,6 +135,51 @@ export function asChildTrigger(root: HTMLElement): void {
   );
 }
 
+export function asChildRefs(root: HTMLElement) {
+  const triggerRef = { current: null as HTMLSpanElement | null };
+  const contentRef = { current: null as HTMLElement | null };
+  const container = mount(
+    <Collapsible defaultOpen>
+      <CollapsibleTrigger asChild>
+        <span ref={triggerRef}>Custom Trigger</span>
+      </CollapsibleTrigger>
+      <CollapsibleContent asChild>
+        <section ref={contentRef}>Custom Content</section>
+      </CollapsibleContent>
+    </Collapsible>,
+    root
+  );
+
+  return {
+    triggerRefIsHost: () =>
+      triggerRef.current === container.querySelector('span'),
+    contentRefIsHost: () =>
+      contentRef.current === container.querySelector('section'),
+  };
+}
+
+export function callerExpandedOverride(root: HTMLElement): void {
+  mount(
+    <Collapsible defaultOpen>
+      <CollapsibleTrigger aria-expanded={false}>Toggle</CollapsibleTrigger>
+      <CollapsibleContent>Content</CollapsibleContent>
+    </Collapsible>,
+    root
+  );
+}
+
+export function callerDisabledOverride(root: HTMLElement): void {
+  mount(
+    <Collapsible disabled>
+      <CollapsibleTrigger asChild aria-disabled={false}>
+        <span>Disabled Trigger</span>
+      </CollapsibleTrigger>
+      <CollapsibleContent>Content</CollapsibleContent>
+    </Collapsible>,
+    root
+  );
+}
+
 export function keyboardToggle(root: HTMLElement) {
   const onNativeOpenChange = spy<[boolean]>();
   const nativeContainer = mount(

@@ -121,10 +121,13 @@ Spaces typed after a typeahead prefix can match multiword values; a standalone
 visible text field that filters options is a separate Combobox capability, not
 Select behavior.
 
-Native buttons and direct `asChild` buttons retain browser activation and form
-submit/reset behavior. Non-native `asChild` hosts receive button-role
-Enter/Space behavior. Component defaults run only when neither an ancestor nor
-the caller canceled the event; activation remains exactly once in either path.
+Native button branches default to `type="button"`. Direct `asChild` `<button>`
+children get the same default unless the child supplies an explicit type. Opaque
+custom child components own their rendered host type and must forward or set it
+themselves.
+Non-native `asChild` hosts receive button-role Enter/Space behavior. Component
+defaults run only when neither an ancestor nor the caller canceled the event;
+activation remains exactly once in either path.
 Menu-item links preserve native Enter navigation, while Space maps to one click.
 
 HoverCard is a non-modal interactive preview. Pointer opening does not move

@@ -4,7 +4,10 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogOverlay,
   AlertDialogPortal,
+  AlertDialogTitle,
   AlertDialogTrigger,
 } from '../../../../../src/components/alert-dialog';
 import { Button } from '../../../../../src/components/button';
@@ -89,6 +92,106 @@ export function dismissCallback(root: HTMLElement) {
   );
 
   return { dismissCount: () => onDismiss.count() };
+}
+
+export function outsidePointerBlocked(root: HTMLElement) {
+  const onPointerDownOutside = spy();
+  mount(
+    <AlertDialog defaultOpen>
+      <AlertDialogPortal>
+        <AlertDialogContent onPointerDownOutside={onPointerDownOutside}>
+          Confirm action
+        </AlertDialogContent>
+      </AlertDialogPortal>
+    </AlertDialog>,
+    root
+  );
+  return { outsideCalls: () => onPointerDownOutside.count() };
+}
+
+export function escapeCanceled(root: HTMLElement) {
+  const onEscapeKeyDown = spy<[KeyboardEvent]>((event) =>
+    event.preventDefault()
+  );
+  mount(
+    <AlertDialog defaultOpen>
+      <AlertDialogPortal>
+        <AlertDialogContent onEscapeKeyDown={onEscapeKeyDown}>
+          Confirm action
+        </AlertDialogContent>
+      </AlertDialogPortal>
+    </AlertDialog>,
+    root
+  );
+  return { escapeCalls: () => onEscapeKeyDown.count() };
+}
+
+export function asChildRefs(root: HTMLElement) {
+  const triggerRef = { current: null as HTMLButtonElement | null };
+  const overlayRef = { current: null as HTMLDivElement | null };
+  const contentRef = { current: null as HTMLElement | null };
+  const titleRef = { current: null as HTMLHeadingElement | null };
+  const descriptionRef = { current: null as HTMLParagraphElement | null };
+  const cancelRef = { current: null as HTMLButtonElement | null };
+  const actionRef = { current: null as HTMLButtonElement | null };
+  mount(
+    <AlertDialog defaultOpen>
+      <AlertDialogTrigger asChild>
+        <button ref={triggerRef}>Open</button>
+      </AlertDialogTrigger>
+      <AlertDialogPortal>
+        <AlertDialogOverlay asChild>
+          <div ref={overlayRef} />
+        </AlertDialogOverlay>
+        <AlertDialogContent asChild>
+          <section ref={contentRef}>
+            <AlertDialogTitle asChild>
+              <h2 ref={titleRef}>Confirm</h2>
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <p ref={descriptionRef}>Description</p>
+            </AlertDialogDescription>
+            <AlertDialogCancel asChild>
+              <button ref={cancelRef}>Cancel</button>
+            </AlertDialogCancel>
+            <AlertDialogAction asChild>
+              <button ref={actionRef}>Confirm action</button>
+            </AlertDialogAction>
+          </section>
+        </AlertDialogContent>
+      </AlertDialogPortal>
+    </AlertDialog>,
+    root
+  );
+  return {
+    refChecks: () => {
+      const byText = (text: string) =>
+        Array.from(
+          document.body.querySelectorAll<HTMLButtonElement>(
+            '[data-dialog-close="true"]'
+          )
+        ).find((button) => button.textContent?.trim() === text);
+      return {
+        trigger:
+          triggerRef.current ===
+          document.body.querySelector('[data-slot="dialog-trigger"]'),
+        overlay:
+          overlayRef.current ===
+          document.body.querySelector('[data-slot="dialog-overlay"]'),
+        content:
+          contentRef.current ===
+          document.body.querySelector('[data-slot="dialog-content"]'),
+        title:
+          titleRef.current ===
+          document.body.querySelector('[data-slot="dialog-title"]'),
+        description:
+          descriptionRef.current ===
+          document.body.querySelector('[data-slot="dialog-description"]'),
+        cancel: cancelRef.current === byText('Cancel'),
+        action: actionRef.current === byText('Confirm action'),
+      };
+    },
+  };
 }
 
 export function persistentRestoreTarget(root: HTMLElement) {

@@ -1,4 +1,5 @@
 import { defineScope, readScope } from '@askrjs/askr';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
 import type { SsrIdRegistration } from '../_internal/ssr-id-association';
 import {
   getMenuCollection,
@@ -60,6 +61,28 @@ export const DropdownRootContext = defineScope<DropdownRootContextValue | null>(
 );
 export const DropdownRenderContext =
   defineScope<DropdownRenderContextValue | null>(null);
+
+/** Reads the ref attached to an asChild host element. */
+export function readDropdownChildRef(
+  children: unknown
+): Ref<Element> | undefined {
+  if (typeof children !== 'object' || children === null) return undefined;
+  return (children as { props?: { ref?: Ref<Element> } }).props?.ref;
+}
+
+/** Removes caller values for ARIA attributes owned by Dropdown state. */
+export function omitDropdownStateAriaProps<T extends object>(
+  props: T,
+  attributes: readonly string[]
+): T {
+  let result: T | undefined;
+  for (const attribute of attributes) {
+    if (!Object.prototype.hasOwnProperty.call(props, attribute)) continue;
+    result ??= { ...props };
+    delete (result as Record<string, unknown>)[attribute];
+  }
+  return result ?? props;
+}
 
 /**
  * Reads the Dropdown Root Context; throws if called outside its provider.

@@ -1,6 +1,10 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { getSignal, state } from '@askrjs/askr';
 import {
   createSsrIdRegistration,
@@ -15,6 +19,7 @@ import {
   readSelectRenderContext,
   readSelectRootContext,
   SelectGroupContext,
+  resolveSelectSlotRef,
 } from './select.shared';
 import type {
   SelectGroupAsChildProps,
@@ -126,11 +131,7 @@ export function SelectGroup(props: SelectGroupProps | SelectGroupAsChildProps) {
   };
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
-      ref as
-        | ((node: Element | null) => void)
-        | { current: Element | null }
-        | null
-        | undefined,
+      resolveSelectSlotRef(asChild, children, ref as Ref<Element> | undefined),
       (node: Element | null) => {
         association.node = node;
         syncLabel();
@@ -206,11 +207,7 @@ export function SelectLabel(props: SelectLabelProps | SelectLabelAsChildProps) {
   const labelNode = state<{ current: Element | null }>({ current: null })();
   const finalProps = mergeProps(rest, {
     ref: composeRefs(
-      ref as
-        | ((node: Element | null) => void)
-        | { current: Element | null }
-        | null
-        | undefined,
+      resolveSelectSlotRef(asChild, children, ref as Ref<Element> | undefined),
       (node: Element | null) => {
         const previous = labelNode.current;
         labelNode.current = node;
@@ -260,8 +257,13 @@ export function SelectSeparator(
   props: SelectSeparatorProps | SelectSeparatorAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
+  const separatorRef = resolveSelectSlotRef(
+    asChild,
+    children,
+    ref as Ref<Element> | undefined
+  );
   const finalProps = mergeProps(rest, {
-    ref,
+    ...(asChild ? { ref: separatorRef } : { ref }),
     role: 'separator',
     'data-slot': 'select-separator',
   });

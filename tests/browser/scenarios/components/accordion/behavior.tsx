@@ -443,3 +443,65 @@ export function virtualizedWindow(root: HTMLElement) {
     lastKeydownPrevented: () => lastKeydownPrevented,
   };
 }
+
+export function conflictingAriaState(root: HTMLElement): void {
+  mount(
+    <Accordion defaultValue="open" collapsible>
+      <AccordionItem value="open">
+        <AccordionHeader>
+          <AccordionTrigger aria-expanded={false}>Open</AccordionTrigger>
+        </AccordionHeader>
+        <AccordionContent>Panel</AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="disabled-native" disabled>
+        <AccordionHeader>
+          <AccordionTrigger aria-disabled={false} data-testid="disabled-native">
+            Disabled native
+          </AccordionTrigger>
+        </AccordionHeader>
+      </AccordionItem>
+      <AccordionItem value="disabled-custom" disabled>
+        <AccordionHeader>
+          <AccordionTrigger
+            asChild
+            aria-disabled={false}
+            data-testid="disabled-custom"
+          >
+            <span>Disabled custom</span>
+          </AccordionTrigger>
+        </AccordionHeader>
+      </AccordionItem>
+    </Accordion>,
+    root
+  );
+}
+
+export function asChildRefs(root: HTMLElement) {
+  const headerRef = { current: null as HTMLHeadingElement | null };
+  const triggerRef = { current: null as HTMLSpanElement | null };
+  const contentRef = { current: null as HTMLElement | null };
+  const container = mount(
+    <Accordion defaultValue="one">
+      <AccordionItem value="one">
+        <AccordionHeader asChild>
+          <h3 ref={headerRef}>
+            <AccordionTrigger asChild>
+              <span ref={triggerRef}>One</span>
+            </AccordionTrigger>
+          </h3>
+        </AccordionHeader>
+        <AccordionContent asChild>
+          <section ref={contentRef}>Panel</section>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>,
+    root
+  );
+  return {
+    refChecks: () => ({
+      header: headerRef.current === container.querySelector('h3'),
+      trigger: triggerRef.current === container.querySelector('span'),
+      content: contentRef.current === container.querySelector('section'),
+    }),
+  };
+}

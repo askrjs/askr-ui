@@ -1,11 +1,29 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { controllableState } from '@askrjs/askr/foundations/state';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { checkablePress } from '../_internal/checkable-press';
 import type { SwitchAsChildProps, SwitchButtonProps } from './switch.types';
 import { formResetRef } from '../_internal/form-reset';
+
+function readSwitchChildRef(children: unknown): Ref<Element> | undefined {
+  if (typeof children !== 'object' || children === null) return undefined;
+  return (children as { props?: { ref?: Ref<Element> } }).props?.ref;
+}
+
+function readSwitchChildForm(children: unknown): string | undefined {
+  if (typeof children !== 'object' || children === null) return undefined;
+  const form = (children as { props?: { form?: unknown } }).props?.form;
+  return typeof form === 'string' ? form : undefined;
+}
 
 /**
  * Renders the `switch` part of `switch` with `role="switch"`.
@@ -46,26 +64,34 @@ export function Switch(props: SwitchButtonProps | SwitchAsChildProps) {
     disabled,
     onPress: () => checkedState.set(!currentChecked),
   });
-
-  const finalProps = mergeProps(rest, {
-    ...interactionProps,
-    ref: composeRefs(
-      ref as
-        | ((value: Element | null) => void)
-        | { current: Element | null }
-        | null
-        | undefined,
-      resetRef
-    ),
+  const childRef = asChild ? readSwitchChildRef(children) : undefined;
+  const formAssociation =
+    (rest as { form?: string }).form ??
+    (asChild ? readSwitchChildForm(children) : undefined);
+  const switchStateProps = {
     role: 'switch',
     'aria-checked': currentChecked ? 'true' : 'false',
+    'aria-disabled': disabled ? 'true' : undefined,
+    tabIndex: disabled ? -1 : 0,
     'data-slot': 'switch',
     'data-disabled': disabled ? 'true' : undefined,
     'data-state': currentChecked ? 'checked' : 'unchecked',
-  });
+  };
 
+  const finalProps = mergeProps(rest, {
+    ...interactionProps,
+    ref: composeRefs(ref as Ref<Element> | undefined, childRef, resetRef),
+    ...switchStateProps,
+    ...(!asChild && disabled ? { disabled: true } : {}),
+  });
+  Object.assign(finalProps, switchStateProps);
+
+  const formProps = formAssociation
+    ? ({ form: formAssociation } as unknown as JSX.IntrinsicElements['input'])
+    : {};
   const hiddenInput = name ? (
     <input
+      {...formProps}
       type="checkbox"
       hidden
       aria-hidden="true"
@@ -82,7 +108,11 @@ export function Switch(props: SwitchButtonProps | SwitchAsChildProps) {
     return (
       <>
         {hiddenInput}
-        <Slot asChild {...finalProps} children={children} />
+        <Slot
+          asChild
+          {...withDefaultNativeButtonType(children, finalProps, typeProp)}
+          children={children}
+        />
       </>
     );
   }

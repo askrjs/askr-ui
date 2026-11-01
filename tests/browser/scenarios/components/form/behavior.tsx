@@ -1,5 +1,5 @@
 import { Form } from '../../../../../src/components/form';
-import { flushUpdates, mount, spy } from '../../_mount';
+import { flushUpdates, mount, spy, unmount } from '../../_mount';
 
 export function canonicalSurface(root: HTMLElement): void {
   mount(
@@ -61,4 +61,39 @@ export function asChildFormAttributes(root: HTMLElement): void {
     </Form>,
     root
   );
+}
+
+export function asChildRefs(root: HTMLElement) {
+  let componentRef: Element | null = null;
+  let hostRef: HTMLElement | null = null;
+  let omittedComponentHostRef: HTMLElement | null = null;
+  const first = mount(
+    <Form asChild ref={(node) => (componentRef = node)}>
+      <section ref={(node) => (hostRef = node)}>Fields</section>
+    </Form>,
+    root
+  );
+  const host = first.querySelector('[data-slot="form"]');
+  const componentMatches = componentRef === host;
+  const hostMatches = hostRef === host;
+
+  unmount(first);
+  const second = mount(
+    <Form asChild>
+      <section ref={(node) => (omittedComponentHostRef = node)}>
+        More fields
+      </section>
+    </Form>,
+    root
+  );
+  const omittedComponentHostMatches =
+    omittedComponentHostRef === second.querySelector('[data-slot="form"]');
+
+  return {
+    refs: () => ({
+      componentMatches,
+      hostMatches,
+      omittedComponentHostMatches,
+    }),
+  };
 }

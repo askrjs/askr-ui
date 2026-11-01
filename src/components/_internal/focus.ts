@@ -12,6 +12,7 @@ export {
 export {
   getActiveElement,
   isHTMLElement,
+  isFocusable,
   focusFirstDescendant,
   focusLastDescendant,
   getFocusableElements,

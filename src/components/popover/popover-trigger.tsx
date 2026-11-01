@@ -1,10 +1,21 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { runCancelablePress } from '../_internal/press';
-import { readPopoverRootContext } from './popover.shared';
+import {
+  omitPopoverStateAriaProps,
+  readPopoverChildRef,
+  readPopoverRootContext,
+} from './popover.shared';
 import {
   registerSsrPartId,
   setSsrIdAssociation,
@@ -33,6 +44,11 @@ export function PopoverTrigger(
     type: typeProp,
     ...rest
   } = props;
+  const callerProps = omitPopoverStateAriaProps(rest, [
+    'aria-disabled',
+    'aria-expanded',
+    'aria-haspopup',
+  ]);
   const root = readPopoverRootContext();
   const interactionProps = pressable({
     disabled,
@@ -43,13 +59,12 @@ export function PopoverTrigger(
     },
     isNativeButton: !asChild,
   });
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeProps(callerProps, {
     ...interactionProps,
     ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
+      ref as Ref<HTMLElement> | undefined,
+      (asChild ? readPopoverChildRef(children) : undefined) as
+        | Ref<HTMLElement>
         | undefined,
       (node: HTMLElement | null) => {
         root.setTriggerNode(
@@ -61,6 +76,7 @@ export function PopoverTrigger(
     id: root.triggerId,
     'aria-haspopup': 'dialog',
     'aria-expanded': root.open ? 'true' : 'false',
+    'aria-disabled': disabled ? 'true' : undefined,
     'aria-controls': root.contentId,
     'data-slot': 'popover-trigger',
     'data-disabled': disabled ? 'true' : undefined,
@@ -75,7 +91,13 @@ export function PopoverTrigger(
   );
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps, typeProp)}
+        children={children}
+      />
+    );
   }
 
   return (

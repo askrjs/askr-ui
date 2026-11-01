@@ -1,6 +1,10 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { DismissableLayer } from '../dismissable-layer';
 import { FocusScope } from '../focus-scope';
 import { syncPersistentOverlayFocus } from '../_internal/overlay-focus';
@@ -9,6 +13,8 @@ import {
   setSsrIdAssociation,
 } from '../_internal/ssr-id-association';
 import {
+  omitPopoverStateAriaProps,
+  readPopoverChildRef,
   readPopoverRootContext,
   resolvePopoverPositionOptions,
 } from './popover.shared';
@@ -41,6 +47,7 @@ export function PopoverContent(
     ...rest
   } = props;
   const root = readPopoverRootContext();
+  const callerProps = omitPopoverStateAriaProps(rest, ['role']);
   syncPersistentOverlayFocus(
     root.open,
     forceMount,
@@ -67,12 +74,11 @@ export function PopoverContent(
 
   root.registerContentPosition(position);
 
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeProps(callerProps, {
     ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
+      ref as Ref<HTMLElement> | undefined,
+      (asChild ? readPopoverChildRef(children) : undefined) as
+        | Ref<HTMLElement>
         | undefined,
       (node: HTMLElement | null) => {
         root.setContentNode(

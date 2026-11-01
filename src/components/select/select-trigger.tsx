@@ -1,14 +1,27 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeRef } from '../_internal/native-ref';
-import { nativeButtonProps } from '../_internal/native-control';
-import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
+import { cloneElement, Slot } from '@askrjs/askr/foundations/structures';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
 import { setSsrIdAssociation } from '../_internal/ssr-id-association';
+import { isJsxElement } from '../_internal/jsx';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { registerOverlayNode } from '../_internal/overlay';
 import { runCancelablePress } from '../_internal/press';
-import { readSelectRootContext } from './select.shared';
+import {
+  readSelectChildRef,
+  readSelectRootContext,
+  resolveSelectDisabled,
+  resolveSelectSlotRef,
+} from './select.shared';
 import type {
   SelectPortalProps,
   SelectTriggerAsChildProps,
@@ -29,19 +42,13 @@ export function SelectTrigger(
 export function SelectTrigger(
   props: SelectTriggerProps | SelectTriggerAsChildProps
 ) {
-  const {
-    asChild,
-    children,
-    disabled = false,
-    onPress,
-    ref,
-    size,
-    type,
-    ...rest
-  } = props;
+  const { asChild, children, disabled, onPress, ref, size, type, ...rest } =
+    props;
   const root = readSelectRootContext();
   const overlayNodeOwner = {};
-  const isDisabled = root.disabled || disabled;
+  const isDisabled =
+    root.disabled ||
+    resolveSelectDisabled(children, disabled, asChild === true);
   const interactionProps = pressable({
     disabled: isDisabled,
     onPress: (event) => {
@@ -80,11 +87,11 @@ export function SelectTrigger(
     onKeyDown: handleKeyDown,
     onKeyUp: handleKeyUp,
     ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
+      resolveSelectSlotRef(
+        asChild,
+        children,
+        ref as Ref<Element> | undefined
+      ) as Ref<HTMLElement> | undefined,
       (node: HTMLElement | null) => {
         if (node)
           root.idAssociation.automatic.controls =
@@ -102,7 +109,9 @@ export function SelectTrigger(
     'aria-haspopup': 'listbox',
     'aria-expanded': root.open ? 'true' : 'false',
     'aria-controls': root.contentId,
-    disabled: isDisabled && !asChild ? true : undefined,
+    ...(asChild && disabled === undefined && !root.disabled
+      ? {}
+      : { disabled: isDisabled ? true : undefined }),
     'data-slot': 'select-trigger',
     'data-disabled': isDisabled ? 'true' : undefined,
     'data-size': size && size !== 'md' ? size : undefined,
@@ -117,7 +126,13 @@ export function SelectTrigger(
   );
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps, type)}
+        children={children}
+      />
+    );
   }
 
   return (
@@ -139,14 +154,25 @@ export function SelectValue(props: SelectValueProps | SelectValueAsChildProps) {
   const root = readSelectRootContext();
   const { selectedText } = root.resolvedState;
   const renderedChildren = children ?? (selectedText || placeholder || null);
+  const childRef = asChild ? readSelectChildRef(children) : undefined;
+  const valueRef =
+    ref == null && childRef == null
+      ? undefined
+      : composeRefs(ref as Ref<Element> | undefined, childRef);
+  const valueHost =
+    asChild && isJsxElement(children) && children.props?.children === undefined
+      ? cloneElement(children, {
+          children: selectedText || placeholder || null,
+        })
+      : children;
   const finalProps = mergeProps(rest, {
-    ref,
+    ...(asChild ? { ref: valueRef } : { ref }),
     'data-slot': 'select-value',
     'data-placeholder': !selectedText && placeholder ? 'true' : undefined,
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children as JSX.Element} />;
+    return <Slot asChild {...finalProps} children={valueHost as JSX.Element} />;
   }
 
   return (

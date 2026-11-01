@@ -190,20 +190,34 @@ export function resolveVirtualRange(options: {
   };
 }
 
+/** Builds cumulative variable row offsets once for range and scroll lookups. */
+export function buildVariableVirtualOffsets(
+  rowHeights: readonly number[]
+): number[] {
+  const offsets = [0];
+  for (const height of rowHeights) {
+    offsets.push(
+      offsets[offsets.length - 1]! +
+        assertPositiveVirtualHeight(height, 'getRowHeight result')
+    );
+  }
+  return offsets;
+}
+
 export function resolveVariableVirtualRange(options: {
   rowHeights: readonly number[];
+  rowOffsets?: readonly number[];
   scrollTop: number;
   viewportHeight: number;
   overscan?: VirtualOverscan;
 }): VirtualRange {
-  const rowHeights = options.rowHeights.map((height) =>
-    assertPositiveVirtualHeight(height, 'getRowHeight result')
-  );
+  const rowHeights = options.rowHeights;
   const totalCount = rowHeights.length;
+  const offsets = options.rowOffsets ?? buildVariableVirtualOffsets(rowHeights);
+  if (offsets.length !== totalCount + 1) {
+    throw new Error('rowOffsets must include one boundary per row');
+  }
   const viewportHeight = Math.max(0, Number(options.viewportHeight) || 0);
-  const offsets = [0];
-  for (const height of rowHeights)
-    offsets.push(offsets[offsets.length - 1] + height);
   const totalHeight = offsets[totalCount];
   const maxScrollTop = Math.max(0, totalHeight - viewportHeight);
   const scrollTop = clampRangeValue(
@@ -270,8 +284,16 @@ export function resolveVariableVirtualRange(options: {
 
 export function resolveVariableVirtualOffset(
   rowHeights: readonly number[],
-  index: number
+  index: number,
+  rowOffsets?: readonly number[]
 ): number {
+  if (rowOffsets) {
+    const boundary = Math.min(
+      rowHeights.length,
+      Math.max(0, Math.floor(index))
+    );
+    return rowOffsets[boundary] ?? 0;
+  }
   let offset = 0;
   for (let current = 0; current < Math.max(0, index); current += 1)
     offset += rowHeights[current] ?? 0;
@@ -282,15 +304,21 @@ export function resolveVariableVirtualScrollTopForIndex(
   index: number,
   rowHeights: readonly number[],
   viewportHeight: number,
-  alignment: VirtualScrollAlignment = 'start'
+  alignment: VirtualScrollAlignment = 'start',
+  rowOffsets?: readonly number[]
 ): number {
   const clampedIndex = clampVirtualIndex(index, rowHeights.length);
   if (clampedIndex < 0) return 0;
-  const rowTop = resolveVariableVirtualOffset(rowHeights, clampedIndex);
+  const rowTop = resolveVariableVirtualOffset(
+    rowHeights,
+    clampedIndex,
+    rowOffsets
+  );
   const rowHeight = rowHeights[clampedIndex];
   const totalHeight = resolveVariableVirtualOffset(
     rowHeights,
-    rowHeights.length
+    rowHeights.length,
+    rowOffsets
   );
   const maxScrollTop = Math.max(0, totalHeight - viewportHeight);
   if (alignment === 'center')
@@ -402,7 +430,8 @@ export function createVariableVirtualAnchor(
   visibleKeys: readonly string[],
   visibleStartIndex: number,
   scrollTop: number,
-  rowHeights: readonly number[]
+  rowHeights: readonly number[],
+  rowOffsets?: readonly number[]
 ): VirtualAnchor | null {
   const anchorOffset = visibleKeys.indexOf(key);
   if (anchorOffset < 0 || visibleStartIndex < 0) return null;
@@ -413,7 +442,8 @@ export function createVariableVirtualAnchor(
       scrollTop -
       resolveVariableVirtualOffset(
         rowHeights,
-        visibleStartIndex + anchorOffset
+        visibleStartIndex + anchorOffset,
+        rowOffsets
       ),
   };
 }
@@ -435,12 +465,14 @@ export function resolveVirtualScrollTopFromAnchor(
 export function resolveVariableVirtualScrollTopFromAnchor(
   anchor: VirtualAnchor,
   nextKeyIndexMap: Map<string, number>,
-  rowHeights: readonly number[]
+  rowHeights: readonly number[],
+  rowOffsets?: readonly number[]
 ): number | null {
   const nextIndex = nextKeyIndexMap.get(anchor.key);
   return nextIndex === undefined
     ? null
-    : resolveVariableVirtualOffset(rowHeights, nextIndex) + anchor.offset;
+    : resolveVariableVirtualOffset(rowHeights, nextIndex, rowOffsets) +
+        anchor.offset;
 }
 
 export function isVirtualAppendOnly(

@@ -2,7 +2,12 @@ import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeRef } from '../_internal/native-ref';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
-import { readDialogRootContext } from './dialog.shared';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
+import { resolveAsChildRef } from '../_internal/slot-ref';
+import {
+  omitDialogStateAriaProps,
+  readDialogRootContext,
+} from './dialog.shared';
 import type {
   DialogOverlayAsChildProps,
   DialogOverlayProps,
@@ -27,8 +32,12 @@ export function DialogOverlay(
 ) {
   const { asChild, children, forceMount = false, ref, ...rest } = props;
   const root = readDialogRootContext();
-  const finalProps = mergeProps(rest, {
-    ref,
+  const callerProps = omitDialogStateAriaProps(rest, ['aria-hidden']);
+  const resolvedRef = asChild
+    ? resolveAsChildRef(children, ref as Ref<Element> | undefined)
+    : ref;
+  const finalProps = mergeProps(callerProps, {
+    ...(resolvedRef === undefined ? {} : { ref: resolvedRef }),
     'data-slot': 'dialog-overlay',
     'data-state': root.open ? 'open' : 'closed',
     'data-dialog-overlay': 'true',

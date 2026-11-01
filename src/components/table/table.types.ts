@@ -75,7 +75,9 @@ export type TableHeaderCellProps =
   | TableHeaderCellAsChildProps;
 
 /** Props for the `asChild` (polymorphic) rendering of Table Header Cell. */
-export type TableHeaderCellAsChildProps = TableAsChildBaseProps;
+export type TableHeaderCellAsChildProps = TableAsChildBaseProps & {
+  scope?: JSX.IntrinsicElements['th']['scope'];
+};
 
 /** Props for Table Cell. */
 export type TableCellProps =

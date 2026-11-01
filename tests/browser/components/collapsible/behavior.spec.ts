@@ -161,6 +161,40 @@ test.describe('Collapsible - Behavior', () => {
       await expect(span).toHaveText('Custom Trigger');
     });
 
+    test('should preserve child refs when wrapper refs are omitted', async ({
+      render,
+      run,
+    }) => {
+      await render('asChildRefs');
+
+      expect(await run<boolean>('triggerRefIsHost')).toBe(true);
+      expect(await run<boolean>('contentRefIsHost')).toBe(true);
+    });
+
+    test('should keep aria-expanded aligned with the actual state', async ({
+      render,
+      root,
+    }) => {
+      await render('callerExpandedOverride');
+
+      await expect(root.locator('button')).toHaveAttribute(
+        'aria-expanded',
+        'true'
+      );
+    });
+
+    test('should keep aria-disabled aligned with the disabled state', async ({
+      render,
+      root,
+    }) => {
+      await render('callerDisabledOverride');
+
+      await expect(root.locator('[data-collapsible-trigger]')).toHaveAttribute(
+        'aria-disabled',
+        'true'
+      );
+    });
+
     test('should toggle exactly once with Enter and Space on native and asChild triggers', async ({
       page,
       render,

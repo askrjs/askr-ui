@@ -4,15 +4,16 @@ import {
   setSsrIdAssociation,
 } from '../_internal/ssr-id-association';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, type Ref } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
 import { DismissableLayer } from '../dismissable-layer';
 import {
   dismissPopupWithTab,
   getActiveElement,
-  getFocusableElements,
+  getTabbableElements,
 } from '../_internal/focus';
 import {
+  readHoverCardChildRef,
   readHoverCardRootContext,
   resolveHoverCardPositionOptions,
 } from './hover-card.shared';
@@ -46,6 +47,7 @@ export function HoverCardContent(
     ...rest
   } = props;
   const root = readHoverCardRootContext();
+  const childRef = asChild ? readHoverCardChildRef(children) : undefined;
   const position = resolveHoverCardPositionOptions({
     side,
     align,
@@ -53,11 +55,8 @@ export function HoverCardContent(
   });
   const finalProps = mergeComponentProps(rest, {
     ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
+      ref as Ref<HTMLElement> | undefined,
+      childRef as Ref<HTMLElement> | undefined,
       (node: HTMLElement | null) => {
         root.setContentNode(
           node,
@@ -136,9 +135,9 @@ export function HoverCardContent(
       if (event.key !== 'Tab') {
         return;
       }
-      const focusable = getFocusableElements(content);
+      const tabbable = getTabbableElements(content);
       const active = getActiveElement(content.ownerDocument);
-      if (event.shiftKey && active === focusable[0] && trigger) {
+      if (event.shiftKey && active === tabbable[0] && trigger) {
         event.preventDefault();
         root.requestTriggerFocus();
         root.setOpen(false);
@@ -152,7 +151,7 @@ export function HoverCardContent(
         });
         return;
       }
-      if (!event.shiftKey && active === focusable[focusable.length - 1]) {
+      if (!event.shiftKey && active === tabbable[tabbable.length - 1]) {
         dismissPopupWithTab(event, trigger, [content], () =>
           root.setOpen(false)
         );

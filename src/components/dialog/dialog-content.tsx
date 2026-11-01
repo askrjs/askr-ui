@@ -1,6 +1,10 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { DismissableLayer } from '../dismissable-layer';
 import { FocusScope } from '../focus-scope';
 import { syncPersistentOverlayFocus } from '../_internal/overlay-focus';
@@ -8,7 +12,7 @@ import {
   registerSsrPartId,
   setSsrIdAssociation,
 } from '../_internal/ssr-id-association';
-import { readDialogRootContext } from './dialog.shared';
+import { readDialogChildRef, readDialogRootContext } from './dialog.shared';
 import type {
   DialogContentAsChildProps,
   DialogContentProps,
@@ -41,9 +45,11 @@ export function DialogContent(
     restoreFocus,
     ...rest
   } = props;
+  const childRef = asChild ? readDialogChildRef(children) : undefined;
   const {
     'aria-labelledby': labelledBy,
     'aria-describedby': describedBy,
+    'aria-modal': _ariaModal,
     ...contentProps
   } = rest as JSX.IntrinsicElements['div'];
   const root = readDialogRootContext();
@@ -68,16 +74,7 @@ export function DialogContent(
       root.clearPosition();
     }
   };
-  const refHandler = ref
-    ? composeRefs(
-        ref as
-          | ((value: HTMLElement | null) => void)
-          | { current: HTMLElement | null }
-          | null
-          | undefined,
-        setNode
-      )
-    : setNode;
+  const refHandler = composeRefs(ref as Ref<HTMLElement>, childRef, setNode);
   const finalProps = mergeProps(contentProps, {
     ref: refHandler,
     id: root.contentId,
@@ -114,7 +111,7 @@ export function DialogContent(
     <Presence present={forceMount || root.open}>
       <FocusScope
         trapped={root.modal && root.open}
-        loop={root.open}
+        loop={root.modal && root.open}
         autoFocus={root.open}
         restoreFocus
         restoreFocusTarget={getRestoreTarget}

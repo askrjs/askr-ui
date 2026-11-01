@@ -330,3 +330,127 @@ export function emptyStringSelection(root: HTMLElement) {
   );
   return { changes: () => changes };
 }
+
+export function asChildRefs(root: HTMLElement) {
+  const childRef = { current: null as HTMLButtonElement | null };
+  const callerRef = { current: null as Element | null };
+  mount(
+    <RadioGroup defaultValue="small">
+      <RadioGroupItem
+        asChild
+        ref={(node) => (callerRef.current = node)}
+        value="small"
+      >
+        <button ref={childRef}>Small</button>
+      </RadioGroupItem>
+    </RadioGroup>,
+    root
+  );
+  return {
+    refs: () => ({
+      child: childRef.current !== null,
+      caller: callerRef.current !== null,
+    }),
+  };
+}
+
+export function disabledNativeChild(root: HTMLElement) {
+  const changes: string[] = [];
+  const container = mount(
+    <RadioGroup
+      defaultValue="active"
+      onValueChange={(value) => changes.push(value)}
+    >
+      <RadioGroupItem asChild value="blocked">
+        <button disabled data-testid="disabled-radio-host">
+          Blocked
+        </button>
+      </RadioGroupItem>
+      <RadioGroupItem value="active">Active</RadioGroupItem>
+    </RadioGroup>,
+    root
+  );
+  return {
+    activateDisabledHost: () => {
+      (
+        container.querySelector(
+          '[data-testid="disabled-radio-host"]'
+        ) as HTMLButtonElement | null
+      )?.click();
+    },
+    changes: () => changes,
+  };
+}
+
+export function canceledItemClick(root: HTMLElement) {
+  const changes: string[] = [];
+  mount(
+    <RadioGroup
+      defaultValue="small"
+      onValueChange={(value) => changes.push(value)}
+    >
+      <RadioGroupItem value="small">Small</RadioGroupItem>
+      <RadioGroupItem
+        value="medium"
+        onClick={(event) => event.preventDefault()}
+      >
+        Medium
+      </RadioGroupItem>
+    </RadioGroup>,
+    root
+  );
+  return { changes: () => changes };
+}
+
+export function statePropOverrides(root: HTMLElement) {
+  mount(
+    <RadioGroup
+      defaultValue="selected"
+      orientation="horizontal"
+      role="group"
+      aria-orientation="vertical"
+      data-orientation="vertical"
+    >
+      <RadioGroupItem
+        data-testid="selected-radio"
+        value="selected"
+        role="checkbox"
+        aria-checked="false"
+        data-state="unchecked"
+        tabIndex={4}
+      >
+        Selected
+      </RadioGroupItem>
+      <RadioGroupItem asChild value="blocked" disabled>
+        <span
+          data-testid="blocked-radio"
+          role="checkbox"
+          aria-disabled="false"
+          aria-checked="true"
+          data-state="checked"
+          tabIndex={0}
+        >
+          Blocked
+        </span>
+      </RadioGroupItem>
+    </RadioGroup>,
+    root
+  );
+}
+
+export async function iframeFormReset(root: HTMLElement): Promise<void> {
+  const iframe = document.createElement('iframe');
+  root.appendChild(iframe);
+  const ownerDocument = iframe.contentDocument;
+  if (!ownerDocument) throw new Error('Expected a same-origin iframe document');
+  const form = ownerDocument.createElement('form');
+  ownerDocument.body.appendChild(form);
+  mount(
+    <RadioGroup name="size" defaultValue="small">
+      <RadioGroupItem value="small">Small</RadioGroupItem>
+      <RadioGroupItem value="medium">Medium</RadioGroupItem>
+    </RadioGroup>,
+    form
+  );
+  await flushUpdates();
+}

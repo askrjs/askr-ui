@@ -89,6 +89,69 @@ test.describe('Slider - Behavior', () => {
     await expect(root.locator('input[type="hidden"]')).toHaveValue('40');
   });
 
+  test('should forward child refs for every asChild part', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildPartRefs');
+
+    expect(await run<Record<string, boolean>>('refStatus')).toEqual({
+      'track-component': true,
+      'track-child': true,
+      'range-component': true,
+      'range-child': true,
+      'thumb-component': true,
+      'thumb-child': true,
+    });
+  });
+
+  test('should keep the thumb role and value semantics tied to slider state', async ({
+    render,
+    root,
+  }) => {
+    await render('semanticOverrides');
+    const thumb = root.locator('[data-slider-thumb]');
+
+    await expect(thumb).toHaveAttribute('role', 'slider');
+    await expect(thumb).toHaveAttribute('aria-valuemin', '0');
+    await expect(thumb).toHaveAttribute('aria-valuemax', '100');
+    await expect(thumb).toHaveAttribute('aria-valuenow', '50');
+    await expect(thumb).toHaveAttribute('aria-orientation', 'vertical');
+  });
+
+  test('should remove a disabled native asChild thumb from the tab order', async ({
+    render,
+    root,
+  }) => {
+    await render('disabledAsChildThumb');
+    const thumb = root.locator('[data-slider-thumb]');
+
+    await expect(thumb).toHaveAttribute('aria-disabled', 'true');
+    await expect(thumb).toHaveAttribute('tabindex', '-1');
+  });
+
+  test('should handle pointer drag inside the slider owner iframe', async ({
+    page,
+    render,
+  }) => {
+    await render('iframeDrag');
+    const frame = page.frameLocator('iframe');
+    const track = frame.locator('[data-slider-track="true"]');
+    const thumb = frame.getByRole('slider');
+    const trackBox = await track.boundingBox();
+    const thumbBox = await thumb.boundingBox();
+    if (!trackBox || !thumbBox) throw new Error('iframe slider has no layout');
+
+    const y = trackBox.y + trackBox.height / 2;
+    await page.mouse.move(thumbBox.x + thumbBox.width / 2, y);
+    await page.mouse.down();
+    await page.mouse.move(trackBox.x + trackBox.width * 0.6, y, { steps: 8 });
+
+    await expect(thumb).toHaveAttribute('aria-valuenow', '60');
+    await page.mouse.up();
+    await expect(frame.locator('input[type="hidden"]')).toHaveValue('60');
+  });
+
   test('should reverse horizontal pointer and arrow semantics in RTL', async ({
     page,
     render,

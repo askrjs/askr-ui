@@ -1,9 +1,13 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
 import { hoverable } from '@askrjs/askr/foundations/interactions';
-import { readTooltipRootContext } from './tooltip.shared';
+import { readTooltipChildRef, readTooltipRootContext } from './tooltip.shared';
 import { setSsrIdAssociation } from '../_internal/ssr-id-association';
 import type {
   TooltipTriggerAsChildProps,
@@ -44,16 +48,11 @@ export function TooltipTrigger(
       (rest as Record<string, unknown>)['aria-describedby'] === undefined
     );
   };
-  const refHandler = ref
-    ? composeRefs(
-        ref as
-          | ((value: HTMLElement | null) => void)
-          | { current: HTMLElement | null }
-          | null
-          | undefined,
-        setNode
-      )
-    : setNode;
+  const childRef = asChild ? readTooltipChildRef(children) : undefined;
+  const refHandler =
+    ref || childRef
+      ? composeRefs(ref as Ref<HTMLElement> | undefined, childRef, setNode)
+      : setNode;
   const finalProps = mergeProps(rest, {
     ...hoverProps,
     ref: refHandler,
@@ -100,7 +99,13 @@ export function TooltipTrigger(
   );
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps, typeProp)}
+        children={children}
+      />
+    );
   }
 
   return (

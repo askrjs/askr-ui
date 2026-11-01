@@ -3,8 +3,10 @@ import { nativeRef } from '../_internal/native-ref';
 import { state } from '@askrjs/askr';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
-import { resource } from '@askrjs/askr/resources';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
+import { resource, task } from '@askrjs/askr/resources';
 import { resolveCompoundId } from '../_internal/id';
+import { resolveAsChildRef } from '../_internal/slot-ref';
 import type {
   AvatarAsChildProps,
   AvatarFallbackAsChildProps,
@@ -67,9 +69,18 @@ export function Avatar(props: AvatarProps | AvatarAsChildProps) {
   const entry = getAvatarEntry(identity);
   const statusState = state<AvatarLoadingStatus>(entry.status);
   const status = statusState();
+  const slotRef = asChild
+    ? resolveAsChildRef(children, ref as Ref<Element> | undefined)
+    : undefined;
 
   const finalProps = mergeProps(rest, {
-    ref,
+    ...(asChild
+      ? slotRef === undefined
+        ? {}
+        : { ref: slotRef }
+      : ref === undefined
+        ? {}
+        : { ref }),
     'data-slot': 'avatar',
     'data-avatar': 'true',
     'data-state': status,
@@ -104,6 +115,11 @@ export function AvatarImage(props: AvatarImageProps): JSX.Element {
   const entry = getAvatarEntry(identity);
   const normalizedSrc = typeof src === 'string' && src ? src : null;
   const sourceChanged = entry.src !== normalizedSrc;
+
+  task(() => () => {
+    entry.src = null;
+    setStatus('idle');
+  });
 
   // Publish the new source only once the render commits, so a rejected render
   // cannot swallow the loading reset on the next accepted one.
@@ -165,8 +181,17 @@ export function AvatarFallback(
   const { asChild, children, ref, ...rest } = props;
   const context = readAvatarContext();
   const status = context.status;
+  const slotRef = asChild
+    ? resolveAsChildRef(children, ref as Ref<Element> | undefined)
+    : undefined;
   const finalProps = mergeProps(rest, {
-    ref,
+    ...(asChild
+      ? slotRef === undefined
+        ? {}
+        : { ref: slotRef }
+      : ref === undefined
+        ? {}
+        : { ref }),
     'data-slot': 'avatar-fallback',
     'data-avatar-fallback': 'true',
     'data-state': status,

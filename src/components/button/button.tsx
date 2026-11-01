@@ -1,8 +1,13 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeRef } from '../_internal/native-ref';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
+import { resolveAsChildRef } from '../_internal/slot-ref';
 import { getButtonInteractionProps } from './button-interactions';
 import type { ButtonNativeProps, ButtonAsChildProps } from './button.types';
 
@@ -23,7 +28,7 @@ function normalizeAriaProps(
  *
  * ## Responsibilities
  * - Compose pressable foundation for interaction behavior
- * - Enforce type="button" default to prevent accidental form submission
+ * - Default native buttons and direct asChild button hosts to type="button"
  * - Forward props and refs to native button or child element
  *
  * ## Non-Responsibilities (delegated to pressable foundation)
@@ -83,19 +88,34 @@ export function Button(props: ButtonNativeProps | ButtonAsChildProps) {
     onPress,
   });
 
+  const normalizedRest = normalizeAriaProps(rest);
+  if (disabled) {
+    // The disabled prop owns this state; do not let a forwarded ARIA value
+    // contradict the interaction state supplied by the pressable foundation.
+    delete normalizedRest['aria-disabled'];
+  }
+
+  const resolvedRef = asChild
+    ? resolveAsChildRef(children, ref as Ref<Element> | undefined)
+    : ref;
   // Prop composition: merge user props, interaction props, and ref
-  const finalProps = mergeProps(normalizeAriaProps(rest), {
+  const finalProps = mergeProps(normalizedRest, {
     ...interactionProps,
     'data-slot': 'button',
     'data-disabled': disabled ? 'true' : undefined,
     'data-variant': variant && variant !== 'default' ? variant : undefined,
     'data-size': size && size !== 'md' ? size : undefined,
     'data-width': width && width !== 'auto' ? width : undefined,
-    ref,
+    ...(resolvedRef === undefined ? {} : { ref: resolvedRef }),
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children as JSX.Element} />;
+    const slotProps = withDefaultNativeButtonType(
+      children,
+      finalProps,
+      typeProp
+    );
+    return <Slot asChild {...slotProps} children={children as JSX.Element} />;
   }
 
   // Explicit type="button" default prevents accidental form submission

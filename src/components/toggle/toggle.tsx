@@ -1,10 +1,31 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { nativeRef } from '../_internal/native-ref';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { pressable } from '@askrjs/askr/foundations/interactions';
-import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
 import type { ToggleButtonProps, ToggleAsChildProps } from './toggle.types';
+import { isJsxElement } from '../_internal/jsx';
+
+function readToggleChildRef(children: unknown): Ref<Element> | undefined {
+  if (!isJsxElement(children)) return undefined;
+  return children.props.ref as Ref<Element> | undefined;
+}
+
+function resolveToggleSlotRef(
+  asChild: boolean | undefined,
+  children: unknown,
+  ref: Ref<Element> | undefined
+): Ref<Element> | undefined {
+  if (!asChild) return ref;
+  const childRef = readToggleChildRef(children);
+  if (ref == null && childRef == null) return undefined;
+  return composeRefs(ref, childRef);
+}
 
 /**
  * Headless Toggle component
@@ -12,7 +33,7 @@ import type { ToggleButtonProps, ToggleAsChildProps } from './toggle.types';
  * ## Responsibilities
  * - Compose pressable foundation for interaction behavior
  * - Apply aria-pressed for toggle state signaling
- * - Enforce type="button" default to prevent accidental form submission
+ * - Default native buttons and direct asChild button hosts to type="button"
  * - Forward props and refs to native button or child element
  *
  * ## Non-Responsibilities (delegated to pressable foundation)
@@ -68,6 +89,11 @@ export function Toggle(props: ToggleButtonProps | ToggleAsChildProps) {
     onPress,
     isNativeButton: !asChild,
   });
+  const resolvedRef = resolveToggleSlotRef(
+    asChild,
+    children,
+    ref as Ref<Element> | undefined
+  );
 
   // Prop composition: merge user props, interaction props, aria-pressed, and ref
   const finalProps = mergeProps(rest, {
@@ -76,11 +102,16 @@ export function Toggle(props: ToggleButtonProps | ToggleAsChildProps) {
     'data-slot': 'toggle',
     'data-disabled': disabled ? 'true' : undefined,
     'data-state': pressed ? 'on' : 'off',
-    ref,
+    ref: resolvedRef,
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    const slotProps = withDefaultNativeButtonType(
+      children,
+      finalProps,
+      typeProp
+    );
+    return <Slot asChild {...slotProps} children={children} />;
   }
 
   // Explicit type="button" default prevents accidental form submission

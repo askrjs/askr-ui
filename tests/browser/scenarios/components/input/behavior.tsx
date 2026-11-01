@@ -8,7 +8,10 @@ export function nativeDefault(root: HTMLElement): void {
 }
 
 export function nativeDisabledReadOnly(root: HTMLElement): void {
-  mount(<Input disabled readOnly aria-label="locked-input" />, root);
+  mount(
+    <Input disabled readOnly aria-disabled={false} aria-label="locked-input" />,
+    root
+  );
 }
 
 export function asChildComposition(root: HTMLElement): void {
@@ -22,11 +25,79 @@ export function asChildComposition(root: HTMLElement): void {
 
 export function asChildDisabled(root: HTMLElement): void {
   mount(
-    <Input asChild disabled>
+    <Input asChild disabled aria-disabled={false}>
       <input aria-label="Email" />
     </Input>,
     root
   );
+}
+
+export function asChildChildDisabled(root: HTMLElement): void {
+  mount(
+    <Input asChild>
+      <input disabled data-testid="already-disabled" />
+    </Input>,
+    root
+  );
+}
+
+export function asChildChildRef(root: HTMLElement) {
+  const childRef = { current: null as HTMLInputElement | null };
+  const inputRef = { current: null as HTMLInputElement | null };
+  const container = mount(
+    <Input asChild ref={inputRef}>
+      <input ref={childRef} />
+    </Input>,
+    root
+  );
+  return {
+    refChecks: () => ({
+      child: childRef.current === container.querySelector('input'),
+      component: inputRef.current === container.querySelector('input'),
+    }),
+  };
+}
+
+export function asChildStableRefsOnRerender(root: HTMLElement) {
+  const childRefCalls: Array<Element | null> = [];
+  const componentRefCalls: Array<Element | null> = [];
+  const childRef = (node: Element | null) => {
+    childRefCalls.push(node);
+  };
+  const componentRef = (node: Element | null) => {
+    componentRefCalls.push(node);
+  };
+  function Fixture() {
+    const version = state(0);
+    return (
+      <div>
+        <Input asChild ref={componentRef}>
+          <input ref={childRef} aria-label="Stable ref input" />
+        </Input>
+        <Button onPress={() => version.set(version() + 1)}>
+          Rerender {version()}
+        </Button>
+      </div>
+    );
+  }
+
+  const container = mount(<Fixture />, root);
+  const originalInput = container.querySelector('input');
+  return {
+    rerender: async () => {
+      container.querySelector('button')?.click();
+      await flushUpdates();
+    },
+    snapshot: () => ({
+      sameInput: container.querySelector('input') === originalInput,
+      childRefCalls: childRefCalls.map((node) =>
+        node === null ? 'null' : 'host'
+      ),
+      componentRefCalls: componentRefCalls.map((node) =>
+        node === null ? 'null' : 'host'
+      ),
+    }),
+  };
 }
 
 export function debouncedDefaultType(root: HTMLElement): void {

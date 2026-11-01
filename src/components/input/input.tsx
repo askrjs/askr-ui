@@ -5,6 +5,8 @@ import { nativeRef } from '../_internal/native-ref';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { focusable } from '@askrjs/askr/foundations/interactions';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
+import { resolveAsChildRef } from '../_internal/slot-ref';
 import type {
   DebouncedInputProps,
   InputAsChildProps,
@@ -20,15 +22,33 @@ import type {
 export function Input(props: InputInputProps): JSX.Element;
 export function Input(props: InputAsChildProps): JSX.Element;
 export function Input(props: InputInputProps | InputAsChildProps) {
-  const { asChild, children, disabled = false, ref, tabIndex, ...rest } = props;
+  const {
+    asChild,
+    children,
+    disabled: disabledProp,
+    ref,
+    tabIndex,
+    ...rest
+  } = props;
+  const disabled = disabledProp ?? false;
 
   const focusProps = focusable({ disabled, tabIndex });
-  const finalProps = mergeProps(rest, {
+  const normalizedRest = { ...rest } as Record<string, unknown>;
+  if (disabled) {
+    delete normalizedRest['aria-disabled'];
+  }
+
+  const resolvedRef = asChild
+    ? resolveAsChildRef(children, ref as Ref<Element> | undefined)
+    : ref;
+  const finalProps = mergeProps(normalizedRest, {
     ...focusProps,
-    disabled: disabled ? true : undefined,
+    ...(disabledProp === undefined ? {} : { disabled: disabledProp }),
     'data-slot': 'input',
-    'data-disabled': disabled ? 'true' : undefined,
-    ref,
+    ...(disabledProp === undefined
+      ? {}
+      : { 'data-disabled': disabled ? 'true' : undefined }),
+    ...(resolvedRef === undefined ? {} : { ref: resolvedRef }),
   });
 
   if (asChild) {

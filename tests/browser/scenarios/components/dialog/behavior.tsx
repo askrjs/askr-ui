@@ -47,6 +47,56 @@ export function customPartIds(root: HTMLElement): void {
   );
 }
 
+export function modelessFocusTraversal(root: HTMLElement): void {
+  mount(
+    <div>
+      <button data-testid="outside-before">Outside before</button>
+      <Dialog defaultOpen modal={false}>
+        <DialogContent>
+          <DialogTitle>Modeless dialog</DialogTitle>
+          <button data-testid="modeless-first">First inside</button>
+          <button data-testid="modeless-last">Last inside</button>
+        </DialogContent>
+      </Dialog>
+      <button data-testid="outside-after">Outside after</button>
+    </div>,
+    root
+  );
+}
+
+export function callerStateAriaOverrides(root: HTMLElement): void {
+  mount(
+    <Dialog defaultOpen>
+      <DialogTrigger aria-expanded={false} aria-haspopup="menu">
+        Open dialog
+      </DialogTrigger>
+      <DialogOverlay aria-hidden={false} />
+      <DialogContent aria-modal={false}>
+        <DialogTitle>Dialog title</DialogTitle>
+        Dialog body
+      </DialogContent>
+    </Dialog>,
+    root
+  );
+}
+
+export function callerDisabledAriaOverrides(root: HTMLElement): void {
+  mount(
+    <Dialog defaultOpen>
+      <DialogTrigger disabled aria-disabled={false}>
+        Disabled trigger
+      </DialogTrigger>
+      <DialogContent>
+        <DialogTitle>Dialog title</DialogTitle>
+        <DialogClose disabled aria-disabled={false}>
+          Disabled close
+        </DialogClose>
+      </DialogContent>
+    </Dialog>,
+    root
+  );
+}
+
 export function callerAriaWithParts(root: HTMLElement): void {
   mount(
     <>
@@ -450,6 +500,47 @@ export function asChildControls(root: HTMLElement): void {
     </Dialog>,
     root
   );
+}
+
+export function asChildRefs(root: HTMLElement) {
+  const overlayChildRef = { current: null as Element | null };
+  const overlayComponentRef = { current: null as Element | null };
+  const closeChildRef = { current: null as Element | null };
+  const closeComponentRef = { current: null as Element | null };
+  mount(
+    <Dialog defaultOpen>
+      <DialogPortal>
+        <DialogOverlay asChild forceMount ref={overlayComponentRef}>
+          <div ref={overlayChildRef} data-testid="as-child-dialog-overlay" />
+        </DialogOverlay>
+        <DialogContent>
+          <DialogTitle>Ref forwarding</DialogTitle>
+          <DialogClose asChild ref={closeComponentRef}>
+            <button ref={closeChildRef} data-testid="as-child-dialog-close">
+              Close
+            </button>
+          </DialogClose>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>,
+    root
+  );
+  return {
+    refChecks: () => ({
+      overlayChild:
+        overlayChildRef.current ===
+        document.querySelector('[data-testid="as-child-dialog-overlay"]'),
+      overlayComponent:
+        overlayComponentRef.current ===
+        document.querySelector('[data-testid="as-child-dialog-overlay"]'),
+      closeChild:
+        closeChildRef.current ===
+        document.querySelector('[data-testid="as-child-dialog-close"]'),
+      closeComponent:
+        closeComponentRef.current ===
+        document.querySelector('[data-testid="as-child-dialog-close"]'),
+    }),
+  };
 }
 
 export function labelledWithoutParts(root: HTMLElement): void {

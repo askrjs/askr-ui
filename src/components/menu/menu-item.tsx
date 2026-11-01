@@ -1,8 +1,11 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, type Ref } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import {
@@ -20,7 +23,12 @@ import {
   resolveVirtualCompositePlacement,
 } from '../_internal/virtual-composite';
 import { runCancelablePress } from '../_internal/press';
-import { readMenuRenderContext, readMenuRootContext } from './menu.shared';
+import {
+  omitMenuStateAriaProps,
+  readMenuChildRef,
+  readMenuRenderContext,
+  readMenuRootContext,
+} from './menu.shared';
 import type { MenuItemAsChildProps, MenuItemProps } from './menu.types';
 
 /**
@@ -43,6 +51,8 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
   } = props;
   const root = readMenuRootContext();
   const renderContext = readMenuRenderContext();
+  const childRef = asChild ? readMenuChildRef(children) : undefined;
+  const callerProps = omitMenuStateAriaProps(rest, ['aria-disabled']);
   const placement = state<{ index: number; setSize?: number }>({ index: -1 })();
   const scopedVirtualPlacement = claimVirtualCompositePlacement(
     placement,
@@ -79,17 +89,14 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
   };
   const registrationOwner = {};
   const focusRepairProps = compositeItemFocusProps();
-  const finalProps = mergeComponentProps(rest, {
+  const finalProps = mergeComponentProps(callerProps, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
     onKeyUp: handleKeyUp,
     ...itemFocusProps,
     ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
+      ref as Ref<HTMLElement> | undefined,
+      childRef as Ref<HTMLElement> | undefined,
       (node: HTMLElement | null) => {
         const virtualPlacement =
           scopedVirtualPlacement ??
@@ -124,10 +131,9 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
     ),
     id: itemId,
     role: 'menuitem',
-    disabled: disabled && !asChild ? true : undefined,
-    'aria-disabled': disabled ? 'true' : undefined,
     'data-slot': 'menu-item',
-    'data-disabled': disabled ? 'true' : undefined,
+    ...(disabled && !asChild ? { disabled: true } : {}),
+    ...(disabled ? { 'aria-disabled': 'true', 'data-disabled': 'true' } : {}),
     tabIndex: disabled ? -1 : itemFocusProps.tabIndex,
     ...focusRepairProps,
     onFocus: (event: FocusEvent) => {
@@ -139,7 +145,13 @@ export function MenuItem(props: MenuItemProps | MenuItemAsChildProps) {
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children as JSX.Element} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps, typeProp)}
+        children={children as JSX.Element}
+      />
+    );
   }
 
   return (

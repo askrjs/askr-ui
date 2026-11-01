@@ -1,11 +1,19 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeRef } from '../_internal/native-ref';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { runCancelablePress } from '../_internal/press';
-import { readDialogRootContext } from './dialog.shared';
+import { resolveAsChildRef } from '../_internal/slot-ref';
+import {
+  omitDialogStateAriaProps,
+  readDialogRootContext,
+} from './dialog.shared';
 import type { DialogCloseAsChildProps, DialogCloseProps } from './dialog.types';
 
 /**
@@ -35,9 +43,13 @@ export function DialogClose(props: DialogCloseProps | DialogCloseAsChildProps) {
     },
     isNativeButton: !asChild,
   });
-  const finalProps = mergeProps(rest, {
+  const callerProps = omitDialogStateAriaProps(rest, ['aria-disabled']);
+  const resolvedRef = asChild
+    ? resolveAsChildRef(children, ref as Ref<Element> | undefined)
+    : ref;
+  const finalProps = mergeProps(callerProps, {
     ...interactionProps,
-    ref,
+    ...(resolvedRef === undefined ? {} : { ref: resolvedRef }),
     'data-slot': 'dialog-close',
     'data-dialog-close': 'true',
     'data-disabled': disabled ? 'true' : undefined,
@@ -45,7 +57,13 @@ export function DialogClose(props: DialogCloseProps | DialogCloseAsChildProps) {
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps, typeProp)}
+        children={children}
+      />
+    );
   }
 
   return (

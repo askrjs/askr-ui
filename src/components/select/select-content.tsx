@@ -1,6 +1,6 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, type Ref } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
 import { registerSsrPartId } from '../_internal/ssr-id-association';
 import { rovingFocus } from '../_internal/roving-focus';
@@ -20,6 +20,7 @@ import {
   readSelectRootContext,
   SelectRenderContext,
   SelectRootContext,
+  resolveSelectSlotRef,
 } from './select.shared';
 import type {
   SelectContentAsChildProps,
@@ -69,11 +70,11 @@ export function SelectContent(
   });
   const finalProps = mergeComponentProps(rest, {
     ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
+      resolveSelectSlotRef(
+        asChild,
+        children,
+        ref as Ref<Element> | undefined
+      ) as Ref<HTMLElement> | undefined,
       (node: HTMLElement | null) => {
         registerOverlayNode(
           root.overlayIdentity,

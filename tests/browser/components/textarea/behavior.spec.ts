@@ -65,6 +65,7 @@ test.describe('Textarea - Behavior', () => {
     expect(
       await host.evaluate((node: HTMLTextAreaElement) => node.disabled)
     ).toBe(true);
+    await expect(host).toHaveAttribute('aria-disabled', 'true');
     await expect(host).toHaveAttribute('data-disabled', 'true');
   });
 
@@ -90,5 +91,43 @@ test.describe('Textarea - Behavior', () => {
     expect(await run<string>('error')).toContain(
       'Textarea `asChild` requires a native <textarea> host.'
     );
+  });
+
+  test('should preserve the child host ref alongside the component ref', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildRefs');
+
+    expect(await run<boolean>('bothRefsAreHost')).toBe(true);
+  });
+
+  test('should preserve a native child disabled state when the prop is omitted', async ({
+    render,
+    root,
+  }) => {
+    await render('asChildChildDisabled');
+
+    await expect(root.locator('textarea')).toBeDisabled();
+  });
+
+  test('should preserve a native child tab index when the prop is omitted', async ({
+    render,
+    root,
+  }) => {
+    await render('asChildChildTabIndex');
+
+    await expect(root.locator('textarea')).toHaveAttribute('tabindex', '-1');
+  });
+
+  test('should keep native aria-disabled consistent with disabled state', async ({
+    render,
+    root,
+  }) => {
+    await render('nativeAriaDisabledOverride');
+    const textarea = root.locator('textarea');
+
+    await expect(textarea).toBeDisabled();
+    await expect(textarea).toHaveAttribute('aria-disabled', 'true');
   });
 });

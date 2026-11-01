@@ -7,9 +7,11 @@ import {
   type VirtualTableColumn,
 } from '../../src/components/virtual-table';
 import {
+  buildVariableVirtualOffsets,
   buildVirtualKeyIndexMap,
   createVirtualAnchor,
   createVariableVirtualAnchor,
+  resolveVariableVirtualRange,
   resolveVirtualScrollTopFromAnchor,
   resolveVariableVirtualScrollTopFromAnchor,
 } from '../../src/components/_internal/virtualization';
@@ -49,6 +51,30 @@ function renderWithStyles(component: () => JSX.Element) {
 }
 
 describe('virtualization SSR styles', () => {
+  it('should avoid scanning every variable row height for a viewport range', () => {
+    const rowHeights = Array.from({ length: 10_000 }, () => 20);
+    let indexedReads = 0;
+    const rowOffsets = buildVariableVirtualOffsets(rowHeights);
+    const trackedHeights = new Proxy(rowHeights, {
+      get(target, property, receiver) {
+        if (typeof property === 'string' && /^\d+$/.test(property)) {
+          indexedReads += 1;
+        }
+        return Reflect.get(target, property, receiver);
+      },
+    });
+
+    const range = resolveVariableVirtualRange({
+      rowHeights: trackedHeights,
+      rowOffsets,
+      scrollTop: 50_000,
+      viewportHeight: 600,
+    });
+
+    expect(range.visibleStartIndex).toBe(2_500);
+    expect(indexedReads).toBeLessThan(100);
+  });
+
   it('should anchor to the first retained visible key when the top key is removed', () => {
     const anchor = createVirtualAnchor(
       'row-21',

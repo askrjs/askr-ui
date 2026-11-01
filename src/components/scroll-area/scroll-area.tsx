@@ -4,6 +4,7 @@ import {
   composeHandlers,
   composeRefs,
   mergeProps,
+  type Ref,
 } from '@askrjs/askr/foundations/utilities';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
 import { getSignal, readScope, defineScope, state } from '@askrjs/askr';
@@ -22,6 +23,7 @@ type ScrollAreaRootContextValue = {
   viewportId: string;
   cornerId: string;
   setViewport: (node: HTMLElement | null) => void;
+  setViewportId: (id: string | undefined) => string;
   setScrollbar: (
     orientation: 'vertical' | 'horizontal',
     node: HTMLElement | null
@@ -35,11 +37,55 @@ type ScrollMetrics = { overflow: boolean; percentage: number };
 type ScrollAreaEntry = {
   viewport: HTMLElement | null;
   observer: ResizeObserver | null;
+  mutationObserver: MutationObserver | null;
+  observedChildren: Set<Element>;
+  ownerWindow: (Window & typeof globalThis) | null;
   resizeFrame: number | null;
   cleanupSignal: AbortSignal | null;
+  viewportId: string;
   metrics: Record<'vertical' | 'horizontal', ScrollMetrics>;
   scrollbars: Map<'vertical' | 'horizontal', HTMLElement>;
 };
+
+function readScrollAreaViewportChildRef(
+  children: unknown
+): Ref<Element> | undefined {
+  if (typeof children !== 'object' || children === null) return undefined;
+  return (children as { props?: { ref?: Ref<Element> } }).props?.ref;
+}
+
+function omitScrollAreaViewportStateProps<T extends object>(props: T): T {
+  let result: T | undefined;
+  for (const attribute of ['id', 'role', 'data-slot']) {
+    if (!Object.prototype.hasOwnProperty.call(props, attribute)) continue;
+    result ??= { ...props };
+    delete (result as Record<string, unknown>)[attribute];
+  }
+  return result ?? props;
+}
+
+function omitScrollAreaScrollbarStateProps<T extends object>(props: T): T {
+  let result: T | undefined;
+  for (const attribute of [
+    'id',
+    'role',
+    'aria-controls',
+    'aria-orientation',
+    'aria-valuemin',
+    'aria-valuemax',
+    'aria-valuenow',
+    'aria-disabled',
+    'data-slot',
+    'data-orientation',
+    'data-state',
+    'tabIndex',
+  ]) {
+    if (!Object.prototype.hasOwnProperty.call(props, attribute)) continue;
+    result ??= { ...props };
+    delete (result as Record<string, unknown>)[attribute];
+  }
+  return result ?? props;
+}
 
 const ScrollAreaRootContext = defineScope<ScrollAreaRootContextValue | null>(
   null
@@ -72,8 +118,12 @@ export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
   const entry = state<ScrollAreaEntry>({
     viewport: null,
     observer: null,
+    mutationObserver: null,
+    observedChildren: new Set(),
+    ownerWindow: null,
     resizeFrame: null,
     cleanupSignal: null,
+    viewportId,
     metrics: {
       vertical: { overflow: false, percentage: 0 },
       horizontal: { overflow: false, percentage: 0 },
@@ -88,10 +138,10 @@ export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
     }
     const maxTop = Math.max(0, viewport.scrollHeight - viewport.clientHeight);
     const maxLeft = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+    const direction =
+      viewport.ownerDocument.defaultView?.getComputedStyle(viewport).direction;
     const horizontalOffset =
-      getComputedStyle(viewport).direction === 'rtl'
-        ? -viewport.scrollLeft
-        : viewport.scrollLeft;
+      direction === 'rtl' ? -viewport.scrollLeft : viewport.scrollLeft;
     const nextVertical = {
       overflow: maxTop > 0,
       percentage: maxTop > 0 ? (viewport.scrollTop / maxTop) * 100 : 0,
@@ -111,6 +161,7 @@ export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
       if (!scrollbar) {
         continue;
       }
+      scrollbar.setAttribute('aria-controls', viewport.id || entry.viewportId);
       scrollbar.setAttribute(
         'aria-valuenow',
         String(Math.round(metrics.percentage))
@@ -124,30 +175,82 @@ export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
     }
   };
 
+  const scheduleMetricsSync = () => {
+    const ownerWindow = entry.ownerWindow;
+    if (!ownerWindow) {
+      queueMicrotask(syncMetrics);
+      return;
+    }
+    if (entry.resizeFrame !== null) {
+      ownerWindow.cancelAnimationFrame(entry.resizeFrame);
+    }
+    entry.resizeFrame = ownerWindow.requestAnimationFrame(() => {
+      entry.resizeFrame = null;
+      syncMetrics();
+    });
+  };
+
   const setViewport = (node: HTMLElement | null) => {
     if (entry.viewport === node) {
+      queueMicrotask(syncMetrics);
       return;
     }
     entry.observer?.disconnect();
+    entry.mutationObserver?.disconnect();
     entry.observer = null;
+    entry.mutationObserver = null;
+    entry.observedChildren.clear();
+    if (entry.resizeFrame !== null) {
+      entry.ownerWindow?.cancelAnimationFrame(entry.resizeFrame);
+      entry.resizeFrame = null;
+    }
     entry.viewport = node;
+    entry.ownerWindow = node?.ownerDocument.defaultView ?? null;
     if (!node) {
+      entry.viewportId = viewportId;
       return;
     }
+    entry.viewportId = node.id || entry.viewportId || viewportId;
     queueMicrotask(syncMetrics);
-    if (typeof ResizeObserver !== 'undefined') {
-      entry.observer = new ResizeObserver(() => {
-        if (entry.resizeFrame !== null) {
-          cancelAnimationFrame(entry.resizeFrame);
-        }
-        entry.resizeFrame = requestAnimationFrame(() => {
-          entry.resizeFrame = null;
-          syncMetrics();
-        });
-      });
+
+    const ownerWindow = entry.ownerWindow;
+    if (!ownerWindow) return;
+
+    const ResizeObserverCtor = ownerWindow.ResizeObserver;
+    if (typeof ResizeObserverCtor !== 'undefined') {
+      entry.observer = new ResizeObserverCtor(scheduleMetricsSync);
       entry.observer.observe(node);
-      if (node.firstElementChild) {
-        entry.observer.observe(node.firstElementChild);
+
+      const syncObservedChildren = () => {
+        const observer = entry.observer;
+        if (!observer || entry.viewport !== node) return;
+        const nextChildren = new Set(Array.from(node.children));
+        for (const child of entry.observedChildren) {
+          if (nextChildren.has(child)) continue;
+          observer.unobserve(child);
+          entry.observedChildren.delete(child);
+        }
+        for (const child of nextChildren) {
+          if (entry.observedChildren.has(child)) continue;
+          observer.observe(child);
+          entry.observedChildren.add(child);
+        }
+      };
+
+      syncObservedChildren();
+      const MutationObserverCtor = ownerWindow.MutationObserver;
+      if (typeof MutationObserverCtor !== 'undefined') {
+        entry.mutationObserver = new MutationObserverCtor((records) => {
+          if (records.some((record) => record.type === 'childList')) {
+            syncObservedChildren();
+          }
+          scheduleMetricsSync();
+        });
+        entry.mutationObserver.observe(node, {
+          childList: true,
+          subtree: true,
+          characterData: true,
+        });
       }
     }
   };
@@ -159,12 +262,17 @@ export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
       'abort',
       () => {
         entry.observer?.disconnect();
+        entry.mutationObserver?.disconnect();
         if (entry.resizeFrame !== null) {
-          cancelAnimationFrame(entry.resizeFrame);
+          entry.ownerWindow?.cancelAnimationFrame(entry.resizeFrame);
         }
         entry.observer = null;
+        entry.mutationObserver = null;
+        entry.observedChildren.clear();
+        entry.ownerWindow = null;
         entry.resizeFrame = null;
         entry.viewport = null;
+        entry.viewportId = viewportId;
         entry.scrollbars.clear();
       },
       { once: true }
@@ -173,9 +281,15 @@ export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
 
   const rootContext: ScrollAreaRootContextValue = {
     scrollAreaId,
-    viewportId,
+    get viewportId() {
+      return entry.viewportId;
+    },
     cornerId,
     setViewport,
+    setViewportId: (id) => {
+      entry.viewportId = id || viewportId;
+      return entry.viewportId;
+    },
     setScrollbar: (orientation, node) => {
       if (node) {
         entry.scrollbars.set(orientation, node);
@@ -192,7 +306,10 @@ export function ScrollArea(props: ScrollAreaProps | ScrollAreaAsChildProps) {
         return false;
       }
       const vertical = orientation === 'vertical';
-      const rtl = !vertical && getComputedStyle(viewport).direction === 'rtl';
+      const rtl =
+        !vertical &&
+        viewport.ownerDocument.defaultView?.getComputedStyle(viewport)
+          .direction === 'rtl';
       const current = vertical
         ? viewport.scrollTop
         : rtl
@@ -264,28 +381,27 @@ export function ScrollAreaViewport(
 ) {
   const { asChild, children, ref, style: _style, ...rest } = props;
   const root = readScrollAreaRootContext();
-  const finalProps = mergeProps(rest, {
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      (node: HTMLElement | null) => {
-        root.setViewport(node);
-      }
-    ),
-    id: root.viewportId,
-    role: 'region',
-    tabIndex: 0,
-    'data-slot': 'scroll-area-viewport',
-    onScroll: (event: Event) => {
-      if (event.currentTarget instanceof HTMLElement) {
-        root.setViewport(event.currentTarget);
-      }
-      root.syncMetrics();
+  const viewportId = root.setViewportId((rest as { id?: string }).id);
+  const childRef = asChild
+    ? readScrollAreaViewportChildRef(children)
+    : undefined;
+  const finalProps = mergeProps(
+    {
+      ref: composeRefs(
+        ref as Ref<HTMLElement> | undefined,
+        childRef as Ref<HTMLElement> | undefined,
+        (node: HTMLElement | null) => {
+          root.setViewport(node);
+        }
+      ),
+      id: viewportId,
+      role: 'region',
+      tabIndex: 0,
+      'data-slot': 'scroll-area-viewport',
+      onScroll: () => root.syncMetrics(),
     },
-  });
+    omitScrollAreaViewportStateProps(rest)
+  );
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;
@@ -310,51 +426,55 @@ export function ScrollAreaScrollbar(
   } = props;
   const root = readScrollAreaRootContext();
   const metrics = root.metrics(orientation);
+  const scrollbarIdProp = (rest as { id?: string }).id;
   const scrollbarId = resolvePartId(
     root.scrollAreaId,
     `scrollbar-${orientation}`
   );
   const thumbId = resolvePartId(root.scrollAreaId, `thumb-${orientation}`);
-  const finalProps = mergeProps(rest, {
-    ref: composeRefs(ref, (node: HTMLElement | null) =>
-      root.setScrollbar(orientation, node)
-    ),
-    id: scrollbarId,
-    role: 'scrollbar',
-    'aria-controls': root.viewportId,
-    'aria-orientation': orientation,
-    'aria-valuemin': '0',
-    'aria-valuemax': '100',
-    'aria-valuenow': String(Math.round(metrics.percentage)),
-    'aria-disabled': metrics.overflow ? undefined : 'true',
-    tabIndex: metrics.overflow ? 0 : -1,
-    'data-slot': 'scroll-area-scrollbar',
-    'data-orientation': orientation,
-    'data-state': metrics.overflow ? 'visible' : 'hidden',
-    onKeyDown: composeHandlers(
-      typeof onKeyDown === 'function'
-        ? (onKeyDown as (event: KeyboardEvent) => void)
-        : undefined,
-      (event: KeyboardEvent) => {
-        if (event.defaultPrevented) {
-          return;
+  const finalProps = mergeProps(
+    {
+      ref: composeRefs(ref, (node: HTMLElement | null) =>
+        root.setScrollbar(orientation, node)
+      ),
+      id: scrollbarIdProp ?? scrollbarId,
+      role: 'scrollbar',
+      'aria-controls': root.viewportId,
+      'aria-orientation': orientation,
+      'aria-valuemin': '0',
+      'aria-valuemax': '100',
+      'aria-valuenow': String(Math.round(metrics.percentage)),
+      'aria-disabled': metrics.overflow ? undefined : 'true',
+      tabIndex: metrics.overflow ? 0 : -1,
+      'data-slot': 'scroll-area-scrollbar',
+      'data-orientation': orientation,
+      'data-state': metrics.overflow ? 'visible' : 'hidden',
+      onKeyDown: composeHandlers(
+        typeof onKeyDown === 'function'
+          ? (onKeyDown as (event: KeyboardEvent) => void)
+          : undefined,
+        (event: KeyboardEvent) => {
+          if (event.defaultPrevented) {
+            return;
+          }
+          const orientationKey =
+            orientation === 'vertical'
+              ? ['ArrowUp', 'ArrowDown']
+              : ['ArrowLeft', 'ArrowRight'];
+          if (
+            !orientationKey.includes(event.key) &&
+            !['PageUp', 'PageDown', 'Home', 'End'].includes(event.key)
+          ) {
+            return;
+          }
+          if (root.scroll(orientation, event.key)) {
+            event.preventDefault();
+          }
         }
-        const orientationKey =
-          orientation === 'vertical'
-            ? ['ArrowUp', 'ArrowDown']
-            : ['ArrowLeft', 'ArrowRight'];
-        if (
-          !orientationKey.includes(event.key) &&
-          !['PageUp', 'PageDown', 'Home', 'End'].includes(event.key)
-        ) {
-          return;
-        }
-        if (root.scroll(orientation, event.key)) {
-          event.preventDefault();
-        }
-      }
-    ),
-  });
+      ),
+    },
+    omitScrollAreaScrollbarStateProps(rest)
+  );
 
   return (
     <ScrollAreaScrollbarContext value={{ orientation, thumbId }}>

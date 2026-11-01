@@ -21,6 +21,28 @@ async function nextFrame(page: Page): Promise<void> {
 }
 
 test.describe('ToggleGroup - Behavior', () => {
+  test('should not submit a form for a default asChild native item button', async ({
+    render,
+    root,
+    run,
+  }) => {
+    await render('asChildFormDefault');
+    const button = root.locator('button');
+
+    await button.click();
+    expect(await run<number>('submitCount')).toBe(0);
+    await expect(button).toHaveAttribute('type', 'button');
+  });
+
+  test('should preserve an explicit type on an asChild native item button', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildExplicitFormType');
+
+    expect(await run<string>('buttonType')).toBe('submit');
+  });
+
   test('should mount single and multiple toggle groups without render-time state errors', async ({
     render,
     root,
@@ -243,6 +265,7 @@ test.describe('ToggleGroup - Behavior', () => {
       groupMatches: true,
       nativeMatches: true,
       childMatches: true,
+      childHostMatches: true,
     });
   });
 

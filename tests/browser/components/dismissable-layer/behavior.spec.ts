@@ -1,6 +1,34 @@
 import { expect, test } from '../../fixtures';
 
 test.describe('DismissableLayer - Behavior', () => {
+  test('should preserve a child ref when asChild omits the wrapper ref', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildRef');
+
+    expect(await run<boolean>('childRefIsHost')).toBe(true);
+  });
+
+  test('should retain a lower modal pointer guard beneath a top nonmodal layer', async ({
+    root,
+    render,
+    run,
+  }) => {
+    await render('lowerModalPointerGuard');
+    await root.getByTestId('outside').dispatchEvent('pointerdown', {
+      bubbles: true,
+      cancelable: true,
+    });
+
+    expect(await run('counts')).toEqual({
+      lower: 0,
+      upper: 1,
+      outsideClick: 0,
+      outsidePointerDown: 0,
+    });
+  });
+
   test('should let the active layer dismiss beneath a disabled layer', async ({
     page,
     render,

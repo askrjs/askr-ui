@@ -17,8 +17,11 @@ export type LabelLabelProps = Omit<Props, 'children'> &
 
 /** Props for the `asChild` (polymorphic) rendering of Label. */
 export type LabelAsChildProps = LabelOwnProps & {
+  /** Additional attributes forwarded to the child host. */
+  [attribute: string]: unknown;
   asChild: true;
   children: JSXElement;
+  htmlFor?: string;
   ref?: Ref<Element>;
 };
 

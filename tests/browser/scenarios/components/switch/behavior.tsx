@@ -121,9 +121,45 @@ export function disabledAsChild(root: HTMLElement) {
   return { calls: () => onCheckedChange.calls };
 }
 
+export function disabledNative(root: HTMLElement): void {
+  mount(
+    <Switch disabled type="submit">
+      Publish
+    </Switch>,
+    root
+  );
+}
+
+export function semanticOverrides(root: HTMLElement): void {
+  mount(
+    <Switch defaultChecked role="button" aria-checked="false">
+      Power
+    </Switch>,
+    root
+  );
+}
+
+export function externalFormAssociation(root: HTMLElement): void {
+  mount(
+    <div>
+      <form id="external-switch-form" />
+      <Switch
+        form="external-switch-form"
+        name="power"
+        value="enabled"
+        defaultChecked
+      >
+        Power
+      </Switch>
+    </div>,
+    root
+  );
+}
+
 export function forwardedRefs(root: HTMLElement) {
   let nativeRef: HTMLButtonElement | null = null;
-  let childRef: HTMLElement | null = null;
+  let asChildRef: HTMLElement | null = null;
+  let childPropRef: HTMLElement | null = null;
 
   let container = mount(
     <Switch ref={(node) => (nativeRef = node)}>Power</Switch>,
@@ -134,13 +170,16 @@ export function forwardedRefs(root: HTMLElement) {
 
   unmount(container);
   container = mount(
-    <Switch asChild ref={(node) => (childRef = node as HTMLElement | null)}>
-      <div>Power</div>
+    <Switch asChild ref={(node) => (asChildRef = node as HTMLElement | null)}>
+      <div ref={(node) => (childPropRef = node)}>Power</div>
     </Switch>,
     root
   );
   const host = container.querySelector('[role="switch"]');
-  const childMatches = childRef !== null && childRef === host;
+  const componentRefMatches = asChildRef !== null && asChildRef === host;
+  const childPropMatches = childPropRef !== null && childPropRef === host;
 
-  return { refs: () => ({ nativeMatches, childMatches }) };
+  return {
+    refs: () => ({ nativeMatches, componentRefMatches, childPropMatches }),
+  };
 }

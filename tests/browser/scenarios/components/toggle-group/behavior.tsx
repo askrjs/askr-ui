@@ -45,6 +45,49 @@ export function mountSingleAndMultiple(root: HTMLElement) {
   return { thrown: () => thrown };
 }
 
+export function asChildFormDefault(root: HTMLElement) {
+  let submitCount = 0;
+  const container = mount(
+    <form
+      onSubmit={(event: SubmitEvent) => {
+        event.preventDefault();
+        submitCount += 1;
+      }}
+    >
+      <ToggleGroup defaultValue="option">
+        <ToggleGroupItem asChild value="option">
+          <button>Option</button>
+        </ToggleGroupItem>
+      </ToggleGroup>
+    </form>,
+    root
+  );
+
+  return {
+    buttonType: () =>
+      (container.querySelector('button') as HTMLButtonElement).type,
+    submitCount: () => submitCount,
+  };
+}
+
+export function asChildExplicitFormType(root: HTMLElement) {
+  const container = mount(
+    <form>
+      <ToggleGroup defaultValue="option">
+        <ToggleGroupItem asChild value="option">
+          <button type="submit">Option</button>
+        </ToggleGroupItem>
+      </ToggleGroup>
+    </form>,
+    root
+  );
+
+  return {
+    buttonType: () =>
+      (container.querySelector('button') as HTMLButtonElement).type,
+  };
+}
+
 export function singleSelectionHooks(root: HTMLElement) {
   mount(
     <ToggleGroup defaultValue="left" orientation="vertical">
@@ -303,6 +346,7 @@ export function refForwarding(root: HTMLElement) {
   let groupRef: HTMLDivElement | null = null;
   let nativeItemRef: HTMLButtonElement | null = null;
   let childItemRef: HTMLElement | null = null;
+  let childHostRef: HTMLElement | null = null;
 
   let container = mount(
     <ToggleGroup ref={(node) => (groupRef = node)} defaultValue="left">
@@ -327,14 +371,22 @@ export function refForwarding(root: HTMLElement) {
         ref={(node) => (childItemRef = node as HTMLElement | null)}
         value="left"
       >
-        <span>Left</span>
+        <span ref={(node) => (childHostRef = node)}>Left</span>
       </ToggleGroupItem>
     </ToggleGroup>,
     root
   );
   const childMatches = childItemRef === getToggleByText(container, 'Left');
+  const childHostMatches = childHostRef === getToggleByText(container, 'Left');
 
-  return { refs: () => ({ groupMatches, nativeMatches, childMatches }) };
+  return {
+    refs: () => ({
+      groupMatches,
+      nativeMatches,
+      childMatches,
+      childHostMatches,
+    }),
+  };
 }
 
 export function controlledValue(root: HTMLElement) {

@@ -9,6 +9,7 @@ import {
   SelectItemText,
   SelectLabel,
   SelectPortal,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from '../../../../../src/components/select';
@@ -423,6 +424,124 @@ export function asChildTrigger(root: HTMLElement): void {
       <SelectPortal>
         <SelectContent>
           <SelectItem value="alpha">Alpha</SelectItem>
+        </SelectContent>
+      </SelectPortal>
+    </Select>,
+    root
+  );
+}
+
+export function asChildDisabledTrigger(root: HTMLElement): void {
+  mount(
+    <Select defaultValue="alpha">
+      <SelectTrigger asChild>
+        <button type="button" disabled data-testid="disabled-select-trigger">
+          <SelectValue />
+        </button>
+      </SelectTrigger>
+      <SelectPortal>
+        <SelectContent>
+          <SelectItem value="alpha">Alpha</SelectItem>
+        </SelectContent>
+      </SelectPortal>
+    </Select>,
+    root
+  );
+}
+
+export function asChildDisabledItem(root: HTMLElement): void {
+  mount(
+    <Select name="framework" defaultValue="alpha">
+      <SelectTrigger>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectPortal>
+        <SelectContent>
+          <SelectItem value="alpha">Alpha</SelectItem>
+          <SelectItem asChild value="beta">
+            <button type="button" disabled>
+              Beta
+            </button>
+          </SelectItem>
+        </SelectContent>
+      </SelectPortal>
+    </Select>,
+    root
+  );
+}
+
+export function asChildPartRefs(root: HTMLElement) {
+  const refs: Record<string, Element | null> = {};
+  const saveRef = (name: string) => (node: Element | null) => {
+    refs[name] = node;
+  };
+
+  mount(
+    <Select defaultOpen defaultValue="alpha">
+      <SelectTrigger asChild ref={saveRef('trigger-component')}>
+        <button ref={saveRef('trigger-child')}>
+          <SelectValue asChild ref={saveRef('value-component')}>
+            <span ref={saveRef('value-child')}>Alpha</span>
+          </SelectValue>
+        </button>
+      </SelectTrigger>
+      <SelectPortal>
+        <SelectContent asChild ref={saveRef('content-component')}>
+          <div ref={saveRef('content-child')}>
+            <SelectGroup asChild ref={saveRef('group-component')}>
+              <section ref={saveRef('group-child')}>
+                <SelectLabel asChild ref={saveRef('label-component')}>
+                  <div ref={saveRef('label-child')}>Frameworks</div>
+                </SelectLabel>
+                <SelectItem
+                  asChild
+                  value="alpha"
+                  ref={saveRef('item-component')}
+                >
+                  <button ref={saveRef('item-child')}>
+                    <SelectItemText
+                      asChild
+                      ref={saveRef('item-text-component')}
+                    >
+                      <span ref={saveRef('item-text-child')}>Alpha</span>
+                    </SelectItemText>
+                  </button>
+                </SelectItem>
+                <SelectSeparator asChild ref={saveRef('separator-component')}>
+                  <div ref={saveRef('separator-child')} />
+                </SelectSeparator>
+              </section>
+            </SelectGroup>
+          </div>
+        </SelectContent>
+      </SelectPortal>
+    </Select>,
+    root
+  );
+
+  return {
+    refStatus: () =>
+      Object.fromEntries(
+        Object.entries(refs).map(([name, node]) => [name, node !== null])
+      ),
+  };
+}
+
+export function asChildValue(
+  root: HTMLElement,
+  options: { defaultValue?: string } = {}
+): void {
+  mount(
+    <Select defaultValue={options.defaultValue}>
+      <SelectTrigger>
+        <SelectValue asChild placeholder="Choose one">
+          <strong data-testid="as-child-select-value" />
+        </SelectValue>
+      </SelectTrigger>
+      <SelectPortal>
+        <SelectContent>
+          <SelectItem value="alpha">Alpha</SelectItem>
+          <SelectItem value="beta">Beta</SelectItem>
         </SelectContent>
       </SelectPortal>
     </Select>,

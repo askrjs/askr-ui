@@ -338,3 +338,25 @@ test('should keep declaration order when the first registration updates (Toast)'
   await expect(toasts.first()).toHaveAttribute('data-variant', 'success');
   await expect(toasts).toHaveText(['First', 'Second']);
 });
+
+test('should preserve refs across every asChild toast part', async ({
+  render,
+  run,
+  root,
+}) => {
+  await render('asChildPartRefs');
+  await expect(root.locator(TOAST)).toHaveCount(1);
+
+  expect(await run<Record<string, boolean>>('refStatus')).toEqual({
+    'viewport-component': true,
+    'viewport-child': true,
+    'title-component': true,
+    'title-child': true,
+    'description-component': true,
+    'description-child': true,
+    'action-component': true,
+    'action-child': true,
+    'close-component': true,
+    'close-child': true,
+  });
+});

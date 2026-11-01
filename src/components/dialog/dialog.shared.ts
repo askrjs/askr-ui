@@ -1,4 +1,5 @@
 import { defineScope, readScope } from '@askrjs/askr';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
 import { OVERLAY_Z_INDEX, type OverlayPortal } from '../_internal/overlay';
 import type { SsrIdRegistration } from '../_internal/ssr-id-association';
 
@@ -45,6 +46,24 @@ export type DialogRootContextValue = {
 export const DialogRootContext = defineScope<DialogRootContextValue | null>(
   null
 );
+
+/** Reads the ref attached to a host element used by an asChild part. */
+export function readDialogChildRef(
+  children: unknown
+): Ref<HTMLElement> | undefined {
+  if (typeof children !== 'object' || children === null) return undefined;
+  return (children as { props?: { ref?: Ref<HTMLElement> } }).props?.ref;
+}
+
+/** Removes caller values for ARIA attributes owned by Dialog state. */
+export function omitDialogStateAriaProps<T extends object>(
+  props: T,
+  attributes: readonly string[]
+): T {
+  const result = { ...props } as Record<string, unknown>;
+  for (const attribute of attributes) delete result[attribute];
+  return result as T;
+}
 
 /**
  * Reads the Dialog Root Context; throws if called outside its provider.
