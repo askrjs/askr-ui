@@ -294,10 +294,21 @@ test('should stop updating after native pointercancel ends a slider drag', async
   await render('dragLifecycle');
   const track = root.locator('[data-slider-track]');
   const rect = (await track.boundingBox())!;
+  await track.evaluate((node) => {
+    node.addEventListener(
+      'pointerdown',
+      (event) => {
+        node.setAttribute('data-test-pointer-id', String(event.pointerId));
+      },
+      { once: true }
+    );
+  });
   await page.mouse.move(rect.x + rect.width * 0.2, rect.y + rect.height / 2);
   await page.mouse.down();
+  const pointerId = await track.getAttribute('data-test-pointer-id');
+  expect(pointerId).not.toBeNull();
   await track.dispatchEvent('pointercancel', {
-    pointerId: 1,
+    pointerId: Number(pointerId),
     pointerType: 'mouse',
     bubbles: true,
   });

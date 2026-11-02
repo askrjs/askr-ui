@@ -47,6 +47,7 @@ test.describe('VirtualList - Behavior', () => {
     await run('scrollToIndex', 4);
 
     expect(await run<number>('visibleStartIndex')).toBe(4);
+    expect(await run<boolean>('isFollowingBottom')).toBe(false);
     await expect(root.locator('[data-key="item-4"]')).toHaveAttribute(
       'data-visible',
       'true'

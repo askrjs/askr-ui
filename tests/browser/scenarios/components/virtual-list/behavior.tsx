@@ -108,7 +108,7 @@ export async function windowScrollAndFollow(root: HTMLElement) {
     visibleStartIndex: () => api?.getVisibleRange().visibleStartIndex ?? null,
     scrollToIndex: async (index: number) => {
       api?.scrollToIndex(index);
-      await flushUpdates();
+      await settle();
     },
     scrollToBottom: async () => {
       api?.scrollToBottom();

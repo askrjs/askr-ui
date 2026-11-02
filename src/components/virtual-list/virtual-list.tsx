@@ -130,7 +130,7 @@ type VirtualListEntry<Item> = {
   resizeObserver: ResizeObserver | null;
   windowResizeHandler: (() => void) | null;
   rootRef: (node: HTMLElement | null) => void;
-  handleScroll: (() => void) | undefined;
+  handleScroll: ((event?: Event, programmatic?: boolean) => void) | undefined;
   handleResize: (() => void) | undefined;
   schedulePendingScrollTop: () => void;
   api: VirtualListApi<Item>;
@@ -307,7 +307,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
       setScrollTop(nextScrollTop);
     }
 
-    entry.handleScroll?.();
+    entry.handleScroll?.(undefined, true);
   };
 
   const updateVisibleRange = (scrollTop: number, viewportHeight: number) => {
@@ -332,7 +332,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
     });
   };
 
-  const handleScroll = (event?: Event) => {
+  const handleScroll = (event?: Event, programmatic = false) => {
     const node = entry.node;
 
     if (!node) {
@@ -345,7 +345,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
 
     if (event) {
       entry.interactionVersion += 1;
-      const programmatic = nextScrollTop === readScrollTop();
+      programmatic = nextScrollTop === readScrollTop();
       if (!programmatic && entry.pendingScrollTop !== null) {
         entry.pendingScrollTop = null;
         if (entry.pendingCommitFrame !== null) {
@@ -368,7 +368,7 @@ function getVirtualListEntry<Item>(key: object): VirtualListEntry<Item> {
       entry.followBottomThreshold
     );
 
-    if (entry.followBottomEnabled) {
+    if (entry.followBottomEnabled && !programmatic) {
       entry.followBottomActive = isAtBottom;
 
       if (isAtBottom) {
