@@ -16,6 +16,7 @@ import {
   readVirtualCompositeIdentity,
   type CompositePlacement,
 } from '../_internal/virtual-composite';
+import { composeRefs, type Ref } from '@askrjs/askr/foundations/utilities';
 
 /** Menubar Trigger Metadata. */
 export type MenubarTriggerMetadata = {
@@ -108,6 +109,40 @@ export function createMenubarIdAssociation(
       );
     },
   };
+}
+
+/** Reads a host ref passed to an element used with an asChild Menubar part. */
+export function readMenubarChildRef(
+  children: unknown
+): Ref<Element> | undefined {
+  if (typeof children !== 'object' || children === null) return undefined;
+  return (children as { props?: { ref?: Ref<Element> } }).props?.ref;
+}
+
+/** Combines the refs owned by a Menubar part with its asChild host ref. */
+export function resolveMenubarSlotRef(
+  asChild: boolean | undefined,
+  children: unknown,
+  ref: Ref<Element>
+): Ref<Element> {
+  if (!asChild) return ref;
+  const childRef = readMenubarChildRef(children);
+  if (ref == null && childRef == null) return undefined;
+  return composeRefs(ref, childRef);
+}
+
+/** Removes ARIA values that are derived from Menubar state. */
+export function omitMenubarStateAriaProps<T extends object>(
+  props: T,
+  attributes: readonly string[]
+): T {
+  let result: T | undefined;
+  for (const attribute of attributes) {
+    if (!Object.prototype.hasOwnProperty.call(props, attribute)) continue;
+    result ??= { ...props };
+    delete (result as Record<string, unknown>)[attribute];
+  }
+  return result ?? props;
 }
 
 export type MenubarMenuContextValue = {

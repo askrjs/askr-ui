@@ -1,5 +1,6 @@
 import { defineScope, readScope } from '@askrjs/askr';
 import type { RovingFocusResult } from '@askrjs/askr/foundations/interactions';
+import { composeRefs, type Ref } from '@askrjs/askr/foundations/utilities';
 import {
   getMenuCollection,
   getMenuCollectionItems,
@@ -52,6 +53,38 @@ export const MenuRootContext = defineScope<MenuRootContextValue | null>(null);
 export const MenuRenderContext = defineScope<MenuRenderContextValue | null>(
   null
 );
+
+/** Reads a host ref passed to an element used with an asChild Menu part. */
+export function readMenuChildRef(children: unknown): Ref<Element> | undefined {
+  if (typeof children !== 'object' || children === null) return undefined;
+  return (children as { props?: { ref?: Ref<Element> } }).props?.ref;
+}
+
+/** Combines the refs owned by a Menu part with its asChild host ref. */
+export function resolveMenuSlotRef(
+  asChild: boolean | undefined,
+  children: unknown,
+  ref: Ref<Element>
+): Ref<Element> {
+  if (!asChild) return ref;
+  const childRef = readMenuChildRef(children);
+  if (ref == null && childRef == null) return undefined;
+  return composeRefs(ref, childRef);
+}
+
+/** Removes ARIA values that are derived from Menu state. */
+export function omitMenuStateAriaProps<T extends object>(
+  props: T,
+  attributes: readonly string[]
+): T {
+  let result: T | undefined;
+  for (const attribute of attributes) {
+    if (!Object.prototype.hasOwnProperty.call(props, attribute)) continue;
+    result ??= { ...props };
+    delete (result as Record<string, unknown>)[attribute];
+  }
+  return result ?? props;
+}
 
 /**
  * Reads the Menu Root Context; throws if called outside its provider.

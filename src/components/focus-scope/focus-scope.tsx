@@ -1,13 +1,14 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { state } from '@askrjs/askr';
-import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, type Ref } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
 import {
   getActiveElement,
   isHTMLElement,
+  isFocusable,
   focusFirstDescendant,
-  getFocusableElements,
+  getTabbableElements,
   markKeyboardModality,
 } from '../_internal/focus';
 import { resolveCompoundId } from '../_internal/id';
@@ -26,6 +27,13 @@ type ScopeEntry = {
 const focusScopeEntries = new WeakMap<HTMLElement, ScopeEntry>();
 const trappedScopes = new Map<ScopeEntry, number>();
 let nextScopeOrder = 0;
+
+function readFocusScopeChildRef(
+  children: unknown
+): Ref<HTMLElement> | undefined {
+  if (typeof children !== 'object' || children === null) return undefined;
+  return (children as { props?: { ref?: Ref<HTMLElement> } }).props?.ref;
+}
 
 function isTopTrappedScope(scope: ScopeEntry): boolean {
   if (!scope.trapped || !scope.node) return false;
@@ -103,9 +111,18 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
     pendingDetachedNode: null,
     trapped: false,
   })();
+  const childRef = asChild ? readFocusScopeChildRef(children) : undefined;
 
   const setNode = (node: HTMLElement | null) => {
     if (node) {
+      if (
+        asChild &&
+        tabIndex === undefined &&
+        !node.hasAttribute('tabindex') &&
+        !isFocusable(node)
+      ) {
+        node.tabIndex = -1;
+      }
       const becameTrapped = trapped && !scopeEntry.trapped;
       scopeEntry.trapped = trapped;
       if (trapped && !trappedScopes.has(scopeEntry))
@@ -186,7 +203,7 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
       return;
     }
 
-    const focusableElements = getFocusableElements(node);
+    const focusableElements = getTabbableElements(node);
 
     if (focusableElements.length === 0) {
       if (trapped) {
@@ -265,16 +282,10 @@ export function FocusScope(props: FocusScopeProps | FocusScopeAsChildProps) {
     }
   };
 
-  const refHandler = ref
-    ? composeRefs(
-        ref as
-          | ((value: HTMLElement | null) => void)
-          | { current: HTMLElement | null }
-          | null
-          | undefined,
-        setNode
-      )
-    : setNode;
+  const refHandler =
+    ref || childRef
+      ? composeRefs(ref as Ref<HTMLElement> | undefined, childRef, setNode)
+      : setNode;
 
   const finalProps = mergeComponentProps(rest, {
     id: scopeId,

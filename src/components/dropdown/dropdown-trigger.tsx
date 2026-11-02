@@ -1,13 +1,20 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, type Ref } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
 import { setSsrIdAssociation } from '../_internal/ssr-id-association';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { registerOverlayNode } from '../_internal/overlay';
 import { runCancelablePress } from '../_internal/press';
-import { readDropdownRootContext } from './dropdown.shared';
+import {
+  omitDropdownStateAriaProps,
+  readDropdownChildRef,
+  readDropdownRootContext,
+} from './dropdown.shared';
 import type {
   DropdownPortalProps,
   DropdownTriggerAsChildProps,
@@ -40,6 +47,12 @@ export function DropdownTrigger(
     ...rest
   } = props;
   const root = readDropdownRootContext();
+  const childRef = asChild ? readDropdownChildRef(children) : undefined;
+  const callerProps = omitDropdownStateAriaProps(rest, [
+    'aria-expanded',
+    'aria-haspopup',
+    'aria-disabled',
+  ]);
   const overlayNodeOwner = {};
   const interactionProps = pressable({
     disabled,
@@ -74,17 +87,15 @@ export function DropdownTrigger(
     );
     root.idAssociation.sync();
   };
-  const refHandler = ref
-    ? composeRefs(
-        ref as
-          | ((value: HTMLElement | null) => void)
-          | { current: HTMLElement | null }
-          | null
-          | undefined,
-        setNode
-      )
-    : setNode;
-  const finalProps = mergeComponentProps(rest, {
+  const refHandler =
+    asChild || ref
+      ? composeRefs(
+          ref as Ref<HTMLElement>,
+          childRef as Ref<HTMLElement>,
+          setNode
+        )
+      : setNode;
+  const finalProps = mergeComponentProps(callerProps, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
     ref: refHandler,
@@ -106,7 +117,13 @@ export function DropdownTrigger(
   );
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps, typeProp)}
+        children={children}
+      />
+    );
   }
 
   return (

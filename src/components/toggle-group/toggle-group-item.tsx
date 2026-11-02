@@ -1,8 +1,12 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { rovingFocus } from '../_internal/roving-focus';
 import {
@@ -19,6 +23,7 @@ import {
   toggleDisclosureValue,
 } from '../_internal/disclosure';
 import { resolvePartId } from '../_internal/id';
+import { isJsxElement } from '../_internal/jsx';
 import {
   claimVirtualCompositePlacement,
   resolveVirtualCompositePlacement,
@@ -97,16 +102,17 @@ export function ToggleGroupItem(
   });
   const itemFocusProps = nav.item(itemIndex);
   const focusRepairProps = compositeItemFocusProps();
+  const childRef =
+    asChild && isJsxElement(children)
+      ? (children.props.ref as Ref<HTMLElement> | undefined)
+      : undefined;
   const registrationOwner = {};
   const finalProps = mergeProps(rest, {
     ...interactionProps,
     ...itemFocusProps,
     ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
+      ref as Ref<HTMLElement>,
+      childRef,
       (node: HTMLElement | null) => {
         const virtualPlacement =
           scopedVirtualPlacement ??
@@ -153,7 +159,8 @@ export function ToggleGroupItem(
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    const slotProps = withDefaultNativeButtonType(children, finalProps, type);
+    return <Slot asChild {...slotProps} children={children} />;
   }
 
   return (

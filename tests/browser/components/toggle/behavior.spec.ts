@@ -1,6 +1,28 @@
 import { expect, test } from '../../fixtures';
 
 test.describe('Toggle - Behavior', () => {
+  test('should not submit a form for a default asChild native button', async ({
+    render,
+    root,
+    run,
+  }) => {
+    await render('asChildFormDefault');
+    const button = root.locator('button');
+
+    await button.click();
+    expect(await run<number>('submitCount')).toBe(0);
+    await expect(button).toHaveAttribute('type', 'button');
+  });
+
+  test('should preserve an explicit type on an asChild native button', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildExplicitFormType');
+
+    expect(await run<string>('buttonType')).toBe('submit');
+  });
+
   test('should render a native toggle button by default', async ({
     render,
     root,
@@ -138,7 +160,15 @@ test.describe('Toggle - Behavior', () => {
     await render('refForwarding');
 
     expect(
-      await run<{ nativeMatches: boolean; childMatches: boolean }>('refs')
-    ).toEqual({ nativeMatches: true, childMatches: true });
+      await run<{
+        nativeMatches: boolean;
+        childMatches: boolean;
+        hostChildMatches: boolean;
+      }>('refs')
+    ).toEqual({
+      nativeMatches: true,
+      childMatches: true,
+      hostChildMatches: true,
+    });
   });
 });

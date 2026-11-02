@@ -2,6 +2,7 @@ import { controllableState } from '@askrjs/askr/foundations/state';
 import { cspNonce, getSignal, state } from '@askrjs/askr';
 import { watch } from '@askrjs/askr/resources';
 import { resolveCompoundId, resolvePartId } from '../_internal/id';
+import { getActiveElement } from '../_internal/focus';
 import {
   captureOverlayNonce,
   clearOverlayPosition,
@@ -203,6 +204,18 @@ export function HoverCard(props: HoverCardProps) {
     scheduleClose: () => {
       clearOpenTimer();
       clearCloseTimer();
+
+      const ownerDocument =
+        overlayNodes.trigger?.ownerDocument ??
+        overlayNodes.content?.ownerDocument;
+      const active = ownerDocument ? getActiveElement(ownerDocument) : null;
+      if (
+        active &&
+        (overlayNodes.trigger?.contains(active) ||
+          overlayNodes.content?.contains(active))
+      ) {
+        return;
+      }
 
       timers.close = setTimeout(() => {
         timers.close = undefined;

@@ -21,23 +21,28 @@ function escapeCssString(value: string) {
     .join('');
 }
 
-function getRegistry(nonce: string | undefined): Registry | null {
-  if (typeof document === 'undefined') {
+function getRegistry(
+  nonce: string | undefined,
+  ownerDocument?: Document
+): Registry | null {
+  const targetDocument =
+    ownerDocument ?? (typeof document === 'undefined' ? undefined : document);
+  if (!targetDocument) {
     return null;
   }
   const key = nonce ?? '';
-  let documentRegistries = registries.get(document);
+  let documentRegistries = registries.get(targetDocument);
   if (!documentRegistries) {
     documentRegistries = new Map();
-    registries.set(document, documentRegistries);
+    registries.set(targetDocument, documentRegistries);
   }
   const current = documentRegistries.get(key);
   if (current?.element.isConnected) return current;
 
-  const created = document.createElement('style');
+  const created = targetDocument.createElement('style');
   created.setAttribute('data-askr-dynamic-styles', 'true');
   if (nonce !== undefined) created.nonce = nonce;
-  document.head.appendChild(created);
+  (targetDocument.head ?? targetDocument.documentElement).appendChild(created);
   const registry = {
     element: created,
     rules: new Map<string, { rule: string; selector: string }>(),
@@ -106,19 +111,22 @@ function publishSerializedRule(
   key: string,
   selector: string,
   rule: string | null,
-  nonce?: string
+  nonce?: string,
+  ownerDocument?: Document
 ) {
   if (!rule) {
-    removeDynamicStyleRule(key);
+    removeDynamicStyleRule(key, ownerDocument);
     return;
   }
 
-  if (typeof document === 'undefined') {
+  const targetDocument =
+    ownerDocument ?? (typeof document === 'undefined' ? undefined : document);
+  if (!targetDocument) {
     registerSSRStyle(`askr-dynamic:${nonce ?? ''}:${key}`, rule);
     return;
   }
 
-  const registry = getRegistry(nonce);
+  const registry = getRegistry(nonce, targetDocument);
   if (!registry) return;
   if (registry.rules.get(key)?.rule === rule && registry.element.isConnected) {
     return;
@@ -126,7 +134,7 @@ function publishSerializedRule(
 
   if (!registry.rules.has(key) && registry.rules.size >= MAX_DYNAMIC_RULES) {
     for (const [candidateKey, candidate] of registry.rules) {
-      if (document.querySelector(candidate.selector)) continue;
+      if (targetDocument.querySelector(candidate.selector)) continue;
       registry.rules.delete(candidateKey);
       break;
     }
@@ -140,13 +148,15 @@ export function setDynamicStyleRule(
   key: string,
   selector: string,
   declarations: Record<string, StyleValue>,
-  nonce?: string
+  nonce?: string,
+  ownerDocument?: Document
 ) {
   publishSerializedRule(
     key,
     selector,
     buildDynamicStyleRule(selector, declarations),
-    nonce
+    nonce,
+    ownerDocument
   );
 }
 
@@ -154,13 +164,15 @@ function prepareRule(
   key: string,
   selector: string,
   declarations: Record<string, StyleValue>,
-  nonce?: string
+  nonce?: string,
+  ownerDocument?: Document
 ) {
   const rule = buildDynamicStyleRule(selector, declarations);
   if (rule) registerSSRStyle(`askr-dynamic:${nonce ?? ''}:${key}`, rule);
   return {
     rule,
-    publish: () => publishSerializedRule(key, selector, rule, nonce),
+    publish: () =>
+      publishSerializedRule(key, selector, rule, nonce, ownerDocument),
   };
 }
 
@@ -169,9 +181,10 @@ export function prepareDynamicStyleRule(
   key: string,
   selector: string,
   declarations: Record<string, StyleValue>,
-  nonce?: string
+  nonce?: string,
+  ownerDocument?: Document
 ) {
-  return prepareRule(key, selector, declarations, nonce).publish;
+  return prepareRule(key, selector, declarations, nonce, ownerDocument).publish;
 }
 
 /** Publish render-derived browser CSS only after its render commits. */
@@ -179,15 +192,24 @@ export function setCommittedDynamicStyleRule(
   key: string,
   selector: string,
   declarations: Record<string, StyleValue>,
-  nonce?: string
+  nonce?: string,
+  ownerDocument?: Document
 ) {
-  const { rule, publish } = prepareRule(key, selector, declarations, nonce);
+  const { rule, publish } = prepareRule(
+    key,
+    selector,
+    declarations,
+    nonce,
+    ownerDocument
+  );
   watch(() => [key, selector, rule, nonce] as const, publish);
 }
 
-export function removeDynamicStyleRule(key: string) {
-  if (typeof document === 'undefined') return;
-  const documentRegistries = registries.get(document);
+export function removeDynamicStyleRule(key: string, ownerDocument?: Document) {
+  const targetDocument =
+    ownerDocument ?? (typeof document === 'undefined' ? undefined : document);
+  if (!targetDocument) return;
+  const documentRegistries = registries.get(targetDocument);
   if (!documentRegistries) return;
   for (const [nonce, registry] of documentRegistries) {
     if (!registry.rules.delete(key)) continue;
@@ -202,11 +224,14 @@ export function removeDynamicStyleRule(key: string) {
 
 export function removeDynamicStyleRuleWhenUnused(
   key: string,
-  selector: string
+  selector: string,
+  ownerDocument?: Document
 ) {
   const removeIfUnused = () => {
-    if (typeof document === 'undefined' || !document.querySelector(selector)) {
-      removeDynamicStyleRule(key);
+    const targetDocument =
+      ownerDocument ?? (typeof document === 'undefined' ? undefined : document);
+    if (!targetDocument || !targetDocument.querySelector(selector)) {
+      removeDynamicStyleRule(key, ownerDocument);
     }
   };
 

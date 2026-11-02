@@ -1,8 +1,15 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { rovingFocus } from '../_internal/roving-focus';
 import { checkablePress } from '../_internal/checkable-press';
 import {
@@ -27,6 +34,33 @@ import type {
   RadioGroupItemProps,
 } from './radio-group.types';
 
+function readRadioGroupItemChildRef(
+  children: unknown
+): Ref<Element> | undefined {
+  if (typeof children !== 'object' || children === null) return undefined;
+  return (children as { props?: { ref?: Ref<Element> } }).props?.ref;
+}
+
+function omitRadioGroupItemStateProps<T extends object>(props: T): T {
+  let result: T | undefined;
+  for (const attribute of [
+    'id',
+    'role',
+    'aria-checked',
+    'aria-disabled',
+    'data-slot',
+    'data-disabled',
+    'data-state',
+    'data-roving-index',
+    'tabIndex',
+  ]) {
+    if (!Object.prototype.hasOwnProperty.call(props, attribute)) continue;
+    result ??= { ...props };
+    delete (result as Record<string, unknown>)[attribute];
+  }
+  return result ?? props;
+}
+
 /**
  * Renders the `radio-group-item` part of `radio-group` with `role="radio"`.
  *
@@ -38,6 +72,7 @@ export function RadioGroupItem(
   props: RadioGroupItemProps | RadioGroupItemAsChildProps
 ) {
   const { asChild, children, value, disabled = false, ref, ...rest } = props;
+  const idProp = (rest as { id?: string }).id;
   const root = readRadioGroupRootContext();
   const renderContext = readRadioGroupRenderContext();
   const placement = state<{ index: number; setSize?: number }>({ index: -1 })();
@@ -113,34 +148,40 @@ export function RadioGroupItem(
       setCurrentIndex: root.setCurrentIndex,
     });
   };
-  const refHandler = ref
-    ? composeRefs(
-        ref as
-          | ((value: HTMLElement | null) => void)
-          | { current: HTMLElement | null }
-          | null
-          | undefined,
-        setNode
-      )
-    : setNode;
-  const finalProps = mergeProps(rest, {
-    ...interactionProps,
-    ...itemFocusProps,
-    ...focusRepairProps,
-    ref: refHandler,
-    id: itemId,
-    role: 'radio',
-    disabled: isDisabled && !asChild ? true : undefined,
-    'aria-checked': checked ? 'true' : 'false',
-    'data-slot': 'radio-group-item',
-    'data-disabled': isDisabled ? 'true' : undefined,
-    'data-state': checked ? 'checked' : 'unchecked',
-    tabIndex: isDisabled ? -1 : itemFocusProps.tabIndex,
-    value,
-  });
+  const refHandler = composeRefs(
+    ref as Ref<HTMLElement> | undefined,
+    (asChild ? readRadioGroupItemChildRef(children) : undefined) as
+      | Ref<HTMLElement>
+      | undefined,
+    setNode
+  );
+  const finalProps = mergeProps(
+    {
+      ...interactionProps,
+      ...itemFocusProps,
+      ...focusRepairProps,
+      ref: refHandler,
+      id: idProp ?? itemId,
+      role: 'radio',
+      ...(isDisabled && !asChild ? { disabled: true } : {}),
+      'aria-checked': checked ? 'true' : 'false',
+      'data-slot': 'radio-group-item',
+      'data-disabled': isDisabled ? 'true' : undefined,
+      'data-state': checked ? 'checked' : 'unchecked',
+      tabIndex: isDisabled ? -1 : itemFocusProps.tabIndex,
+      value,
+    },
+    omitRadioGroupItemStateProps(rest)
+  );
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps)}
+        children={children}
+      />
+    );
   }
 
   return (

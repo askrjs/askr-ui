@@ -46,10 +46,16 @@ export interface CollapsibleTriggerProps extends Omit<
 
 /** Props for the `asChild` (polymorphic) rendering of Collapsible Trigger. */
 export interface CollapsibleTriggerAsChildProps {
+  /** Additional attributes forwarded to the child host. */
+  [attribute: string]: unknown;
   /** Render as child element instead of button */
   asChild: true;
   /** Child content */
   children: JSXElement;
+  /** Expanded state is managed by the root and always forwarded to the host. */
+  'aria-expanded'?: boolean | string;
+  /** Disabled state is managed by the root and always forwarded to the host. */
+  'aria-disabled'?: boolean | string;
   /** Ref forwarding */
   ref?: Ref<Element>;
 }
@@ -73,6 +79,8 @@ export interface CollapsibleContentProps extends Omit<
 
 /** Props for the `asChild` (polymorphic) rendering of Collapsible Content. */
 export interface CollapsibleContentAsChildProps {
+  /** Additional attributes forwarded to the child host. */
+  [attribute: string]: unknown;
   /** Render as child element instead of div */
   asChild: true;
   /** Child content */

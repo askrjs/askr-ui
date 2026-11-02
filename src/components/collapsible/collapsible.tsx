@@ -1,11 +1,18 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeRef } from '../_internal/native-ref';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { mergeComponentProps } from '../_internal/component-props';
 import { defineScope, readScope, state } from '@askrjs/askr';
 import { Slot, Presence } from '@askrjs/askr/foundations/structures';
 import { controllableState } from '@askrjs/askr/foundations/state';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { resolveCompoundId } from '../_internal/id';
 import type {
@@ -43,6 +50,10 @@ function readCollapsibleRootContext(): CollapsibleRootContextValue {
   }
 
   return context;
+}
+
+function readCollapsibleChildRef(children: unknown): Ref<Element> | undefined {
+  return (children as { props?: { ref?: Ref<Element> } } | null)?.props?.ref;
 }
 
 /**
@@ -97,13 +108,21 @@ export function CollapsibleTrigger(
 export function CollapsibleTrigger(
   props: CollapsibleTriggerProps | CollapsibleTriggerAsChildProps
 ) {
-  const { asChild, children, ref, ...rest } = props;
+  const {
+    asChild,
+    children,
+    ref,
+    'aria-expanded': _ariaExpanded,
+    'aria-disabled': _ariaDisabled,
+    ...rest
+  } = props;
   const root = readCollapsibleRootContext();
+  const childRef = asChild ? readCollapsibleChildRef(children) : undefined;
   const focusRestore = state({ pending: false })();
-  const restoreFocusRef = (node: HTMLElement | null) => {
+  const restoreFocusRef = (node: Element | null) => {
     if (node && focusRestore.pending) {
       focusRestore.pending = false;
-      node.focus();
+      (node as HTMLElement).focus?.();
     }
   };
   const toggleOpen = (event?: Event) => {
@@ -126,14 +145,7 @@ export function CollapsibleTrigger(
   });
   const finalProps = mergeComponentProps(rest, {
     ...interactionProps,
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      restoreFocusRef
-    ),
+    ref: composeRefs(ref as Ref<Element>, childRef, restoreFocusRef),
     'data-slot': 'collapsible-trigger',
     'data-collapsible-trigger': 'true',
     'aria-expanded': root.open ? 'true' : 'false',
@@ -143,7 +155,13 @@ export function CollapsibleTrigger(
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps)}
+        children={children}
+      />
+    );
   }
 
   return (
@@ -169,8 +187,13 @@ export function CollapsibleContent(
 ) {
   const { asChild, children, forceMount = false, ref, ...rest } = props;
   const root = readCollapsibleRootContext();
+  const childRef = asChild ? readCollapsibleChildRef(children) : undefined;
   const finalProps = mergeProps(rest, {
-    ref,
+    ...(asChild && ref === undefined
+      ? childRef === undefined
+        ? {}
+        : { ref: composeRefs(childRef) }
+      : { ref: asChild ? composeRefs(ref as Ref<Element>, childRef) : ref }),
     id: root.contentId,
     'data-slot': 'collapsible-content',
     'data-state': root.open ? 'open' : 'closed',

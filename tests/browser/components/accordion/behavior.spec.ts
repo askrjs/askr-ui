@@ -338,4 +338,35 @@ test.describe('Accordion - Behavior', () => {
       .toBeGreaterThan(40);
     await expect(button(root, 'Item 43')).toBeFocused();
   });
+
+  test('should keep expanded and disabled ARIA aligned with component state', async ({
+    render,
+    root,
+  }) => {
+    await render('conflictingAriaState');
+
+    await expect(button(root, 'Open')).toHaveAttribute('aria-expanded', 'true');
+    await expect(
+      root.locator('[data-testid="disabled-native"]')
+    ).toBeDisabled();
+    await expect(
+      root.locator('[data-testid="disabled-native"]')
+    ).toHaveAttribute('aria-disabled', 'true');
+    await expect(
+      root.locator('[data-testid="disabled-custom"]')
+    ).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  test('should preserve child refs on asChild header, trigger, and content', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildRefs');
+
+    expect(await run<Record<string, boolean>>('refChecks')).toEqual({
+      header: true,
+      trigger: true,
+      content: true,
+    });
+  });
 });

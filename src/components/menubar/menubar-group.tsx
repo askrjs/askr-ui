@@ -1,6 +1,8 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
 import { nativeRef } from '../_internal/native-ref';
+import { resolveMenubarSlotRef } from './menubar.shared';
 import type {
   MenubarGroupAsChildProps,
   MenubarGroupProps,
@@ -19,9 +21,10 @@ export function MenubarGroup(
   props: MenubarGroupProps | MenubarGroupAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
+  const slotRef = resolveMenubarSlotRef(asChild, children, ref as Ref<Element>);
 
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: slotRef,
     role: 'group',
     'data-slot': 'menubar-group',
   });
@@ -44,8 +47,9 @@ export function MenubarLabel(
   props: MenubarLabelProps | MenubarLabelAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
+  const slotRef = resolveMenubarSlotRef(asChild, children, ref as Ref<Element>);
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: slotRef,
     'data-slot': 'menubar-label',
     'data-menubar-label': 'true',
   });
@@ -68,8 +72,9 @@ export function MenubarSeparator(
   props: MenubarSeparatorProps | MenubarSeparatorAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
+  const slotRef = resolveMenubarSlotRef(asChild, children, ref as Ref<Element>);
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: slotRef,
     role: 'separator',
     'data-slot': 'menubar-separator',
   });

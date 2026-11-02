@@ -5,11 +5,65 @@ import { runCancelablePress } from '../_internal/press';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
 import { checkablePress } from '../_internal/checkable-press';
 import { formResetRef } from '../_internal/form-reset';
+import { resolveAsChildRef } from '../_internal/slot-ref';
 import type {
   CheckboxInputProps,
   CheckboxAsChildProps,
   PressEvent,
 } from './checkbox.types';
+
+type NativeInputRef =
+  | ((value: Element | null) => void)
+  | { current: Element | null }
+  | null
+  | undefined;
+
+function getNativeInputProps({
+  ref,
+  resetRef,
+  indeterminate,
+  isControlled,
+  currentChecked,
+  ariaChecked,
+  dataState,
+  disabled,
+  toggleChecked,
+}: {
+  ref: NativeInputRef;
+  resetRef: (node: Element | null) => void;
+  indeterminate: boolean;
+  isControlled: boolean;
+  currentChecked: boolean;
+  ariaChecked: 'true' | 'false' | 'mixed';
+  dataState: 'checked' | 'unchecked' | 'indeterminate';
+  disabled: boolean;
+  toggleChecked: (event: PressEvent) => void;
+}) {
+  return {
+    ref: composeRefs(ref, resetRef, (node: Element | null) => {
+      if (node instanceof HTMLInputElement) {
+        node.indeterminate = indeterminate;
+      }
+    }),
+    onClick: (event: Event) => {
+      toggleChecked(event as PressEvent);
+
+      if (isControlled) {
+        (event.currentTarget as HTMLInputElement).checked = currentChecked;
+      }
+    },
+    onChange: isControlled
+      ? (event: Event) => {
+          (event.currentTarget as HTMLInputElement).checked = currentChecked;
+        }
+      : undefined,
+    'aria-checked': indeterminate ? undefined : ariaChecked,
+    'aria-disabled': disabled ? 'true' : undefined,
+    'data-slot': 'checkbox',
+    'data-disabled': disabled ? 'true' : undefined,
+    'data-state': dataState,
+  };
+}
 
 /**
  * Headless Checkbox component
@@ -107,65 +161,78 @@ export function Checkbox(props: CheckboxInputProps | CheckboxAsChildProps) {
     : currentChecked
       ? 'checked'
       : 'unchecked';
+  const normalizedRest = { ...rest } as Record<string, unknown>;
+  delete normalizedRest['aria-checked'];
+  if (disabled) {
+    delete normalizedRest['aria-disabled'];
+  }
 
   if (asChild) {
+    const slotRef = resolveAsChildRef(children, ref as NativeInputRef);
+    const child = children as {
+      type?: unknown;
+      props?: Record<string, unknown>;
+    };
+    const isNativeCheckbox =
+      child?.type === 'input' && child.props?.type === 'checkbox';
+
+    if (isNativeCheckbox) {
+      // Keep native form, state, and keyboard behavior when the child is already
+      // a checkbox input; custom hosts use the ARIA interaction path below.
+      const finalProps = mergeProps(normalizedRest, {
+        ...getNativeInputProps({
+          ref: slotRef,
+          resetRef,
+          indeterminate,
+          isControlled,
+          currentChecked,
+          ariaChecked,
+          dataState,
+          disabled,
+          toggleChecked,
+        }),
+        checked: currentChecked,
+        ...(disabled ? { disabled: true } : {}),
+        ...(required ? { required: true } : {}),
+        ...(name === undefined ? {} : { name }),
+        ...(value === undefined ? {} : { value }),
+      });
+
+      return <Slot asChild {...finalProps} children={children} />;
+    }
+
     const interactionProps = checkablePress({
       disabled,
       onPress: (event) => toggleChecked(event as PressEvent),
     });
 
-    const finalProps = mergeProps(rest, {
+    const finalProps = mergeProps(normalizedRest, {
       ...interactionProps,
       role: 'checkbox',
       'aria-checked': ariaChecked,
       'data-slot': 'checkbox',
       'data-disabled': disabled ? 'true' : undefined,
       'data-state': dataState,
-      ref: composeRefs(
-        ref as
-          | ((value: Element | null) => void)
-          | { current: Element | null }
-          | null
-          | undefined,
-        resetRef
-      ),
+      ref: composeRefs(slotRef, resetRef),
     });
 
     return <Slot asChild {...finalProps} children={children} />;
   }
 
-  const finalProps = mergeProps(rest, {
-    ref: composeRefs(
-      ref as
-        | ((value: Element | null) => void)
-        | { current: Element | null }
-        | null
-        | undefined,
+  const finalProps = mergeProps(
+    normalizedRest,
+    getNativeInputProps({
+      ref: ref as NativeInputRef,
       resetRef,
-      (node: Element | null) => {
-        if (node instanceof HTMLInputElement) {
-          node.indeterminate = indeterminate;
-        }
-      }
-    ),
-    onClick: (e: Event) => {
-      toggleChecked(e as PressEvent);
-
-      if (isControlled) {
-        (e.currentTarget as HTMLInputElement).checked = currentChecked;
-      }
-    },
-    onChange: isControlled
-      ? (e: Event) => {
-          (e.currentTarget as HTMLInputElement).checked = currentChecked;
-        }
-      : undefined,
-    'aria-checked': indeterminate ? undefined : ariaChecked,
-    'aria-disabled': disabled ? 'true' : undefined,
-    'data-slot': 'checkbox',
-    'data-disabled': disabled ? 'true' : undefined,
-    'data-state': dataState,
-  });
+      indeterminate,
+      isControlled,
+      currentChecked,
+      ariaChecked,
+      dataState,
+      disabled,
+      toggleChecked,
+    })
+  );
 
   return (
     <input

@@ -5,6 +5,45 @@ export function nativeDefault(root: HTMLElement): void {
   mount(<Toggle>Mute</Toggle>, root);
 }
 
+export function asChildFormDefault(root: HTMLElement) {
+  let submitCount = 0;
+  const container = mount(
+    <form
+      onSubmit={(event: SubmitEvent) => {
+        event.preventDefault();
+        submitCount += 1;
+      }}
+    >
+      <Toggle asChild>
+        <button>Mute</button>
+      </Toggle>
+    </form>,
+    root
+  );
+
+  return {
+    buttonType: () =>
+      (container.querySelector('button') as HTMLButtonElement).type,
+    submitCount: () => submitCount,
+  };
+}
+
+export function asChildExplicitFormType(root: HTMLElement) {
+  const container = mount(
+    <form>
+      <Toggle asChild>
+        <button type="submit">Save</button>
+      </Toggle>
+    </form>,
+    root
+  );
+
+  return {
+    buttonType: () =>
+      (container.querySelector('button') as HTMLButtonElement).type,
+  };
+}
+
 export function explicitTypeAndPressed(root: HTMLElement): void {
   mount(
     <Toggle type="submit" pressed>
@@ -97,6 +136,7 @@ export function asChildDisabled(root: HTMLElement) {
 export function refForwarding(root: HTMLElement) {
   let nativeRef: HTMLButtonElement | null = null;
   let childRef: HTMLElement | null = null;
+  let hostChildRef: HTMLElement | null = null;
 
   const first = mount(
     <Toggle ref={(node) => (nativeRef = node)}>Mute</Toggle>,
@@ -109,13 +149,16 @@ export function refForwarding(root: HTMLElement) {
 
   const second = mount(
     <Toggle asChild ref={(node) => (childRef = node as HTMLElement | null)}>
-      <span>Mute</span>
+      <span ref={(node) => (hostChildRef = node)}>Mute</span>
     </Toggle>,
     root
   );
   const childMatches =
     childRef ===
     (second.querySelector('[role="button"]') as HTMLElement | null);
+  const hostChildMatches =
+    hostChildRef ===
+    (second.querySelector('[role="button"]') as HTMLElement | null);
 
-  return { refs: () => ({ nativeMatches, childMatches }) };
+  return { refs: () => ({ nativeMatches, childMatches, hostChildMatches }) };
 }

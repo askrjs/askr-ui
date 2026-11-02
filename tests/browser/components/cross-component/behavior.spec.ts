@@ -1,6 +1,47 @@
 import { expect, test } from '../../fixtures';
 
 test.describe('Cross-component contracts', () => {
+  test('should preserve the safe button type through asChild controls', async ({
+    render,
+    page,
+    run,
+  }) => {
+    await render('asChildButtonTypeDefaults');
+    await page.getByTestId('native-type-menubar-trigger').click();
+    await expect(page.getByTestId('native-type-menubar-item')).toBeVisible();
+    await page.getByTestId('native-type-menubar-sub-trigger').click();
+    await expect(
+      page.getByTestId('native-type-menubar-sub-item')
+    ).toBeVisible();
+
+    expect(await run<Record<string, string>>('types')).toEqual({
+      button: 'button',
+      toggle: 'button',
+      'toggle-group-item': 'button',
+      'accordion-trigger': 'button',
+      'collapsible-trigger': 'button',
+      'dialog-trigger': 'button',
+      'dialog-close': 'button',
+      'dropdown-trigger': 'button',
+      'dropdown-item': 'button',
+      'hover-card-trigger': 'button',
+      'menu-item': 'button',
+      'menubar-trigger': 'button',
+      'menubar-item': 'button',
+      'menubar-sub-trigger': 'button',
+      'menubar-sub-item': 'button',
+      'popover-trigger': 'button',
+      'popover-close': 'button',
+      'radio-group-item': 'button',
+      'select-trigger': 'button',
+      'select-item': 'button',
+      switch: 'button',
+      'toast-action': 'button',
+      'toast-close': 'button',
+      'tooltip-trigger': 'button',
+    });
+  });
+
   test('should preserve internal values and current callbacks across controlled mode transitions', async ({
     render,
     root,

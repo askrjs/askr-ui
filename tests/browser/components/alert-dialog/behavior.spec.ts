@@ -88,6 +88,50 @@ test.describe('AlertDialog - Behavior', () => {
     expect(await run<number>('dismissCount')).toBe(1);
   });
 
+  test('should not dismiss on pointer interaction outside the content', async ({
+    page,
+    render,
+    run,
+  }) => {
+    await render('outsidePointerBlocked');
+
+    await page
+      .locator('#mount-root')
+      .dispatchEvent('pointerdown', { bubbles: true, cancelable: true });
+
+    await expect(page.locator('[data-slot="dialog-content"]')).toHaveCount(1);
+    expect(await run<number>('outsideCalls')).toBe(1);
+  });
+
+  test('should honor canceled Escape in the content callback', async ({
+    page,
+    render,
+    run,
+  }) => {
+    await render('escapeCanceled');
+    await page.keyboard.press('Escape');
+
+    await expect(page.locator('[data-slot="dialog-content"]')).toHaveCount(1);
+    expect(await run<number>('escapeCalls')).toBe(1);
+  });
+
+  test('should preserve child refs across asChild parts', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildRefs');
+
+    expect(await run<Record<string, boolean>>('refChecks')).toEqual({
+      trigger: true,
+      overlay: true,
+      content: true,
+      title: true,
+      description: true,
+      cancel: true,
+      action: true,
+    });
+  });
+
   for (const closeMethod of ['escape', 'cancel', 'action'] as const) {
     test(`should restore an explicit persistent target after triggerless ${closeMethod} close`, async ({
       page,

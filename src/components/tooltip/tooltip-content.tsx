@@ -2,8 +2,10 @@ import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { registerSsrPartId } from '../_internal/ssr-id-association';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
 import { DismissableLayer } from '../dismissable-layer';
 import {
+  readTooltipChildRef,
   readTooltipRootContext,
   resolveTooltipPositionOptions,
 } from './tooltip.shared';
@@ -51,16 +53,11 @@ export function TooltipContent(
       root.clearPosition();
     }
   };
-  const refHandler = ref
-    ? composeRefs(
-        ref as
-          | ((value: HTMLElement | null) => void)
-          | { current: HTMLElement | null }
-          | null
-          | undefined,
-        setNode
-      )
-    : setNode;
+  const childRef = asChild ? readTooltipChildRef(children) : undefined;
+  const refHandler =
+    ref || childRef
+      ? composeRefs(ref as Ref<HTMLElement> | undefined, childRef, setNode)
+      : setNode;
 
   const finalProps = mergeProps(rest, {
     ref: refHandler,

@@ -33,6 +33,33 @@ export function disabledNative(root: HTMLElement) {
   return { pressCount: () => onPress.count() };
 }
 
+export function ariaStateOverrides(root: HTMLElement): void {
+  mount(
+    <div>
+      <Checkbox
+        checked={false}
+        disabled
+        aria-checked="true"
+        aria-disabled="false"
+        data-testid="native-checkbox"
+      />
+      <Checkbox
+        asChild
+        checked={false}
+        indeterminate
+        disabled
+        aria-checked="true"
+        aria-disabled="false"
+      >
+        <div role="checkbox" data-testid="child-checkbox">
+          Agree
+        </div>
+      </Checkbox>
+    </div>,
+    root
+  );
+}
+
 export function checkedIndeterminate(root: HTMLElement): void {
   mount(<Checkbox checked indeterminate />, root);
 }
@@ -70,16 +97,107 @@ export function retainedIndeterminate(root: HTMLElement) {
 }
 
 export function asChildRef(root: HTMLElement) {
-  let refNode: HTMLElement | null = null;
+  const childRef = { current: null as HTMLDivElement | null };
+  const componentRef = { current: null as HTMLDivElement | null };
   const container = mount(
-    <Checkbox asChild ref={(node) => (refNode = node as HTMLElement | null)}>
-      <div>Checkbox</div>
+    <Checkbox asChild ref={componentRef}>
+      <div ref={childRef}>Checkbox</div>
     </Checkbox>,
     root
   );
   return {
-    refIsHost: () =>
-      refNode !== null && refNode === container.querySelector('div'),
+    refChecks: () => ({
+      child: childRef.current === container.querySelector('div'),
+      component: componentRef.current === container.querySelector('div'),
+    }),
+  };
+}
+
+export function asChildNativeInput(root: HTMLElement) {
+  const childRef = { current: null as HTMLInputElement | null };
+  const componentRef = { current: null as HTMLInputElement | null };
+  const container = mount(
+    <form>
+      <Checkbox
+        asChild
+        ref={componentRef}
+        checked
+        disabled
+        required
+        indeterminate
+        name="outer-terms"
+        value="accepted"
+      >
+        <input ref={childRef} type="checkbox" data-testid="native-as-child" />
+      </Checkbox>
+    </form>,
+    root
+  );
+  const input = container.querySelector('input') as HTMLInputElement;
+  const form = container.querySelector('form') as HTMLFormElement;
+
+  return {
+    snapshot: () => ({
+      checked: input.checked,
+      disabled: input.disabled,
+      required: input.required,
+      name: input.name,
+      value: input.value,
+      role: input.getAttribute('role'),
+      ariaChecked: input.getAttribute('aria-checked'),
+      indeterminate: input.indeterminate,
+      formValue: new FormData(form).get('outer-terms'),
+      childRefAttached: childRef.current === input,
+      componentRefAttached: componentRef.current === input,
+    }),
+  };
+}
+
+export function asChildNativeInputActivation(root: HTMLElement) {
+  const onCheckedChange = spy<[boolean]>();
+  const container = mount(
+    <Checkbox asChild onCheckedChange={onCheckedChange}>
+      <input type="checkbox" data-testid="native-as-child" />
+    </Checkbox>,
+    root
+  );
+  const input = container.querySelector('input') as HTMLInputElement;
+
+  return {
+    focus: () => input.focus(),
+    checked: () => input.checked,
+    ariaChecked: () => input.getAttribute('aria-checked'),
+    calls: () => onCheckedChange.calls,
+  };
+}
+
+export function asChildNativeInputReset(root: HTMLElement) {
+  const onCheckedChange = spy<[boolean]>();
+  const container = mount(
+    <form>
+      <Checkbox
+        asChild
+        defaultChecked={false}
+        onCheckedChange={onCheckedChange}
+      >
+        <input type="checkbox" defaultChecked />
+      </Checkbox>
+    </form>,
+    root
+  );
+  const input = container.querySelector('input') as HTMLInputElement;
+  const form = container.querySelector('form') as HTMLFormElement;
+
+  return {
+    reset: async () => {
+      form.reset();
+      await flushUpdates();
+    },
+    snapshot: () => ({
+      checked: input.checked,
+      defaultChecked: input.defaultChecked,
+      calls: onCheckedChange.calls,
+    }),
   };
 }
 

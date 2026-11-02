@@ -94,7 +94,73 @@ test.describe('HoverCard - Behavior', () => {
     expect(await run('refs')).toEqual({
       triggerIsAnchor: true,
       contentIsSection: true,
+      triggerChildRefIsAnchor: true,
+      contentChildRefIsSection: true,
     });
+  });
+
+  test('should keep state-owned trigger ARIA aligned with open and disabled state', async ({
+    render,
+    root,
+  }) => {
+    await render('callerStateAriaOverrides');
+    await expect(root.locator('[data-testid="open-trigger"]')).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    );
+    await expect(root.locator('[data-testid="open-trigger"]')).toHaveAttribute(
+      'aria-haspopup',
+      'dialog'
+    );
+    await expect(
+      root.locator('[data-testid="disabled-trigger"]')
+    ).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  test('should tab from the trigger to the first sequential stop', async ({
+    page,
+    render,
+    root,
+  }) => {
+    await render('programmaticOnlyBeforeTabStop');
+    const trigger = root.locator(TRIGGER);
+    await trigger.focus();
+    await page.keyboard.press('Tab');
+    await expect(root.getByTestId('first-tab-stop')).toBeFocused();
+  });
+
+  test('should dismiss from the last sequential stop when a programmatic target follows', async ({
+    page,
+    render,
+    root,
+  }) => {
+    await installClock(page);
+    await render('programmaticOnlyAfterTabStop');
+    await root.getByTestId('last-tab-stop').focus();
+    await page.keyboard.press('Tab');
+    await expect(root.getByTestId('after-card')).toBeFocused();
+    await expect(page.locator(CONTENT)).toHaveCount(0);
+  });
+
+  test('should stay open while keyboard focus remains inside after the pointer leaves', async ({
+    page,
+    render,
+    run,
+  }) => {
+    await installClock(page);
+    await render('pointerLeavesFocusedContent');
+    const action = page.getByTestId('focused-action');
+    await action.focus();
+    await page.locator(EXIT).hover();
+    await page.clock.runFor(100);
+    await expect(action).toBeFocused();
+    await expect(page.locator(CONTENT)).toHaveCount(1);
+    expect(await run<boolean>('contentOpen')).toBe(true);
+
+    await page.locator(EXIT).focus();
+    await page.clock.runFor(100);
+    await expect(page.locator(CONTENT)).toHaveCount(0);
+    expect(await run<boolean>('contentOpen')).toBe(false);
   });
 
   test('should preserve controlled open state given open and onOpenChange when hover and focus events interleave', async ({

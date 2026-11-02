@@ -47,6 +47,7 @@ test.describe('VirtualList - Behavior', () => {
     await run('scrollToIndex', 4);
 
     expect(await run<number>('visibleStartIndex')).toBe(4);
+    expect(await run<boolean>('isFollowingBottom')).toBe(false);
     await expect(root.locator('[data-key="item-4"]')).toHaveAttribute(
       'data-visible',
       'true'
@@ -92,6 +93,36 @@ test.describe('VirtualList - Behavior', () => {
     await expect(host).not.toHaveAttribute('role');
     await expect(firstRow).toHaveAttribute('data-slot', 'virtual-list-row');
     await expect(firstRow).not.toHaveAttribute('role');
+  });
+
+  test('should compose the VirtualList ref with the asChild host ref', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildRefs');
+
+    expect(await run('refs')).toEqual({ listRef: true, hostRef: true });
+    expect(await run<boolean>('hasApi')).toBe(true);
+  });
+
+  test('should not recalculate all variable row heights for a scroll-only update', async ({
+    render,
+    run,
+  }) => {
+    await render('variableHeightScrollCalls');
+    expect(await run<number>('initialCalls')).toBeGreaterThanOrEqual(1_000);
+
+    expect(await run<number>('scroll')).toBe(0);
+  });
+
+  test('should refresh variable row heights when a stable getter reads changed state', async ({
+    render,
+    run,
+  }) => {
+    await render('stableVariableHeightGetterUpdates');
+
+    expect(await run<number>('scrollHeight')).toBe(60);
+    expect(await run<number>('update')).toBe(120);
   });
 
   test('should forward user scroll handlers from the virtual viewport', async ({
@@ -172,14 +203,19 @@ test.describe('VirtualList - Behavior', () => {
   test('should reposition keyed rows when an opt-in row height expands', async ({
     render,
     root,
+    run,
   }) => {
     await render('expandableRowHeight');
+    const initialRowHeightCalls = await run<number>('rowHeightCalls');
     const host = root.locator('[data-slot="virtual-list"]');
     const scrollHeight = () => host.evaluate((node) => node.scrollHeight);
 
     expect(await scrollHeight()).toBe(80);
 
     await root.locator('[data-key="item-0"] button').click();
+    await expect
+      .poll(() => run<number>('rowHeightCalls'))
+      .toBeGreaterThan(initialRowHeightCalls);
     const inspect = root.getByRole('button', { name: 'Inspect Item 0' });
     const checkInspectFocus = await captureFocusTarget(inspect);
     await inspect.focus();

@@ -160,10 +160,13 @@ export function Menubar(props: MenubarProps) {
         index,
         menuKey === undefined
           ? undefined
-          : () =>
-              document.getElementById(
+          : () => {
+              const ownerDocument =
+                collection.items()[0]?.node.ownerDocument ?? document;
+              return ownerDocument.getElementById(
                 resolvePartId(menubarId, `trigger-${menuKey}`)
-              )
+              );
+            }
       );
     });
   };

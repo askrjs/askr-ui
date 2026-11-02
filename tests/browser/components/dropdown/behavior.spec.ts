@@ -8,6 +8,49 @@ function focusedText(page: Page) {
 }
 
 test.describe('Dropdown - Behavior', () => {
+  test('should preserve child refs across asChild parts when wrapper refs are omitted', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildPartRefs');
+
+    expect(await run('refs')).toEqual({
+      trigger: true,
+      content: true,
+      group: true,
+      label: true,
+      item: true,
+      separator: true,
+    });
+  });
+
+  test('should keep state-derived ARIA aligned with open and disabled state', async ({
+    page,
+    render,
+  }) => {
+    await render('callerStateAriaOverrides');
+    const attributes = await page.evaluate(() => ({
+      triggerExpanded: document
+        .querySelector('[data-slot="dropdown-trigger"]')
+        ?.getAttribute('aria-expanded'),
+      triggerHasPopup: document
+        .querySelector('[data-slot="dropdown-trigger"]')
+        ?.getAttribute('aria-haspopup'),
+      triggerDisabled: document
+        .querySelector('[data-slot="dropdown-trigger"]')
+        ?.getAttribute('aria-disabled'),
+      itemDisabled: document
+        .querySelector('[data-slot="dropdown-item"][data-disabled="true"]')
+        ?.getAttribute('aria-disabled'),
+    }));
+    expect(attributes).toEqual({
+      triggerExpanded: 'true',
+      triggerHasPopup: 'menu',
+      triggerDisabled: 'true',
+      itemDisabled: 'true',
+    });
+  });
+
   for (const callerAria of [false, true]) {
     test(`should ${callerAria ? 'preserve caller ARIA despite' : 'associate'} a custom native content ID`, async ({
       render,

@@ -59,8 +59,15 @@ export function OverlayHost(props: OverlayHostProps) {
 
       pendingRegistrations.set(portal, signal);
       queueMicrotask(() => {
+        if (pendingRegistrations.get(portal) !== signal) return;
         pendingRegistrations.delete(portal);
-        if (hostSignal.aborted || signal.aborted) return;
+        if (
+          hostSignal.aborted ||
+          signal.aborted ||
+          activeRegistrations.has(portal)
+        ) {
+          return;
+        }
         const registration = { key: keyForPortal(portal), portal, signal };
         activeRegistrations.set(portal, registration);
         registrations.set([...activeRegistrations.values()]);
@@ -68,7 +75,9 @@ export function OverlayHost(props: OverlayHostProps) {
       signal.addEventListener(
         'abort',
         () => {
-          pendingRegistrations.delete(portal);
+          if (pendingRegistrations.get(portal) === signal) {
+            pendingRegistrations.delete(portal);
+          }
           const current = activeRegistrations.get(portal);
           if (!current || current.signal !== signal) return;
           activeRegistrations.delete(portal);

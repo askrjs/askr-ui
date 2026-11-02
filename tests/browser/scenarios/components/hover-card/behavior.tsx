@@ -73,13 +73,17 @@ export function disabledFocusTrigger(root: HTMLElement) {
 export function asChildRefs(root: HTMLElement) {
   const triggerRef = { current: null as HTMLAnchorElement | null };
   const contentRef = { current: null as HTMLElement | null };
+  const triggerChildRef = { current: null as HTMLAnchorElement | null };
+  const contentChildRef = { current: null as HTMLElement | null };
   const container = mount(
     <HoverCard defaultOpen>
       <HoverCardTrigger asChild ref={triggerRef}>
-        <a href="/preview">Preview</a>
+        <a href="/preview" ref={triggerChildRef}>
+          Preview
+        </a>
       </HoverCardTrigger>
       <HoverCardContent asChild ref={contentRef}>
-        <section>Details</section>
+        <section ref={contentChildRef}>Details</section>
       </HoverCardContent>
     </HoverCard>,
     root
@@ -96,7 +100,95 @@ export function asChildRefs(root: HTMLElement) {
           document.body.querySelector(
             'section[data-slot="hover-card-content"]'
           ),
+      triggerChildRefIsAnchor:
+        triggerChildRef.current === container.querySelector('a'),
+      contentChildRefIsSection:
+        contentChildRef.current ===
+        document.body.querySelector('section[data-slot="hover-card-content"]'),
     }),
+  };
+}
+
+export function callerStateAriaOverrides(root: HTMLElement): void {
+  mount(
+    <>
+      <HoverCard defaultOpen>
+        <HoverCardTrigger
+          aria-expanded="false"
+          aria-haspopup="menu"
+          data-testid="open-trigger"
+        >
+          Open
+        </HoverCardTrigger>
+        <HoverCardContent>Details</HoverCardContent>
+      </HoverCard>
+      <HoverCard>
+        <HoverCardTrigger
+          disabled
+          aria-disabled="false"
+          data-testid="disabled-trigger"
+        >
+          Disabled
+        </HoverCardTrigger>
+        <HoverCardContent>Details</HoverCardContent>
+      </HoverCard>
+    </>,
+    root
+  );
+}
+
+export function programmaticOnlyBeforeTabStop(root: HTMLElement): void {
+  mount(
+    <HoverCard open>
+      <HoverCardTrigger>Preview</HoverCardTrigger>
+      <HoverCardContent>
+        <div data-testid="programmatic-only" tabIndex={-1} />
+        <button data-testid="first-tab-stop" type="button">
+          First
+        </button>
+      </HoverCardContent>
+    </HoverCard>,
+    root
+  );
+}
+
+export function programmaticOnlyAfterTabStop(root: HTMLElement): void {
+  mount(
+    <>
+      <HoverCard defaultOpen closeDelay={100}>
+        <HoverCardTrigger>Preview</HoverCardTrigger>
+        <HoverCardContent>
+          <button data-testid="last-tab-stop" type="button">
+            Last
+          </button>
+          <div data-testid="programmatic-only" tabIndex={-1} />
+        </HoverCardContent>
+      </HoverCard>
+      <button data-testid="after-card" type="button">
+        After
+      </button>
+    </>,
+    root
+  );
+}
+
+export function pointerLeavesFocusedContent(root: HTMLElement) {
+  addPointerExitTarget(root);
+  mount(
+    <HoverCard defaultOpen closeDelay={90}>
+      <HoverCardTrigger>Preview</HoverCardTrigger>
+      <HoverCardContent>
+        <button data-testid="focused-action" type="button">
+          Action
+        </button>
+      </HoverCardContent>
+    </HoverCard>,
+    root
+  );
+
+  return {
+    contentOpen: () =>
+      document.querySelector('[data-slot="hover-card-content"]') !== null,
   };
 }
 

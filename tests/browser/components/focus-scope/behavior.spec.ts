@@ -1,6 +1,45 @@
 import { expect, test } from '../../fixtures';
 
 test.describe('FocusScope - Behavior', () => {
+  test('should compose caller and child host refs when rendered asChild', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildChildRef');
+    expect(
+      await run<{ childRefAttached: boolean; callerRefAttached: boolean }>(
+        'refsAttached'
+      )
+    ).toEqual({ childRefAttached: true, callerRefAttached: true });
+  });
+
+  test('should preserve a native asChild host in the tab order', async ({
+    render,
+    run,
+  }) => {
+    await render('focusableAsChildHost');
+    expect(await run<number>('hostTabIndex')).toBe(0);
+  });
+
+  test('should wrap Tab at the last tabbable child when a programmatic-only child follows', async ({
+    page,
+    render,
+    root,
+  }) => {
+    await render('loopSkipsProgrammaticFocusTarget');
+    await root.getByTestId('last').focus();
+    await page.keyboard.press('Tab');
+    await expect(root.getByTestId('first')).toBeFocused();
+  });
+
+  test('should autofocus an empty asChild scope host', async ({
+    render,
+    run,
+  }) => {
+    await render('emptyAsChildAutoFocus');
+    expect(await run<boolean>('hostFocused')).toBe(true);
+  });
+
   test('should preserve focus when a caller cancels looping Tab defaults', async ({
     page,
     render,

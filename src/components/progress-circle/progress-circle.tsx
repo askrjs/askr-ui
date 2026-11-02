@@ -1,7 +1,11 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { cspNonce, defineScope, readScope } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { nativeRef } from '../_internal/native-ref';
 import {
   dynamicAttributeSelector,
@@ -32,6 +36,29 @@ type ProgressCircleRootContextValue = {
 const ProgressCircleRootContext =
   defineScope<ProgressCircleRootContextValue | null>(null);
 
+function readProgressCircleIndicatorChildRef(
+  children: unknown
+): Ref<Element> | undefined {
+  if (typeof children !== 'object' || children === null) return undefined;
+  return (children as { props?: { ref?: Ref<Element> } }).props?.ref;
+}
+
+function omitProgressCircleStateAriaProps<T extends object>(props: T): T {
+  let result: T | undefined;
+  for (const attribute of [
+    'role',
+    'aria-valuemin',
+    'aria-valuemax',
+    'aria-valuenow',
+    'aria-valuetext',
+  ]) {
+    if (!Object.prototype.hasOwnProperty.call(props, attribute)) continue;
+    result ??= { ...props };
+    delete (result as Record<string, unknown>)[attribute];
+  }
+  return result ?? props;
+}
+
 function readProgressCircleRootContext(): ProgressCircleRootContextValue {
   const context = readScope(ProgressCircleRootContext);
 
@@ -53,16 +80,7 @@ function readProgressCircleRootContext(): ProgressCircleRootContextValue {
  */
 export function ProgressCircle(props: ProgressCircleProps) {
   const nonce = cspNonce();
-  const {
-    children,
-    getValueLabel,
-    id,
-    max,
-    ref,
-    style: _style,
-    value,
-    ...rest
-  } = props;
+  const { children, getValueLabel, id, max, ref, value, ...rest } = props;
   const progressCircleId = resolveCompoundId('progress-circle', id, children);
   const normalizedMax = normalizeProgressMax(max);
   const normalizedValue = normalizeProgressValue(value, normalizedMax);
@@ -85,7 +103,7 @@ export function ProgressCircle(props: ProgressCircleProps) {
     },
     nonce
   );
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeProps(omitProgressCircleStateAriaProps(rest), {
     ref: composeRefs(
       ref as
         | ((value: HTMLElement | null) => void)
@@ -143,8 +161,11 @@ export function ProgressCircleIndicator(
 ) {
   const { asChild, children, ref, ...rest } = props;
   const root = readProgressCircleRootContext();
+  const childRef = asChild
+    ? readProgressCircleIndicatorChildRef(children)
+    : undefined;
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: asChild ? composeRefs(ref as Ref<Element> | undefined, childRef) : ref,
     id: resolvePartId(root.progressCircleId, 'indicator'),
     'data-slot': 'progress-circle-indicator',
     'data-progress-circle-indicator': 'true',

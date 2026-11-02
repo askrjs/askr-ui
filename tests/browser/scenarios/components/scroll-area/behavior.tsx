@@ -66,10 +66,11 @@ export function orientationSemantics(root: HTMLElement): void {
 export function asChildViewport(root: HTMLElement) {
   const onScroll = spy<[Event]>();
   const ref = { current: null as HTMLDivElement | null };
+  const childRef = { current: null as HTMLDivElement | null };
   const container = mount(
     <ScrollArea>
       <ScrollAreaViewport asChild ref={ref} onScroll={onScroll}>
-        <div>Messages</div>
+        <div ref={childRef}>Messages</div>
       </ScrollAreaViewport>
     </ScrollArea>,
     root
@@ -81,8 +82,75 @@ export function asChildViewport(root: HTMLElement) {
       ref.current !== null &&
       ref.current ===
         container.querySelector('[data-slot="scroll-area-viewport"]'),
+    childRefIsViewport: () =>
+      childRef.current !== null &&
+      childRef.current ===
+        container.querySelector('[data-slot="scroll-area-viewport"]'),
     scrollCalls: () => onScroll.count(),
   };
+}
+
+export function laterChildResize(root: HTMLElement) {
+  const container = mount(
+    <>
+      <style>
+        {`[data-testid="later-child-viewport"] {
+          width: 200px;
+          height: 100px;
+          overflow: scroll;
+        }`}
+      </style>
+      <ScrollArea>
+        <ScrollAreaViewport data-testid="later-child-viewport">
+          <div style={{ height: '20px' }}>First child</div>
+          <div data-testid="later-content-child" style={{ height: '500px' }}>
+            Later child
+          </div>
+        </ScrollAreaViewport>
+        <ScrollAreaScrollbar aria-label="Vertical" />
+      </ScrollArea>
+    </>,
+    root
+  );
+  return {
+    shrinkLaterChild: () => {
+      const child = container.querySelector(
+        '[data-testid="later-content-child"]'
+      ) as HTMLElement | null;
+      if (!child) throw new Error('Expected the later content child');
+      child.style.height = '10px';
+    },
+    appendOverflowingChild: () => {
+      const viewport = container.querySelector(
+        '[data-testid="later-child-viewport"]'
+      );
+      if (!viewport) throw new Error('Expected the scroll area viewport');
+      const child = viewport.ownerDocument.createElement('div');
+      child.style.height = '500px';
+      child.textContent = 'New overflowing child';
+      viewport.appendChild(child);
+    },
+  };
+}
+
+export function semanticOverrides(root: HTMLElement) {
+  mount(
+    <ScrollArea>
+      <ScrollAreaViewport id="custom-viewport" role="main" aria-label="Text">
+        Text
+      </ScrollAreaViewport>
+      <ScrollAreaScrollbar
+        orientation="horizontal"
+        aria-label="Horizontal"
+        role="slider"
+        aria-controls="wrong"
+        aria-orientation="vertical"
+        aria-valuemin="10"
+        aria-valuemax="20"
+      />
+    </ScrollArea>,
+    root
+  );
 }
 
 export function overflowMetrics(root: HTMLElement): void {

@@ -1,6 +1,10 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { getSignal, state } from '@askrjs/askr';
 import { resolveCompoundId } from '../_internal/id';
 import type {
@@ -9,11 +13,11 @@ import type {
 } from './dismissable-layer.types';
 
 type LayerEntry = {
-  node: HTMLElement | null;
+  node: Element | null;
   unregister: (() => void) | null;
   unregisterDocumentListeners: (() => void) | null;
   isTop: (() => boolean) | null;
-  setNode: (node: HTMLElement | null) => void;
+  setNode: (node: Element | null) => void;
   handleKeyDown: (event: KeyboardEvent) => void;
   handlePointerDownCapture: (event: PointerEvent) => void;
   lastEscapeEvent: KeyboardEvent | null;
@@ -37,6 +41,37 @@ const layerEntries = new Map<object, LayerEntry>();
  */
 const mountedLayers = new Map<LayerEntry, number>();
 let nextLayerOrder = 1;
+
+function shouldBlockPointerEvent(event: PointerEvent): boolean {
+  const target = event.target;
+  if (!target || !('nodeType' in target)) return false;
+  const targetNode = target as Node;
+  const activeLayers = Array.from(mountedLayers.keys()).filter(
+    (entry) =>
+      !entry.disabled &&
+      entry.node &&
+      entry.node.ownerDocument === targetNode.ownerDocument
+  );
+
+  for (const entry of activeLayers) {
+    if (
+      !entry.disableOutsidePointerEvents ||
+      entry.node?.contains(targetNode)
+    ) {
+      continue;
+    }
+
+    const targetIsInHigherLayer = activeLayers.some(
+      (other) =>
+        other !== entry &&
+        other.node?.contains(targetNode) &&
+        isAbove(other, entry)
+    );
+    if (!targetIsInHigherLayer) return true;
+  }
+
+  return false;
+}
 
 function isAbove(candidate: LayerEntry, other: LayerEntry): boolean {
   const candidateNode = candidate.node;
@@ -85,7 +120,7 @@ function getLayerEntry(identity: object): LayerEntry {
     node: null,
     unregister: null,
     isTop: null,
-    setNode: (node: HTMLElement | null) => {
+    setNode: (node: Element | null) => {
       if (!node) {
         const detached = created.node;
         queueMicrotask(() => {
@@ -166,6 +201,10 @@ function getLayerEntry(identity: object): LayerEntry {
 
       created.lastOutsidePointerEvent = event;
       runDismissCallbacks(created, 'outside');
+      if (shouldBlockPointerEvent(event)) {
+        if (created.isTop?.()) event.preventDefault();
+        event.stopPropagation();
+      }
     },
     lastEscapeEvent: null,
     lastOutsidePointerEvent: null,
@@ -255,11 +294,6 @@ function runDismissCallbacks(entry: LayerEntry, trigger: 'escape' | 'outside') {
     return;
   }
 
-  if (entry.disableOutsidePointerEvents) {
-    pointerEvent.preventDefault?.();
-    pointerEvent.stopPropagation?.();
-  }
-
   entry.onDismiss?.();
 }
 
@@ -289,12 +323,15 @@ export function DismissableLayer(
     ...rest
   } = props;
 
+  const childRef = asChild
+    ? (children as { props?: { ref?: Ref<Element> } } | null)?.props?.ref
+    : undefined;
   const identity = state<object>({
     id: resolveCompoundId('dismissable-layer', id, children),
   })();
   const entry = getLayerEntry(identity);
   registerLayerCleanup(identity, entry);
-  const setNode = (node: HTMLElement | null) => {
+  const setNode = (node: Element | null) => {
     if (node) {
       const becameEnabled = entry.disabled && !disabled;
       entry.disabled = disabled;
@@ -309,16 +346,10 @@ export function DismissableLayer(
     entry.setNode(node);
   };
 
-  const refHandler = ref
-    ? composeRefs(
-        ref as
-          | ((value: HTMLElement | null) => void)
-          | { current: HTMLElement | null }
-          | null
-          | undefined,
-        setNode
-      )
-    : setNode;
+  const refHandler =
+    asChild || ref
+      ? composeRefs(ref as Ref<Element>, childRef, setNode)
+      : setNode;
 
   const finalProps = mergeProps(rest, {
     ref: refHandler,

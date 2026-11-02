@@ -8,6 +8,65 @@ function zIndex(locator: Locator): Promise<number> {
 }
 
 test.describe('Dialog - Behavior', () => {
+  test('should allow focus to leave a modeless dialog', async ({
+    page,
+    render,
+  }) => {
+    await render('modelessFocusTraversal');
+    const first = page.getByTestId('modeless-first');
+
+    await first.focus();
+    await page.keyboard.press('Shift+Tab');
+
+    const focusRemainsInsideDialog = await page.evaluate(
+      () =>
+        document.activeElement?.closest('[data-slot="dialog-content"]') !== null
+    );
+    expect(focusRemainsInsideDialog).toBe(false);
+  });
+
+  test('should keep state-derived ARIA aligned with open and modal state', async ({
+    page,
+    render,
+  }) => {
+    await render('callerStateAriaOverrides');
+    const aria = await page.evaluate(() => ({
+      expanded: document
+        .querySelector('[data-dialog-trigger]')
+        ?.getAttribute('aria-expanded'),
+      haspopup: document
+        .querySelector('[data-dialog-trigger]')
+        ?.getAttribute('aria-haspopup'),
+      modal: document
+        .querySelector('[data-slot="dialog-content"]')
+        ?.getAttribute('aria-modal'),
+      overlayHidden: document
+        .querySelector('[data-dialog-overlay]')
+        ?.getAttribute('aria-hidden'),
+    }));
+
+    expect(aria).toEqual({
+      expanded: 'true',
+      haspopup: 'dialog',
+      modal: 'true',
+      overlayHidden: 'true',
+    });
+  });
+
+  test('should keep disabled trigger and close ARIA aligned with behavior', async ({
+    page,
+    render,
+  }) => {
+    await render('callerDisabledAriaOverrides');
+    const disabledStates = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('[data-disabled="true"]')).map(
+        (node) => node.getAttribute('aria-disabled')
+      )
+    );
+
+    expect(disabledStates).toEqual(['true', 'true']);
+  });
+
   test('should associate content with the actual custom part ids', async ({
     render,
     page,
@@ -364,6 +423,20 @@ test.describe('Dialog - Behavior', () => {
     await page.keyboard.press(' ');
 
     await expect(page.locator('[data-slot="dialog-content"]')).toHaveCount(0);
+  });
+
+  test('should preserve child and component refs on DialogClose and DialogOverlay hosts', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildRefs');
+
+    expect(await run<Record<string, boolean>>('refChecks')).toEqual({
+      overlayChild: true,
+      overlayComponent: true,
+      closeChild: true,
+      closeComponent: true,
+    });
   });
 
   test('should omit generated title and description references when those parts are absent', async ({

@@ -93,7 +93,7 @@ function isNaturallyFocusable(element: HTMLElement): boolean {
   return element.isContentEditable;
 }
 
-function isFocusable(element: HTMLElement): boolean {
+export function isFocusable(element: HTMLElement): boolean {
   return (
     !element.hasAttribute('disabled') &&
     !isDisabledByFieldset(element) &&

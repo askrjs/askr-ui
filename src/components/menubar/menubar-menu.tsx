@@ -1,8 +1,11 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { getSignal, state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, type Ref } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
 import {
   registerSsrPartId,
@@ -35,6 +38,8 @@ import {
   createMenubarIdAssociation,
   MenubarMenuContext,
   MenubarRootContext,
+  omitMenubarStateAriaProps,
+  readMenubarChildRef,
   type MenubarMenuContextValue,
   type MenubarRootContextValue,
 } from './menubar.shared';
@@ -139,6 +144,11 @@ export function MenubarTrigger(
     type: typeProp,
     ...rest
   } = props;
+  const callerProps = omitMenubarStateAriaProps(rest, [
+    'aria-disabled',
+    'aria-expanded',
+    'aria-haspopup',
+  ]);
   const root = readMenubarRootContext();
   const menu = readMenubarMenuContext();
   const scopedVirtualPlacement = menu.placement;
@@ -212,16 +222,13 @@ export function MenubarTrigger(
       setCurrentIndex: root.setCurrentTriggerIndex,
     });
   };
-  const refHandler = ref
-    ? composeRefs(
-        ref as
-          | ((value: HTMLElement | null) => void)
-          | { current: HTMLElement | null }
-          | null
-          | undefined,
-        setNode
-      )
-    : setNode;
+  const refHandler = composeRefs(
+    ref as Ref<HTMLElement> | undefined,
+    (asChild ? readMenubarChildRef(children) : undefined) as
+      | Ref<HTMLElement>
+      | undefined,
+    setNode
+  );
   const handleKeyDown = (event: KeyboardEvent) => {
     if (!disabled && root.handleTypeaheadKeyDown(event)) {
       return;
@@ -243,7 +250,7 @@ export function MenubarTrigger(
     interactionProps.onKeyUp?.(event);
   };
   const itemFocusProps = nav.item(menu.menuIndex);
-  const finalProps = mergeComponentProps(rest, {
+  const finalProps = mergeComponentProps(callerProps, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
     onKeyUp: handleKeyUp,
@@ -251,9 +258,10 @@ export function MenubarTrigger(
     ref: refHandler,
     id: menu.triggerId,
     role: 'menuitem',
-    disabled: disabled && !asChild ? true : undefined,
+    ...(disabled && !asChild ? { disabled: true } : {}),
     'aria-haspopup': 'menu',
     'aria-expanded': isOpen() ? 'true' : 'false',
+    'aria-disabled': disabled ? 'true' : undefined,
     'aria-controls': menu.contentId,
     'data-slot': 'menubar-trigger',
     'data-disabled': disabled ? 'true' : undefined,
@@ -288,7 +296,13 @@ export function MenubarTrigger(
   }
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps, typeProp)}
+        children={children}
+      />
+    );
   }
 
   return (

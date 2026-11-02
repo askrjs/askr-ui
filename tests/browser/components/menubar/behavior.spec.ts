@@ -19,6 +19,72 @@ function focusedText(page: Page) {
 }
 
 test.describe('Menubar - Behavior', () => {
+  test('should compose child host refs across asChild menubar parts', async ({
+    render,
+    page,
+    run,
+  }) => {
+    await render('asChildChildRefs');
+    await button(page, 'File').click();
+    await button(page, 'Share').click();
+    await expect(
+      page.getByRole('menuitem', { name: 'Copy link' })
+    ).toBeVisible();
+    const expectedRefs = {
+      trigger: true,
+      content: true,
+      group: true,
+      label: true,
+      item: true,
+      separator: true,
+      subTrigger: true,
+      subContent: true,
+    };
+    expect(await run<Record<string, boolean>>('refsAttached')).toEqual(
+      expectedRefs
+    );
+    expect(await run<Record<string, boolean>>('callerRefsAttached')).toEqual(
+      expectedRefs
+    );
+  });
+
+  test('should keep state-derived ARIA aligned with menubar state', async ({
+    render,
+    root,
+    page,
+  }) => {
+    await render('callerStateAriaOverrides');
+    const trigger = button(page, 'File');
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
+    await trigger.click();
+    await expect(
+      page.getByRole('menuitem', { name: 'Unavailable' })
+    ).toHaveAttribute('aria-disabled', 'true');
+    await expect(root.getByRole('menubar')).toBeVisible();
+  });
+
+  test('should preserve native disabled state on an asChild host', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildDisabledHost');
+    expect(await run<boolean>('hostDisabled')).toBe(true);
+  });
+
+  test('should dismiss and move Tab focus within the menubar owner document', async ({
+    page,
+    render,
+    run,
+  }) => {
+    await render('iframeTabTraversal');
+    const frame = page.frameLocator('iframe');
+    await frame.getByRole('menuitem', { name: 'Inside' }).focus();
+    await page.keyboard.press('Tab');
+    await expect(frame.getByTestId('after-menubar')).toBeFocused();
+    expect(await run<boolean>('tabWasStopped')).toBe(true);
+  });
+
   for (const submenu of [false, true]) {
     for (const callerAria of [false, true]) {
       test(`should ${callerAria ? 'preserve caller ARIA despite' : 'associate'} a custom native trigger ID in ${submenu ? 'submenu' : 'top menu'}`, async ({
@@ -233,6 +299,7 @@ test.describe('Menubar - Behavior', () => {
     await trigger.focus();
     await page.keyboard.press('ArrowDown');
     await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await expect(trigger).toHaveAttribute('aria-disabled', 'true');
     await expect(button(page, 'Disabled action')).toHaveCount(0);
   });
 
@@ -246,6 +313,7 @@ test.describe('Menubar - Behavior', () => {
     await trigger.focus();
     await page.keyboard.press('ArrowRight');
     await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await expect(trigger).toHaveAttribute('aria-disabled', 'true');
     await expect(button(page, 'Disabled child action')).toHaveCount(0);
   });
 

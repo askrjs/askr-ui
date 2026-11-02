@@ -1,14 +1,16 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeRef } from '../_internal/native-ref';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { mergeProps, type Ref } from '@askrjs/askr/foundations/utilities';
+import { resolveMenuSlotRef } from './menu.shared';
 import type { MenuItemPartAsChildProps, MenuItemPartProps } from './menu.types';
 
 type PartProps = MenuItemPartProps | MenuItemPartAsChildProps;
 
 function MenuItemPart(props: PartProps, slot: string) {
   const { asChild, children, ref, ...rest } = props;
-  const finalProps = mergeProps(rest, { ref, 'data-slot': slot });
+  const slotRef = resolveMenuSlotRef(asChild, children, ref as Ref<Element>);
+  const finalProps = mergeProps(rest, { ref: slotRef, 'data-slot': slot });
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;

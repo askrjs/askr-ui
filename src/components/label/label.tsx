@@ -1,6 +1,7 @@
 import { Slot } from '@askrjs/askr/foundations/structures';
 import type { JSXElement } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { resolveAsChildRef } from '../_internal/slot-ref';
 import type { LabelAsChildProps, LabelLabelProps } from './label.types';
 
 /**
@@ -13,7 +14,11 @@ export function Label(props: LabelAsChildProps): JSXElement;
 export function Label(props: LabelLabelProps | LabelAsChildProps) {
   if (props.asChild) {
     const { asChild: _asChild, children, ref, ...rest } = props;
-    const finalProps = mergeProps(rest, { ref, 'data-slot': 'label' });
+    const slotRef = resolveAsChildRef(children, ref);
+    const finalProps = mergeProps(rest, {
+      ...(slotRef === undefined ? {} : { ref: slotRef }),
+      'data-slot': 'label',
+    });
 
     return <Slot asChild {...finalProps} children={children as JSXElement} />;
   }
