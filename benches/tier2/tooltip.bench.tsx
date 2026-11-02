@@ -1,5 +1,6 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   Tooltip,
   TooltipContent,
@@ -7,7 +8,7 @@ import {
   TooltipTrigger,
 } from '../../src/components/tooltip';
 describe('Tooltip benches - default tree', () => {
-  bench(
+  registerBench(
     'SSR render tooltip tree',
     () => {
       renderToStringSync(() => (
@@ -30,7 +31,7 @@ describe('Tooltip benches - default tree', () => {
   );
 });
 describe('Tooltip benches - asChild content', () => {
-  bench(
+  registerBench(
     'SSR render tooltip tree with asChild content',
     () => {
       renderToStringSync(() => (

@@ -1,5 +1,6 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   Menubar,
   MenubarContent,
@@ -9,7 +10,7 @@ import {
   MenubarTrigger,
 } from '../../src/components';
 describe('Menubar benches', () => {
-  bench(
+  registerBench(
     'SSR render menubar',
     () => {
       renderToStringSync(() => (

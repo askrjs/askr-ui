@@ -1,5 +1,6 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import { VirtualTable } from '../../src/components/virtual-table';
 type Row = {
   id: string;
@@ -24,7 +25,7 @@ const columns = [
   },
 ] as const;
 describe('VirtualTable benches', () => {
-  bench(
+  registerBench(
     'SSR render virtual table',
     () => {
       renderToStringSync(() => (

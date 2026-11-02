@@ -1,5 +1,6 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   Table,
   TableBody,
@@ -11,7 +12,7 @@ import {
   TableRow,
 } from '../../src/components/table';
 describe('Table benches', () => {
-  bench(
+  registerBench(
     'SSR render semantic table',
     () => {
       renderToStringSync(() => (
@@ -70,7 +71,7 @@ describe('Table benches', () => {
     },
     { throws: true }
   );
-  bench(
+  registerBench(
     'SSR render table with asChild hosts',
     () => {
       renderToStringSync(() => (

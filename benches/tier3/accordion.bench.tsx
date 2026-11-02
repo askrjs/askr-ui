@@ -1,5 +1,6 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   Accordion,
   AccordionContent,
@@ -8,7 +9,7 @@ import {
   AccordionTrigger,
 } from '../../src/components';
 describe('Accordion benches', () => {
-  bench(
+  registerBench(
     'SSR render accordion',
     () => {
       renderToStringSync(() => (

@@ -1,13 +1,14 @@
 import { runBrowserBench } from '../tier4/browser-bench';
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   Button,
   type ButtonAsChildProps,
   type ButtonNativeProps,
 } from '../../src/components/button';
 describe('Button benches', () => {
-  bench(
+  registerBench(
     'SSR render native <button>',
     () => {
       renderToStringSync(() => (
@@ -16,7 +17,7 @@ describe('Button benches', () => {
     },
     { throws: true }
   );
-  bench(
+  registerBench(
     'SSR render with asChild and prop merging',
     () => {
       const child = <div />;
@@ -35,7 +36,7 @@ describe('Button benches', () => {
   );
 });
 describe('Button benches - activation', () => {
-  bench(
+  registerBench(
     'mount, activate, and clean up native button',
     async () => {
       let calls = 0;
@@ -62,7 +63,7 @@ describe('Button benches - activation', () => {
   );
 });
 describe('Button benches - activation asChild', () => {
-  bench(
+  registerBench(
     'mount, activate, and clean up asChild button',
     async () => {
       let calls = 0;

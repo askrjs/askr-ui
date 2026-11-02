@@ -1,8 +1,9 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import { VisuallyHidden } from '../../src/components/visually-hidden';
 describe('VisuallyHidden benches', () => {
-  bench(
+  registerBench(
     'SSR render hidden span',
     () => {
       renderToStringSync(() => (
@@ -11,7 +12,7 @@ describe('VisuallyHidden benches', () => {
     },
     { throws: true }
   );
-  bench(
+  registerBench(
     'SSR render hidden asChild host',
     () => {
       renderToStringSync(() => (

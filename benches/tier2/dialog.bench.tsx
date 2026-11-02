@@ -1,5 +1,6 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   Dialog,
   DialogClose,
@@ -11,7 +12,7 @@ import {
   DialogTrigger,
 } from '../../src/components/dialog';
 describe('Dialog benches - default tree', () => {
-  bench(
+  registerBench(
     'SSR render dialog tree',
     () => {
       renderToStringSync(() => (
@@ -39,7 +40,7 @@ describe('Dialog benches - default tree', () => {
   );
 });
 describe('Dialog benches - asChild content', () => {
-  bench(
+  registerBench(
     'SSR render dialog tree with asChild content',
     () => {
       renderToStringSync(() => (

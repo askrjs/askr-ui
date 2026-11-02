@@ -1,8 +1,9 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import { ToggleGroup, ToggleGroupItem } from '../../src/components';
 describe('ToggleGroup benches', () => {
-  bench(
+  registerBench(
     'SSR render toggle group',
     () => {
       renderToStringSync(() => (

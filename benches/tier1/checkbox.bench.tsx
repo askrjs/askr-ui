@@ -1,13 +1,14 @@
 import { runBrowserBench } from '../tier4/browser-bench';
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   Checkbox,
   type CheckboxAsChildProps,
   type CheckboxInputProps,
 } from '../../src/components';
 describe('Checkbox benches - native', () => {
-  bench(
+  registerBench(
     'SSR render native <input type="checkbox">',
     () => {
       renderToStringSync(() => <Checkbox {...({} as CheckboxInputProps)} />);
@@ -16,7 +17,7 @@ describe('Checkbox benches - native', () => {
   );
 });
 describe('Checkbox benches - checked', () => {
-  bench(
+  registerBench(
     'SSR render with checked state',
     () => {
       renderToStringSync(() => (
@@ -27,7 +28,7 @@ describe('Checkbox benches - checked', () => {
   );
 });
 describe('Checkbox benches - indeterminate', () => {
-  bench(
+  registerBench(
     'SSR render with indeterminate state',
     () => {
       renderToStringSync(() => (
@@ -40,7 +41,7 @@ describe('Checkbox benches - indeterminate', () => {
   );
 });
 describe('Checkbox benches - asChild', () => {
-  bench(
+  registerBench(
     'SSR render with asChild and prop merging',
     () => {
       const child = <div />;
@@ -60,7 +61,7 @@ describe('Checkbox benches - asChild', () => {
   );
 });
 describe('Checkbox benches - activation native', () => {
-  bench(
+  registerBench(
     'mount, activate, and clean up native checkbox',
     async () => {
       const changes: boolean[] = [];
@@ -83,7 +84,7 @@ describe('Checkbox benches - activation native', () => {
   );
 });
 describe('Checkbox benches - activation asChild', () => {
-  bench(
+  registerBench(
     'mount, activate, and clean up asChild checkbox',
     async () => {
       const changes: boolean[] = [];
@@ -106,7 +107,7 @@ describe('Checkbox benches - activation asChild', () => {
   );
 });
 describe('Checkbox benches - checked transitions', () => {
-  bench(
+  registerBench(
     'SSR render checked false/true/false variants',
     () => {
       renderToStringSync(() => (
@@ -123,7 +124,7 @@ describe('Checkbox benches - checked transitions', () => {
   );
 });
 describe('Checkbox benches - indeterminate transitions', () => {
-  bench(
+  registerBench(
     'SSR render indeterminate variants',
     () => {
       renderToStringSync(() => (

@@ -1,5 +1,6 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   Select,
   SelectContent,
@@ -12,7 +13,7 @@ import {
   SelectValue,
 } from '../../src/components/select';
 describe('Select benches - default tree', () => {
-  bench(
+  registerBench(
     'SSR render select tree',
     () => {
       renderToStringSync(() => (
@@ -41,7 +42,7 @@ describe('Select benches - default tree', () => {
   );
 });
 describe('Select benches - grouped tree', () => {
-  bench(
+  registerBench(
     'SSR render grouped select tree',
     () => {
       renderToStringSync(() => (

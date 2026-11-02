@@ -1,8 +1,9 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import { DebouncedInput, Input } from '../../src/components/input';
 describe('Input benches', () => {
-  bench(
+  registerBench(
     'SSR render native input',
     () => {
       renderToStringSync(() => (
@@ -11,7 +12,7 @@ describe('Input benches', () => {
     },
     { throws: true }
   );
-  bench(
+  registerBench(
     'SSR render input with asChild host',
     () => {
       renderToStringSync(() => (
@@ -26,7 +27,7 @@ describe('Input benches', () => {
     },
     { throws: true }
   );
-  bench(
+  registerBench(
     'SSR render debounced input',
     () => {
       renderToStringSync(() => (

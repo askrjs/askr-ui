@@ -1,8 +1,9 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import { Label } from '../../src/components/label';
 describe('Label benches - native', () => {
-  bench(
+  registerBench(
     'SSR render native label',
     () => {
       renderToStringSync(() => (
@@ -13,7 +14,7 @@ describe('Label benches - native', () => {
   );
 });
 describe('Label benches - asChild', () => {
-  bench(
+  registerBench(
     'SSR render label with asChild host',
     () => {
       renderToStringSync(() => (

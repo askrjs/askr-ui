@@ -1,4 +1,5 @@
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import { Menu, MenuContent, MenuItem } from '../../src/components/menu';
 import { getTabbableElements } from '../../src/components/_internal/focus';
 import {
@@ -14,7 +15,7 @@ const navigationBenchOptions = createTier4BenchOptions({
 });
 
 describe('Focus-order traversal benches', () => {
-  bench(
+  registerBench(
     'flatten 1k mixed light and shadow focus stops',
     () => {
       const root = document.createElement('div');
@@ -39,7 +40,7 @@ describe('Focus-order traversal benches', () => {
 });
 
 describe('Typeahead benches', () => {
-  bench(
+  registerBench(
     'match within a 200-item rendered menu',
     async () => {
       await runBrowserBench(

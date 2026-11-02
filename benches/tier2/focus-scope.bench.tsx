@@ -1,8 +1,9 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import { FocusScope } from '../../src/components/focus-scope';
 describe('FocusScope benches', () => {
-  bench(
+  registerBench(
     'SSR render default focus scope',
     () => {
       renderToStringSync(() => (
@@ -19,7 +20,7 @@ describe('FocusScope benches', () => {
     },
     { throws: true }
   );
-  bench(
+  registerBench(
     'SSR render looping focus scope',
     () => {
       renderToStringSync(() => (
@@ -36,7 +37,7 @@ describe('FocusScope benches', () => {
     },
     { throws: true }
   );
-  bench(
+  registerBench(
     'SSR render trapped focus scope',
     () => {
       renderToStringSync(() => (

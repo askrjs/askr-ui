@@ -1,5 +1,6 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,7 +13,7 @@ import {
   AlertDialogTrigger,
 } from '../../src/components/alert-dialog';
 describe('AlertDialog benches', () => {
-  bench(
+  registerBench(
     'SSR render alert dialog tree',
     () => {
       renderToStringSync(() => (
@@ -39,7 +40,7 @@ describe('AlertDialog benches', () => {
     },
     { throws: true }
   );
-  bench(
+  registerBench(
     'SSR render alert dialog tree with asChild content',
     () => {
       renderToStringSync(() => (

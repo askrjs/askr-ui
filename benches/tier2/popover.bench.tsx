@@ -1,5 +1,6 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import { OverlayHost } from '../../src/components/overlay-host';
 import {
   Popover,
@@ -9,7 +10,7 @@ import {
   PopoverTrigger,
 } from '../../src/components/popover';
 describe('Popover benches - default tree', () => {
-  bench(
+  registerBench(
     'SSR render popover tree',
     () => {
       renderToStringSync(() => (
@@ -32,7 +33,7 @@ describe('Popover benches - default tree', () => {
   );
 });
 describe('OverlayHost benches - hosted popover tree', () => {
-  bench(
+  registerBench(
     'SSR render overlay host with popover tree',
     () => {
       renderToStringSync(() => (
@@ -54,7 +55,7 @@ describe('OverlayHost benches - hosted popover tree', () => {
   );
 });
 describe('Popover benches - asChild content', () => {
-  bench(
+  registerBench(
     'SSR render popover tree with asChild content',
     () => {
       renderToStringSync(() => (

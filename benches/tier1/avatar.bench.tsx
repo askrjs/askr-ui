@@ -1,8 +1,9 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import { Avatar, AvatarFallback, AvatarImage } from '../../src/components';
 describe('Avatar benches', () => {
-  bench(
+  registerBench(
     'SSR render avatar',
     () => {
       renderToStringSync(() => (

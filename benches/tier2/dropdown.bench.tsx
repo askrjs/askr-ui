@@ -1,5 +1,6 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import {
   Dropdown,
   DropdownContent,
@@ -11,7 +12,7 @@ import {
   DropdownTrigger,
 } from '../../src/components/dropdown';
 describe('Dropdown benches - default tree', () => {
-  bench(
+  registerBench(
     'SSR render dropdown tree',
     () => {
       renderToStringSync(() => (
@@ -36,7 +37,7 @@ describe('Dropdown benches - default tree', () => {
   );
 });
 describe('Dropdown benches - grouped tree', () => {
-  bench(
+  registerBench(
     'SSR render grouped dropdown tree',
     () => {
       renderToStringSync(() => (

@@ -1,8 +1,9 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import { RadioGroup, RadioGroupItem } from '../../src/components/radio-group';
 describe('RadioGroup benches - default group', () => {
-  bench(
+  registerBench(
     'SSR render radio group',
     () => {
       renderToStringSync(() => (
@@ -22,7 +23,7 @@ describe('RadioGroup benches - default group', () => {
   );
 });
 describe('RadioGroup benches - asChild item', () => {
-  bench(
+  registerBench(
     'SSR render radio group with asChild item',
     () => {
       renderToStringSync(() => (

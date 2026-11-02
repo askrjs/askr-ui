@@ -1,8 +1,9 @@
 import { renderToStringSync } from '@askrjs/askr/ssr';
-import { bench, describe } from 'vite-plus/test';
+import { describe } from 'vite-plus/test';
+import { registerBench } from '../bench';
 import { ProgressCircle, ProgressCircleIndicator } from '../../src/components';
 describe('ProgressCircle benches', () => {
-  bench(
+  registerBench(
     'SSR render progress circle',
     () => {
       renderToStringSync(() => (
