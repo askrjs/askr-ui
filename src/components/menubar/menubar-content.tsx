@@ -1,7 +1,7 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { getSignal, state } from '@askrjs/askr';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, type Ref } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
 import {
   registerSsrPartId,
@@ -45,6 +45,7 @@ import {
   readMenubarSubContext,
   resolveMenubarContentOwner,
   resolveMenubarContentState,
+  readMenubarChildRef,
   type MenubarContentContextValue,
   type MenubarIdAssociation,
 } from './menubar.shared';
@@ -166,6 +167,11 @@ function renderMenubarSurfaceContent(
     },
   });
   const setNode = (node: HTMLElement | null) => {
+    const ownerDocument =
+      node?.ownerDocument ??
+      overlayNodes.content?.ownerDocument ??
+      overlayNodes.trigger?.ownerDocument ??
+      document;
     if (node)
       owner.idAssociation.automatic.labelledBy =
         (rest as Record<string, unknown>)['aria-labelledby'] === undefined;
@@ -189,7 +195,9 @@ function renderMenubarSurfaceContent(
         return overlayNodes.trigger;
       }
 
-      const fallbackTrigger = document.getElementById(contentContext.triggerId);
+      const fallbackTrigger = ownerDocument.getElementById(
+        contentContext.triggerId
+      );
 
       if (fallbackTrigger) {
         registerOverlayNode(
@@ -254,7 +262,7 @@ function renderMenubarSurfaceContent(
           if (
             overlayNodes.content !== node ||
             !node.isConnected ||
-            node.contains(document.activeElement)
+            node.contains(node.ownerDocument.activeElement)
           ) {
             return;
           }
@@ -271,16 +279,13 @@ function renderMenubarSurfaceContent(
       });
     }
   };
-  const refHandler = ref
-    ? composeRefs(
-        ref as
-          | ((value: HTMLElement | null) => void)
-          | { current: HTMLElement | null }
-          | null
-          | undefined,
-        setNode
-      )
-    : setNode;
+  const refHandler = composeRefs(
+    ref as Ref<HTMLElement> | undefined,
+    (asChild ? readMenubarChildRef(children) : undefined) as
+      | Ref<HTMLElement>
+      | undefined,
+    setNode
+  );
   const finalProps = mergeComponentProps(rest, {
     ref: refHandler,
     id: contentContext.contentId,
@@ -328,7 +333,9 @@ function renderMenubarSurfaceContent(
           event,
           rootTrigger ?? null,
           Array.from(
-            document.querySelectorAll<HTMLElement>(
+            (
+              event.currentTarget as HTMLElement
+            ).ownerDocument.querySelectorAll<HTMLElement>(
               '[data-slot="menubar-content"]'
             )
           ),

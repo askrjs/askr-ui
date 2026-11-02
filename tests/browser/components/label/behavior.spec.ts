@@ -24,4 +24,28 @@ test.describe('Label - Behavior', () => {
     await expect(span).toHaveAttribute('data-from-child', 'yes');
     await expect(span).toHaveAttribute('data-slot', 'label');
   });
+
+  test('should preserve child and Label refs for an asChild host', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildChildRef');
+
+    expect(await run<Record<string, boolean>>('refChecks')).toEqual({
+      child: true,
+      component: true,
+    });
+  });
+
+  test('should forward htmlFor to a native asChild label host', async ({
+    render,
+    root,
+  }) => {
+    await render('asChildNativeLabel');
+    const label = root.getByTestId('as-child-label');
+
+    await expect(label).toHaveAttribute('for', 'email');
+    await label.click();
+    await expect(root.locator('#email')).toBeFocused();
+  });
 });

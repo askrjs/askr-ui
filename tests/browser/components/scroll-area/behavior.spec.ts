@@ -78,7 +78,66 @@ test.describe('ScrollArea - Behavior', () => {
       .dispatchEvent('scroll');
 
     expect(await run<boolean>('refIsViewport')).toBe(true);
+    expect(await run<boolean>('childRefIsViewport')).toBe(true);
     expect(await run<number>('scrollCalls')).toBe(1);
+  });
+
+  test('should refresh overflow metrics when a later content child resizes', async ({
+    page,
+    render,
+    root,
+    run,
+  }) => {
+    await render('laterChildResize');
+    const scrollbar = root.getByRole('scrollbar', { name: 'Vertical' });
+    await expect(scrollbar).toHaveAttribute('aria-disabled', 'false');
+    const waitForObserverSync = () =>
+      page.evaluate(
+        () =>
+          new Promise<void>((resolve) =>
+            requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+          )
+      );
+
+    await run('shrinkLaterChild');
+    await waitForObserverSync();
+
+    await expect(scrollbar).toHaveAttribute('aria-disabled', 'true', {
+      timeout: 500,
+    });
+    await expect(scrollbar).toHaveAttribute('data-state', 'hidden');
+
+    await run('appendOverflowingChild');
+    await waitForObserverSync();
+    await expect(scrollbar).toHaveAttribute('aria-disabled', 'false');
+    await expect(scrollbar).toHaveAttribute('data-state', 'visible');
+  });
+
+  test('should keep viewport and scrollbar semantics connected to the actual host', async ({
+    render,
+    root,
+  }) => {
+    await render('semanticOverrides');
+    const viewport = root.locator('[data-slot="scroll-area-viewport"]');
+    const scrollbar = root.locator('[data-slot="scroll-area-scrollbar"]');
+
+    expect({
+      viewportId: await viewport.getAttribute('id'),
+      viewportRole: await viewport.getAttribute('role'),
+      scrollbarRole: await scrollbar.getAttribute('role'),
+      controls: await scrollbar.getAttribute('aria-controls'),
+      orientation: await scrollbar.getAttribute('aria-orientation'),
+      valueMin: await scrollbar.getAttribute('aria-valuemin'),
+      valueMax: await scrollbar.getAttribute('aria-valuemax'),
+    }).toEqual({
+      viewportId: 'custom-viewport',
+      viewportRole: 'region',
+      scrollbarRole: 'scrollbar',
+      controls: 'custom-viewport',
+      orientation: 'horizontal',
+      valueMin: '0',
+      valueMax: '100',
+    });
   });
 
   test('should synchronize range state and keyboard scrolling given overflow', async ({

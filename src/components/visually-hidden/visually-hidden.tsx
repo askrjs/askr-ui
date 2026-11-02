@@ -3,6 +3,8 @@ import { nativeRef } from '../_internal/native-ref';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { cspNonce } from '@askrjs/askr';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
+import { resolveAsChildRef } from '../_internal/slot-ref';
 import { setDynamicStyleRule } from '../_internal/dynamic-style';
 import type {
   VisuallyHiddenAsChildProps,
@@ -46,10 +48,22 @@ export function VisuallyHidden(
   ensureVisuallyHiddenRule(nonce);
 
   const { asChild, children, ref, ...rest } = props;
-  const finalProps = mergeProps(rest, { ...visuallyHiddenAttrs, ref });
+  const finalProps = mergeProps(rest, visuallyHiddenAttrs);
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    const slotRef = resolveAsChildRef(
+      children,
+      ref as Ref<Element> | undefined
+    );
+
+    return (
+      <Slot
+        asChild
+        {...finalProps}
+        {...(slotRef === undefined ? {} : { ref: slotRef })}
+        children={children}
+      />
+    );
   }
 
   return (

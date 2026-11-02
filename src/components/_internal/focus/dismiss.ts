@@ -1,4 +1,4 @@
-import { getTabbableElements } from './query';
+import { getActiveElement, getTabbableElements } from './query';
 
 export function dismissPopupWithTab(
   event: KeyboardEvent,
@@ -10,7 +10,13 @@ export function dismissPopupWithTab(
     return false;
   }
 
-  const candidates = getTabbableElements().filter(
+  const currentTarget = event.currentTarget as HTMLElement | null;
+  const ownerDocument =
+    currentTarget?.ownerDocument ??
+    trigger?.ownerDocument ??
+    excludedRoots[0]?.ownerDocument ??
+    document;
+  const candidates = getTabbableElements(ownerDocument).filter(
     (candidate) =>
       !excludedRoots.some((excludedRoot) => excludedRoot.contains(candidate))
   );
@@ -48,11 +54,9 @@ export function moveFocusOutsideCompositeWithTab(
     return false;
   }
 
-  const candidates = getTabbableElements();
-  const activeElement =
-    document.activeElement instanceof HTMLElement
-      ? document.activeElement
-      : null;
+  const ownerDocument = composite.ownerDocument;
+  const candidates = getTabbableElements(ownerDocument);
+  const activeElement = getActiveElement(ownerDocument);
   const activeIndex = activeElement ? candidates.indexOf(activeElement) : -1;
 
   if (activeIndex < 0 || !composite.contains(activeElement)) {

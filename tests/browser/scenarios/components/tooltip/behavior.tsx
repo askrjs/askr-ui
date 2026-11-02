@@ -36,6 +36,45 @@ export function hoverTrigger(root: HTMLElement): void {
   );
 }
 
+export function asChildRefs(root: HTMLElement) {
+  let triggerRef: HTMLElement | null = null;
+  let triggerHostRef: HTMLElement | null = null;
+  let contentRef: HTMLElement | null = null;
+  let contentHostRef: HTMLElement | null = null;
+  const container = mount(
+    <Tooltip defaultOpen>
+      <TooltipTrigger
+        asChild
+        ref={(node) => (triggerRef = node as HTMLElement | null)}
+      >
+        <button ref={(node) => (triggerHostRef = node)}>Hover me</button>
+      </TooltipTrigger>
+      <TooltipContent
+        asChild
+        ref={(node) => (contentRef = node as HTMLElement | null)}
+      >
+        <div ref={(node) => (contentHostRef = node)}>Helpful text</div>
+      </TooltipContent>
+    </Tooltip>,
+    root
+  );
+  const trigger = container.querySelector(
+    '[data-slot="tooltip-trigger"]'
+  ) as HTMLElement | null;
+  const content = container.querySelector(
+    '[data-slot="tooltip-content"]'
+  ) as HTMLElement | null;
+
+  return {
+    refs: () => ({
+      triggerComponent: triggerRef === trigger,
+      triggerHost: triggerHostRef === trigger,
+      contentComponent: contentRef === content,
+      contentHost: contentHostRef === content,
+    }),
+  };
+}
+
 export function disabledFocusTrigger(root: HTMLElement) {
   const onOpenChange = spy<[boolean]>();
   mount(

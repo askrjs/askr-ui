@@ -1,11 +1,18 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, type Ref } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
 import { hoverable, pressable } from '@askrjs/askr/foundations/interactions';
-import { focusFirstDescendant } from '../_internal/focus';
-import { readHoverCardRootContext } from './hover-card.shared';
+import { getTabbableElements } from '../_internal/focus';
+import {
+  omitHoverCardStateAriaProps,
+  readHoverCardChildRef,
+  readHoverCardRootContext,
+} from './hover-card.shared';
 import {
   registerSsrPartId,
   setSsrIdAssociation,
@@ -37,6 +44,12 @@ export function HoverCardTrigger(
     ...rest
   } = props;
   const root = readHoverCardRootContext();
+  const childRef = asChild ? readHoverCardChildRef(children) : undefined;
+  const callerProps = omitHoverCardStateAriaProps(rest, [
+    'aria-expanded',
+    'aria-haspopup',
+    'aria-disabled',
+  ]);
   const hoverProps = hoverable({
     disabled,
     onEnter: () => {
@@ -51,15 +64,12 @@ export function HoverCardTrigger(
     onPress,
     isNativeButton: !asChild,
   });
-  const finalProps = mergeComponentProps(rest, {
+  const finalProps = mergeComponentProps(callerProps, {
     ...interactionProps,
     ...hoverProps,
     ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
+      ref as Ref<HTMLElement> | undefined,
+      childRef as Ref<HTMLElement> | undefined,
       (node: HTMLElement | null) => {
         root.setTriggerNode(
           node,
@@ -97,9 +107,13 @@ export function HoverCardTrigger(
         return;
       }
       const content = root.getContentNode();
-      if (content && focusFirstDescendant(content)) {
+      const firstTabbable = content
+        ? getTabbableElements(content)[0]
+        : undefined;
+      if (firstTabbable) {
         event.preventDefault();
         root.cancelClose();
+        firstTabbable.focus();
       }
     },
   });
@@ -113,7 +127,13 @@ export function HoverCardTrigger(
   );
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps, typeProp)}
+        children={children}
+      />
+    );
   }
 
   return (

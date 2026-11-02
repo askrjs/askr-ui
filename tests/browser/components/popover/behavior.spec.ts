@@ -13,6 +13,92 @@ function rectOf(locator: Locator): Promise<Rect> {
 }
 
 test.describe('Popover - Behavior', () => {
+  test('should compose child and caller refs across asChild parts', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildChildRefs');
+    expect(await run('refsAttached')).toEqual({
+      child: { trigger: true, content: true, close: true },
+      caller: { trigger: true, content: true, close: true },
+    });
+  });
+
+  test('should keep trigger and content semantics aligned with Popover state', async ({
+    render,
+    root,
+    page,
+  }) => {
+    await render('stateAriaOverrides');
+    const trigger = root.locator('[data-slot="popover-trigger"]');
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+    await expect(trigger).toHaveAttribute('aria-disabled', 'true');
+    await expect(trigger).toBeDisabled();
+    await expect(page.locator('[data-slot="popover-content"]')).toHaveAttribute(
+      'role',
+      'dialog'
+    );
+    await expect(page.getByTestId('disabled-close')).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
+  });
+
+  test('should preserve native disabled state on enabled asChild hosts', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildDisabledHost');
+    expect(await run('hostStates')).toEqual({ trigger: true, close: true });
+  });
+
+  test('should toggle a Popover trigger within its iframe owner document', async ({
+    page,
+    render,
+  }) => {
+    await render('iframeTriggerToggle');
+    const trigger = page.frameLocator('iframe').getByRole('button', {
+      name: 'Toggle',
+    });
+    const content = page
+      .frameLocator('iframe')
+      .locator('[data-slot="popover-content"]');
+    const viewportWidth = await page
+      .locator('iframe')
+      .evaluate(
+        (frame) => (frame as HTMLIFrameElement).contentWindow?.innerWidth
+      );
+    expect(viewportWidth).toBeTruthy();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await expect(content).toHaveCSS('position', 'fixed');
+    await expect(content).toHaveCSS(
+      '--ak-overlay-available-width',
+      `${viewportWidth! - 24}px`
+    );
+    await trigger.click();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await expect(
+      page.frameLocator('iframe').locator('style[data-askr-dynamic-styles]')
+    ).toHaveCount(0);
+  });
+
+  test('should not treat an iframe trigger pointerdown as an outside press', async ({
+    page,
+    render,
+  }) => {
+    await render('iframeTriggerToggle');
+    const trigger = page
+      .frameLocator('iframe')
+      .locator('[data-slot="popover-trigger"]');
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await expect(
+      page.frameLocator('iframe').locator('[data-slot="popover-content"]')
+    ).toHaveCount(1);
+    await trigger.dispatchEvent('pointerdown');
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  });
+
   test('should move and restore focus while force-mounted content opens and closes', async ({
     page,
     render,

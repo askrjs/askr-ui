@@ -167,12 +167,19 @@ function cloneJsxElement(
   props: Record<string, unknown>,
   children: unknown
 ) {
+  const childRef = element.props?.ref as Ref<Element> | undefined;
+  const injectedRef = props.ref as Ref<Element> | undefined;
+  const nextProps = mergeProps(element.props ?? {}, {
+    ...props,
+    children,
+  });
+  if (injectedRef) {
+    nextProps.ref = composeRefs(childRef, injectedRef);
+  }
+
   return {
     ...element,
-    props: mergeProps(element.props ?? {}, {
-      ...props,
-      children,
-    }),
+    props: nextProps,
   } as JSXElement;
 }
 

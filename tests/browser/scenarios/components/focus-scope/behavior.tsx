@@ -136,3 +136,78 @@ export function trappedFocusOut(root: HTMLElement) {
 
   return { focusedInside: () => focusedInside };
 }
+
+export function asChildChildRef(root: HTMLElement) {
+  const childRef = { current: null as HTMLElement | null };
+  const callerRef = { current: null as HTMLElement | null };
+  const container = mount(
+    <FocusScope asChild autoFocus={false} ref={callerRef}>
+      <section ref={childRef}>Scope</section>
+    </FocusScope>,
+    root
+  );
+
+  return {
+    refsAttached: () => {
+      const host = container.querySelector('section');
+      return {
+        childRefAttached: childRef.current === host,
+        callerRefAttached: callerRef.current === host,
+      };
+    },
+  };
+}
+
+export function focusableAsChildHost(root: HTMLElement) {
+  const container = mount(
+    <FocusScope asChild autoFocus={false}>
+      <button type="button">Scope</button>
+    </FocusScope>,
+    root
+  );
+
+  return {
+    hostTabIndex: () => container.querySelector('button')?.tabIndex ?? -1,
+  };
+}
+
+export function loopSkipsProgrammaticFocusTarget(root: HTMLElement): void {
+  mount(
+    <>
+      <FocusScope autoFocus={false} loop>
+        <button data-testid="first" type="button">
+          First
+        </button>
+        <button data-testid="last" type="button">
+          Last
+        </button>
+        <div data-testid="programmatic-only" tabIndex={-1} />
+      </FocusScope>
+      <button data-testid="outside" type="button">
+        Outside
+      </button>
+    </>,
+    root
+  );
+}
+
+export function emptyAsChildAutoFocus(root: HTMLElement) {
+  const previousFocus = document.createElement('button');
+  root.appendChild(previousFocus);
+  previousFocus.focus();
+  const container = mount(
+    <FocusScope asChild>
+      <section data-testid="empty-scope" />
+    </FocusScope>,
+    root
+  );
+
+  return {
+    hostFocused: () => {
+      const host = container.querySelector('section');
+      const focused = document.activeElement === host;
+      previousFocus.remove();
+      return focused;
+    },
+  };
+}

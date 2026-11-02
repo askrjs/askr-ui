@@ -1,4 +1,5 @@
 import { defineScope, readScope } from '@askrjs/askr';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
 import type { SsrIdRegistration } from '../_internal/ssr-id-association';
 import {
   OVERLAY_Z_INDEX,
@@ -44,6 +45,28 @@ export type HoverCardRootContextValue = {
 
 export const HoverCardRootContext =
   defineScope<HoverCardRootContextValue | null>(null);
+
+/** Reads the ref attached to a host element used by an asChild part. */
+export function readHoverCardChildRef(
+  children: unknown
+): Ref<Element> | undefined {
+  if (typeof children !== 'object' || children === null) return undefined;
+  return (children as { props?: { ref?: Ref<Element> } }).props?.ref;
+}
+
+/** Removes ARIA values that must stay aligned with HoverCard state. */
+export function omitHoverCardStateAriaProps<T extends object>(
+  props: T,
+  attributes: readonly string[]
+): T {
+  let result: T | undefined;
+  for (const attribute of attributes) {
+    if (!Object.prototype.hasOwnProperty.call(props, attribute)) continue;
+    result ??= { ...props };
+    delete (result as Record<string, unknown>)[attribute];
+  }
+  return result ?? props;
+}
 
 /**
  * Reads the Hover Card Root Context; throws if called outside its provider.

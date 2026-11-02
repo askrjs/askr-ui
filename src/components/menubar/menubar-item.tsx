@@ -1,8 +1,11 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { state } from '@askrjs/askr';
-import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, type Ref } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
 import {
   registerSsrPartId,
@@ -32,6 +35,8 @@ import {
   readOptionalMenubarRootContext,
   readMenubarSubContext,
   resolveMenubarContentState,
+  omitMenubarStateAriaProps,
+  readMenubarChildRef,
   type MenubarSubContextValue,
 } from './menubar.shared';
 import type {
@@ -69,6 +74,7 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
     type: typeProp,
     ...rest
   } = props;
+  const callerProps = omitMenubarStateAriaProps(rest, ['aria-disabled']);
   const content = readMenubarContentContext();
   const renderContext = readMenubarContentRenderContext();
   const scopedVirtualPlacement = readVirtualCompositePlacement(
@@ -159,17 +165,14 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
       setCurrentIndex: content.setCurrentIndex,
     });
   };
-  const refHandler = ref
-    ? composeRefs(
-        ref as
-          | ((value: HTMLElement | null) => void)
-          | { current: HTMLElement | null }
-          | null
-          | undefined,
-        setNode
-      )
-    : setNode;
-  const finalProps = mergeComponentProps(rest, {
+  const refHandler = composeRefs(
+    ref as Ref<HTMLElement> | undefined,
+    (asChild ? readMenubarChildRef(children) : undefined) as
+      | Ref<HTMLElement>
+      | undefined,
+    setNode
+  );
+  const finalProps = mergeComponentProps(callerProps, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
     onKeyUp: handleKeyUp,
@@ -177,7 +180,7 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
     ref: refHandler,
     id: surfaceId,
     role: 'menuitem',
-    disabled: disabled && !asChild ? true : undefined,
+    ...(disabled && !asChild ? { disabled: true } : {}),
     'aria-disabled': disabled ? 'true' : undefined,
     'data-slot': 'menubar-item',
     'data-disabled': disabled ? 'true' : undefined,
@@ -194,7 +197,13 @@ export function MenubarItem(props: MenubarItemProps | MenubarItemAsChildProps) {
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps, typeProp)}
+        children={children}
+      />
+    );
   }
 
   return (
@@ -275,6 +284,11 @@ export function MenubarSubTrigger(
     type: typeProp,
     ...rest
   } = props;
+  const callerProps = omitMenubarStateAriaProps(rest, [
+    'aria-disabled',
+    'aria-expanded',
+    'aria-haspopup',
+  ]);
   const content = readMenubarContentContext();
   const sub = readMenubarSubContext();
   const scopedTriggerPlacement = sub.placement;
@@ -354,16 +368,13 @@ export function MenubarSubTrigger(
       setCurrentIndex: content.setCurrentIndex,
     });
   };
-  const refHandler = ref
-    ? composeRefs(
-        ref as
-          | ((value: HTMLElement | null) => void)
-          | { current: HTMLElement | null }
-          | null
-          | undefined,
-        setNode
-      )
-    : setNode;
+  const refHandler = composeRefs(
+    ref as Ref<HTMLElement> | undefined,
+    (asChild ? readMenubarChildRef(children) : undefined) as
+      | Ref<HTMLElement>
+      | undefined,
+    setNode
+  );
   const handleKeyDown = (event: KeyboardEvent) => {
     if (!disabled && content.handleTypeaheadKeyDown(event)) {
       return;
@@ -387,7 +398,7 @@ export function MenubarSubTrigger(
     interactionProps.onKeyUp?.(event);
   };
   const itemFocusProps = nav.item(sub.surfaceIndex);
-  const finalProps = mergeComponentProps(rest, {
+  const finalProps = mergeComponentProps(callerProps, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
     onKeyUp: handleKeyUp,
@@ -395,9 +406,10 @@ export function MenubarSubTrigger(
     ref: refHandler,
     id: sub.triggerId,
     role: 'menuitem',
-    disabled: disabled && !asChild ? true : undefined,
+    ...(disabled && !asChild ? { disabled: true } : {}),
     'aria-haspopup': 'menu',
     'aria-expanded': isOpen() ? 'true' : 'false',
+    'aria-disabled': disabled ? 'true' : undefined,
     'aria-controls': sub.contentId,
     'data-slot': 'menubar-sub-trigger',
     'data-state': isOpen() ? 'open' : 'closed',
@@ -434,7 +446,13 @@ export function MenubarSubTrigger(
   }
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps, typeProp)}
+        children={children}
+      />
+    );
   }
 
   return (

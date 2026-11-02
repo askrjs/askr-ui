@@ -1,8 +1,11 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs } from '@askrjs/askr/foundations/utilities';
+import { composeRefs, type Ref } from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { rovingFocus } from '../_internal/roving-focus';
@@ -22,7 +25,9 @@ import {
 } from '../_internal/virtual-composite';
 import { runCancelablePress } from '../_internal/press';
 import {
+  omitDropdownStateAriaProps,
   readDropdownRenderContext,
+  readDropdownChildRef,
   readDropdownRootContext,
 } from './dropdown.shared';
 import type {
@@ -56,6 +61,8 @@ export function DropdownItem(
   } = props;
   const root = readDropdownRootContext();
   const renderContext = readDropdownRenderContext();
+  const childRef = asChild ? readDropdownChildRef(children) : undefined;
+  const callerProps = omitDropdownStateAriaProps(rest, ['aria-disabled']);
   const placement = state<{ index: number; setSize?: number }>({ index: -1 })();
   const scopedVirtualPlacement = claimVirtualCompositePlacement(
     placement,
@@ -154,17 +161,15 @@ export function DropdownItem(
       }
     });
   }
-  const refHandler = ref
-    ? composeRefs(
-        ref as
-          | ((value: HTMLElement | null) => void)
-          | { current: HTMLElement | null }
-          | null
-          | undefined,
-        setNode
-      )
-    : setNode;
-  const finalProps = mergeComponentProps(rest, {
+  const refHandler =
+    asChild || ref
+      ? composeRefs(
+          ref as Ref<HTMLElement>,
+          childRef as Ref<HTMLElement>,
+          setNode
+        )
+      : setNode;
+  const finalProps = mergeComponentProps(callerProps, {
     ...interactionProps,
     onKeyDown: handleKeyDown,
     onKeyUp: handleKeyUp,
@@ -188,7 +193,13 @@ export function DropdownItem(
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children as JSX.Element} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps, typeProp)}
+        children={children as JSX.Element}
+      />
+    );
   }
 
   return (

@@ -108,7 +108,7 @@ export async function windowScrollAndFollow(root: HTMLElement) {
     visibleStartIndex: () => api?.getVisibleRange().visibleStartIndex ?? null,
     scrollToIndex: async (index: number) => {
       api?.scrollToIndex(index);
-      await flushUpdates();
+      await settle();
     },
     scrollToBottom: async () => {
       api?.scrollToBottom();
@@ -156,6 +156,118 @@ export async function asChildList(root: HTMLElement): Promise<void> {
     root
   );
   await flushUpdates();
+}
+
+export async function asChildRefs(root: HTMLElement) {
+  let listRef: HTMLElement | null = null;
+  let hostRef: HTMLElement | null = null;
+  let api: VirtualListApi<Item> | null = null;
+  const container = mount(
+    <VirtualList
+      asChild
+      ref={(node) => (listRef = node)}
+      aria-label="Messages"
+      style={{ height: '60px', overflowY: 'auto' }}
+      items={createItems(3)}
+      rowHeight={20}
+      getKey={(item) => item.id}
+      rowComponent={({ item }) => <span>{item.label}</span>}
+      apiRef={(next) => {
+        api = next;
+      }}
+    >
+      <ul ref={(node) => (hostRef = node)} />
+    </VirtualList>,
+    root
+  );
+  await flushUpdates();
+  const host = container.querySelector('[data-slot="virtual-list"]');
+
+  return {
+    refs: () => ({ listRef: listRef === host, hostRef: hostRef === host }),
+    hasApi: () => api !== null,
+  };
+}
+
+export async function variableHeightScrollCalls(root: HTMLElement) {
+  const items = createItems(1_000);
+  let api: VirtualListApi<Item> | null = null;
+  let calls = 0;
+  const getKey = (item: Item) => item.id;
+  const getRowHeight = () => {
+    calls += 1;
+    return 20;
+  };
+  const rowComponent = ({ item }: { item: Item }) => <span>{item.label}</span>;
+  mount(
+    <VirtualList
+      aria-label="Messages"
+      style={{ height: '60px', overflowY: 'auto' }}
+      items={items}
+      rowHeight={20}
+      getRowHeight={getRowHeight}
+      getKey={getKey}
+      rowComponent={rowComponent}
+      apiRef={(next) => {
+        api = next;
+      }}
+    />,
+    root
+  );
+  await settle();
+  const initialCalls = calls;
+
+  return {
+    initialCalls: () => initialCalls,
+    scroll: async () => {
+      await settle();
+      await settle();
+      const callsBeforeScroll = calls;
+      api?.scrollToIndex(500);
+      await settle();
+      return calls - callsBeforeScroll;
+    },
+  };
+}
+
+export function stableVariableHeightGetterUpdates(root: HTMLElement) {
+  const items = createItems(3);
+  const getKey = (item: Item) => item.id;
+  let rowHeight!: ReturnType<typeof state<number>>;
+  const getRowHeight = () => rowHeight();
+
+  function Fixture() {
+    rowHeight = state(20);
+    return (
+      <div>
+        <button type="button" onClick={() => rowHeight.set(40)}>
+          Update row heights
+        </button>
+        <VirtualList
+          aria-label="Messages"
+          style={{ height: '30px', overflowY: 'auto' }}
+          items={items}
+          rowHeight={20}
+          getRowHeight={getRowHeight}
+          getKey={getKey}
+          rowComponent={({ item }) => <span>{item.label}</span>}
+        />
+      </div>
+    );
+  }
+
+  const container = mount(<Fixture />, root);
+  const host = container.querySelector<HTMLElement>(
+    '[data-slot="virtual-list"]'
+  );
+  return {
+    scrollHeight: () => host?.scrollHeight,
+    update: async () => {
+      container.querySelector('button')?.click();
+      await settle();
+      return host?.scrollHeight;
+    },
+  };
 }
 
 export async function forwardedScrollHandler(root: HTMLElement) {
@@ -351,7 +463,8 @@ export async function fixedRowHeightContainment(
   await flushUpdates();
 }
 
-export async function expandableRowHeight(root: HTMLElement): Promise<void> {
+export async function expandableRowHeight(root: HTMLElement) {
+  let rowHeightCalls = 0;
   function ExpandableList() {
     const expanded = state<string | null>(null);
     const items = createItems(4);
@@ -362,7 +475,10 @@ export async function expandableRowHeight(root: HTMLElement): Promise<void> {
         items={items}
         rowHeight={20}
         overscan={1}
-        getRowHeight={(item) => (expanded() === item.id ? 80 : 20)}
+        getRowHeight={(item) => {
+          rowHeightCalls += 1;
+          return expanded() === item.id ? 80 : 20;
+        }}
         getKey={(item) => item.id}
         rowComponent={({ item }) => (
           <div>
@@ -380,6 +496,7 @@ export async function expandableRowHeight(root: HTMLElement): Promise<void> {
 
   mount(<ExpandableList />, root);
   await flushUpdates();
+  return { rowHeightCalls: () => rowHeightCalls };
 }
 
 export function committedScrollRestoration(

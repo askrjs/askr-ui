@@ -1,5 +1,17 @@
 import { state } from '@askrjs/askr';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionHeader,
+  AccordionItem,
+  AccordionTrigger,
+} from '../../../../../src/components/accordion';
+import { Button } from '../../../../../src/components/button';
 import { Checkbox } from '../../../../../src/components/checkbox';
+import {
+  Collapsible,
+  CollapsibleTrigger,
+} from '../../../../../src/components/collapsible';
 import {
   RadioGroup,
   RadioGroupItem,
@@ -8,17 +20,51 @@ import { Form } from '../../../../../src/components/form';
 import { Input } from '../../../../../src/components/input';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogPortal,
   DialogTitle,
   DialogTrigger,
 } from '../../../../../src/components/dialog';
 import {
+  Dropdown,
+  DropdownContent,
+  DropdownItem,
+  DropdownTrigger,
+} from '../../../../../src/components/dropdown';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '../../../../../src/components/hover-card';
+import {
   Popover,
+  PopoverClose,
   PopoverContent,
   PopoverPortal,
   PopoverTrigger,
 } from '../../../../../src/components/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from '../../../../../src/components/select';
+import { Switch } from '../../../../../src/components/switch';
+import {
+  Toast,
+  ToastAction,
+  ToastClose,
+  ToastHost,
+  ToastTitle,
+  ToastViewport,
+} from '../../../../../src/components/toast';
+import { Toggle } from '../../../../../src/components/toggle';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '../../../../../src/components/tooltip';
 import { VirtualList } from '../../../../../src/components/virtual-list';
 import {
   Menu,
@@ -27,7 +73,13 @@ import {
 } from '../../../../../src/components/menu';
 import {
   Menubar,
+  MenubarContent,
+  MenubarItem,
   MenubarMenu,
+  MenubarPortal,
+  MenubarSub,
+  MenubarSubContent,
+  MenubarSubTrigger,
   MenubarTrigger,
 } from '../../../../../src/components/menubar';
 import {
@@ -35,6 +87,181 @@ import {
   ToggleGroupItem,
 } from '../../../../../src/components/toggle-group';
 import { flushUpdates, mount, spy, unmount } from '../../_mount';
+
+export function asChildButtonTypeDefaults(root: HTMLElement) {
+  mount(
+    <form onSubmit={(event: SubmitEvent) => event.preventDefault()}>
+      <Button asChild>
+        <button data-testid="native-type-button">Button</button>
+      </Button>
+      <Toggle asChild>
+        <button data-testid="native-type-toggle">Toggle</button>
+      </Toggle>
+      <ToggleGroup defaultValue="one">
+        <ToggleGroupItem asChild value="one">
+          <button data-testid="native-type-toggle-group-item">
+            Group item
+          </button>
+        </ToggleGroupItem>
+      </ToggleGroup>
+      <Accordion defaultValue="one">
+        <AccordionItem value="one">
+          <AccordionHeader>
+            <AccordionTrigger asChild>
+              <button data-testid="native-type-accordion-trigger">
+                Accordion
+              </button>
+            </AccordionTrigger>
+          </AccordionHeader>
+          <AccordionContent>Content</AccordionContent>
+        </AccordionItem>
+      </Accordion>
+      <Collapsible>
+        <CollapsibleTrigger asChild>
+          <button data-testid="native-type-collapsible-trigger">
+            Collapsible
+          </button>
+        </CollapsibleTrigger>
+      </Collapsible>
+      <Dialog defaultOpen>
+        <DialogTrigger asChild>
+          <button data-testid="native-type-dialog-trigger">Dialog</button>
+        </DialogTrigger>
+        <DialogPortal>
+          <DialogContent>
+            <DialogTitle>Dialog</DialogTitle>
+            <DialogClose asChild>
+              <button data-testid="native-type-dialog-close">
+                Close dialog
+              </button>
+            </DialogClose>
+          </DialogContent>
+        </DialogPortal>
+      </Dialog>
+      <Dropdown defaultOpen>
+        <DropdownTrigger asChild>
+          <button data-testid="native-type-dropdown-trigger">Dropdown</button>
+        </DropdownTrigger>
+        <DropdownContent>
+          <DropdownItem asChild>
+            <button data-testid="native-type-dropdown-item">
+              Dropdown item
+            </button>
+          </DropdownItem>
+        </DropdownContent>
+      </Dropdown>
+      <HoverCard defaultOpen>
+        <HoverCardTrigger asChild>
+          <button data-testid="native-type-hover-card-trigger">
+            Hover card
+          </button>
+        </HoverCardTrigger>
+        <HoverCardContent>Preview</HoverCardContent>
+      </HoverCard>
+      <Menu>
+        <MenuContent>
+          <MenuItem asChild>
+            <button data-testid="native-type-menu-item">Menu item</button>
+          </MenuItem>
+        </MenuContent>
+      </Menu>
+      <Menubar>
+        <MenubarMenu value="file">
+          <MenubarTrigger asChild>
+            <button data-testid="native-type-menubar-trigger">File</button>
+          </MenubarTrigger>
+          <MenubarPortal>
+            <MenubarContent>
+              <MenubarItem asChild>
+                <button data-testid="native-type-menubar-item">Open</button>
+              </MenubarItem>
+              <MenubarSub value="more">
+                <MenubarSubTrigger asChild>
+                  <button data-testid="native-type-menubar-sub-trigger">
+                    More
+                  </button>
+                </MenubarSubTrigger>
+                <MenubarSubContent>
+                  <MenubarItem asChild>
+                    <button data-testid="native-type-menubar-sub-item">
+                      Nested
+                    </button>
+                  </MenubarItem>
+                </MenubarSubContent>
+              </MenubarSub>
+            </MenubarContent>
+          </MenubarPortal>
+        </MenubarMenu>
+      </Menubar>
+      <Popover defaultOpen>
+        <PopoverTrigger asChild>
+          <button data-testid="native-type-popover-trigger">Popover</button>
+        </PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent forceMount>
+            <PopoverClose asChild>
+              <button data-testid="native-type-popover-close">
+                Close popover
+              </button>
+            </PopoverClose>
+          </PopoverContent>
+        </PopoverPortal>
+      </Popover>
+      <RadioGroup defaultValue="one">
+        <RadioGroupItem asChild value="one">
+          <button data-testid="native-type-radio-group-item">Radio</button>
+        </RadioGroupItem>
+      </RadioGroup>
+      <Select defaultOpen defaultValue="one">
+        <SelectTrigger asChild>
+          <button data-testid="native-type-select-trigger">Select</button>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem asChild value="one">
+            <button data-testid="native-type-select-item">One</button>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+      <Switch asChild>
+        <button data-testid="native-type-switch">Switch</button>
+      </Switch>
+      <ToastHost duration={Infinity}>
+        <ToastViewport />
+        <Toast defaultOpen>
+          <ToastTitle>Saved</ToastTitle>
+          <ToastAction asChild>
+            <button data-testid="native-type-toast-action">Undo</button>
+          </ToastAction>
+          <ToastClose asChild>
+            <button data-testid="native-type-toast-close">Close</button>
+          </ToastClose>
+        </Toast>
+      </ToastHost>
+      <Tooltip defaultOpen>
+        <TooltipTrigger asChild>
+          <button data-testid="native-type-tooltip-trigger">Tooltip</button>
+        </TooltipTrigger>
+        <TooltipContent>Helpful text</TooltipContent>
+      </Tooltip>
+    </form>,
+    root
+  );
+
+  return {
+    types: () =>
+      Object.fromEntries(
+        Array.from(
+          document.querySelectorAll<HTMLButtonElement>(
+            'button[data-testid^="native-type-"]'
+          ),
+          (button) => [
+            button.dataset.testid?.replace('native-type-', ''),
+            button.type,
+          ]
+        )
+      ),
+  };
+}
 
 export async function controlledToUncontrolled(root: HTMLElement) {
   let checked!: ReturnType<typeof state<boolean | undefined>>;

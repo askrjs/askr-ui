@@ -39,6 +39,7 @@ import {
   createSelectRenderContext,
   SelectRenderContext,
   SelectRootContext,
+  resolveSelectDisabled,
   resolveSelectState,
   type SelectRootContextValue,
 } from './select.shared';
@@ -104,7 +105,11 @@ export function Select(props: SelectProps) {
     (element) => element.type === SelectItem
   ).map((element, index) => ({
     index,
-    disabled: Boolean(element.props?.disabled),
+    disabled: resolveSelectDisabled(
+      element.props?.children,
+      element.props?.disabled,
+      element.props?.asChild === true
+    ),
     value:
       typeof element.props?.value === 'string'
         ? element.props.value

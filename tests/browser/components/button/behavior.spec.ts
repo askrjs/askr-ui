@@ -59,6 +59,17 @@ test.describe('Button - Behavior', () => {
     expect(await run<number>('pressCount')).toBe(0);
   });
 
+  test('should keep native disabled ARIA state authoritative', async ({
+    render,
+    root,
+  }) => {
+    await render('disabledNativeAriaOverride');
+    const button = root.locator('button');
+
+    await expect(button).toBeDisabled();
+    await expect(button).toHaveAttribute('aria-disabled', 'true');
+  });
+
   test('should support asChild hosts with composed props and disabled semantics', async ({
     render,
     root,
@@ -95,7 +106,7 @@ test.describe('Button - Behavior', () => {
     await expect(link).not.toHaveAttribute('tabindex');
     expect(defaultPrevented).toBe(false);
 
-    await run('clickWithoutNavigation');
+    await run('clickAsAnchorWithoutHref');
 
     expect(await run<number>('pressCount')).toBe(1);
   });
@@ -114,6 +125,39 @@ test.describe('Button - Behavior', () => {
     expect(defaultPrevented).toBe(false);
   });
 
+  test('should respect an Askr Link child cancelling its activation', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildAskrLink');
+    const initialPathname = await run<string>('initialPathname');
+
+    await run('click');
+
+    expect(await run<number>('childPressCount')).toBe(1);
+    expect(await run<number>('buttonPressCount')).toBe(0);
+    expect(await run<string>('pathname')).toBe(initialPathname);
+  });
+
+  test('should preserve native semantics for a typed-route Link child', async ({
+    page,
+    render,
+    root,
+    run,
+  }) => {
+    await render('asChildTypedAskrLink');
+    const link = root.locator('a');
+
+    await expect(link).not.toHaveAttribute('role');
+    await expect(link).not.toHaveAttribute('tabindex');
+    await expect(link).not.toHaveAttribute('type');
+    await run('focusLink');
+    await page.keyboard.press('Enter');
+
+    expect(await run<number>('childPressCount')).toBe(1);
+    expect(await run<number>('buttonPressCount')).toBe(0);
+  });
+
   test('should use native semantics given a button asChild host', async ({
     render,
     root,
@@ -130,6 +174,46 @@ test.describe('Button - Behavior', () => {
     await run('click');
 
     expect(await run<number>('pressCount')).toBe(0);
+  });
+
+  test('should preserve child and Button refs for an asChild host', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildChildRef');
+
+    expect(await run<Record<string, boolean>>('refChecks')).toEqual({
+      child: true,
+      component: true,
+    });
+  });
+
+  test('should default a native button asChild host to type button', async ({
+    render,
+    root,
+    run,
+  }) => {
+    await render('asChildNativeDefaultType');
+    const button = root.locator('button');
+
+    await run('click');
+
+    expect(await run<number>('submitCount')).toBe(0);
+    await expect(button).toHaveAttribute('type', 'button');
+  });
+
+  test('should preserve keyboard submit for a forwarding native button asChild host', async ({
+    page,
+    render,
+    run,
+  }) => {
+    await render('asChildNativeSubmitWrapper');
+
+    await run('focusButton');
+    await page.keyboard.press('Enter');
+
+    expect(await run<number>('submitCount')).toBe(1);
+    expect(await run<number>('pressCount')).toBe(1);
   });
 
   test('should retain synthetic button semantics given a non-native asChild host', async ({

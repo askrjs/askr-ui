@@ -15,6 +15,147 @@ import {
 import { flushUpdates, mount, spy } from '../../_mount';
 import { state } from '@askrjs/askr';
 
+export function asChildChildRefs(root: HTMLElement) {
+  const childRefs = {
+    trigger: { current: null as HTMLElement | null },
+    content: { current: null as HTMLElement | null },
+    close: { current: null as HTMLElement | null },
+  };
+  const callerRefs = {
+    trigger: { current: null as HTMLElement | null },
+    content: { current: null as HTMLElement | null },
+    close: { current: null as HTMLElement | null },
+  };
+  mount(
+    <Popover defaultOpen>
+      <PopoverTrigger
+        asChild
+        ref={(node) => (callerRefs.trigger.current = node)}
+      >
+        <button ref={childRefs.trigger}>Open</button>
+      </PopoverTrigger>
+      <PopoverPortal>
+        <PopoverContent
+          asChild
+          ref={(node) => (callerRefs.content.current = node)}
+        >
+          <section ref={childRefs.content}>
+            <PopoverClose
+              asChild
+              ref={(node) => (callerRefs.close.current = node)}
+            >
+              <button ref={childRefs.close}>Close</button>
+            </PopoverClose>
+          </section>
+        </PopoverContent>
+      </PopoverPortal>
+    </Popover>,
+    root
+  );
+  return {
+    refsAttached: () => ({
+      child: Object.fromEntries(
+        Object.entries(childRefs).map(([name, ref]) => [
+          name,
+          ref.current !== null,
+        ])
+      ),
+      caller: Object.fromEntries(
+        Object.entries(callerRefs).map(([name, ref]) => [
+          name,
+          ref.current !== null,
+        ])
+      ),
+    }),
+  };
+}
+
+export function stateAriaOverrides(root: HTMLElement) {
+  mount(
+    <Popover>
+      <PopoverTrigger
+        disabled
+        aria-disabled="false"
+        aria-expanded="true"
+        aria-haspopup="menu"
+      >
+        Disabled popover
+      </PopoverTrigger>
+      <PopoverPortal>
+        <PopoverContent forceMount role="alert">
+          Details
+          <PopoverClose disabled asChild aria-disabled="false">
+            <span data-testid="disabled-close">Close</span>
+          </PopoverClose>
+        </PopoverContent>
+      </PopoverPortal>
+    </Popover>,
+    root
+  );
+}
+
+export function asChildDisabledHost(root: HTMLElement) {
+  mount(
+    <Popover>
+      <PopoverTrigger asChild>
+        <button disabled data-testid="disabled-trigger-host">
+          Open
+        </button>
+      </PopoverTrigger>
+      <PopoverPortal>
+        <PopoverContent forceMount>
+          <PopoverClose asChild>
+            <button disabled data-testid="disabled-close-host">
+              Close
+            </button>
+          </PopoverClose>
+        </PopoverContent>
+      </PopoverPortal>
+    </Popover>,
+    root
+  );
+  return {
+    hostStates: () => ({
+      trigger:
+        (
+          root.querySelector(
+            '[data-testid="disabled-trigger-host"]'
+          ) as HTMLButtonElement | null
+        )?.disabled ?? false,
+      close:
+        (
+          document.body.querySelector(
+            '[data-testid="disabled-close-host"]'
+          ) as HTMLButtonElement | null
+        )?.disabled ?? false,
+    }),
+  };
+}
+
+export async function iframeTriggerToggle(root: HTMLElement) {
+  const iframe = document.createElement('iframe');
+  iframe.style.width = '480px';
+  iframe.style.height = '360px';
+  root.appendChild(iframe);
+  const ownerDocument = iframe.contentDocument;
+  if (!ownerDocument) throw new Error('Expected a same-origin iframe document');
+  const appRoot = ownerDocument.createElement('div');
+  ownerDocument.body.append(appRoot);
+  mount(
+    <OverlayHost>
+      <Popover defaultOpen>
+        <PopoverTrigger>Toggle</PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent>Details</PopoverContent>
+        </PopoverPortal>
+      </Popover>
+    </OverlayHost>,
+    appRoot
+  );
+  await flushUpdates();
+  await flushUpdates();
+}
+
 export function forceMountedToggle(root: HTMLElement): void {
   function Fixture() {
     const open = state(false);

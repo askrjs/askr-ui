@@ -231,6 +231,16 @@ test.describe('VirtualTable - Behavior', () => {
     await expect(table.locator('tr')).toHaveCount(5);
   });
 
+  test('should compose the VirtualTable ref with the asChild host ref and API attachment', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildRefs');
+
+    expect(await run('refs')).toEqual({ tableRef: true, hostRef: true });
+    expect(await run<boolean>('hasApi')).toBe(true);
+  });
+
   test('should forward user scroll handlers from the virtual wrapper', async ({
     render,
     run,

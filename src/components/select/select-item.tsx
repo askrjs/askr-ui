@@ -1,10 +1,17 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { getCompositeItemFocusTracker } from '../_internal/focus/composite';
 import { nativeRef } from '../_internal/native-ref';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { state } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { mergeComponentProps } from '../_internal/component-props';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { rovingFocus } from '../_internal/roving-focus';
@@ -25,7 +32,10 @@ import {
 import { runCancelablePress } from '../_internal/press';
 import {
   readSelectRenderContext,
+  readSelectChildRef,
   readSelectRootContext,
+  resolveSelectDisabled,
+  resolveSelectSlotRef,
 } from './select.shared';
 import type {
   SelectItemAsChildProps,
@@ -42,16 +52,8 @@ import type {
 export function SelectItem(props: SelectItemProps): JSX.Element | null;
 export function SelectItem(props: SelectItemAsChildProps): JSX.Element | null;
 export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
-  const {
-    asChild,
-    children,
-    disabled = false,
-    value,
-    textValue,
-    ref,
-    type,
-    ...rest
-  } = props;
+  const { asChild, children, disabled, value, textValue, ref, type, ...rest } =
+    props;
   const root = readSelectRootContext();
   const renderContext = readSelectRenderContext();
   const placement = state<{ index: number; setSize?: number }>({ index: -1 })();
@@ -62,7 +64,9 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
   );
   const itemIndex = scopedVirtualPlacement?.index ?? placement.index;
   const itemText = resolveMenuItemText(children, textValue);
-  const isDisabled = root.disabled || disabled;
+  const isDisabled =
+    root.disabled ||
+    resolveSelectDisabled(children, disabled, asChild === true);
 
   const itemId = resolvePartId(root.selectId, `item-${value}`);
   const { items, currentIndex, disabledIndexes } = root.resolvedState;
@@ -170,16 +174,18 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
     onKeyUp: handleKeyUp,
     ...itemFocusProps,
     ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
+      resolveSelectSlotRef(
+        asChild,
+        children,
+        ref as Ref<Element> | undefined
+      ) as Ref<HTMLElement> | undefined,
       setNode
     ),
     id: itemId,
     role: 'option',
-    disabled: isDisabled && !asChild ? true : undefined,
+    ...(asChild && disabled === undefined && !root.disabled
+      ? {}
+      : { disabled: isDisabled ? true : undefined }),
     'aria-selected': selected ? 'true' : 'false',
     'data-slot': 'select-item',
     'data-state': selected ? 'checked' : 'unchecked',
@@ -196,7 +202,13 @@ export function SelectItem(props: SelectItemProps | SelectItemAsChildProps) {
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children as JSX.Element} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps, type)}
+        children={children as JSX.Element}
+      />
+    );
   }
 
   return (
@@ -221,8 +233,13 @@ export function SelectItemText(
   props: SelectItemTextProps | SelectItemTextAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
+  const childRef = asChild ? readSelectChildRef(children) : undefined;
+  const valueRef =
+    ref == null && childRef == null
+      ? undefined
+      : composeRefs(ref as Ref<Element> | undefined, childRef);
   const finalProps = mergeProps(rest, {
-    ref,
+    ...(asChild ? { ref: valueRef } : { ref }),
     'data-slot': 'select-item-text',
     'data-select-item-text': 'true',
   });

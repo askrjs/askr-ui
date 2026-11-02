@@ -44,11 +44,13 @@ export function formResetRef<T extends Element = HTMLElement>(
   if (!entry.handleReset) {
     entry.handleReset = (event) => {
       queueMicrotask(() => {
+        const FormConstructor = entry.document?.defaultView?.HTMLFormElement;
         if (
           !event.defaultPrevented &&
-          event.target instanceof HTMLFormElement &&
+          FormConstructor &&
+          event.target instanceof FormConstructor &&
           entry.node &&
-          belongsToForm(entry.node, event.target)
+          belongsToForm(entry.node, event.target as HTMLFormElement)
         ) {
           entry.onReset();
         }

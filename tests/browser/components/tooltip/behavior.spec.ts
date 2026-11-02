@@ -15,6 +15,20 @@ test.describe('Tooltip - Behavior', () => {
     );
   });
 
+  test('should preserve component and child refs for asChild trigger and content', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildRefs');
+
+    expect(await run('refs')).toEqual({
+      triggerComponent: true,
+      triggerHost: true,
+      contentComponent: true,
+      contentHost: true,
+    });
+  });
+
   test('should keep a disabled asChild trigger closed when programmatically focused', async ({
     render,
     root,

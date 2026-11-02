@@ -2,6 +2,59 @@ import { captureFocusTarget } from '../../assertions';
 import { expect, test } from '../../fixtures';
 
 test.describe('Menu - Behavior', () => {
+  test('should preserve child host refs across asChild parts', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildChildRefs');
+    expect(await run<Record<string, boolean>>('childRefs')).toEqual({
+      content: true,
+      group: true,
+      label: true,
+      item: true,
+      icon: true,
+      itemLabel: true,
+      description: true,
+      separator: true,
+    });
+  });
+
+  test('should keep disabled and orientation ARIA aligned with Menu state', async ({
+    render,
+    root,
+  }) => {
+    await render('callerStateAriaOverrides');
+    await expect(root.getByRole('menu')).toHaveAttribute(
+      'aria-orientation',
+      'horizontal'
+    );
+    await expect(root.getByRole('menuitem')).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
+  });
+
+  test('should preserve native disabled state on an asChild host', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildDisabledHost');
+    expect(await run<boolean>('hostDisabled')).toBe(true);
+  });
+
+  test('should move focus outside the menu in its owner document', async ({
+    page,
+    render,
+    run,
+  }) => {
+    await render('iframeTabTraversal');
+    const frame = page.frameLocator('iframe');
+    await frame.getByRole('menuitem').focus();
+    await page.keyboard.press('Tab');
+    await expect(frame.getByTestId('after-menu')).toBeFocused();
+    expect(await run<boolean>('tabWasStopped')).toBe(true);
+  });
+
   for (const cancel of [false, true]) {
     test(`should ${cancel ? 'suppress' : 'allow'} typeahead when the caller ${cancel ? 'cancels' : 'observes'} own item keydown`, async ({
       page,

@@ -21,6 +21,19 @@ test.describe('Form - Behavior', () => {
     await expect(root.locator('section')).toHaveAttribute('data-slot', 'form');
   });
 
+  test('should preserve Form and child refs when using asChild', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildRefs');
+
+    expect(await run('refs')).toEqual({
+      componentMatches: true,
+      hostMatches: true,
+      omittedComponentHostMatches: true,
+    });
+  });
+
   test('should submit and reset native controls given Form defaults when submit and reset events occur', async ({
     render,
     run,

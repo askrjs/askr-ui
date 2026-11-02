@@ -1,7 +1,11 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { cspNonce, defineScope, readScope } from '@askrjs/askr';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { nativeRef } from '../_internal/native-ref';
 import {
   dynamicAttributeSelector,
@@ -31,6 +35,29 @@ type ProgressRootContextValue = {
 
 const ProgressRootContext = defineScope<ProgressRootContextValue | null>(null);
 
+function readProgressIndicatorChildRef(
+  children: unknown
+): Ref<Element> | undefined {
+  if (typeof children !== 'object' || children === null) return undefined;
+  return (children as { props?: { ref?: Ref<Element> } }).props?.ref;
+}
+
+function omitProgressStateAriaProps<T extends object>(props: T): T {
+  let result: T | undefined;
+  for (const attribute of [
+    'role',
+    'aria-valuemin',
+    'aria-valuemax',
+    'aria-valuenow',
+    'aria-valuetext',
+  ]) {
+    if (!Object.prototype.hasOwnProperty.call(props, attribute)) continue;
+    result ??= { ...props };
+    delete (result as Record<string, unknown>)[attribute];
+  }
+  return result ?? props;
+}
+
 function readProgressRootContext(): ProgressRootContextValue {
   const context = readScope(ProgressRootContext);
 
@@ -46,16 +73,7 @@ function readProgressRootContext(): ProgressRootContextValue {
  */
 export function Progress(props: ProgressProps) {
   const nonce = cspNonce();
-  const {
-    children,
-    getValueLabel,
-    id,
-    max,
-    ref,
-    style: _style,
-    value,
-    ...rest
-  } = props;
+  const { children, getValueLabel, id, max, ref, value, ...rest } = props;
   const progressId = resolveCompoundId('progress', id, children);
   const normalizedMax = normalizeProgressMax(max);
   const normalizedValue = normalizeProgressValue(value, normalizedMax);
@@ -75,7 +93,7 @@ export function Progress(props: ProgressProps) {
     },
     nonce
   );
-  const finalProps = mergeProps(rest, {
+  const finalProps = mergeProps(omitProgressStateAriaProps(rest), {
     ref: composeRefs(
       ref as
         | ((value: HTMLElement | null) => void)
@@ -128,8 +146,11 @@ export function ProgressIndicator(
 ) {
   const { asChild, children, ref, ...rest } = props;
   const root = readProgressRootContext();
+  const childRef = asChild
+    ? readProgressIndicatorChildRef(children)
+    : undefined;
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: asChild ? composeRefs(ref as Ref<Element> | undefined, childRef) : ref,
     id: resolvePartId(root.progressId, 'indicator'),
     'data-slot': 'progress-indicator',
     'data-progress-indicator': 'true',

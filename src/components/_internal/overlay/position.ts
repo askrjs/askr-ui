@@ -19,11 +19,13 @@ export function primeOverlayStackNode(
 ) {
   const attribute = 'data-askr-overlay-stack-id';
   const styleKey = `${overlayStyleKey(identity)}:stack:${part}`;
+  const nodes = overlayNodes.get(identity);
   return prepareDynamicStyleRule(
     styleKey,
     dynamicAttributeSelector(attribute, domId),
     { 'z-index': resolveOverlayStackZIndex(identity, requested, part) },
-    getOverlayNonce(identity)
+    getOverlayNonce(identity),
+    nodes?.content?.ownerDocument ?? nodes?.trigger?.ownerDocument
   );
 }
 
@@ -47,14 +49,17 @@ function clamp(value: number, min: number, max: number) {
 
 // Geometry APIs include CSS zoom, while fixed-position CSS lengths do not.
 // Use the content's effective zoom: a portaled trigger can have another zoom.
-function contentZoom(content: HTMLElement): number {
+function contentZoom(
+  content: HTMLElement,
+  ownerWindow: Window & typeof globalThis
+): number {
   const nativeZoom = content.currentCSSZoom;
   if (Number.isFinite(nativeZoom) && nativeZoom > 0) return nativeZoom;
 
   let zoom = 1;
   let node: Element | null = content;
   while (node) {
-    const ownZoom = Number(window.getComputedStyle(node).zoom);
+    const ownZoom = Number(ownerWindow.getComputedStyle(node).zoom);
     // CSS zoom: 0 has the same used value as 1.
     if (Number.isFinite(ownZoom) && ownZoom > 0) zoom *= ownZoom;
     if (node.assignedSlot) {
@@ -63,7 +68,10 @@ function contentZoom(content: HTMLElement): number {
       node = node.parentElement;
     } else {
       const root = node.getRootNode();
-      node = root instanceof ShadowRoot ? root.host : null;
+      node =
+        root.nodeType === 11 && 'host' in root
+          ? (root as ShadowRoot).host
+          : null;
     }
   }
   return Number.isFinite(zoom) && zoom > 0 ? zoom : 1;
@@ -150,11 +158,12 @@ function resolveAlignedOffset(
 function applyAnchoredPosition(
   trigger: HTMLElement,
   content: HTMLElement,
-  options: Required<OverlayPositionOptions>
+  options: Required<OverlayPositionOptions>,
+  ownerWindow: Window & typeof globalThis
 ): OverlayPositionDeclarations {
-  const zoom = contentZoom(content);
-  const viewportWidth = window.innerWidth / zoom;
-  const viewportHeight = window.innerHeight / zoom;
+  const zoom = contentZoom(content, ownerWindow);
+  const viewportWidth = ownerWindow.innerWidth / zoom;
+  const viewportHeight = ownerWindow.innerHeight / zoom;
   const triggerRect = rectInContentSpace(trigger.getBoundingClientRect(), zoom);
   const contentRect = rectInContentSpace(content.getBoundingClientRect(), zoom);
   const contentWidth = options.matchTriggerWidth
@@ -187,7 +196,7 @@ function applyAnchoredPosition(
       triggerRect.left,
       triggerRect.right,
       contentWidth,
-      window.getComputedStyle(trigger).direction === 'rtl'
+      ownerWindow.getComputedStyle(trigger).direction === 'rtl'
     );
     top =
       resolvedSide === 'bottom'
@@ -233,13 +242,14 @@ function applyAnchoredPosition(
 
 function applyCenteredPosition(
   content: HTMLElement,
-  options: Required<OverlayPositionOptions>
+  options: Required<OverlayPositionOptions>,
+  ownerWindow: Window & typeof globalThis
 ): OverlayPositionDeclarations {
-  const zoom = contentZoom(content);
-  const viewportWidth = window.innerWidth / zoom;
-  const viewportHeight = window.innerHeight / zoom;
+  const zoom = contentZoom(content, ownerWindow);
+  const viewportWidth = ownerWindow.innerWidth / zoom;
+  const viewportHeight = ownerWindow.innerHeight / zoom;
   const contentRect = rectInContentSpace(content.getBoundingClientRect(), zoom);
-  const contentTransform = window.getComputedStyle(content).transform;
+  const contentTransform = ownerWindow.getComputedStyle(content).transform;
   const measureFromLayoutBox = contentTransform !== 'none';
   const contentWidth =
     measureFromLayoutBox && content.offsetWidth
@@ -313,6 +323,7 @@ export function primeOverlayPosition(
   zIndex: OverlayZIndex
 ) {
   const resolvedZIndex = resolveOverlayStackZIndex(identity, zIndex);
+  const nodes = overlayNodes.get(identity);
   setDynamicStyleRule(
     overlayStyleKey(identity),
     dynamicAttributeSelector('data-askr-overlay-id', domId),
@@ -322,7 +333,8 @@ export function primeOverlayPosition(
       margin: '0',
       'z-index': resolvedZIndex,
     },
-    getOverlayNonce(identity)
+    getOverlayNonce(identity),
+    nodes?.content?.ownerDocument ?? nodes?.trigger?.ownerDocument
   );
 }
 
@@ -342,6 +354,9 @@ export function syncOverlayPosition(
     return;
   }
   const positionedContent = nodes.content;
+  const ownerDocument = positionedContent.ownerDocument;
+  const ownerWindow = ownerDocument.defaultView;
+  if (!ownerWindow) return;
   const selectorAttribute = positionedContent.id
     ? { name: 'id', value: positionedContent.id }
     : { name: 'data-askr-overlay-id', value: domId };
@@ -379,9 +394,14 @@ export function syncOverlayPosition(
 
     const position =
       resolvedOptions.mode === 'centered'
-        ? applyCenteredPosition(content, resolvedOptions)
+        ? applyCenteredPosition(content, resolvedOptions, ownerWindow)
         : trigger
-          ? applyAnchoredPosition(trigger, content, resolvedOptions)
+          ? applyAnchoredPosition(
+              trigger,
+              content,
+              resolvedOptions,
+              ownerWindow
+            )
           : null;
 
     if (position) {
@@ -395,17 +415,18 @@ export function syncOverlayPosition(
             resolvedOptions.zIndex
           ),
         },
-        getOverlayNonce(identity)
+        getOverlayNonce(identity),
+        ownerDocument
       );
     }
   };
 
   const scheduleUpdate = () => {
     if (frame) {
-      cancelAnimationFrame(frame);
+      ownerWindow.cancelAnimationFrame(frame);
     }
 
-    frame = requestAnimationFrame(() => {
+    frame = ownerWindow.requestAnimationFrame(() => {
       frame = 0;
       update();
     });
@@ -414,11 +435,12 @@ export function syncOverlayPosition(
   nodes.updatePosition = update;
   update();
   scheduleUpdate();
-  window.addEventListener('resize', scheduleUpdate);
-  window.addEventListener('scroll', scheduleUpdate, true);
+  ownerWindow.addEventListener('resize', scheduleUpdate);
+  ownerWindow.addEventListener('scroll', scheduleUpdate, true);
 
-  if (typeof ResizeObserver !== 'undefined') {
-    resizeObserver = new ResizeObserver(() => {
+  const ResizeObserverCtor = ownerWindow.ResizeObserver;
+  if (typeof ResizeObserverCtor !== 'undefined') {
+    resizeObserver = new ResizeObserverCtor(() => {
       scheduleUpdate();
     });
 
@@ -432,17 +454,17 @@ export function syncOverlayPosition(
   nodes.cleanup = () => {
     if (nodes.updatePosition === update) nodes.updatePosition = undefined;
     if (frame) {
-      cancelAnimationFrame(frame);
+      ownerWindow.cancelAnimationFrame(frame);
       frame = 0;
     }
 
-    window.removeEventListener('resize', scheduleUpdate);
-    window.removeEventListener('scroll', scheduleUpdate, true);
+    ownerWindow.removeEventListener('resize', scheduleUpdate);
+    ownerWindow.removeEventListener('scroll', scheduleUpdate, true);
     resizeObserver?.disconnect();
     resizeObserver = null;
     if (selectorAttribute.name === 'data-askr-overlay-id') {
       positionedContent.removeAttribute(selectorAttribute.name);
     }
-    removeDynamicStyleRule(overlayStyleKey(identity));
+    removeDynamicStyleRule(overlayStyleKey(identity), ownerDocument);
   };
 }

@@ -14,6 +14,73 @@ async function domClick(locator: Locator): Promise<void> {
 }
 
 test.describe('RadioGroup - Behavior', () => {
+  test('should preserve child and caller refs for an asChild item', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildRefs');
+    expect(await run('refs')).toEqual({ child: true, caller: true });
+  });
+
+  test('should preserve a native disabled attribute on an enabled asChild host', async ({
+    render,
+    root,
+  }) => {
+    await render('disabledNativeChild');
+    await expect(
+      root.locator('[data-testid="disabled-radio-host"]')
+    ).toBeDisabled();
+  });
+
+  test('should not activate an enabled asChild item whose native host is disabled', async ({
+    render,
+    root,
+    run,
+  }) => {
+    await render('disabledNativeChild');
+    await run('activateDisabledHost');
+    await expect(radio(root, 'Active')).toHaveAttribute('aria-checked', 'true');
+    expect(await run('changes')).toEqual([]);
+  });
+
+  test('should honor preventDefault from the item click handler', async ({
+    render,
+    root,
+    run,
+  }) => {
+    await render('canceledItemClick');
+    await radio(root, 'Medium').click();
+    await expect(radio(root, 'Small')).toHaveAttribute('aria-checked', 'true');
+    await expect(radio(root, 'Medium')).toHaveAttribute(
+      'aria-checked',
+      'false'
+    );
+    expect(await run('changes')).toEqual([]);
+  });
+
+  test('should keep group and item semantics aligned with RadioGroup state', async ({
+    render,
+    root,
+  }) => {
+    await render('statePropOverrides');
+    const group = root.locator('[data-slot="radio-group"]');
+    const selected = root.locator('[data-testid="selected-radio"]');
+    const blocked = root.locator('[data-testid="blocked-radio"]');
+
+    await expect(group).toHaveAttribute('role', 'radiogroup');
+    await expect(group).toHaveAttribute('aria-orientation', 'horizontal');
+    await expect(group).toHaveAttribute('data-orientation', 'horizontal');
+    await expect(selected).toHaveAttribute('role', 'radio');
+    await expect(selected).toHaveAttribute('aria-checked', 'true');
+    await expect(selected).toHaveAttribute('data-state', 'checked');
+    await expect(selected).toHaveAttribute('tabindex', '0');
+    await expect(blocked).toHaveAttribute('role', 'radio');
+    await expect(blocked).toHaveAttribute('aria-disabled', 'true');
+    await expect(blocked).toHaveAttribute('aria-checked', 'false');
+    await expect(blocked).toHaveAttribute('data-state', 'unchecked');
+    await expect(blocked).toHaveAttribute('tabindex', '-1');
+  });
+
   test('should render the radiogroup container and checked hooks in uncontrolled mode', async ({
     render,
     root,
@@ -163,6 +230,23 @@ test.describe('RadioGroup - Behavior', () => {
 
     await expect(radio(root, 'Small')).toHaveAttribute('aria-checked', 'true');
     expect(await run('calls')).toEqual([['medium'], ['small']]);
+  });
+
+  test('should restore its uncontrolled value when reset from its owner iframe', async ({
+    page,
+    render,
+  }) => {
+    await render('iframeFormReset');
+    const frame = page.frameLocator('iframe');
+    const small = frame.getByRole('radio', { name: 'Small' });
+    const medium = frame.getByRole('radio', { name: 'Medium' });
+
+    await medium.click();
+    await expect(medium).toHaveAttribute('aria-checked', 'true');
+    await frame
+      .locator('form')
+      .evaluate((form) => (form as HTMLFormElement).reset());
+    await expect(small).toHaveAttribute('aria-checked', 'true');
   });
 
   test('should forward refs to the group container and item hosts', async ({

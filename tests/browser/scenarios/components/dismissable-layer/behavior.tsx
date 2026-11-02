@@ -28,6 +28,53 @@ export function singleLayer(root: HTMLElement) {
   return { dismissCount: () => onDismiss.count() };
 }
 
+export function asChildRef(root: HTMLElement) {
+  const childRef = { current: null as HTMLSpanElement | null };
+  const container = mount(
+    <DismissableLayer asChild>
+      <span ref={childRef}>Layer</span>
+    </DismissableLayer>,
+    root
+  );
+
+  return {
+    childRefIsHost: () => childRef.current === container.querySelector('span'),
+  };
+}
+
+export function lowerModalPointerGuard(root: HTMLElement) {
+  const lowerDismiss = spy();
+  const upperDismiss = spy();
+  let outsideClickCount = 0;
+  let outsidePointerDownCount = 0;
+  mount(
+    <>
+      <DismissableLayer disableOutsidePointerEvents onDismiss={lowerDismiss}>
+        Modal layer
+      </DismissableLayer>
+      <DismissableLayer onDismiss={upperDismiss}>
+        Top nonmodal layer
+      </DismissableLayer>
+    </>,
+    root
+  );
+  const outside = document.createElement('button');
+  outside.dataset.testid = 'outside';
+  outside.textContent = 'Outside';
+  outside.addEventListener('click', () => outsideClickCount++);
+  outside.addEventListener('pointerdown', () => outsidePointerDownCount++);
+  root.append(outside);
+
+  return {
+    counts: () => ({
+      lower: lowerDismiss.count(),
+      upper: upperDismiss.count(),
+      outsideClick: outsideClickCount,
+      outsidePointerDown: outsidePointerDownCount,
+    }),
+  };
+}
+
 export function disabledUpperLayer(root: HTMLElement) {
   const lowerDismiss = spy();
   const upperDismiss = spy();

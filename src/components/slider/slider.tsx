@@ -2,7 +2,11 @@ import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeRef } from '../_internal/native-ref';
 import { mergeComponentProps } from '../_internal/component-props';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import { watch } from '@askrjs/askr/resources';
 import { cspNonce, getSignal, state } from '@askrjs/askr';
@@ -29,6 +33,7 @@ import type {
 import {
   SliderRootContext,
   readSliderRootContext,
+  resolveSliderSlotRef,
   type SliderRootContextValue,
 } from './slider.shared';
 import { resolveTextDirection } from '../_internal/direction';
@@ -39,6 +44,9 @@ type SliderEntry = {
   thumb: HTMLElement | null;
   dragMove: ((event: PointerEvent) => void) | null;
   dragEnd: ((event: PointerEvent) => void) | null;
+  dragWindow: Window | null;
+  pointerCaptureNode: HTMLElement | null;
+  pointerId: number | null;
   cleanupSignal: AbortSignal | null;
 };
 
@@ -57,6 +65,9 @@ function getSliderEntry(identity: object) {
     thumb: null,
     dragMove: null,
     dragEnd: null,
+    dragWindow: null,
+    pointerCaptureNode: null,
+    pointerId: null,
     cleanupSignal: null,
   };
   sliderEntries.set(identity, created);
@@ -134,25 +145,46 @@ function updateSliderValueFromPointer(
   entry.thumb?.focus?.();
 }
 
-function beginSliderDrag(identity: object, sliderId: string) {
+function beginSliderDrag(
+  identity: object,
+  sliderId: string,
+  event: PointerEvent
+) {
   const entry = getSliderEntry(identity);
 
   if (entry.dragMove || entry.dragEnd) {
     return;
   }
 
-  entry.dragMove = (event: PointerEvent) => {
+  const ownerWindow = entry.track?.ownerDocument.defaultView ?? window;
+  const pointerId = event.pointerId;
+  const captureNode = event.currentTarget as HTMLElement | null;
+  entry.dragWindow = ownerWindow;
+  entry.pointerId = pointerId;
+  if (captureNode && typeof captureNode.setPointerCapture === 'function') {
+    try {
+      captureNode.setPointerCapture(pointerId);
+      entry.pointerCaptureNode = captureNode;
+    } catch {
+      // Pointer capture is a best-effort enhancement; owner-window listeners
+      // still handle movement while the pointer remains in this document.
+    }
+  }
+  entry.dragMove = (moveEvent: PointerEvent) => {
+    if (moveEvent.pointerId !== pointerId) return;
     updateSliderValueFromPointer(
-      event,
+      moveEvent,
       getSliderRootContext(identity, sliderId)
     );
   };
-  entry.dragEnd = () => {
-    endSliderDrag(identity);
+  entry.dragEnd = (endEvent: PointerEvent) => {
+    if (endEvent.pointerId === pointerId) {
+      endSliderDrag(identity);
+    }
   };
-  window.addEventListener('pointermove', entry.dragMove);
-  window.addEventListener('pointerup', entry.dragEnd);
-  window.addEventListener('pointercancel', entry.dragEnd);
+  ownerWindow.addEventListener('pointermove', entry.dragMove);
+  ownerWindow.addEventListener('pointerup', entry.dragEnd);
+  ownerWindow.addEventListener('pointercancel', entry.dragEnd);
 }
 
 function endSliderDrag(identity: object) {
@@ -160,15 +192,28 @@ function endSliderDrag(identity: object) {
   if (!entry) {
     return;
   }
+  const ownerWindow = entry.dragWindow ?? window;
   if (entry.dragMove) {
-    window.removeEventListener('pointermove', entry.dragMove);
+    ownerWindow.removeEventListener('pointermove', entry.dragMove);
   }
   if (entry.dragEnd) {
-    window.removeEventListener('pointerup', entry.dragEnd);
-    window.removeEventListener('pointercancel', entry.dragEnd);
+    ownerWindow.removeEventListener('pointerup', entry.dragEnd);
+    ownerWindow.removeEventListener('pointercancel', entry.dragEnd);
+  }
+  if (entry.pointerCaptureNode && entry.pointerId !== null) {
+    try {
+      if (entry.pointerCaptureNode.hasPointerCapture(entry.pointerId)) {
+        entry.pointerCaptureNode.releasePointerCapture(entry.pointerId);
+      }
+    } catch {
+      // The pointer may already have been released by the browser.
+    }
   }
   entry.dragMove = null;
   entry.dragEnd = null;
+  entry.dragWindow = null;
+  entry.pointerCaptureNode = null;
+  entry.pointerId = null;
 }
 
 function registerSliderCleanup(identity: object) {
@@ -324,11 +369,11 @@ export function SliderTrack(props: SliderTrackProps | SliderTrackAsChildProps) {
   const percentage = rangePercentage(root.value, root.min, root.max);
   const finalProps = mergeComponentProps(rest, {
     ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
+      resolveSliderSlotRef(
+        asChild,
+        children,
+        ref as Ref<Element> | undefined
+      ) as Ref<HTMLElement> | undefined,
       (node: HTMLElement | null) => {
         entry.track = node;
       }
@@ -350,7 +395,7 @@ export function SliderTrack(props: SliderTrackProps | SliderTrackAsChildProps) {
       }
 
       updateSliderValueFromPointer(event, liveRoot);
-      beginSliderDrag(liveRoot.identity, liveRoot.sliderId);
+      beginSliderDrag(liveRoot.identity, liveRoot.sliderId, event);
     },
   });
 
@@ -376,7 +421,11 @@ export function SliderRange(props: SliderRangeProps | SliderRangeAsChildProps) {
   const root = readSliderRootContext();
   const percentage = rangePercentage(root.value, root.min, root.max);
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: resolveSliderSlotRef(
+      asChild,
+      children,
+      ref as Ref<Element> | undefined
+    ),
     'data-slot': 'slider-range',
     'data-slider-range': 'true',
     'data-orientation': root.orientation,
@@ -406,20 +455,9 @@ export function SliderThumb(props: SliderThumbProps | SliderThumbAsChildProps) {
   const root = readSliderRootContext();
   const entry = getSliderEntry(root.identity);
   const percentage = rangePercentage(root.value, root.min, root.max);
-  const finalProps = mergeComponentProps(rest, {
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      (node: HTMLElement | null) => {
-        entry.thumb = node;
-      }
-    ),
-    id: root.thumbId,
+  const thumbStateProps = {
     role: 'slider',
-    tabIndex: root.disabled ? undefined : 0,
+    tabIndex: root.disabled ? -1 : 0,
     'aria-valuemin': String(root.min),
     'aria-valuemax': String(root.max),
     'aria-valuenow': String(root.value),
@@ -429,13 +467,27 @@ export function SliderThumb(props: SliderThumbProps | SliderThumbAsChildProps) {
     'data-slider-thumb': 'true',
     'data-orientation': root.orientation,
     'data-percentage': String(percentage),
+  };
+  const finalProps = mergeComponentProps(rest, {
+    ref: composeRefs(
+      resolveSliderSlotRef(
+        asChild,
+        children,
+        ref as Ref<Element> | undefined
+      ) as Ref<HTMLElement> | undefined,
+      (node: HTMLElement | null) => {
+        entry.thumb = node;
+      }
+    ),
+    id: root.thumbId,
+    ...thumbStateProps,
     onPointerDown: (event: PointerEvent) => {
       if (event.defaultPrevented || root.disabled) {
         return;
       }
 
       event.preventDefault();
-      beginSliderDrag(root.identity, root.sliderId);
+      beginSliderDrag(root.identity, root.sliderId, event);
     },
     onKeyDown: (event: KeyboardEvent) => {
       if (event.defaultPrevented || root.disabled) {
@@ -479,6 +531,7 @@ export function SliderThumb(props: SliderThumbProps | SliderThumbAsChildProps) {
       );
     },
   });
+  Object.assign(finalProps, thumbStateProps);
 
   if (asChild) {
     return <Slot asChild {...finalProps} children={children} />;

@@ -178,6 +178,44 @@ test.describe('Switch - Behavior', () => {
     expect(await run('calls')).toEqual([]);
   });
 
+  test('should use the native disabled attribute for a disabled native switch', async ({
+    render,
+    root,
+  }) => {
+    await render('disabledNative');
+
+    expect(
+      await root
+        .locator('button')
+        .evaluate((node: HTMLButtonElement) => node.disabled)
+    ).toBe(true);
+  });
+
+  test('should keep generated switch semantics tied to checked state', async ({
+    render,
+    root,
+  }) => {
+    await render('semanticOverrides');
+    const host = root.locator('[data-slot="switch"]');
+
+    await expect(host).toHaveAttribute('role', 'switch');
+    await expect(host).toHaveAttribute('aria-checked', 'true');
+  });
+
+  test('should associate the hidden checkbox with an external form', async ({
+    render,
+    root,
+  }) => {
+    await render('externalFormAssociation');
+    const form = root.locator('#external-switch-form');
+
+    expect(
+      await form.evaluate((node: HTMLFormElement) =>
+        new FormData(node).get('power')
+      )
+    ).toBe('enabled');
+  });
+
   test('should forward refs to native and asChild hosts', async ({
     render,
     run,
@@ -186,7 +224,8 @@ test.describe('Switch - Behavior', () => {
 
     expect(await run('refs')).toEqual({
       nativeMatches: true,
-      childMatches: true,
+      componentRefMatches: true,
+      childPropMatches: true,
     });
   });
 });

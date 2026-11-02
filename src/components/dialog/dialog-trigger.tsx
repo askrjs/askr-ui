@@ -1,11 +1,22 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { runCancelablePress } from '../_internal/press';
 import { setSsrIdAssociation } from '../_internal/ssr-id-association';
-import { readDialogRootContext } from './dialog.shared';
+import {
+  omitDialogStateAriaProps,
+  readDialogChildRef,
+  readDialogRootContext,
+} from './dialog.shared';
 import type {
   DialogTriggerAsChildProps,
   DialogTriggerProps,
@@ -31,6 +42,12 @@ export function DialogTrigger(
     ...rest
   } = props;
   const root = readDialogRootContext();
+  const childRef = asChild ? readDialogChildRef(children) : undefined;
+  const callerProps = omitDialogStateAriaProps(rest, [
+    'aria-expanded',
+    'aria-haspopup',
+    'aria-disabled',
+  ]);
   const interactionProps = pressable({
     disabled,
     onPress: (event) => {
@@ -46,17 +63,8 @@ export function DialogTrigger(
       (rest as JSX.IntrinsicElements['button'])['aria-controls'] === undefined
     );
   };
-  const refHandler = ref
-    ? composeRefs(
-        ref as
-          | ((value: HTMLElement | null) => void)
-          | { current: HTMLElement | null }
-          | null
-          | undefined,
-        setNode
-      )
-    : setNode;
-  const finalProps = mergeProps(rest, {
+  const refHandler = composeRefs(ref as Ref<HTMLElement>, childRef, setNode);
+  const finalProps = mergeProps(callerProps, {
     ...interactionProps,
     ref: refHandler,
     'aria-haspopup': 'dialog',
@@ -75,7 +83,13 @@ export function DialogTrigger(
   );
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps, typeProp)}
+        children={children}
+      />
+    );
   }
 
   return (

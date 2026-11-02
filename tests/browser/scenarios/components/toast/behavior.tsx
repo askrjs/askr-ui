@@ -420,3 +420,42 @@ export function liveToastOrder(root: HTMLElement) {
     },
   };
 }
+
+export function asChildPartRefs(root: HTMLElement) {
+  const refs: Record<string, Element | null> = {};
+  const saveRef = (name: string) => (node: Element | null) => {
+    refs[name] = node;
+  };
+
+  mount(
+    <ToastHost duration={Infinity}>
+      <ToastViewport asChild ref={saveRef('viewport-component')}>
+        <section ref={saveRef('viewport-child')} />
+      </ToastViewport>
+      <Toast id="refs-toast">
+        <ToastTitle asChild ref={saveRef('title-component')}>
+          <h2 ref={saveRef('title-child')}>Saved</h2>
+        </ToastTitle>
+        <ToastDescription asChild ref={saveRef('description-component')}>
+          <p ref={saveRef('description-child')}>Changes stored</p>
+        </ToastDescription>
+        <ToastAction asChild ref={saveRef('action-component')}>
+          <a href="/logs" ref={saveRef('action-child')}>
+            Undo
+          </a>
+        </ToastAction>
+        <ToastClose asChild ref={saveRef('close-component')}>
+          <button ref={saveRef('close-child')}>Close</button>
+        </ToastClose>
+      </Toast>
+    </ToastHost>,
+    root
+  );
+
+  return {
+    refStatus: () =>
+      Object.fromEntries(
+        Object.entries(refs).map(([name, node]) => [name, node !== null])
+      ),
+  };
+}

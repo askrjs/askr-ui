@@ -26,16 +26,30 @@ export function getButtonInteractionProps({
           props?: Record<string, unknown>;
         })
       : null;
+  // Askr's typed route destinations are objects; Link resolves them through `href`.
+  const childTo = child?.props?.to;
   const isAnchorHost =
     child?.type === 'a' ||
     typeof child?.props?.href === 'string' ||
-    typeof child?.props?.to === 'string';
+    typeof childTo === 'string' ||
+    (typeof childTo === 'object' &&
+      childTo !== null &&
+      typeof (childTo as { href?: unknown }).href === 'string');
+  // A function child hides its host, so an explicit button type is the signal
+  // that lets Button preserve native button behavior safely.
+  const childButtonType = child?.props?.type;
+  const isNativeButtonHost =
+    child?.type === 'button' ||
+    (typeof child?.type !== 'string' &&
+      (childButtonType === 'button' ||
+        childButtonType === 'submit' ||
+        childButtonType === 'reset'));
 
   if (!isAnchorHost) {
     return pressable({
       disabled,
       onPress,
-      isNativeButton: !asChild || child?.type === 'button',
+      isNativeButton: !asChild || isNativeButtonHost,
     });
   }
 
@@ -46,6 +60,7 @@ export function getButtonInteractionProps({
         event.stopPropagation?.();
         return;
       }
+      if (event.defaultPrevented) return;
       onPress?.(event);
     },
     'aria-disabled': disabled ? 'true' : undefined,

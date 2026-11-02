@@ -1,10 +1,17 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { nativeRef } from '../_internal/native-ref';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { mergeComponentProps } from '../_internal/component-props';
 import { state } from '@askrjs/askr';
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { rovingFocus } from '../_internal/roving-focus';
 import {
@@ -52,6 +59,11 @@ import {
   resolveVirtualCompositePlacement,
   VirtualCompositeOwnerContext,
 } from '../_internal/virtual-composite';
+
+function getAsChildRef(children: unknown): Ref<HTMLElement> | undefined {
+  return (children as { props?: { ref?: Ref<HTMLElement> } } | null)?.props
+    ?.ref;
+}
 
 function focusAccordionItem(
   collection: AccordionRootContextValue['collection'],
@@ -371,7 +383,7 @@ export function AccordionHeader(
 ) {
   const { asChild, children, ref, ...rest } = props;
   const finalProps = mergeProps(rest, {
-    ref,
+    ...(asChild && ref === undefined ? {} : { ref }),
     'data-slot': 'accordion-header',
     'data-accordion-header': 'true',
   });
@@ -408,6 +420,7 @@ export function AccordionTrigger(
     type: typeProp,
     ...rest
   } = props;
+  const childRef = asChild ? getAsChildRef(children) : undefined;
   const root = readAccordionRootContext();
   const item = readAccordionItemContext();
   const collection = root.collection;
@@ -444,50 +457,53 @@ export function AccordionTrigger(
   const itemFocusProps = nav.item(item.itemIndex);
   const focusRepairProps = compositeItemFocusProps();
   const registrationOwner = {};
-  const finalProps = mergeProps(rest, {
+  const normalizedRest = { ...rest } as Record<string, unknown>;
+  delete normalizedRest['aria-expanded'];
+  if (isDisabled) {
+    delete normalizedRest['aria-disabled'];
+  }
+  const triggerRef = composeRefs(
+    ref as Ref<HTMLElement>,
+    childRef,
+    (node: HTMLElement | null) => {
+      const nextPlacement = node
+        ? resolveVirtualCompositePlacement(node)
+        : null;
+      if (nextPlacement) {
+        item.itemIndex = nextPlacement.index;
+        item.itemSetSize = nextPlacement.setSize;
+      }
+      registerCompositeNode(
+        item.triggerId,
+        collection,
+        node,
+        {
+          index: item.itemIndex,
+          setSize: item.itemSetSize,
+          disabled: isDisabled,
+          value: item.itemValue,
+        },
+        registrationOwner
+      );
+      repairFocusForDisabledItem({
+        collection,
+        disabled: isDisabled,
+        index: item.itemIndex,
+        loop: root.loop,
+        node,
+        setCurrentIndex: root.setCurrentIndex,
+      });
+      restorePendingCollectionItemFocus(
+        root.pendingFocus,
+        item.itemIndex,
+        node
+      );
+    }
+  );
+  const finalProps = mergeProps(normalizedRest, {
     ...interactionProps,
     ...itemFocusProps,
-    ref: composeRefs(
-      ref as
-        | ((value: HTMLElement | null) => void)
-        | { current: HTMLElement | null }
-        | null
-        | undefined,
-      (node: HTMLElement | null) => {
-        const nextPlacement = node
-          ? resolveVirtualCompositePlacement(node)
-          : null;
-        if (nextPlacement) {
-          item.itemIndex = nextPlacement.index;
-          item.itemSetSize = nextPlacement.setSize;
-        }
-        registerCompositeNode(
-          item.triggerId,
-          collection,
-          node,
-          {
-            index: item.itemIndex,
-            setSize: item.itemSetSize,
-            disabled: isDisabled,
-            value: item.itemValue,
-          },
-          registrationOwner
-        );
-        repairFocusForDisabledItem({
-          collection,
-          disabled: isDisabled,
-          index: item.itemIndex,
-          loop: root.loop,
-          node,
-          setCurrentIndex: root.setCurrentIndex,
-        });
-        restorePendingCollectionItemFocus(
-          root.pendingFocus,
-          item.itemIndex,
-          node
-        );
-      }
-    ),
+    ref: triggerRef,
     id: item.triggerId,
     'data-slot': 'accordion-trigger',
     'aria-controls': item.contentId,
@@ -499,7 +515,13 @@ export function AccordionTrigger(
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps, typeProp)}
+        children={children}
+      />
+    );
   }
 
   return (
@@ -528,7 +550,7 @@ export function AccordionContent(
   const item = readAccordionItemContext();
   const open = isDisclosureValueOpen(root.type, root.value, item.itemValue);
   const finalProps = mergeProps(rest, {
-    ref,
+    ...(asChild && ref === undefined ? {} : { ref }),
     id: item.contentId,
     role: 'region',
     'aria-labelledby': item.triggerId,

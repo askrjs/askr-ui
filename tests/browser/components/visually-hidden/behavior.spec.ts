@@ -19,4 +19,17 @@ test.describe('VisuallyHidden — Behavior', () => {
       'true'
     );
   });
+
+  test('should preserve child refs with and without a component ref', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildRefs');
+
+    expect(await run('refs')).toEqual({
+      componentMatches: true,
+      hostMatches: true,
+      omittedComponentHostMatches: true,
+    });
+  });
 });

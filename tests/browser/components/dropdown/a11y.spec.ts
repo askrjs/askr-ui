@@ -9,4 +9,13 @@ test.describe('Dropdown - Accessibility', () => {
 
     expect(await axeViolations()).toEqual([]);
   });
+
+  test('should have no automated axe violations given grouped menu items', async ({
+    render,
+    axeViolations,
+  }) => {
+    await render('axeGroupedDropdown');
+
+    expect(await axeViolations()).toEqual([]);
+  });
 });

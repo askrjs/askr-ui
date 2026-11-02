@@ -33,6 +33,32 @@ test.describe('Avatar - Behavior', () => {
 
     await expect(root.locator(fallbackSelector)).toHaveCount(0);
   });
+
+  test('should show fallback again after the loaded image is removed', async ({
+    render,
+    root,
+    run,
+  }) => {
+    await render('fallbackAfterImageRemoval');
+    await run('loadAndRemove');
+
+    await expect(root.locator('img')).toHaveCount(0);
+    await expect(root.locator('[data-avatar-fallback]')).toHaveText('JD');
+  });
+
+  test('should preserve child refs for Avatar and AvatarFallback asChild hosts', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildRefs');
+
+    expect(await run<Record<string, boolean>>('refChecks')).toEqual({
+      avatarChild: true,
+      avatarComponent: true,
+      fallbackChild: true,
+      fallbackComponent: true,
+    });
+  });
 });
 
 test('should preserve fallback while replacement source is loading (Avatar)', async ({

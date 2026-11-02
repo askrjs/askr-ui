@@ -1,7 +1,13 @@
 import { state } from '@askrjs/askr';
 import { Link } from '@askrjs/askr/router';
+import type { RouteDestination } from '@askrjs/askr/router';
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { Button } from '../../../../../src/components/button';
 import { flushUpdates, mount, spy } from '../../_mount';
+
+function ForwardingSubmit(props: JSX.IntrinsicElements['button']) {
+  return <button {...props}>Submit</button>;
+}
 
 export function nativeDefault(root: HTMLElement): void {
   mount(<Button>Save</Button>, root);
@@ -27,6 +33,15 @@ export function disabledNative(root: HTMLElement) {
     root
   );
   return { pressCount: () => onPress.count() };
+}
+
+export function disabledNativeAriaOverride(root: HTMLElement): void {
+  mount(
+    <Button disabled aria-disabled={false}>
+      Save
+    </Button>,
+    root
+  );
 }
 
 export function asChildDisabledLink(root: HTMLElement) {
@@ -79,9 +94,9 @@ export function asChildEnabledLink(root: HTMLElement) {
       link.dispatchEvent(enter);
       return enter.defaultPrevented;
     },
-    /** Clicks with navigation suppressed, exactly as the vitest original did. */
-    clickWithoutNavigation: () => {
-      link.addEventListener('click', (event) => event.preventDefault());
+    /** Clicks an anchor host with no href, avoiding navigation without cancellation. */
+    clickAsAnchorWithoutHref: () => {
+      link.removeAttribute('href');
       link.click();
     },
     pressCount: () => onPress.count(),
@@ -89,9 +104,20 @@ export function asChildEnabledLink(root: HTMLElement) {
 }
 
 export function asChildAskrLink(root: HTMLElement) {
+  const buttonPress = spy();
+  const childPress = spy();
+  const initialPathname = window.location.pathname;
   const container = mount(
-    <Button asChild>
-      <Link href="/docs">Docs</Link>
+    <Button asChild onPress={buttonPress}>
+      <Link
+        href="/docs"
+        onPress={(event) => {
+          childPress();
+          event.preventDefault();
+        }}
+      >
+        Docs
+      </Link>
     </Button>,
     root
   );
@@ -107,6 +133,38 @@ export function asChildAskrLink(root: HTMLElement) {
       link.dispatchEvent(enter);
       return enter.defaultPrevented;
     },
+    click: () => link.click(),
+    buttonPressCount: () => buttonPress.count(),
+    childPressCount: () => childPress.count(),
+    pathname: () => window.location.pathname,
+    initialPathname: () => initialPathname,
+  };
+}
+
+export function asChildTypedAskrLink(root: HTMLElement) {
+  const buttonPress = spy();
+  const childPress = spy();
+  const destination = { href: '/docs' } as RouteDestination;
+  const container = mount(
+    <Button asChild onPress={buttonPress}>
+      <Link
+        to={destination}
+        onPress={(event) => {
+          childPress();
+          event.preventDefault();
+        }}
+      >
+        Docs
+      </Link>
+    </Button>,
+    root
+  );
+  const link = container.querySelector('a') as HTMLAnchorElement;
+
+  return {
+    focusLink: () => link.focus(),
+    buttonPressCount: () => buttonPress.count(),
+    childPressCount: () => childPress.count(),
   };
 }
 
@@ -124,6 +182,73 @@ export function asChildNativeButton(root: HTMLElement) {
       container.querySelector('button')?.click();
     },
     pressCount: () => onPress.count(),
+  };
+}
+
+export function asChildChildRef(root: HTMLElement) {
+  const childRef = { current: null as HTMLButtonElement | null };
+  const buttonRef = { current: null as HTMLButtonElement | null };
+  const container = mount(
+    <Button asChild ref={buttonRef}>
+      <button ref={childRef}>Save</button>
+    </Button>,
+    root
+  );
+
+  return {
+    refChecks: () => ({
+      child: childRef.current === container.querySelector('button'),
+      component: buttonRef.current === container.querySelector('button'),
+    }),
+  };
+}
+
+export function asChildNativeDefaultType(root: HTMLElement) {
+  const submitCount = spy();
+  const container = mount(
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        submitCount();
+      }}
+    >
+      <Button asChild>
+        <button>Save</button>
+      </Button>
+    </form>,
+    root
+  );
+
+  return {
+    click: () => {
+      container.querySelector('button')?.click();
+    },
+    submitCount: () => submitCount.count(),
+  };
+}
+
+export function asChildNativeSubmitWrapper(root: HTMLElement) {
+  const onPress = spy();
+  const submitCount = spy();
+  const container = mount(
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        submitCount();
+      }}
+    >
+      <Button asChild onPress={onPress}>
+        <ForwardingSubmit type="submit" />
+      </Button>
+    </form>,
+    root
+  );
+  const button = container.querySelector('button') as HTMLButtonElement;
+
+  return {
+    focusButton: () => button.focus(),
+    pressCount: () => onPress.count(),
+    submitCount: () => submitCount.count(),
   };
 }
 

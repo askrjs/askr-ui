@@ -1,7 +1,11 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import {
+  composeRefs,
+  mergeProps,
+  type Ref,
+} from '@askrjs/askr/foundations/utilities';
 import { Slot } from '@askrjs/askr/foundations/structures';
-import { readDialogRootContext } from './dialog.shared';
+import { readDialogChildRef, readDialogRootContext } from './dialog.shared';
 import { registerSsrPartId } from '../_internal/ssr-id-association';
 import type {
   DialogDescriptionAsChildProps,
@@ -22,19 +26,11 @@ export function DialogDescription(
 ) {
   const { asChild, children, ref, ...rest } = props;
   const root = readDialogRootContext();
+  const childRef = asChild ? readDialogChildRef(children) : undefined;
   const setNode = (node: HTMLElement | null) => {
     root.setDescriptionNode(node);
   };
-  const refHandler = ref
-    ? composeRefs(
-        ref as
-          | ((value: HTMLElement | null) => void)
-          | { current: HTMLElement | null }
-          | null
-          | undefined,
-        setNode
-      )
-    : setNode;
+  const refHandler = composeRefs(ref as Ref<HTMLElement>, childRef, setNode);
   const finalProps = mergeProps(rest, {
     ref: refHandler,
     id: root.descriptionId,

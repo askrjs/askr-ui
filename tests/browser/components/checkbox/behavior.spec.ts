@@ -71,6 +71,37 @@ test.describe('Checkbox - Behavior', () => {
     expect(await run<number>('pressCount')).toBe(0);
   });
 
+  test('should keep component-owned checked ARIA state authoritative', async ({
+    render,
+    root,
+  }) => {
+    await render('ariaStateOverrides');
+
+    await expect(
+      root.locator('[data-testid="native-checkbox"]')
+    ).toHaveAttribute('aria-checked', 'false');
+    await expect(
+      root.locator('[data-testid="child-checkbox"]')
+    ).toHaveAttribute('aria-checked', 'mixed');
+  });
+
+  test('should keep native and asChild disabled ARIA state authoritative', async ({
+    render,
+    root,
+  }) => {
+    await render('ariaStateOverrides');
+
+    await expect(
+      root.locator('[data-testid="child-checkbox"]')
+    ).toHaveAttribute('aria-disabled', 'true');
+    await expect(
+      root.locator('[data-testid="native-checkbox"]')
+    ).toBeDisabled();
+    await expect(
+      root.locator('[data-testid="native-checkbox"]')
+    ).toHaveAttribute('aria-disabled', 'true');
+  });
+
   test('should apply checked and indeterminate state hooks to the native host', async ({
     render,
     root,
@@ -113,10 +144,65 @@ test.describe('Checkbox - Behavior', () => {
     });
   });
 
-  test('should forward refs to the asChild host', async ({ render, run }) => {
+  test('should preserve child and Checkbox refs for a custom asChild host', async ({
+    render,
+    run,
+  }) => {
     await render('asChildRef');
 
-    expect(await run<boolean>('refIsHost')).toBe(true);
+    expect(await run<Record<string, boolean>>('refChecks')).toEqual({
+      child: true,
+      component: true,
+    });
+  });
+
+  test('should preserve native input behavior when it is the asChild host', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildNativeInput');
+
+    expect(await run('snapshot')).toEqual({
+      checked: true,
+      disabled: true,
+      required: true,
+      name: 'outer-terms',
+      value: 'accepted',
+      role: null,
+      ariaChecked: null,
+      indeterminate: true,
+      formValue: null,
+      childRefAttached: true,
+      componentRefAttached: true,
+    });
+  });
+
+  test('should use native Space activation for an asChild checkbox input', async ({
+    page,
+    render,
+    run,
+  }) => {
+    await render('asChildNativeInputActivation');
+    await run('focus');
+    await page.keyboard.press('Space');
+
+    expect(await run<boolean>('checked')).toBe(true);
+    expect(await run<string>('ariaChecked')).toBe('true');
+    expect(await run<boolean[][]>('calls')).toEqual([[true]]);
+  });
+
+  test('should reset a native asChild input to the Checkbox default', async ({
+    render,
+    run,
+  }) => {
+    await render('asChildNativeInputReset');
+    await run('reset');
+
+    expect(await run('snapshot')).toEqual({
+      checked: false,
+      defaultChecked: false,
+      calls: [],
+    });
   });
 
   test('should ignore Enter and toggle native and asChild hosts with Space', async ({

@@ -1,4 +1,5 @@
 import type { JSXElement } from '@askrjs/askr/foundations/structures';
+import type { LabelAsChildProps } from '@askrjs/ui';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -202,6 +203,15 @@ const debouncedInputProps: DebouncedInputProps = {
   onDebouncedInput: (value: string) => value,
 };
 
+const labelAsChildProps: LabelAsChildProps = {
+  asChild: true,
+  children: slotChild,
+  htmlFor: 'email',
+  'aria-label': 'Email address',
+  'data-testid': 'email-label',
+};
+void labelAsChildProps;
+
 const dismissableLayerProps: DismissableLayerProps = {
   onDismiss: () => {},
 };
@@ -249,6 +259,9 @@ const collapsibleTriggerProps: CollapsibleTriggerProps = {
 const collapsibleTriggerAsChildProps: CollapsibleTriggerAsChildProps = {
   asChild: true,
   children: slotChild,
+  'aria-expanded': false,
+  'aria-disabled': false,
+  'data-testid': 'collapsible-trigger',
 };
 const collapsibleContentProps: CollapsibleContentProps = {
   forceMount: true,
@@ -257,6 +270,8 @@ const collapsibleContentProps: CollapsibleContentProps = {
 const collapsibleContentAsChildProps: CollapsibleContentAsChildProps = {
   asChild: true,
   children: slotChild,
+  'data-testid': 'collapsible-content',
+  id: 'details',
 };
 
 const toggleProps: ToggleProps = { pressed: true, children: 'Bold' };

@@ -1,5 +1,8 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import { nativeButtonProps } from '../_internal/native-control';
+import {
+  nativeButtonProps,
+  withDefaultNativeButtonType,
+} from '../_internal/native-control';
 import { nativeRef } from '../_internal/native-ref';
 /**
  * Toast is the stacked notification family.
@@ -23,6 +26,7 @@ import { nativeRef } from '../_internal/native-ref';
  */
 import { Presence, Slot } from '@askrjs/askr/foundations/structures';
 import { composeRefs, mergeProps } from '@askrjs/askr/foundations/utilities';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
 import { controllableState } from '@askrjs/askr/foundations/state';
 import { pressable } from '@askrjs/askr/foundations/interactions';
 import { runCancelablePress } from '../_internal/press';
@@ -58,6 +62,22 @@ import {
   type ToastHostContextValue,
   type ToastRootContextValue,
 } from './toast.shared';
+
+function readToastChildRef(children: unknown): Ref<Element> | undefined {
+  if (!isJsxElement(children)) return undefined;
+  return children.props.ref as Ref<Element> | undefined;
+}
+
+function resolveToastSlotRef(
+  asChild: boolean | undefined,
+  children: unknown,
+  ref: Ref<Element> | undefined
+): Ref<Element> | undefined {
+  if (!asChild) return ref;
+  const childRef = readToastChildRef(children);
+  if (ref == null && childRef == null) return undefined;
+  return composeRefs(ref, childRef);
+}
 
 type ToastLifecycleEntry = {
   node: HTMLElement | null;
@@ -434,9 +454,12 @@ export function ToastViewport(
     </For>
   );
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: resolveToastSlotRef(
+      asChild,
+      children,
+      ref as Ref<Element> | undefined
+    ),
     role: 'region',
-    'aria-live': 'polite',
     'aria-label': 'Notifications',
     'data-slot': 'toast-viewport',
     'data-toast-viewport': 'true',
@@ -534,7 +557,11 @@ export function ToastTitle(props: ToastTitleProps | ToastTitleAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
   const root = readToastRootContext();
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: resolveToastSlotRef(
+      asChild,
+      children,
+      ref as Ref<Element> | undefined
+    ),
     id: root.titleId,
     'data-slot': 'toast-title',
     'data-toast-title': 'true',
@@ -569,7 +596,11 @@ export function ToastDescription(
   const { asChild, children, ref, ...rest } = props;
   const root = readToastRootContext();
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: resolveToastSlotRef(
+      asChild,
+      children,
+      ref as Ref<Element> | undefined
+    ),
     id: root.descriptionId,
     'data-slot': 'toast-description',
     'data-toast-description': 'true',
@@ -618,14 +649,24 @@ export function ToastAction(props: ToastActionProps | ToastActionAsChildProps) {
   });
   const finalProps = mergeProps(rest, {
     ...interactionProps,
-    ref,
+    ref: resolveToastSlotRef(
+      asChild,
+      children,
+      ref as Ref<Element> | undefined
+    ),
     'data-slot': 'toast-action',
     'data-disabled': disabled ? 'true' : undefined,
     'data-toast-action': 'true',
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps, typeProp)}
+        children={children}
+      />
+    );
   }
 
   return (
@@ -671,14 +712,24 @@ export function ToastClose(props: ToastCloseProps | ToastCloseAsChildProps) {
   });
   const finalProps = mergeProps(rest, {
     ...interactionProps,
-    ref,
+    ref: resolveToastSlotRef(
+      asChild,
+      children,
+      ref as Ref<Element> | undefined
+    ),
     'data-slot': 'toast-close',
     'data-disabled': disabled ? 'true' : undefined,
     'data-toast-close': 'true',
   });
 
   if (asChild) {
-    return <Slot asChild {...finalProps} children={children} />;
+    return (
+      <Slot
+        asChild
+        {...withDefaultNativeButtonType(children, finalProps, typeProp)}
+        children={children}
+      />
+    );
   }
 
   return (

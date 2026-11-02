@@ -226,3 +226,90 @@ export function dragLifecycle(root: HTMLElement) {
     changes: () => changes,
   };
 }
+
+export function asChildPartRefs(root: HTMLElement) {
+  const refs: Record<string, Element | null> = {};
+  const saveRef = (name: string) => (node: Element | null) => {
+    refs[name] = node;
+  };
+  mount(
+    <Slider defaultValue={50}>
+      <SliderTrack asChild ref={saveRef('track-component')}>
+        <section ref={saveRef('track-child')}>
+          <SliderRange asChild ref={saveRef('range-component')}>
+            <i ref={saveRef('range-child')} />
+          </SliderRange>
+          <SliderThumb asChild ref={saveRef('thumb-component')}>
+            <button aria-label="Volume" ref={saveRef('thumb-child')} />
+          </SliderThumb>
+        </section>
+      </SliderTrack>
+    </Slider>,
+    root
+  );
+
+  return {
+    refStatus: () =>
+      Object.fromEntries(
+        Object.entries(refs).map(([name, node]) => [name, node !== null])
+      ),
+  };
+}
+
+export function semanticOverrides(root: HTMLElement): void {
+  mount(
+    <Slider defaultValue={50} min={0} max={100} orientation="vertical">
+      <SliderTrack>
+        <SliderRange />
+        <SliderThumb
+          aria-label="Volume"
+          role="button"
+          aria-valuemin="10"
+          aria-valuemax="20"
+          aria-valuenow="15"
+          aria-orientation="horizontal"
+        />
+      </SliderTrack>
+    </Slider>,
+    root
+  );
+}
+
+export function disabledAsChildThumb(root: HTMLElement): void {
+  mount(
+    <Slider disabled defaultValue={30}>
+      <SliderTrack>
+        <SliderRange />
+        <SliderThumb asChild>
+          <button aria-label="Volume" />
+        </SliderThumb>
+      </SliderTrack>
+    </Slider>,
+    root
+  );
+}
+
+export async function iframeDrag(root: HTMLElement): Promise<void> {
+  const iframe = document.createElement('iframe');
+  iframe.style.width = '320px';
+  iframe.style.height = '180px';
+  root.appendChild(iframe);
+  const ownerDocument = iframe.contentDocument;
+  if (!ownerDocument) throw new Error('Expected a same-origin iframe document');
+  const appRoot = ownerDocument.createElement('div');
+  appRoot.id = 'mount-root';
+  ownerDocument.body.append(appRoot);
+  const style = ownerDocument.createElement('style');
+  style.textContent = LAYOUT_CSS;
+  ownerDocument.head.append(style);
+  mount(
+    <Slider defaultValue={20} name="volume">
+      <SliderTrack>
+        <SliderRange />
+        <SliderThumb aria-label="Volume" />
+      </SliderTrack>
+    </Slider>,
+    appRoot
+  );
+  await flushUpdates();
+}

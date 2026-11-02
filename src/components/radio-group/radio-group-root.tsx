@@ -28,6 +28,22 @@ import {
 import type { RadioGroupProps } from './radio-group.types';
 import { formResetRef } from '../_internal/form-reset';
 
+function omitRadioGroupStateProps<T extends object>(props: T): T {
+  let result: T | undefined;
+  for (const attribute of [
+    'role',
+    'aria-orientation',
+    'data-slot',
+    'data-disabled',
+    'data-orientation',
+  ]) {
+    if (!Object.prototype.hasOwnProperty.call(props, attribute)) continue;
+    result ??= { ...props };
+    delete (result as Record<string, unknown>)[attribute];
+  }
+  return result ?? props;
+}
+
 function RadioGroupRootView(props: {
   children?: unknown;
   name?: string;
@@ -194,14 +210,17 @@ export function RadioGroup(props: RadioGroupProps) {
       restorePendingCollectionItemFocus(pendingFocus, index, node),
   };
   const renderContext = createRadioGroupRenderContext();
-  const finalProps = mergeProps(rest, {
-    ref: composeRefs(ref, resetRef),
-    role: 'radiogroup',
-    'data-slot': 'radio-group',
-    'data-disabled': disabled ? 'true' : undefined,
-    'data-orientation': orientation,
-    'aria-orientation': orientation === 'both' ? undefined : orientation,
-  });
+  const finalProps = mergeProps(
+    {
+      ref: composeRefs(ref, resetRef),
+      role: 'radiogroup',
+      'data-slot': 'radio-group',
+      'data-disabled': disabled ? 'true' : undefined,
+      'data-orientation': orientation,
+      'aria-orientation': orientation === 'both' ? undefined : orientation,
+    },
+    omitRadioGroupStateProps(rest)
+  );
 
   return (
     <RadioGroupRootContext value={rootContext}>

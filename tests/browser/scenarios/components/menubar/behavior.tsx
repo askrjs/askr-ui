@@ -2,9 +2,12 @@ import { state } from '@askrjs/askr';
 import {
   Menubar,
   MenubarContent,
+  MenubarGroup,
   MenubarItem,
+  MenubarLabel,
   MenubarMenu,
   MenubarPortal,
+  MenubarSeparator,
   MenubarSub,
   MenubarSubContent,
   MenubarSubTrigger,
@@ -12,6 +15,192 @@ import {
 } from '../../../../../src/components/menubar';
 import { getCompositeCollection } from '../../../../../src/components/_internal/composite';
 import { flushUpdates, mount, spy } from '../../_mount';
+
+export async function asChildChildRefs(root: HTMLElement) {
+  const refs = {
+    trigger: { current: null as HTMLElement | null },
+    content: { current: null as HTMLElement | null },
+    group: { current: null as HTMLElement | null },
+    label: { current: null as HTMLElement | null },
+    item: { current: null as HTMLElement | null },
+    separator: { current: null as HTMLElement | null },
+    subTrigger: { current: null as HTMLElement | null },
+    subContent: { current: null as HTMLElement | null },
+  };
+  const callerRefs = {
+    trigger: { current: null as HTMLElement | null },
+    content: { current: null as HTMLElement | null },
+    group: { current: null as HTMLElement | null },
+    label: { current: null as HTMLElement | null },
+    item: { current: null as HTMLElement | null },
+    separator: { current: null as HTMLElement | null },
+    subTrigger: { current: null as HTMLElement | null },
+    subContent: { current: null as HTMLElement | null },
+  };
+  mount(
+    <Menubar>
+      <MenubarMenu value="file">
+        <MenubarTrigger
+          asChild
+          ref={(node) => (callerRefs.trigger.current = node)}
+        >
+          <button ref={refs.trigger}>File</button>
+        </MenubarTrigger>
+        <MenubarPortal>
+          <MenubarContent
+            asChild
+            ref={(node) => (callerRefs.content.current = node)}
+          >
+            <section ref={refs.content}>
+              <MenubarGroup
+                asChild
+                ref={(node) => (callerRefs.group.current = node)}
+              >
+                <div ref={refs.group}>
+                  <MenubarLabel
+                    asChild
+                    ref={(node) => (callerRefs.label.current = node)}
+                  >
+                    <h3 ref={refs.label}>Actions</h3>
+                  </MenubarLabel>
+                  <MenubarItem
+                    asChild
+                    ref={(node) => (callerRefs.item.current = node)}
+                  >
+                    <a href="#open" ref={refs.item}>
+                      Open
+                    </a>
+                  </MenubarItem>
+                </div>
+              </MenubarGroup>
+              <MenubarSeparator
+                asChild
+                ref={(node) => (callerRefs.separator.current = node)}
+              >
+                <hr ref={refs.separator} />
+              </MenubarSeparator>
+              <MenubarSub value="share">
+                <MenubarSubTrigger
+                  asChild
+                  ref={(node) => (callerRefs.subTrigger.current = node)}
+                >
+                  <button ref={refs.subTrigger}>Share</button>
+                </MenubarSubTrigger>
+                <MenubarPortal>
+                  <MenubarSubContent
+                    asChild
+                    ref={(node) => (callerRefs.subContent.current = node)}
+                  >
+                    <aside ref={refs.subContent}>
+                      <MenubarItem>Copy link</MenubarItem>
+                    </aside>
+                  </MenubarSubContent>
+                </MenubarPortal>
+              </MenubarSub>
+            </section>
+          </MenubarContent>
+        </MenubarPortal>
+      </MenubarMenu>
+    </Menubar>,
+    root
+  );
+  await flushPortalUpdates();
+  return {
+    refsAttached: () =>
+      Object.fromEntries(
+        Object.entries(refs).map(([name, ref]) => [name, ref.current !== null])
+      ),
+    callerRefsAttached: () =>
+      Object.fromEntries(
+        Object.entries(callerRefs).map(([name, ref]) => [
+          name,
+          ref.current !== null,
+        ])
+      ),
+  };
+}
+
+export function callerStateAriaOverrides(root: HTMLElement) {
+  mount(
+    <Menubar>
+      <MenubarMenu value="file">
+        <MenubarTrigger aria-expanded="true" aria-haspopup="dialog">
+          File
+        </MenubarTrigger>
+        <MenubarPortal>
+          <MenubarContent>
+            <MenubarItem disabled aria-disabled="false">
+              Unavailable
+            </MenubarItem>
+          </MenubarContent>
+        </MenubarPortal>
+      </MenubarMenu>
+    </Menubar>,
+    root
+  );
+  return {};
+}
+
+export function asChildDisabledHost(root: HTMLElement) {
+  mount(
+    <Menubar>
+      <MenubarMenu value="file">
+        <MenubarTrigger asChild>
+          <button disabled>File</button>
+        </MenubarTrigger>
+        <MenubarPortal>
+          <MenubarContent>
+            <MenubarItem>Open</MenubarItem>
+          </MenubarContent>
+        </MenubarPortal>
+      </MenubarMenu>
+    </Menubar>,
+    root
+  );
+  return {
+    hostDisabled: () => root.querySelector('button')?.disabled === true,
+  };
+}
+
+export async function iframeTabTraversal(root: HTMLElement) {
+  const iframe = document.createElement('iframe');
+  root.appendChild(iframe);
+  const ownerDocument = iframe.contentDocument;
+  if (!ownerDocument) {
+    throw new Error('Expected a same-origin iframe document');
+  }
+
+  const before = ownerDocument.createElement('button');
+  before.textContent = 'Before';
+  const menuRoot = ownerDocument.createElement('div');
+  const after = ownerDocument.createElement('button');
+  after.dataset.testid = 'after-menubar';
+  after.textContent = 'After menubar';
+  ownerDocument.body.replaceChildren(before, menuRoot, after);
+
+  let tabBubbledToParent = false;
+  mount(
+    <Menubar>
+      <MenubarMenu value="file">
+        <MenubarTrigger>File</MenubarTrigger>
+        <MenubarPortal>
+          <MenubarContent>
+            <MenubarItem>Inside</MenubarItem>
+          </MenubarContent>
+        </MenubarPortal>
+      </MenubarMenu>
+    </Menubar>,
+    menuRoot
+  );
+  menuRoot.addEventListener('keydown', (event) => {
+    if (event.key === 'Tab') tabBubbledToParent = true;
+  });
+  await flushPortalUpdates();
+  menuRoot.querySelector('button')?.click();
+  await flushPortalUpdates();
+
+  return { tabWasStopped: () => !tabBubbledToParent };
+}
 
 export function customContentId(
   root: HTMLElement,

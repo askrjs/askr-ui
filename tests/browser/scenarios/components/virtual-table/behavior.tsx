@@ -369,6 +369,38 @@ export async function asChildComposition(root: HTMLElement): Promise<void> {
   await flushUpdates();
 }
 
+export async function asChildRefs(root: HTMLElement) {
+  let tableRef: HTMLElement | null = null;
+  let hostRef: HTMLElement | null = null;
+  let api: VirtualTableApi<Row> | null = null;
+  const container = mount(
+    <VirtualTable
+      asChild
+      ref={(node) => (tableRef = node)}
+      apiRef={(next) => {
+        api = next;
+      }}
+      aria-label="Users"
+      style={{ height: '120px', overflowY: 'auto' }}
+      rows={createRows(6)}
+      rowHeight={24}
+      headerHeight={24}
+      getKey={(row) => row.id}
+      columns={columns}
+    >
+      <section ref={(node) => (hostRef = node)} />
+    </VirtualTable>,
+    root
+  );
+  await flushUpdates();
+  const host = container.querySelector('[data-slot="virtual-table"]');
+
+  return {
+    refs: () => ({ tableRef: tableRef === host, hostRef: hostRef === host }),
+    hasApi: () => api !== null,
+  };
+}
+
 export async function forwardedScrollHandler(root: HTMLElement) {
   const onScroll = spy();
   let api: VirtualTableApi<Row> | null = null;

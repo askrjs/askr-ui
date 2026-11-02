@@ -47,4 +47,69 @@ test.describe('Table - Behavior', () => {
       'true'
     );
   });
+
+  test('should preserve every child ref across asChild table parts', async ({
+    render,
+    run,
+  }) => {
+    await render('customAsChildHosts');
+
+    expect(await run<Record<string, boolean>>('refStatus')).toEqual({
+      'table-component': true,
+      'table-child': true,
+      'caption-component': true,
+      'caption-child': true,
+      'head-component': true,
+      'head-child': true,
+      'head-row-component': true,
+      'head-row-child': true,
+      'header-component': true,
+      'header-child': true,
+      'body-component': true,
+      'body-child': true,
+      'body-row-component': true,
+      'body-row-child': true,
+      'cell-component': true,
+      'cell-child': true,
+      'foot-component': true,
+      'foot-child': true,
+      'foot-row-component': true,
+      'foot-row-child': true,
+      'foot-cell-component': true,
+      'foot-cell-child': true,
+    });
+  });
+
+  test('should retain table roles when asChild uses nonsemantic hosts', async ({
+    render,
+    root,
+  }) => {
+    await render('customAsChildHosts');
+
+    await expect(root.locator('[role="table"]')).toHaveCount(1);
+    await expect(root.locator('[data-table-caption="true"]')).toHaveCount(1);
+    await expect(
+      root.locator('[data-table-caption="true"]')
+    ).not.toHaveAttribute('role');
+    await expect(root.locator('[role="table"]')).toHaveAttribute(
+      'aria-label',
+      'Users'
+    );
+    await expect(root.locator('[role="rowgroup"]')).toHaveCount(3);
+    await expect(root.locator('[role="row"]')).toHaveCount(3);
+    await expect(root.locator('[role="columnheader"]')).toHaveCount(1);
+    await expect(root.locator('[role="cell"]')).toHaveCount(2);
+  });
+
+  test('should update a slotted header role when its scope changes', async ({
+    render,
+    run,
+    root,
+  }) => {
+    await render('reactiveHeaderScope');
+
+    await expect(root.locator('[role="columnheader"]')).toHaveCount(1);
+    await run('setRow');
+    await expect(root.locator('[role="rowheader"]')).toHaveCount(1);
+  });
 });

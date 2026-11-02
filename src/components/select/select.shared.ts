@@ -1,5 +1,7 @@
 import { defineScope, readScope } from '@askrjs/askr';
+import { composeRefs, type Ref } from '@askrjs/askr/foundations/utilities';
 import type { SsrIdRegistration } from '../_internal/ssr-id-association';
+import { isJsxElement } from '../_internal/jsx';
 import { getMenuCollection, getMenuCollectionItems } from '../_internal/menu';
 import type { OverlayPortal } from '../_internal/overlay';
 import {
@@ -91,6 +93,26 @@ export const SelectGroupContext = defineScope<SelectGroupContextValue | null>(
   null
 );
 
+/** Reads a host ref passed to an element used with an asChild Select part. */
+export function readSelectChildRef(
+  children: unknown
+): Ref<Element> | undefined {
+  if (typeof children !== 'object' || children === null) return undefined;
+  return (children as { props?: { ref?: Ref<Element> } }).props?.ref;
+}
+
+/** Combines refs owned by a Select part with the ref on its asChild host. */
+export function resolveSelectSlotRef(
+  asChild: boolean | undefined,
+  children: unknown,
+  ref: Ref<Element> | undefined
+): Ref<Element> | undefined {
+  if (!asChild) return ref;
+  const childRef = readSelectChildRef(children);
+  if (ref == null && childRef == null) return undefined;
+  return composeRefs(ref, childRef);
+}
+
 /**
  * Reads the Select Root Context; throws if called outside its provider.
  */
@@ -144,6 +166,31 @@ export function createSelectRenderContext(): SelectRenderContextValue {
       return index;
     },
   };
+}
+
+function isEnabledAsBoolean(value: unknown): boolean {
+  const resolved = typeof value === 'function' ? value() : value;
+  return resolved === true || resolved === 'true';
+}
+
+/** Resolves the disabled state, inheriting it from an asChild host when omitted. */
+export function resolveSelectDisabled(
+  children: unknown,
+  disabled: unknown,
+  asChild: boolean
+): boolean {
+  if (disabled !== undefined) {
+    return isEnabledAsBoolean(disabled);
+  }
+
+  if (!asChild || !isJsxElement(children)) {
+    return false;
+  }
+
+  return (
+    isEnabledAsBoolean(children.props?.disabled) ||
+    isEnabledAsBoolean(children.props?.['aria-disabled'])
+  );
 }
 
 /**

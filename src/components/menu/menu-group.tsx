@@ -1,7 +1,9 @@
 import type { JSX } from '@askrjs/askr/jsx-runtime';
+import type { Ref } from '@askrjs/askr/foundations/utilities';
 import { nativeRef } from '../_internal/native-ref';
 import { Slot } from '@askrjs/askr/foundations/structures';
 import { mergeProps } from '@askrjs/askr/foundations/utilities';
+import { resolveMenuSlotRef } from './menu.shared';
 import type {
   MenuGroupAsChildProps,
   MenuGroupProps,
@@ -20,8 +22,9 @@ export function MenuGroup(props: MenuGroupProps): JSX.Element;
 export function MenuGroup(props: MenuGroupAsChildProps): JSX.Element;
 export function MenuGroup(props: MenuGroupProps | MenuGroupAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
+  const slotRef = resolveMenuSlotRef(asChild, children, ref as Ref<Element>);
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: slotRef,
     'data-slot': 'menu-group',
     role: 'group',
   });
@@ -46,8 +49,9 @@ export function MenuLabel(props: MenuLabelProps): JSX.Element | null;
 export function MenuLabel(props: MenuLabelAsChildProps): JSX.Element | null;
 export function MenuLabel(props: MenuLabelProps | MenuLabelAsChildProps) {
   const { asChild, children, ref, ...rest } = props;
+  const slotRef = resolveMenuSlotRef(asChild, children, ref as Ref<Element>);
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: slotRef,
     'data-slot': 'menu-label',
   });
 
@@ -75,8 +79,9 @@ export function MenuSeparator(
   props: MenuSeparatorProps | MenuSeparatorAsChildProps
 ) {
   const { asChild, children, ref, ...rest } = props;
+  const slotRef = resolveMenuSlotRef(asChild, children, ref as Ref<Element>);
   const finalProps = mergeProps(rest, {
-    ref,
+    ref: slotRef,
     'data-slot': 'menu-separator',
     role: 'separator',
   });

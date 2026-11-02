@@ -3,8 +3,11 @@ import { state } from '@askrjs/askr';
 import {
   Dropdown,
   DropdownContent,
+  DropdownGroup,
   DropdownItem,
+  DropdownLabel,
   DropdownPortal,
+  DropdownSeparator,
   DropdownTrigger,
 } from '../../../../../src/components/dropdown';
 import { flushUpdates, mount, spy } from '../../_mount';
@@ -106,6 +109,87 @@ export function toggleExpansion(root: HTMLElement): void {
       <DropdownPortal>
         <DropdownContent>
           <DropdownItem>Archive</DropdownItem>
+        </DropdownContent>
+      </DropdownPortal>
+    </Dropdown>,
+    root
+  );
+}
+
+export function asChildPartRefs(root: HTMLElement) {
+  const refs = {
+    trigger: { current: null as HTMLButtonElement | null },
+    content: { current: null as HTMLElement | null },
+    group: { current: null as HTMLDivElement | null },
+    label: { current: null as HTMLSpanElement | null },
+    item: { current: null as HTMLAnchorElement | null },
+    separator: { current: null as HTMLDivElement | null },
+  };
+  mount(
+    <Dropdown defaultOpen>
+      <DropdownTrigger asChild>
+        <button ref={refs.trigger} data-testid="trigger-ref">
+          Open dropdown
+        </button>
+      </DropdownTrigger>
+      <DropdownPortal>
+        <DropdownContent asChild>
+          <section ref={refs.content} data-testid="content-ref">
+            <DropdownGroup asChild>
+              <div ref={refs.group} data-testid="group-ref">
+                <DropdownLabel asChild>
+                  <span ref={refs.label} data-testid="label-ref">
+                    Actions
+                  </span>
+                </DropdownLabel>
+                <DropdownItem asChild>
+                  <a ref={refs.item} data-testid="item-ref" href="#action">
+                    Archive
+                  </a>
+                </DropdownItem>
+                <DropdownSeparator asChild>
+                  <div ref={refs.separator} data-testid="separator-ref" />
+                </DropdownSeparator>
+              </div>
+            </DropdownGroup>
+          </section>
+        </DropdownContent>
+      </DropdownPortal>
+    </Dropdown>,
+    root
+  );
+
+  const matchesHost = (ref: { current: Element | null }, selector: string) =>
+    ref.current === document.querySelector(selector);
+  return {
+    refs: () => ({
+      trigger: matchesHost(refs.trigger, '[data-testid="trigger-ref"]'),
+      content: matchesHost(refs.content, '[data-testid="content-ref"]'),
+      group: matchesHost(refs.group, '[data-testid="group-ref"]'),
+      label: matchesHost(refs.label, '[data-testid="label-ref"]'),
+      item: matchesHost(refs.item, '[data-testid="item-ref"]'),
+      separator: matchesHost(refs.separator, '[data-testid="separator-ref"]'),
+    }),
+  };
+}
+
+export function callerStateAriaOverrides(root: HTMLElement): void {
+  mount(
+    <Dropdown defaultOpen>
+      <DropdownTrigger
+        aria-expanded={false}
+        aria-haspopup="listbox"
+        disabled
+        aria-disabled={false}
+      >
+        Open dropdown
+      </DropdownTrigger>
+      <DropdownPortal>
+        <DropdownContent>
+          <DropdownItem disabled aria-disabled={false}>
+            Disabled action
+          </DropdownItem>
+          <DropdownItem>Enabled action</DropdownItem>
         </DropdownContent>
       </DropdownPortal>
     </Dropdown>,
