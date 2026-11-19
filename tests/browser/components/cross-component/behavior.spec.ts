@@ -9,7 +9,8 @@ test.describe('Cross-component contracts', () => {
     await render('asChildButtonTypeDefaults');
     await page.getByTestId('native-type-menubar-trigger').click();
     await expect(page.getByTestId('native-type-menubar-item')).toBeVisible();
-    await page.getByTestId('native-type-menubar-sub-trigger').click();
+    // Pointer entry opens the submenu. A subsequent click can toggle it closed.
+    await page.getByTestId('native-type-menubar-sub-trigger').hover();
     await expect(
       page.getByTestId('native-type-menubar-sub-item')
     ).toBeVisible();
