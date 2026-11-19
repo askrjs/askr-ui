@@ -136,16 +136,15 @@ export function resolveVirtualRange(options: {
     0,
     maxScrollTop
   );
-  const visibleCount = Math.max(
-    1,
-    Math.ceil(viewportHeight > 0 ? viewportHeight / rowHeight : 1)
-  );
   const visibleStartIndex = clampVirtualIndex(
     Math.floor(clampedScrollTop / rowHeight),
     totalCount
   );
   const visibleEndIndex = clampVirtualIndex(
-    visibleStartIndex + visibleCount - 1,
+    Math.max(
+      visibleStartIndex,
+      Math.ceil((clampedScrollTop + viewportHeight) / rowHeight) - 1
+    ),
     totalCount
   );
   const renderStartIndex = clampVirtualIndex(
@@ -236,12 +235,13 @@ export function resolveVariableVirtualRange(options: {
       rowHeight: 0,
     };
   }
-  const indexAtOffset = (offset: number) => {
+  const indexAtOffset = (offset: number, exclusive = false) => {
     let low = 0;
     let high = totalCount - 1;
     while (low < high) {
       const middle = Math.floor((low + high + 1) / 2);
-      if (offsets[middle] <= offset) low = middle;
+      if (exclusive ? offsets[middle] < offset : offsets[middle] <= offset)
+        low = middle;
       else high = middle - 1;
     }
     return clampVirtualIndex(low, totalCount);
@@ -249,7 +249,8 @@ export function resolveVariableVirtualRange(options: {
   const overscan = normalizeVirtualOverscan(options.overscan);
   const visibleStartIndex = indexAtOffset(scrollTop);
   const visibleEndIndex = indexAtOffset(
-    Math.max(scrollTop, scrollTop + viewportHeight - 1)
+    scrollTop + viewportHeight,
+    viewportHeight > 0
   );
   const renderStartIndex = clampVirtualIndex(
     visibleStartIndex - overscan.before,
