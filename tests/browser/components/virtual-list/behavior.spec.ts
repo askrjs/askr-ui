@@ -246,3 +246,36 @@ for (const delayedNotification of [false, true]) {
       .toEqual({ apiTop: 1600, domTop: 1600, start: 80 });
   });
 }
+
+test('should include the row clipped by the viewport bottom', async ({
+  render,
+  root,
+  run,
+}) => {
+  const host = root.locator('[data-slot="virtual-list"]');
+  const rows = root.locator('[data-slot="virtual-list-row"]');
+  for (const options of [{}, { variable: true }]) {
+    await render('viewportEdge', options);
+    expect(await run<number>('end')).toBe(4);
+    await expect(rows).toHaveCount(5);
+    await host.evaluate((el) => {
+      el.scrollTop = 10;
+    });
+    await expect(rows).toHaveCount(6);
+    expect(
+      await rows.evaluateAll((elements) =>
+        elements.map((el) => el.getAttribute('data-key'))
+      )
+    ).toEqual(Array.from({ length: 6 }, (_, i) => 'item-' + i));
+    expect(await run<number>('end')).toBe(5);
+    await host.evaluate((el) => {
+      el.scrollTop = el.scrollHeight;
+    });
+    await expect(rows.last()).toHaveAttribute('data-key', 'item-19');
+    await expect(rows).toHaveCount(5);
+    expect(await run<number>('end')).toBe(19);
+  }
+  await render('viewportEdge', { count: 0 });
+  await expect(rows).toHaveCount(0);
+  expect(await run<number>('end')).toBe(-1);
+});
