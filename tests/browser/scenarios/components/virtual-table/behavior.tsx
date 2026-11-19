@@ -1100,3 +1100,28 @@ export function rejectedVirtualProperties(root: HTMLElement) {
     },
   };
 }
+
+export async function viewportEdge(
+  root: HTMLElement,
+  options?: { count?: number } | null
+) {
+  let api: VirtualTableApi<Row> | null = null;
+  mount(
+    <VirtualTable
+      aria-label="Rows"
+      style={{ height: '120px', overflowY: 'auto' }}
+      rowHeight={20}
+      overscan={0}
+      rows={createRows(options?.count ?? 20)}
+      headerHeight={20}
+      getKey={(row) => row.id}
+      columns={columns}
+      apiRef={(next) => {
+        api = next;
+      }}
+    />,
+    root
+  );
+  await flushUpdates();
+  return { end: () => api?.getVisibleRange().visibleEndIndex };
+}

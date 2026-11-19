@@ -602,3 +602,28 @@ export function committedScrollRestoration(
     }),
   };
 }
+
+export async function viewportEdge(
+  root: HTMLElement,
+  options?: { count?: number; variable?: boolean } | null
+) {
+  let api: VirtualListApi<Item> | null = null;
+  mount(
+    <VirtualList
+      aria-label="Rows"
+      style={{ height: '100px', overflowY: 'auto' }}
+      rowHeight={20}
+      {...(options?.variable && { getRowHeight: () => 20 })}
+      overscan={0}
+      items={createItems(options?.count ?? 20)}
+      getKey={(item) => item.id}
+      rowComponent={({ item }) => <span>{item.label}</span>}
+      apiRef={(next) => {
+        api = next;
+      }}
+    />,
+    root
+  );
+  await flushUpdates();
+  return { end: () => api?.getVisibleRange().visibleEndIndex };
+}

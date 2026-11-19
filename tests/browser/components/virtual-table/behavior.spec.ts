@@ -491,3 +491,34 @@ for (const phase of ['render', 'structural'] as const) {
     expect(await run('selectCallback')).toEqual(['old-selection']);
   });
 }
+
+test('should include the row clipped by the viewport bottom', async ({
+  render,
+  root,
+  run,
+}) => {
+  const host = root.locator('[data-slot="virtual-table"]');
+  const rows = root.locator('[data-slot="virtual-table-row"]');
+  await render('viewportEdge');
+  expect(await run<number>('end')).toBe(4);
+  await expect(rows).toHaveCount(5);
+  await host.evaluate((el) => {
+    el.scrollTop = 10;
+  });
+  await expect(rows).toHaveCount(6);
+  expect(
+    await rows.evaluateAll((elements) =>
+      elements.map((el) => el.getAttribute('data-row-key'))
+    )
+  ).toEqual(Array.from({ length: 6 }, (_, i) => 'row-' + i));
+  expect(await run<number>('end')).toBe(5);
+  await host.evaluate((el) => {
+    el.scrollTop = el.scrollHeight;
+  });
+  await expect(rows.last()).toHaveAttribute('data-row-key', 'row-19');
+  await expect(rows).toHaveCount(5);
+  expect(await run<number>('end')).toBe(19);
+  await render('viewportEdge', { count: 0 });
+  await expect(rows).toHaveCount(0);
+  expect(await run<number>('end')).toBe(-1);
+});

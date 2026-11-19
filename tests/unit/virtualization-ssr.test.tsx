@@ -11,6 +11,7 @@ import {
   buildVirtualKeyIndexMap,
   createVirtualAnchor,
   createVariableVirtualAnchor,
+  resolveVirtualRange,
   resolveVariableVirtualRange,
   resolveVirtualScrollTopFromAnchor,
   resolveVariableVirtualScrollTopFromAnchor,
@@ -51,6 +52,31 @@ function renderWithStyles(component: () => JSX.Element) {
 }
 
 describe('virtualization SSR styles', () => {
+  it.each([
+    [20, 0, 0, 4],
+    [20, 0.5, 0, 5],
+    [20, 10, 0, 5],
+    [20, 20, 1, 5],
+    [20, 999, 15, 19],
+    [0, 10, -1, -1],
+  ])(
+    'should share viewport edges for %i rows at offset %f',
+    (count, scrollTop, start, end) => {
+      const options = { scrollTop, viewportHeight: 100, overscan: 0 };
+      for (const range of [
+        resolveVirtualRange({ ...options, totalCount: count, rowHeight: 20 }),
+        resolveVariableVirtualRange({
+          ...options,
+          rowHeights: Array.from({ length: count }, () => 20),
+        }),
+      ])
+        expect([range.visibleStartIndex, range.visibleEndIndex]).toEqual([
+          start,
+          end,
+        ]);
+    }
+  );
+
   it('should avoid scanning every variable row height for a viewport range', () => {
     const rowHeights = Array.from({ length: 10_000 }, () => 20);
     let indexedReads = 0;
