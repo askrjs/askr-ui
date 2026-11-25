@@ -137,6 +137,52 @@ export function trappedFocusOut(root: HTMLElement) {
   return { focusedInside: () => focusedInside };
 }
 
+export async function trappedNullRelatedTarget(root: HTMLElement) {
+  const outside = document.createElement('button');
+  outside.textContent = 'Outside';
+  document.body.appendChild(outside);
+  outside.focus();
+  const container = mount(
+    <FocusScope trapped autoFocus={false}>
+      <button type="button" data-testid="first">
+        First
+      </button>
+      <button type="button" data-testid="second">
+        Second
+      </button>
+    </FocusScope>,
+    root
+  );
+  const first = container.querySelector(
+    '[data-testid="first"]'
+  ) as HTMLButtonElement;
+  const second = container.querySelector(
+    '[data-testid="second"]'
+  ) as HTMLButtonElement;
+  const startedOutside = document.activeElement === outside;
+  first.dispatchEvent(
+    new FocusEvent('focusout', { bubbles: true, relatedTarget: null })
+  );
+  await Promise.resolve();
+  const recoveredOutside = document.activeElement === first;
+
+  first.focus();
+  first.dispatchEvent(
+    new FocusEvent('focusout', { bubbles: true, relatedTarget: null })
+  );
+  second.focus();
+  await Promise.resolve();
+  const preservedInside = document.activeElement === second;
+  const result = {
+    startedOutside,
+    recoveredOutside,
+    preservedInside,
+    mounted: root.contains(container),
+  };
+  outside.remove();
+  return { result: () => result };
+}
+
 export function asChildChildRef(root: HTMLElement) {
   const childRef = { current: null as HTMLElement | null };
   const callerRef = { current: null as HTMLElement | null };

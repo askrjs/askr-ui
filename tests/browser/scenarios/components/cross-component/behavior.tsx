@@ -490,17 +490,67 @@ export async function asChildHydration(root: HTMLElement) {
 }
 
 export async function virtualizedRowIdentity(root: HTMLElement) {
-  mount(
-    <VirtualList
-      items={[{ id: 'a' }, { id: 'b' }]}
-      rowHeight={24}
-      overscan={2}
-      getKey={(item) => item.id}
-      rowComponent={({ item }) => <div>{item.id}</div>}
-    />,
-    root
-  );
+  const initial = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+  let update!: () => void;
+  function Scenario() {
+    const resized = state(false);
+    update = () => resized.set(true);
+    const keys = resized()
+      ? ['new', 'b', 'a', 'c', 'd', 'e', 'f', 'g', 'h']
+      : initial;
+    return (
+      <VirtualList
+        items={keys}
+        rowHeight={24}
+        overscan={0}
+        style={{ height: resized() ? '72px' : '48px', overflow: 'auto' }}
+        getKey={(key) => key}
+        rowComponent={({ item }) => <div>{item}</div>}
+      />
+    );
+  }
+
+  mount(<Scenario />, root);
   await flushUpdates();
+
+  const viewport = root.querySelector<HTMLElement>(
+    '[data-virtual-viewport-height]'
+  )!;
+  const originalRows = new Map<string, Element>();
+  return {
+    async scroll() {
+      viewport.scrollTop = 48;
+      viewport.dispatchEvent(new Event('scroll'));
+      await flushUpdates();
+    },
+    capture() {
+      for (const key of ['c', 'd']) {
+        const row = viewport.querySelector(`[data-key="${key}"]`);
+        if (!row) throw new Error(`Expected visible row ${key}`);
+        originalRows.set(key, row);
+      }
+    },
+    async reorderAndResize() {
+      update();
+      await flushUpdates();
+    },
+    retainedKeys() {
+      return [...originalRows]
+        .filter(
+          ([key, row]) => viewport.querySelector(`[data-key="${key}"]`) === row
+        )
+        .map(([key]) => key);
+    },
+    visibleState() {
+      return {
+        scrollTop: viewport.scrollTop,
+        height: viewport.clientHeight,
+        keys: [...viewport.querySelectorAll('[data-key]')].map((node) =>
+          node.getAttribute('data-key')
+        ),
+      };
+    },
+  };
 }
 
 export async function identicalCompositeIds(root: HTMLElement) {

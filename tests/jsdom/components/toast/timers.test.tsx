@@ -39,15 +39,15 @@ describe('Toast timers', () => {
     expect(container.querySelectorAll('[data-toast="true"]')).toHaveLength(0);
   });
 
-  it('should dismiss simultaneous sibling toasts independently', async () => {
+  it('should dismiss sibling toasts on their separate deadlines', async () => {
     vi.useFakeTimers();
     container = mount(
-      <ToastHost duration={50}>
+      <ToastHost>
         <ToastViewport />
-        <Toast id="first" defaultOpen>
+        <Toast id="first" defaultOpen duration={50}>
           <ToastTitle>First</ToastTitle>
         </Toast>
-        <Toast id="second" defaultOpen>
+        <Toast id="second" defaultOpen duration={100}>
           <ToastTitle>Second</ToastTitle>
         </Toast>
       </ToastHost>
@@ -55,7 +55,12 @@ describe('Toast timers', () => {
     await flushUpdates();
 
     expect(container.querySelectorAll('[data-toast="true"]')).toHaveLength(2);
-    await drainTimers();
+    await vi.advanceTimersByTimeAsync(50);
+    await flushUpdates();
+    expect(container.querySelectorAll('[data-toast="true"]')).toHaveLength(1);
+    expect(container.textContent).toContain('Second');
+    await vi.advanceTimersByTimeAsync(50);
+    await flushUpdates();
     expect(container.querySelectorAll('[data-toast="true"]')).toHaveLength(0);
   });
 });

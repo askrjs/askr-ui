@@ -352,6 +352,8 @@ describe('popover part identity associations', () => {
       const content = view.container.querySelector(
         '[data-slot="popover-content"]'
       )!;
+      if (part === 'trigger') expect(trigger.id).toBe('custom-popover-trigger');
+      if (part === 'content') expect(content.id).toBe('custom-popover-content');
       expect(trigger.getAttribute('aria-controls')).toBe(content.id);
       expect(content.getAttribute('aria-labelledby')).toBe(trigger.id);
     }

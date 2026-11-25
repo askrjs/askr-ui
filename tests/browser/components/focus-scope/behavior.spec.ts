@@ -113,4 +113,24 @@ test.describe('FocusScope - Behavior', () => {
 
     expect(await run<boolean>('focusedInside')).toBe(true);
   });
+
+  test('should recover null-related focusout without stealing focus moved back inside', async ({
+    render,
+    run,
+  }) => {
+    await render('trappedNullRelatedTarget');
+    expect(
+      await run<{
+        startedOutside: boolean;
+        recoveredOutside: boolean;
+        preservedInside: boolean;
+        mounted: boolean;
+      }>('result')
+    ).toEqual({
+      startedOutside: true,
+      recoveredOutside: true,
+      preservedInside: true,
+      mounted: true,
+    });
+  });
 });
