@@ -215,16 +215,32 @@ test.describe('Toast - Behavior', () => {
   });
 
   test('should open a controlled toast from a press button without locking the page', async ({
+    page,
     render,
     root,
   }) => {
     await render('controlledPressButton');
+    await page.evaluate(() => {
+      const button = document.createElement('button');
+      button.id = 'background-control';
+      button.textContent = 'Background control';
+      button.addEventListener('click', () => button.setAttribute('data-clicked', 'true'));
+      document.body.append(button);
+    });
+    const initialOverflow = await page.locator('body').evaluate((body) => body.style.overflow);
     const launcher = root.locator('#open-press-toast');
 
     await launcher.focus();
     await launcher.click();
 
     await expect(root.locator(TOAST)).toHaveCount(1);
+    const background = page.locator('#background-control');
+    await background.focus();
+    await expect(background).toBeFocused();
+    await background.click();
+    await expect(background).toHaveAttribute('data-clicked', 'true');
+    expect(await page.locator('body').evaluate((body) => body.style.overflow)).toBe(initialOverflow);
+    await expect(page.locator('body')).not.toHaveAttribute('inert', '');
   });
 
   test('should dismiss on escape and action press', async ({

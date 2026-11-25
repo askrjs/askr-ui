@@ -110,7 +110,10 @@ describe('Consistency Reset - Portal Contract', () => {
   });
 
   it('should register dialog titles and descriptions without render-time state writes', async () => {
-    container = mount(
+    let renders = 0;
+    const App = () => {
+      renders += 1;
+      return (
       <div>
         <Dialog key="dialog" defaultOpen>
           <DialogPortal>
@@ -129,7 +132,9 @@ describe('Consistency Reset - Portal Contract', () => {
           </AlertDialogPortal>
         </AlertDialog>
       </div>
-    );
+      );
+    };
+    container = mount(<App />);
 
     await flushUpdates();
 
@@ -138,9 +143,17 @@ describe('Consistency Reset - Portal Contract', () => {
     );
 
     expect(dialogs).toHaveLength(2);
-    for (const dialog of dialogs) {
-      expect(dialog.getAttribute('aria-labelledby')).toBeTruthy();
-      expect(dialog.getAttribute('aria-describedby')).toBeTruthy();
+    expect(renders).toBe(1);
+    for (const [dialog, title, description] of [
+      [dialogs[0]!, 'Dialog title', 'Dialog description'],
+      [dialogs[1]!, 'Alert title', 'Alert description'],
+    ] as const) {
+      const labelledBy = dialog.getAttribute('aria-labelledby');
+      const describedBy = dialog.getAttribute('aria-describedby');
+      expect(labelledBy).toBeTruthy();
+      expect(describedBy).toBeTruthy();
+      expect(container.querySelector(`#${CSS.escape(labelledBy!)}`)?.textContent).toBe(title);
+      expect(container.querySelector(`#${CSS.escape(describedBy!)}`)?.textContent).toBe(description);
     }
   });
 });
