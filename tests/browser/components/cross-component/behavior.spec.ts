@@ -208,14 +208,30 @@ test.describe('Cross-component contracts', () => {
     await expect(root.locator('[data-slot="popover-trigger"]')).toHaveCount(1);
   });
 
-  test('should preserve virtualized row identity given reorder, resize, and scroll-anchor changes when data updates during virtualization', async ({
+  test('should preserve virtualized rows and their scroll anchor across reorder and resize', async ({
     render,
-    root,
+    run,
   }) => {
     await render('virtualizedRowIdentity');
+    await run('scroll');
+    await expect
+      .poll(() => run('visibleState'))
+      .toEqual({
+        scrollTop: 48,
+        height: 48,
+        keys: ['c', 'd'],
+      });
+    await run('capture');
 
-    await expect(root.locator('[data-key="a"]')).toHaveCount(1);
-    await expect(root.locator('[data-key="b"]')).toHaveCount(1);
+    await run('reorderAndResize');
+    await expect
+      .poll(() => run('visibleState'))
+      .toEqual({
+        scrollTop: 72,
+        height: 72,
+        keys: ['c', 'd', 'e'],
+      });
+    expect(await run('retainedKeys')).toEqual(['c', 'd']);
   });
 
   test('should isolate identical composite ids while keeping each mounted identity stable', async ({
