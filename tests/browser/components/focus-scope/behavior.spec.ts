@@ -121,10 +121,16 @@ test.describe('FocusScope - Behavior', () => {
     await render('trappedNullRelatedTarget');
     expect(
       await run<{
+        startedOutside: boolean;
         recoveredOutside: boolean;
         preservedInside: boolean;
         mounted: boolean;
       }>('result')
-    ).toEqual({ recoveredOutside: true, preservedInside: true, mounted: true });
+    ).toEqual({
+      startedOutside: true,
+      recoveredOutside: true,
+      preservedInside: true,
+      mounted: true,
+    });
   });
 });

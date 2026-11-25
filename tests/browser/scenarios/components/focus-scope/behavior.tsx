@@ -141,8 +141,9 @@ export async function trappedNullRelatedTarget(root: HTMLElement) {
   const outside = document.createElement('button');
   outside.textContent = 'Outside';
   document.body.appendChild(outside);
+  outside.focus();
   const container = mount(
-    <FocusScope trapped>
+    <FocusScope trapped autoFocus={false}>
       <button type="button" data-testid="first">
         First
       </button>
@@ -158,8 +159,7 @@ export async function trappedNullRelatedTarget(root: HTMLElement) {
   const second = container.querySelector(
     '[data-testid="second"]'
   ) as HTMLButtonElement;
-  first.focus();
-  outside.focus();
+  const startedOutside = document.activeElement === outside;
   first.dispatchEvent(
     new FocusEvent('focusout', { bubbles: true, relatedTarget: null })
   );
@@ -174,10 +174,12 @@ export async function trappedNullRelatedTarget(root: HTMLElement) {
   await Promise.resolve();
   const preservedInside = document.activeElement === second;
   const result = {
+    startedOutside,
     recoveredOutside,
     preservedInside,
     mounted: root.contains(container),
   };
+  outside.remove();
   return { result: () => result };
 }
 
