@@ -224,10 +224,14 @@ test.describe('Toast - Behavior', () => {
       const button = document.createElement('button');
       button.id = 'background-control';
       button.textContent = 'Background control';
-      button.addEventListener('click', () => button.setAttribute('data-clicked', 'true'));
+      button.addEventListener('click', () =>
+        button.setAttribute('data-clicked', 'true')
+      );
       document.body.append(button);
     });
-    const initialOverflow = await page.locator('body').evaluate((body) => body.style.overflow);
+    const initialOverflow = await page
+      .locator('body')
+      .evaluate((body) => body.style.overflow);
     const launcher = root.locator('#open-press-toast');
 
     await launcher.focus();
@@ -239,7 +243,9 @@ test.describe('Toast - Behavior', () => {
     await expect(background).toBeFocused();
     await background.click();
     await expect(background).toHaveAttribute('data-clicked', 'true');
-    expect(await page.locator('body').evaluate((body) => body.style.overflow)).toBe(initialOverflow);
+    expect(
+      await page.locator('body').evaluate((body) => body.style.overflow)
+    ).toBe(initialOverflow);
     await expect(page.locator('body')).not.toHaveAttribute('inert', '');
   });
 

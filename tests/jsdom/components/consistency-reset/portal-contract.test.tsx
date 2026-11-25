@@ -114,24 +114,26 @@ describe('Consistency Reset - Portal Contract', () => {
     const App = () => {
       renders += 1;
       return (
-      <div>
-        <Dialog key="dialog" defaultOpen>
-          <DialogPortal>
-            <DialogContent>
-              <DialogTitle>Dialog title</DialogTitle>
-              <DialogDescription>Dialog description</DialogDescription>
-            </DialogContent>
-          </DialogPortal>
-        </Dialog>
-        <AlertDialog key="alert-dialog" defaultOpen>
-          <AlertDialogPortal>
-            <AlertDialogContent>
-              <AlertDialogTitle>Alert title</AlertDialogTitle>
-              <AlertDialogDescription>Alert description</AlertDialogDescription>
-            </AlertDialogContent>
-          </AlertDialogPortal>
-        </AlertDialog>
-      </div>
+        <div>
+          <Dialog key="dialog" defaultOpen>
+            <DialogPortal>
+              <DialogContent>
+                <DialogTitle>Dialog title</DialogTitle>
+                <DialogDescription>Dialog description</DialogDescription>
+              </DialogContent>
+            </DialogPortal>
+          </Dialog>
+          <AlertDialog key="alert-dialog" defaultOpen>
+            <AlertDialogPortal>
+              <AlertDialogContent>
+                <AlertDialogTitle>Alert title</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Alert description
+                </AlertDialogDescription>
+              </AlertDialogContent>
+            </AlertDialogPortal>
+          </AlertDialog>
+        </div>
       );
     };
     container = mount(<App />);
@@ -152,8 +154,12 @@ describe('Consistency Reset - Portal Contract', () => {
       const describedBy = dialog.getAttribute('aria-describedby');
       expect(labelledBy).toBeTruthy();
       expect(describedBy).toBeTruthy();
-      expect(container.querySelector(`#${CSS.escape(labelledBy!)}`)?.textContent).toBe(title);
-      expect(container.querySelector(`#${CSS.escape(describedBy!)}`)?.textContent).toBe(description);
+      expect(
+        container.querySelector(`#${CSS.escape(labelledBy!)}`)?.textContent
+      ).toBe(title);
+      expect(
+        container.querySelector(`#${CSS.escape(describedBy!)}`)?.textContent
+      ).toBe(description);
     }
   });
 });

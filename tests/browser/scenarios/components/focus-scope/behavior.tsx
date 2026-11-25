@@ -143,21 +143,33 @@ export async function trappedNullRelatedTarget(root: HTMLElement) {
   document.body.appendChild(outside);
   const container = mount(
     <FocusScope trapped>
-      <button type="button" data-testid="first">First</button>
-      <button type="button" data-testid="second">Second</button>
+      <button type="button" data-testid="first">
+        First
+      </button>
+      <button type="button" data-testid="second">
+        Second
+      </button>
     </FocusScope>,
     root
   );
-  const first = container.querySelector('[data-testid="first"]') as HTMLButtonElement;
-  const second = container.querySelector('[data-testid="second"]') as HTMLButtonElement;
+  const first = container.querySelector(
+    '[data-testid="first"]'
+  ) as HTMLButtonElement;
+  const second = container.querySelector(
+    '[data-testid="second"]'
+  ) as HTMLButtonElement;
   first.focus();
   outside.focus();
-  first.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: null }));
+  first.dispatchEvent(
+    new FocusEvent('focusout', { bubbles: true, relatedTarget: null })
+  );
   await Promise.resolve();
   const recoveredOutside = document.activeElement === first;
 
   first.focus();
-  first.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: null }));
+  first.dispatchEvent(
+    new FocusEvent('focusout', { bubbles: true, relatedTarget: null })
+  );
   second.focus();
   await Promise.resolve();
   const preservedInside = document.activeElement === second;
