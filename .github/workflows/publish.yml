@@ -3,18 +3,16 @@ name: Publish Package
 on:
   workflow_dispatch:
 
-jobs:
-  ci:
-    uses: ./.github/workflows/ci.yml
-    permissions:
-      contents: read
+concurrency:
+  group: publish-package
+  cancel-in-progress: false
 
+permissions: {}
+
+jobs:
   publish:
-    needs: [ci]
-    uses: askrjs/actions/.github/workflows/publish-package.yml@main
-    with:
-      install-playwright: true
+    uses: askrjs/actions/.github/workflows/publish-verified-package.yml@main
     permissions:
+      actions: read
       contents: write
       id-token: write
-      packages: read
